@@ -37,26 +37,27 @@ Start off by setting up the config.json file:
 
 ## Things to note:
 - Free custom search has a limit of 100 calls per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
-- Try not to keep setafk on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response counts as someone else using your selfbot commands and this shouldn't really be a thing. Highly suggested to be used as a fun gimmik rather than for actual use all the time.
-- All commands besides quick commands are invoked with the ``>`` prefix, **however, custom commands use the prefix ``.``**
+- Try not to keep setafk on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
+- All commands besides quick commands are invoked with the ``>`` prefix, **however, custom commands use the prefix** ``.``
+- The bot sets you to idle when you are not on discord. If you open up discord again, you will be online and you can freely change your status but when you go offline the bot changes it back to idle.
 - Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
 ## Custom Commands:
-There are two types of commands: commands that have a ``string`` as a response and commands that have a ``list`` as a response.
+There are two types of commands: commands that have a ``string`` as a response and commands that have a ``list`` as a response (multiple possible responses).
 
 **String commands**:
-- 90% of the time, you will probably be doing the ``string`` command type with something like ``.<command>`` to get the response. Ex: ``.hakomari`` leads to the response ``https://myanimelist.net/manga/55215/Utsuro_no_Hako_to_Zero_no_Maria``
+- 90% of the time you will probably be using the ``string`` command type with something like ``.<command>`` to get the response. Ex: ``.hakomari`` leads to the response ``https://myanimelist.net/manga/55215/Utsuro_no_Hako_to_Zero_no_Maria``
 - To add a command, you would do ``>add <command> <response>`` and to remove a command, you would do ``>remove <command>``
 
 In order to have multiple responses to one command, you need to use the ``list`` command type:
 
 **List commands**:
 - Add a second parameter between the command and the response like so: ``>add <command> <response_name> <response>`` Ex: ``>add kaguya cute http://i.imgur.com/LtdE1zW.jpg``.
-- Adding different <response_name> and <response> to the same <command> will append it to the list of responses for that command.
-- Invoke a specific response with ``.<command> <response_name>`` or ``.<command> <index>``
-- If more than one response name and response are in a command, get a random response with ``.<command>``.
+- Adding different ``<response_name>`` and ``<response>`` to the same ``<command>`` will append it to the list of responses for that command.
+- Invoke a specific response with: ``.<command> <response_name>`` or ``.<command> <index>``
+- Random responses: If more than one response name and response are in a command, get a random response with ``.<command>``.
 - Removing follows the logical syntax: ``>remove <command> <response_name>`` to remove a specific response from the command and ``>remove <command>`` to remove the entire command.
-- **Important Note:** You cannot make a command that was initially a string command into a list command by adding a second response to a string command. You must the string command and add it as a list command.
+- **Important Note:** You cannot make a command that was initially a string command into a list command by adding a second response to it. You must remove the string command and add it as a list command.
 
 **Adding commands with more than one word for the command/response_name/response:**
 
