@@ -1,4 +1,5 @@
-import discord, datetime, traceback, re, asyncio, mimetypes, collections
+import discord, datetime, traceback, re, asyncio, mimetypes, collections, math
+import subprocess, sys
 from discord.ext import commands
 import json
 import spice_api as spice
@@ -28,6 +29,12 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+
+# Restart selfbot
+@bot.command(pass_context=True)
+async def restart(ctx):
+    await bot.edit_message(ctx.message, 'Restarting...')
+    subprocess.call(['python3', __file__])
 
 # Simple calculator
 @bot.command(pass_context=True)
@@ -245,6 +252,39 @@ async def l2g(ctx):
             lmgtfy += word + '+'
         await bot.send_message(ctx.message.channel, lmgtfy[:-1])
 
+# Set afk status on or off. If on, pinging will lead to an automated response.
+@bot.command(pass_context=True)
+async def setafk(ctx):
+    if ctx.message.content[7:].lower().strip() == 'on':
+        with open('config.json', 'r+') as conf:
+            cf = json.load(conf)
+            cf['set_afk'] = 'on'
+            conf.seek(0)
+            conf.truncate()
+            json.dump(cf, conf, indent=4)
+        await bot.send_message(ctx.message.channel, 'AFK on')
+    elif ctx.message.content[7:].lower().strip() == 'off':
+        with open('config.json', 'r+') as conf:
+            cf = json.load(conf)
+            cf['set_afk'] = 'off'
+            conf.seek(0)
+            conf.truncate()
+            json.dump(cf, conf, indent=4)
+        await bot.send_message(ctx.message.channel, 'AFK off')
+    else:
+        await bot.send_message(ctx.message.channel, 'Invalid argument.')
+
+# Set afk message
+@bot.command(pass_context=True)
+async def setafkmsg(ctx):
+    with open('config.json', 'r+') as conf:
+        cf = json.load(conf)
+        cf['afk_message'] = ctx.message.content[10:]
+        conf.seek(0)
+        conf.truncate()
+        json.dump(cf, conf, indent=4)
+        await bot.send_message(ctx.message.channel, 'Set afk message to: %s' % cf['afk_message'])
+
 # List all custom commands
 @bot.command(pass_context=True)
 async def customcmds(ctx):
@@ -262,7 +302,22 @@ async def customcmds(ctx):
                 msg += str(cmds[cmd]) + '",\n\n'
         msg = msg[:-3]
         msg += '}```'
-        await bot.send_message(ctx.message.channel, msg)
+        part = int(math.ceil(len(msg) / 1900))
+        if part == 1:
+            await bot.send_message(ctx.message.channel, msg)
+        else:
+            msg = msg[7:-3]
+            splitList = [msg[i:i + 1900] for i in range(0, len(msg), 1900)]
+            allWords = []
+            splitmsg = ''
+            for i, blocks in enumerate(splitList):
+                splitmsg += 'List of Custom Commands: %s of %s\n' % (i + 1, part)
+                for b in blocks.split('\n'):
+                    splitmsg += b + '\n'
+                allWords.append(splitmsg)
+                splitmsg = ''
+            for i in allWords:
+                await bot.send_message(ctx.message.channel, '```%s```' % i)
 
 # Add a custom command
 @bot.command(pass_context=True)
@@ -481,26 +536,8 @@ async def on_message(message):
         selflog.append(message)
         success = False
 
-        # Set afk status on or off. If on, pinging will lead to an automated response.
-        if message.content.lower().startswith('setafk on'):
-            with open('config.json', 'r+') as conf:
-                cf = json.load(conf)
-                cf['set_afk'] = 'on'
-                conf.seek(0)
-                conf.truncate()
-                json.dump(cf, conf, indent=4)
-            await bot.send_message(message.channel, 'on')
-        elif message.content.lower().startswith('setafk off'):
-            with open('config.json', 'r+') as conf:
-                cf = json.load(conf)
-                cf['set_afk'] = 'off'
-                conf.seek(0)
-                conf.truncate()
-                json.dump(cf, conf, indent=4)
-            await bot.send_message(message.channel, 'off')
-
         # Quick cmds for da memes
-        elif message.content.lower().strip() == 'shrug':
+        if message.content.lower().strip() == 'shrug':
             await bot.delete_message(message)
             await bot.send_message(message.channel, '¯\_(ツ)_/¯')
         elif message.content.lower().strip() == 'flip':
@@ -568,9 +605,8 @@ async def on_message(message):
     notified = message.mentions
     for i in notified:
         if i.id == config['my_id']:
-            with open('config.json', 'r') as conf:
-                if conf['set_afk'] == 'on':
-                    await bot.send_message(message.channel, 'Beep boop. appu1232 is afk right now. He is busy: ``fucking bitches``. He\'ll respond back when he\'s done. :eggplant:')
+            if config['set_afk'] == 'on':
+                await bot.send_message(message.channel, config['afk_message'])
 
 
     await bot.process_commands(message)

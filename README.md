@@ -1,4 +1,4 @@
-# A discord Selfbot with various commands
+# A Discord selfbot with various commands
 
 A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord. **Note: The in-built command prefix is ``>`` but custom commands use the prefix ``.``**
 
@@ -25,19 +25,20 @@ Start off by setting up the config.json file:
     "custom_search_engine" : "",
 	"mal_username" : "",
     "mal_password" : "",
-	"set_afk" : "off"
+	"set_afk" : "off",
 	"afk_message" : ""
 }
 ```
 
-- ``my_id`` refers to your discord ID
-- ``token`` is your token obtained from ``localStorage.token``
+- ``my_id`` - your discord ID
+- ``token`` - our token obtained from ``localStorage.token``
 - ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See **Google API** section below for instructions.
-- ``mal_username`` and ``mal_password`` are required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
-- ``set_afk`` does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``.
-- ``af_message`` is the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
+- ``mal_username`` and ``mal_password`` - MyAnimeList username and password which is required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
+- ``set_afk`` - does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``.
+- ``af_message`` - the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
 
 ## All Commands:
+- ``>restart`` - restart the bot.
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result.
