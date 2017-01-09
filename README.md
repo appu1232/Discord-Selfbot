@@ -1,17 +1,16 @@
 # A discord Selfbot with various commands
 
-A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord. **Note: In-built command prefix is ``>`` but custom commands use the prefix ``.``**
+A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord. **Note: The in-built command prefix is ``>`` but custom commands use the prefix ``.``**
 
 ## Features
 
-- Calculator
+- Simple calculator
 - Google search (web or image).
-- Dynamically add custom commands (trigger links, messages, etc.).
-- Set yourself as afk and message a user telling them you are away if they message/mention you.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Ping command that shows the response time.
-- Custom commands. Add and remove custom commands as needed. ``commands.json`` has some sample commands added that can already be used.
-- Quick fun commands so you can meme as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``.
+- Set yourself as afk and message a user telling them you are away if they message/mention you.
+- Dynamically add custom commands. Stored in ``commands.json`` which has some sample commands added to start with.
+- Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
 
 ## Setup
@@ -27,7 +26,8 @@ Start off by setting up the config.json file:
 	"mal_username": "",
     "mal_password": "",
 	"set_afk": "off"
-}```
+}
+```
 
 - ``my_id`` refers to your discord ID
 - ``token`` is your token obtained from ``localStorage.token``
@@ -38,7 +38,7 @@ Start off by setting up the config.json file:
 ## Things to note:
 - Free custom search has a limit of 100 calls per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
 - Try not to use keep setafk on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response counts as someone else using your selfbot commands and this shouldn't really be a thing. Highly suggested to be used as a fun gimmik rather than for actual use all the time.
-- All commands besides quick commands and setafk are invoked with the ``>`` prefix, **however, custom commands use the prefix ``.``**
+- All commands besides quick commands are invoked with the ``>`` prefix, **however, custom commands use the prefix ``.``**
 - Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
 ## Custom Commands:
