@@ -39,7 +39,7 @@ Start off by setting up the config.json file:
 
 ## All Commands:
 - ``>restart`` - restart the bot.
-- ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
+- ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with \**)
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result.
 - ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result.
@@ -48,7 +48,7 @@ Start off by setting up the config.json file:
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on and off.
 - ``>setafkmsg <msg>`` - Set the afk message.
 - ``>customcmds`` - List all custom commands.
-- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
+- ``>add <command> <response>`` or ``>add <command> <response_name> <response> - Add a custom command. See the **Custom Commands** section for more info.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 - ``>d`` or ``>d <seconds>`` - Remove the last message you sent (along with this one). ``>d`` will immediately delete but ``>d <seconds>`` will wait out the number of seconds. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 
@@ -92,6 +92,6 @@ Follow these steps to obtain them:
 
 1. Use the [Google API Console](https://console.developers.google.com/) to obtain an API key. [Follow these steps](https://developers.google.com/maps/documentation/android-api/signup) if you are not sure how to go about it. Once you have it, paste it into the empty quotes for ``google_api_key``.
 2. Add the Custom Search API to the list of APIs.
-3. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (don't change anything in the Add page)
-4. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web by emphasize included sites``. You should have no sites included so this will just do a normal google search like we want.
+3. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
+4. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
 5. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
