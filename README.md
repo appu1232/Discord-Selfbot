@@ -59,7 +59,11 @@ In order to have multiple responses to one command, you need to use the ``list``
 - **Important Note:** You cannot make a command that was initially a string command into a list command by adding a second response to a string command. You must the string command and add it as a list command.
 
 **Adding commands with more than one word for the command/response_name/response:**
-- If *any* one of these are multiple words, you must put *all three* in quotes. Ex: ``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"`` or ``>"get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
+
+If *any* one of these are multiple words, you must put *all three* in quotes. Ex:
+``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"``
+or:
+``>"get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
 
 
 ## Google API
