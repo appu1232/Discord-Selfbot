@@ -1,5 +1,5 @@
 import discord, datetime, traceback, re, asyncio, mimetypes, collections, math
-import subprocess, sys, os
+import sys, os
 from discord.ext import commands
 import json
 import spice_api as spice
@@ -33,7 +33,8 @@ async def on_ready():
 # Restart selfbot
 @bot.command(pass_context=True)
 async def restart(ctx):
-    await bot.send_message(ctx.message.channel, 'Restarting...')
+    await bot.edit_message(ctx.message, 'Restarting...')
+
     # subprocess.call(['python3', __file__])
     python = sys.executable
     os.execl(python, python, *sys.argv)
