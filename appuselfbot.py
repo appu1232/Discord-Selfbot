@@ -20,7 +20,7 @@ with open('config.json', 'r') as f:
 
 selflog = collections.deque(maxlen=5)
 
-bot = commands.Bot(command_prefix='>', description='''Selfbot by appu1232''')
+bot = commands.Bot(command_prefix='>', description='''Selfbot by appu1232''', self_bot=True)
 
 # Startup
 @bot.event
@@ -613,5 +613,4 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-#bot.run(config['token'], bot=False)
-bot.run('MjYwNjUxNDYxMTgzMTQzOTM4.C1UFCg.KjH7OVE7wg8MyZgXfEQ80S9DqzA')
+bot.run(config['token'], bot=False)
