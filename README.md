@@ -33,28 +33,33 @@ Start off by setting up the config.json file:
 - ``token`` is your token obtained from ``localStorage.token``
 - ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See **Google API** section below for instructions.
 - ``mal_username`` and ``mal_password`` are required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
-- ``set_afk`` does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``setafk on`` or ``setafk off`` (no > needed).
+- ``set_afk`` does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``.
 
 ## Things to note:
 - Free custom search has a limit of 100 calls per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
-- Try not to use keep setafk on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response counts as someone else using your selfbot commands and this shouldn't really be a thing. Highly suggested to be used as a fun gimmik rather than for actual use all the time.
+- Try not to keep setafk on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response counts as someone else using your selfbot commands and this shouldn't really be a thing. Highly suggested to be used as a fun gimmik rather than for actual use all the time.
 - All commands besides quick commands are invoked with the ``>`` prefix, **however, custom commands use the prefix ``.``**
 - Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
 ## Custom Commands:
 There are two types of commands: commands that have a ``string`` as a response and commands that have a ``list`` as a response.
 
-**String commands**: 90% of the time, you will probably be doing the ``string`` command type with something like ``.<command>`` to get the response. Ex: ``.hakomari`` leads to the response ``https://myanimelist.net/manga/55215/Utsuro_no_Hako_to_Zero_no_Maria``
-To add a command, you would do ``>add <command> <response>`` and to remove a command, you would do ``>remove <command>``
-However, if you want to have have multiple responses to one command you would use the ``list`` command type.
+**String commands**:
+- 90% of the time, you will probably be doing the ``string`` command type with something like ``.<command>`` to get the response. Ex: ``.hakomari`` leads to the response ``https://myanimelist.net/manga/55215/Utsuro_no_Hako_to_Zero_no_Maria``
+- To add a command, you would do ``>add <command> <response>`` and to remove a command, you would do ``>remove <command>``
 
-**List commands**: You can add a second parameter between the command and the response like so: ``>add <command> <response_name> <response>`` Ex: ``>add kaguya cute http://i.imgur.com/LtdE1zW.jpg``.
-Adding different <response_name> and <response> to the same <command> will just append it to the list of responses for that command. You can invoke a specific response with ``.<command> <response_name>`` or ``.<command> <index>`` and you can also just get a random response from the list with ``.<command>``.
-Removing follows the logical syntax: ``>remove <command> <response_name>`` to remove a specific response from the command and ``>remove <command>`` to remove the entire command.
-**Important Note:** You cannot make a command that was initially a string command into a list command by adding a second response to a string command. You must the string command and add it as a list command.
+In order to have multiple responses to one command, you need to use the ``list`` command type:
 
-Adding commands with more than one word for the command/response_name/response:
-If *any* one of these are multiple words, you must put *all three* in quotes. Ex: ``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"`` or ``>"get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
+**List commands**:
+- Add a second parameter between the command and the response like so: ``>add <command> <response_name> <response>`` Ex: ``>add kaguya cute http://i.imgur.com/LtdE1zW.jpg``.
+- Adding different <response_name> and <response> to the same <command> will append it to the list of responses for that command.
+- Invoke a specific response with ``.<command> <response_name>`` or ``.<command> <index>``
+- If more than one response name and response are in a command, get a random response with ``.<command>``.
+- Removing follows the logical syntax: ``>remove <command> <response_name>`` to remove a specific response from the command and ``>remove <command>`` to remove the entire command.
+- **Important Note:** You cannot make a command that was initially a string command into a list command by adding a second response to a string command. You must the string command and add it as a list command.
+
+**Adding commands with more than one word for the command/response_name/response:**
+- If *any* one of these are multiple words, you must put *all three* in quotes. Ex: ``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"`` or ``>"get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
 
 
 ## Google API
@@ -62,6 +67,7 @@ If *any* one of these are multiple words, you must put *all three* in quotes. Ex
 In order to use the ``>g`` command to search the web/images and in order to get more accurate MyAnimeList search results, you will need a Google API key and a Custom Search Engine ID.
 
 Follow these steps to obtain them:
+
 1. Use the [Google API Console](https://console.developers.google.com/) to obtain an API key. [Follow these steps](https://developers.google.com/maps/documentation/android-api/signup) if you are not sure how to go about it. Once you have it, paste it into the empty quotes for ``google_api_key``.
 2. Add the Custom Search API to the list of APIs.
 3. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (don't change anything in the Add page)
