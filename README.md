@@ -19,13 +19,14 @@ Start off by setting up the config.json file:
 
 ```json
 {
-	"my_id": "",
-	"token": "",
-	"google_api_key": "",
-    "custom_search_engine": "",
-	"mal_username": "",
-    "mal_password": "",
-	"set_afk": "off"
+	"my_id" : "",
+	"token" : "",
+	"google_api_key" : "",
+    "custom_search_engine" : "",
+	"mal_username" : "",
+    "mal_password" : "",
+	"set_afk" : "off"
+	"afk_message" : ""
 }
 ```
 
@@ -34,6 +35,21 @@ Start off by setting up the config.json file:
 - ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See **Google API** section below for instructions.
 - ``mal_username`` and ``mal_password`` are required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
 - ``set_afk`` does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``.
+- ``af_message`` is the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
+
+## All Commands:
+- ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
+- ``>ping`` - Responds with ``pong`` and also gives the response time.
+- ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result.
+- ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result.
+- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
+- ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
+- ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on and off.
+- ``>setafkmsg <msg>`` - Set the afk message.
+- ``>customcmds`` - List all custom commands.
+- ``>add <command> <response>`` or ``>add <command> <response_name> <response> - Add a custom command. See the **Custom Commands** section for more info.
+- ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
+- ``>d`` or ``>d <seconds>`` - Remove the last message you sent (along with this one). ``>d`` will immediately delete but ``>d <seconds>`` will wait out the number of seconds. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 
 ## Things to note:
 - Free custom search has a limit of 100 calls per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
