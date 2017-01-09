@@ -48,7 +48,7 @@ Start off by setting up the config.json file:
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on and off.
 - ``>setafkmsg <msg>`` - Set the afk message.
 - ``>customcmds`` - List all custom commands.
-- ``>add <command> <response>`` or ``>add <command> <response_name> <response> - Add a custom command. See the **Custom Commands** section for more info.
+- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 - ``>d`` or ``>d <seconds>`` - Remove the last message you sent (along with this one). ``>d`` will immediately delete but ``>d <seconds>`` will wait out the number of seconds. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 
