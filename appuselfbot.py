@@ -1,5 +1,5 @@
 import discord, datetime, traceback, re, asyncio, mimetypes, collections, math
-import subprocess, sys
+import subprocess, sys, os
 from discord.ext import commands
 import json
 import spice_api as spice
@@ -20,7 +20,7 @@ with open('config.json', 'r') as f:
 
 selflog = collections.deque(maxlen=5)
 
-bot = commands.Bot(command_prefix='>', description='''Selfbot by appu1232''', self_bot=True)
+bot = commands.Bot(command_prefix='>', description='''Selfbot by appu1232''')
 
 # Startup
 @bot.event
@@ -33,8 +33,10 @@ async def on_ready():
 # Restart selfbot
 @bot.command(pass_context=True)
 async def restart(ctx):
-    await bot.edit_message(ctx.message, 'Restarting...')
-    subprocess.call(['python3', __file__])
+    await bot.send_message(ctx.message.channel, 'Restarting...')
+    # subprocess.call(['python3', __file__])
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
 # Simple calculator
 @bot.command(pass_context=True)
@@ -611,4 +613,5 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-bot.run(config['token'], bot=False)
+#bot.run(config['token'], bot=False)
+bot.run('MjYwNjUxNDYxMTgzMTQzOTM4.C1UFCg.KjH7OVE7wg8MyZgXfEQ80S9DqzA')
