@@ -63,6 +63,7 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>add <command> <response>`` or ``>add <command> <response_name> <response> - Add a custom command. See the **Custom Commands** section for more info.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 - ``>d`` or ``>d <seconds>`` - Remove the last message you sent (along with this one). ``>d`` will immediately delete but ``>d <seconds>`` will wait out the number of seconds. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
+- ``>about`` - link to this github project
 
 ## Things to note:
 - Free custom search has a limit of 100 searches per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
