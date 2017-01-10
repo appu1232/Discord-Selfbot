@@ -7,7 +7,7 @@
     "custom_search_engine": "",
     "afk_message": "",
     "set_afk": "off",
-	"cmd_prefix": ">",
-	"customcmd_prefix": ".",
-	"bot_identifier": ":robot:"
+    "cmd_prefix": ">",
+    "customcmd_prefix": ".",
+    "bot_identifier": ":robot:"
 }
