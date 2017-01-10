@@ -1,26 +1,25 @@
-import discord, datetime, traceback, re, asyncio, mimetypes, collections, math
+import discord, datetime, time, traceback, re, asyncio, mimetypes, collections, math
 import sys, os
 from discord.ext import commands
+import inspect
+from io import StringIO
+import contextlib, sys
 import json
 import spice_api as spice
 import urllib.request, urllib.parse, requests
 from random import randint
 from bs4 import BeautifulSoup
 
-# Discord Logger
-# logger = logging.getLogger('discord')
-# logger.setLevel(logging.DEBUG)
-# handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-# logger.addHandler(handler)
-# bot = discord.bot()
-
 with open('config.json', 'r') as f:
     config = json.load(f)
 
-selflog = collections.deque(maxlen=5)
+selflog = collections.deque(maxlen=200)
+isBot = config['bot_identifier'] + ' '
+if isBot == ' ':
+    isBot = ''
+allLogs = {}
 
-bot = commands.Bot(command_prefix='>', description='''Selfbot by appu1232''', self_bot=True)
+bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
 
 # Startup
 @bot.event
@@ -30,45 +29,77 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+@bot.command(pass_context=True)
+async def about(ctx):
+    em = discord.Embed(description='by appu1232#2569\n\nhttps://github.com/appu1232/Selfbot-for-Discord', colour=0x593bd3)
+    em.set_image(url='https://github.com/appu1232/Selfbot-for-Discord')
+    em.set_author(name='Discord Selfbot', icon_url='http://i.imgur.com/mvyVEqw.jpg')
+    await bot.send_message(ctx.message.channel, embed=em)
+
 # Restart selfbot
 @bot.command(pass_context=True)
 async def restart(ctx):
     await bot.edit_message(ctx.message, 'Restarting...')
-
-    # subprocess.call(['python3', __file__])
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
 # Simple calculator
 @bot.command(pass_context=True)
 async def calc(ctx):
-    if ctx.message.author.id == config['my_id']:
-        equation = ctx.message.content[5:].strip()
-        if '=' in equation:
-            left = eval(equation.split('=')[0])
-            right = eval(equation.split('=')[1])
-            await bot.send_message(ctx.message.channel, str(left == right))
-        else:
-            await bot.send_message(ctx.message.channel, str(eval(equation)))
+    equation = ctx.message.content[5:].strip()
+    if '=' in equation:
+        left = eval(equation.split('=')[0])
+        right = eval(equation.split('=')[1])
+        await bot.send_message(ctx.message.channel, isBot + str(left == right))
+    else:
+        await bot.send_message(ctx.message.channel, isBot + str(eval(equation)))
 
 # Get response time
 @bot.command(pass_context=True)
 async def ping(ctx):
-    if ctx.message.author.id == config['my_id']:
-        msgTime = ctx.message.timestamp.now()
-        await bot.send_message(ctx.message.channel, 'pong')
-        now = datetime.datetime.now()
-        ping = now - msgTime
-        pong = discord.Embed(title='Response Time:', description=str(ping), color=0x7A0000)
-        pong.set_thumbnail(url='http://odysseedupixel.fr/wp-content/gallery/pong/pong.jpg')
-        await bot.send_message(ctx.message.channel, content=None, embed=pong)
+    msgTime = ctx.message.timestamp.now()
+    await bot.send_message(ctx.message.channel, isBot + ' pong')
+    now = datetime.datetime.now()
+    ping = now - msgTime
+    pong = discord.Embed(title='Response Time:', description=str(ping), color=0x7A0000)
+    pong.set_thumbnail(url='http://odysseedupixel.fr/wp-content/gallery/pong/pong.jpg')
+    await bot.send_message(ctx.message.channel, content=None, embed=pong)
+
+
+# Get user info
+@bot.command(pass_context=True)
+async def info(ctx):
+    if ctx.invoked_subcommand is None:
+        name = ctx.message.content[5:].strip()
+        if name:
+            try:
+                name = ctx.message.mentions[0]
+            except:
+                name = ctx.message.server.get_member_named(name)
+            if not name:
+                await bot.send_message(ctx.message.channel, isBot + 'Could not find user.')
+                return
+        else:
+            name = ctx.message.author
+
+        em = discord.Embed(timestamp=ctx.message.timestamp, colour=0x708DD0)
+        em.add_field(name='User ID', value=name.id, inline=True)
+        em.add_field(name='Nick', value=name.nick, inline=True)
+        em.add_field(name='Status', value=name.status, inline=True)
+        em.add_field(name='In Voice', value=name.voice_channel, inline=True)
+        em.add_field(name='Account Created', value=name.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
+        em.add_field(name='Join Date', value=name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
+        em.set_thumbnail(url=name.avatar_url)
+        em.set_author(name=name, icon_url='https://i.imgur.com/RHagTDg.png')
+        await bot.send_message(ctx.message.channel, embed=em)
+        await asyncio.sleep(2)
+        await bot.delete_message(ctx.message)
 
 # Mal search (chained with either anime or manga)
 @bot.group(pass_context=True)
 async def mal(ctx):
     if ctx.invoked_subcommand is None:
-        await ctx.bot.send_message(ctx.message.channel, "```Invalid Command. Use $help for more info```")
-
+        await ctx.bot.send_message(ctx.message.channel, isBot + 'Invalid Syntax. Example use: ``>mal anime steins;gate`` or ``>mal manga kaguya wants to be confessed to``')
 
 # Anime search for Mal
 @mal.command(pass_context=True)
@@ -98,7 +129,7 @@ async def anime(ctx):
 
     # No results found for specified tags
     if not results:
-        await ctx.send_message(ctx.message.channel, 'No results.')
+        await ctx.send_message(ctx.message.channel, isBot + 'No results.')
         return
 
     # Formatting embed
@@ -149,7 +180,7 @@ async def manga(ctx):
 
     # No results found for specified tags
     if not results:
-        await ctx.bot.send_message(ctx.message.channel, 'No results.')
+        await ctx.bot.send_message(ctx.message.channel, isBot + 'No results.')
         return
 
     # Formatting
@@ -175,85 +206,80 @@ async def manga(ctx):
 # Google search
 @bot.group(pass_context=True)
 async def g(ctx):
-    if ctx.message.author.id == config['my_id'] and not ctx.message.content[2:].startswith(' i '):
-
-        # If >g then google web search with specified words
-        if ctx.invoked_subcommand is None:
-            searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
-                        ctx.message.content[
-                        3:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']
-            r = requests.get(searchUrl)
-            response = r.content.decode('utf-8')
-            result = json.loads(response)
-            try:
-                webpage = urllib.request.urlopen(result['items'][0]['link']).read()
-                try:
-                    title = str(webpage).split('<title>')[1].split('</title>')[0]
-                except:
-                    title = ''
-                em = discord.Embed(title=result['items'][0]['link'], description=title, colour=0x2D5AF9)
-                em.set_author(name='Google Results:\n\n')
-                await bot.send_message(ctx.message.channel, embed=em)
-            except Exception as e:
-                await bot.send_message(ctx.message.channel, 'Error on reading url: %s. Error: %s.' % (result['items'][0]['link'], e))
-
-        # >g <n> leads to nth result in google results.
-        else:
-            searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
-                        ctx.message.content[5:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']
-            r = requests.get(searchUrl)
-            response = r.content.decode('utf-8')
-            result = json.loads(response)
-            webpage = urllib.request.urlopen(result['items'][int(ctx.message.content[3])]['link']).read()
+    # If >g then google web search with specified words
+    if ctx.invoked_subcommand is None:
+        searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
+                    ctx.message.content[
+                    3:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']
+        r = requests.get(searchUrl)
+        response = r.content.decode('utf-8')
+        result = json.loads(response)
+        try:
+            webpage = urllib.request.urlopen(result['items'][0]['link']).read()
             try:
                 title = str(webpage).split('<title>')[1].split('</title>')[0]
             except:
                 title = ''
-            em = discord.Embed(title=result['items'][int(ctx.message.content[3])]['link'], description=title, colour=0x2D5AF9)
+            em = discord.Embed(title=result['items'][0]['link'], description=title, colour=0x2D5AF9)
             em.set_author(name='Google Results:\n\n')
             await bot.send_message(ctx.message.channel, embed=em)
+        except Exception as e:
+            await bot.send_message(ctx.message.channel, isBot + 'Error on reading url: %s. Error: %s.' % (result['items'][0]['link'], e))
+
+    # >g <n> leads to nth result in google results.
+    else:
+        searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
+                    ctx.message.content[5:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']
+        r = requests.get(searchUrl)
+        response = r.content.decode('utf-8')
+        result = json.loads(response)
+        webpage = urllib.request.urlopen(result['items'][int(ctx.message.content[3])]['link']).read()
+        try:
+            title = str(webpage).split('<title>')[1].split('</title>')[0]
+        except:
+            title = ''
+        em = discord.Embed(title=result['items'][int(ctx.message.content[3])]['link'], description=title, colour=0x2D5AF9)
+        em.set_author(name='Google Results:\n\n')
+        await bot.send_message(ctx.message.channel, embed=em)
 
 @g.command(pass_context=True)
 async def i(ctx):
-    if ctx.message.author.id == config['my_id']:
+    # If >g i then google image search with specified words
+    if not ctx.message.content[5].isdigit():
+        searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
+                    ctx.message.content[
+                    5:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + \
+                    "&searchType=image"
+        r = requests.get(searchUrl)
+        response = r.content.decode('utf-8')
+        result = json.loads(response)
 
-        # If >g i then google image search with specified words
-        if not ctx.message.content[5].isdigit():
-            searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
-                        ctx.message.content[
-                        5:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + \
-                        "&searchType=image"
-            r = requests.get(searchUrl)
-            response = r.content.decode('utf-8')
-            result = json.loads(response)
+        # Send as embed
+        em=discord.Embed()
+        await bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][0]['link']))
 
-            # Send as embed
-            em=discord.Embed()
-            await bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][0]['link']))
+    # >g i <n> leads to nth result in google image results.
+    else:
+        searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
+                    ctx.message.content[
+                    7:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + \
+                    "&searchType=image"
+        r = requests.get(searchUrl)
+        response = r.content.decode('utf-8')
+        result = json.loads(response)
 
-        # >g i <n> leads to nth result in google image results.
-        else:
-            searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
-                        ctx.message.content[
-                        7:].strip() + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + \
-                        "&searchType=image"
-            r = requests.get(searchUrl)
-            response = r.content.decode('utf-8')
-            result = json.loads(response)
-
-            # Send as embed
-            em = discord.Embed()
-            await bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][int(ctx.message.content[5])]['link']))
+        # Send as embed
+        em = discord.Embed()
+        await bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][int(ctx.message.content[5])]['link']))
 
 # Sends a googleitfor.me link with the specified tags
 @bot.command(pass_context=True)
 async def l2g(ctx):
-    if ctx.message.author.id == config['my_id']:
-        lmgtfy = 'http://googleitfor.me/?q='
-        words = ctx.message.content[5:].lower().strip().split(' ')
-        for word in words:
-            lmgtfy += word + '+'
-        await bot.send_message(ctx.message.channel, lmgtfy[:-1])
+    lmgtfy = 'http://googleitfor.me/?q='
+    words = ctx.message.content[5:].lower().strip().split(' ')
+    for word in words:
+        lmgtfy += word + '+'
+    await bot.send_message(ctx.message.channel, isBot + lmgtfy[:-1])
 
 # Set afk status on or off. If on, pinging will lead to an automated response.
 @bot.command(pass_context=True)
@@ -265,7 +291,7 @@ async def setafk(ctx):
             conf.seek(0)
             conf.truncate()
             json.dump(cf, conf, indent=4)
-        await bot.send_message(ctx.message.channel, 'AFK on')
+        await bot.send_message(ctx.message.channel, isBot + 'AFK on')
     elif ctx.message.content[7:].lower().strip() == 'off':
         with open('config.json', 'r+') as conf:
             cf = json.load(conf)
@@ -273,9 +299,9 @@ async def setafk(ctx):
             conf.seek(0)
             conf.truncate()
             json.dump(cf, conf, indent=4)
-        await bot.send_message(ctx.message.channel, 'AFK off')
+        await bot.send_message(ctx.message.channel, isBot + 'AFK off')
     else:
-        await bot.send_message(ctx.message.channel, 'Invalid argument.')
+        await bot.send_message(ctx.message.channel, isBot + 'Invalid argument.')
 
 # Set afk message
 @bot.command(pass_context=True)
@@ -286,201 +312,204 @@ async def setafkmsg(ctx):
         conf.seek(0)
         conf.truncate()
         json.dump(cf, conf, indent=4)
-        await bot.send_message(ctx.message.channel, 'Set afk message to: %s' % cf['afk_message'])
+        await bot.send_message(ctx.message.channel, isBot + 'Set afk message to: %s' % cf['afk_message'])
 
 # List all custom commands
 @bot.command(pass_context=True)
 async def customcmds(ctx):
-    if ctx.message.author.id == config['my_id']:
-        with open('commands.json', 'r') as commands:
-            cmds = json.load(commands)
-        msg = '```json\nList of Custom Commands: {\n'
-        for cmd in cmds:
-            msg += '"' + cmd + '" : "'
-            if type(cmds[cmd]) == list:
-                for i in cmds[cmd]:
-                    msg += str(i) + ', '
-                msg = msg[:-2] + '",\n\n'
-            else:
-                msg += str(cmds[cmd]) + '",\n\n'
-        msg = msg[:-3]
-        msg += '}```'
-        part = int(math.ceil(len(msg) / 1900))
-        if part == 1:
-            await bot.send_message(ctx.message.channel, msg)
+    with open('commands.json', 'r') as commands:
+        cmds = json.load(commands)
+    msg = '```json\nList of Custom Commands: {\n'
+    for cmd in cmds:
+        msg += '"' + cmd + '" : "'
+        if type(cmds[cmd]) == list:
+            for i in cmds[cmd]:
+                msg += str(i) + ', '
+            msg = msg[:-2] + '",\n\n'
         else:
-            msg = msg[7:-3]
-            splitList = [msg[i:i + 1900] for i in range(0, len(msg), 1900)]
-            allWords = []
+            msg += str(cmds[cmd]) + '",\n\n'
+    msg = msg[:-3]
+    msg += '}```'
+    part = int(math.ceil(len(msg) / 1900))
+    if part == 1:
+        await bot.send_message(ctx.message.channel, isBot + msg)
+    else:
+        msg = msg[7:-3]
+        splitList = [msg[i:i + 1900] for i in range(0, len(msg), 1900)]
+        allWords = []
+        splitmsg = ''
+        for i, blocks in enumerate(splitList):
+            splitmsg += 'List of Custom Commands: %s of %s\n' % (i + 1, part)
+            for b in blocks.split('\n'):
+                splitmsg += b + '\n'
+            allWords.append(splitmsg)
             splitmsg = ''
-            for i, blocks in enumerate(splitList):
-                splitmsg += 'List of Custom Commands: %s of %s\n' % (i + 1, part)
-                for b in blocks.split('\n'):
-                    splitmsg += b + '\n'
-                allWords.append(splitmsg)
-                splitmsg = ''
-            for i in allWords:
-                await bot.send_message(ctx.message.channel, '```%s```' % i)
+        for i in allWords:
+            await bot.send_message(ctx.message.channel, '```%s```' % i)
 
 # Add a custom command
 @bot.command(pass_context=True)
 async def add(ctx):
-    if ctx.message.author.id == config['my_id']:
-        words = ctx.message.content[5:].strip()
+    words = ctx.message.content[5:].strip()
 
-        with open('commands.json', 'r') as commands:
-            cmds = json.load(commands)
+    with open('commands.json', 'r') as commands:
+        cmds = json.load(commands)
 
-        try:
+    try:
 
-            # If there are quotes in the message (meaning multiple words for each param)
-            if '"' in words:
-                entry = re.findall('"([^"]+)"', words)
+        # If there are quotes in the message (meaning multiple words for each param)
+        if '"' in words:
+            entry = re.findall('"([^"]+)"', words)
 
-                # Item for key is list
-                if len(entry) == 3:
+            # Item for key is list
+            if len(entry) == 3:
 
-                    # Key exists
-                    if entry[0] in cmds:
-                        entries = []
-                        for i in cmds[entry[0]]:
-                            entries.append(tuple((i[0], i[1])))
-                        entries.append(tuple([entry[1], entry[2]]))
-                        cmds[entry[0]] = entries
-                    else:
-                        cmds[entry[0]] = [(entry[1], entry[2])]
-
-                # Item for key is string
+                # Key exists
+                if entry[0] in cmds:
+                    entries = []
+                    for i in cmds[entry[0]]:
+                        entries.append(tuple((i[0], i[1])))
+                    entries.append(tuple([entry[1], entry[2]]))
+                    cmds[entry[0]] = entries
                 else:
-                    cmds[entry[0]] = entry[1]
+                    cmds[entry[0]] = [(entry[1], entry[2])]
 
-            # No quotes so spaces seperate params
+            # Item for key is string
             else:
+                cmds[entry[0]] = entry[1]
 
-                # Item for key is list
-                if len(words.split(' ')) == 3:
-                    entry = words.split(' ', 2)
+        # No quotes so spaces seperate params
+        else:
 
-                    # Key exists
-                    if entry[0] in cmds:
-                        entries = []
-                        for i in cmds[entry[0]]:
-                            entries.append(tuple((i[0], i[1])))
-                        entries.append(tuple([entry[1], entry[2]]))
-                        cmds[entry[0]] = entries
-                    else:
-                        cmds[entry[0]] = [(entry[1], entry[2])]
+            # Item for key is list
+            if len(words.split(' ')) == 3:
+                entry = words.split(' ', 2)
 
-                # Item for key is string
+                # Key exists
+                if entry[0] in cmds:
+                    entries = []
+                    for i in cmds[entry[0]]:
+                        entries.append(tuple((i[0], i[1])))
+                    entries.append(tuple([entry[1], entry[2]]))
+                    cmds[entry[0]] = entries
                 else:
-                    entry = words.split(' ', 1)
-                    cmds[entry[0]] = entry[1]
+                    cmds[entry[0]] = [(entry[1], entry[2])]
 
-            await bot.send_message(ctx.message.channel, 'Successfully added ``%s`` to ``%s``' % (entry[1], entry[0]))
+            # Item for key is string
+            else:
+                entry = words.split(' ', 1)
+                cmds[entry[0]] = entry[1]
 
-        except Exception as e:
-            await bot.send_message(ctx.message.channel, 'Error, seomthing went wrong. Exception: ``%s``' % e)
+        await bot.send_message(ctx.message.channel, isBot + 'Successfully added ``%s`` to ``%s``' % (entry[1], entry[0]))
 
-        # Update commands.json
-        with open('commands.json', 'w') as commands:
-            commands.truncate()
-            json.dump(cmds, commands, indent=4)
+    except Exception as e:
+        await bot.send_message(ctx.message.channel, isBot + 'Error, seomthing went wrong. Exception: ``%s``' % e)
+
+    # Update commands.json
+    with open('commands.json', 'w') as commands:
+        commands.truncate()
+        json.dump(cmds, commands, indent=4)
 
 # Remove a custom command
 @bot.command(pass_context=True)
 async def remove(ctx):
-    if ctx.message.author.id == config['my_id']:
-        words = ctx.message.content[8:].strip()
+    words = ctx.message.content[8:].strip()
 
-        with open('commands.json', 'r') as commands:
-            cmds = json.load(commands)
+    with open('commands.json', 'r') as commands:
+        cmds = json.load(commands)
 
-        try:
+    try:
 
-            # If there are quotes in the message (meaning multiple words for each param)
-            success = False
-            if '"' in words:
-                entry = re.findall('"([^"]+)"', words)
+        # If there are quotes in the message (meaning multiple words for each param)
+        success = False
+        if '"' in words:
+            entry = re.findall('"([^"]+)"', words)
 
-                # Item for key is list
-                if len(entry) == 2:
+            # Item for key is list
+            if len(entry) == 2:
 
-                    # Key exists
-                    if entry[0] in cmds:
-                        entries = []
-                        for i in cmds[entry[0]]:
-                            if entry[1] == i[0]:
-                                cmds[entry[0]].remove(i)
-                                await bot.send_message(ctx.message.channel, 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
-                                success = True
-                    else:
-                        if entry[0] in cmds:
-                            del cmds[entry[0]]
+                # Key exists
+                if entry[0] in cmds:
+                    entries = []
+                    for i in cmds[entry[0]]:
+                        if entry[1] == i[0]:
+                            cmds[entry[0]].remove(i)
+                            await bot.send_message(ctx.message.channel, isBot + 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
                             success = True
-                            await bot.send_message(ctx.message.channel, 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
-
-
-                # Item for key is string
                 else:
                     if entry[0] in cmds:
-                        oldValue = cmds[entry[0]]
                         del cmds[entry[0]]
                         success = True
-                        await bot.send_message(ctx.message.channel, 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
+                        await bot.send_message(ctx.message.channel, isBot + 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
 
-            # No quotes so spaces seperate params
+
+            # Item for key is string
             else:
+                if entry[0] in cmds:
+                    oldValue = cmds[entry[0]]
+                    del cmds[entry[0]]
+                    success = True
+                    await bot.send_message(ctx.message.channel, isBot + 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
 
-                # Item for key is list
-                if len(words.split(' ')) == 2:
-                    entry = words.split(' ')
+        # No quotes so spaces seperate params
+        else:
 
-                    # Key exists
-                    if entry[0] in cmds:
-                        entries = []
-                        for i in cmds[entry[0]]:
-                            if entry[1] == i[0]:
-                                cmds[entry[0]].remove(i)
-                                await bot.send_message(ctx.message.channel, 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
-                                success = True
-                    else:
-                        if entry[0] in cmds:
-                            del cmds[entry[0]]
+            # Item for key is list
+            if len(words.split(' ')) == 2:
+                entry = words.split(' ')
+
+                # Key exists
+                if entry[0] in cmds:
+                    entries = []
+                    for i in cmds[entry[0]]:
+                        if entry[1] == i[0]:
+                            cmds[entry[0]].remove(i)
+                            await bot.send_message(ctx.message.channel, isBot + 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
                             success = True
-                            await bot.send_message(ctx.message.channel, 'Successfully removed ``%s`` from %``s``' % (entry[1], entry[0]))
-
-                # Item for key is string
                 else:
-                    entry = words.split(' ', 1)
                     if entry[0] in cmds:
-                        oldValue = cmds[entry[0]]
                         del cmds[entry[0]]
                         success = True
-                        await bot.send_message(ctx.message.channel, 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
+                        await bot.send_message(ctx.message.channel, isBot + 'Successfully removed ``%s`` from %``s``' % (entry[1], entry[0]))
 
-            if success == False:
-                await bot.send_message(ctx.message.channel, 'Could not find specified command.')
+            # Item for key is string
+            else:
+                entry = words.split(' ', 1)
+                if entry[0] in cmds:
+                    oldValue = cmds[entry[0]]
+                    del cmds[entry[0]]
+                    success = True
+                    await bot.send_message(ctx.message.channel, isBot + 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
 
-        except Exception as e:
-            await bot.send_message(ctx.message.channel, 'Error, something went wrong. Exception: ``%s``' % e)
+        if success == False:
+            await bot.send_message(ctx.message.channel, isBot + 'Could not find specified command.')
 
-        # Update commands.json
-        with open('commands.json', 'w') as commands:
-            commands.truncate()
-            json.dump(cmds, commands, indent=4)
+    except Exception as e:
+        await bot.send_message(ctx.message.channel, isBot + 'Error, something went wrong. Exception: ``%s``' % e)
+
+    # Update commands.json
+    with open('commands.json', 'w') as commands:
+        commands.truncate()
+        json.dump(cmds, commands, indent=4)
 
 # Deletes previous message immediately or after specified number of seconds (because why not)
 @bot.command(pass_context=True)
 async def d(ctx):
-    if ctx.message.author.id == config['my_id']:
-
-        # If number of seconds are specified
-        if len(ctx.message.content.lower().strip()) > 2:
+    # If number of seconds are specified
+    if len(ctx.message.content.lower().strip()) > 2:
+        if ctx.message.content[3] == '!':
+            await bot.delete_message(selflog.pop())
+            for i in range(int(ctx.message.content[4])):
+                await bot.delete_message(selflog.pop())
+            temp = collections.deque(maxlen=50)
+            for i in selflog:
+                temp.append(i)
+        else:
             killMsg = selflog[len(selflog) - 2]
             timer = int(ctx.message.content[2:].lower().strip())
 
             # Animated countdown because screw rate limit amirite
-            destroy = await bot.edit_message(ctx.message, 'The above message will self-destruct in:')
+            destroy = await bot.edit_message(ctx.message, isBot + 'The above message will self-destruct in:')
             msg = await bot.send_message(ctx.message.channel, '``%s  |``' % timer)
             for i in range(0, timer, 4):
                 if timer - 1 - i == 0:
@@ -522,10 +551,10 @@ async def d(ctx):
             await bot.delete_message(msg)
             await bot.delete_message(killMsg)
 
-        # If no number specified, delete message immediately
-        else:
-            await bot.delete_message(ctx.message)
-            await bot.delete_message(selflog[len(selflog)-2])
+    # If no number specified, delete message immediately
+    else:
+        await bot.delete_message(ctx.message)
+        await bot.delete_message(selflog[len(selflog)-2])
 
 # On all messages sent (will be used for logging/stats)
 @bot.event
@@ -549,18 +578,18 @@ async def on_message(message):
         elif message.content.lower().strip() == 'unflip':
             await bot.delete_message(message)
             await bot.send_message(message.channel, '┬─┬﻿ ノ( ゜-゜ノ)')
-        elif message.content.lower().startswith("lenny"):
+        elif message.content.lower().startswith('lenny'):
             await bot.delete_message(message)
             await bot.send_message(message.channel, '( ͡° ͜ʖ ͡°)')
         elif message.content.lower().startswith('comeatmebro'):
             await bot.send_message(message.channel, '(ง’̀-‘́)ง')
-        elif message.content.startswith('.'):
+        elif message.content.startswith(config['customcmd_prefix'][0]):
             success = False
             with open('commands.json', 'r') as f:
                 commands = json.load(f)
                 file = discord.Embed(colour=0x27007A)
             for i in commands:
-                if message.content[1:].lower().startswith(i):
+                if message.content[1:].lower().startswith(i.lower()):
                     success = True
 
                     # If the commands resulting reply is a list instead of a str
@@ -607,9 +636,10 @@ async def on_message(message):
             await bot.delete_message(message)
     notified = message.mentions
     for i in notified:
-        if i.id == config['my_id']:
-            if config['set_afk'] == 'on':
-                await bot.send_message(message.channel, config['afk_message'])
+        with open('config.json', 'r') as conf:
+            afk = json.load(conf)
+            if i.id == afk['my_id'] and afk['set_afk'] == 'on':
+                await bot.send_message(message.channel, afk['afk_message'])
 
 
     await bot.process_commands(message)
