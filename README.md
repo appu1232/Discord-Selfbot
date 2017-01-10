@@ -1,6 +1,6 @@
 # A Discord selfbot with various commands
 
-A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord.
+A selfbot that has various useful in-built commands as well as the ability to dynamically add custom commands right from Discord.
 
 ## Features
 
@@ -39,7 +39,7 @@ Start off by setting up the config.json file:
 - ``mal_username`` and ``mal_password`` - MyAnimeList username and password which is required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
 - ``set_afk`` - does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``.
 - ``afk_message`` - the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
-- ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported for customcmds. You may set them as the same but be careful not to make a custom cmd with the same name as in in-built.
+- ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported for customcmds. You may set them as the same prefix but be careful not to make a custom cmd with the same name as in in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
 
 ## Running the selfbot
