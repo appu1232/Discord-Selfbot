@@ -68,7 +68,7 @@ Note: You must have Python 3.5.2 or above installed.
 ## Things to note:
 - Free custom search has a limit of 100 searches per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
 - Try not to keep ``setafk`` on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
-- The bot sets you to idle when you are not on discord. If you open up discord again, you will be online and you can freely change your status but when you go offline the bot changes it back to idle.
+- The bot sets you to invisible when you are not on discord  (basically the same as offline). If you open up discord again, you will be online and you can freely change your status but when you go offline the bot changes it back to invisible/offline.
 - Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
 ## Custom Commands:
@@ -102,10 +102,11 @@ In order to use the ``>g`` command to search the web/images and in order to get 
 
 Follow these steps to obtain them:
 
-1. Use the [Google API Console](https://console.developers.google.com/) to obtain an API key. Once you are in the Console, create a new project.  Make sure to add ``Custom Search API`` from the Library and enable it in the dashboard too. Once you have they key, paste it into the empty quotes for ``google_api_key``.
-2. Add the Custom Search API to the list of APIs.
-3. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
-4. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
-5. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
+1. Use the [Google API Console](https://console.developers.google.com/) to obtain an API key. Once you are in the Console, create a new project.
+2. Go to ``Library`` and search ``Custom Search API``. Click it and enable it.
+3. Go to ``Credentials`` and click ``create credentials`` and choose ``API Key`` (no need to restrict the key). The value under "Key" is your api key. Paste this into the config.json under ``google_api_key``.
+4. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
+5. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
+6. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
 
 Note: Google may take a little while to properly register your key so the search feature may not work right away. If it's still not working after a few hours, then you may have messed up somewhere.
