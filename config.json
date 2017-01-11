@@ -1,13 +1,3 @@
 {
-    "set_afk": "on",
-    "google_api_key": "AIzaSyDqtBqXWyy2PHtjzFt9aAyuaURmqDM8Ik8",
-    "custom_search_engine": "008451276526510954961:rl9q_vdywe0",
-    "bot_identifier": ":robot:",
-    "cmd_prefix": ">",
-    "mal_username": "appu1232",
-    "my_id": "124910128582361092",
-    "afk_message": " \ud83e\udd16 Beeb boop. appu1232 is afk right now. He'll acknowledge your existence when he's back. Try not to get too excited. \ud83c\udf46",
-    "mal_password": "appu2844",
-    "token": "mfa.rdu9j4lhfiCpjCrPvzuEJiJZXw-Uojpef5MaXX7jPk7LjcZ7o1vQQqdr2VLmsgz8tMPD1tB_XdsoHVnZ79ze",
-    "customcmd_prefix": "."
+    
 }
