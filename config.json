@@ -1,3 +1,13 @@
 {
-    
+    "my_id" : "",
+    "token" : "",
+    "google_api_key" : "",
+    "custom_search_engine" : "",
+    "mal_username" : "",
+    "mal_password" : "",
+    "set_afk" : "off",
+    "afk_message" : "",
+    "cmd_prefix": ">",
+    "customcmd_prefix": ".",
+    "bot_identifier": ":robot:"
 }
