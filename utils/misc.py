@@ -53,19 +53,19 @@ class Misc:
 
     # Deletes previous message immediately or after specified number of seconds (because why not)
     @commands.command(pass_context=True)
-    async def d(self, ctx, *, msg: str):
+    async def d(self, ctx):
         # If number of seconds are specified
-        if len(msg.strip()) > 2:
-            if msg[0] == '!':
+        if len(ctx.message.content.lower().strip()) > 2:
+            if ctx.message.content[3] == '!':
                 await self.bot.delete_message(selflog.pop())
-                for i in range(int(msg[1:])):
+                for i in range(int(ctx.message.content[4])):
                     await self.bot.delete_message(selflog.pop())
                 temp = collections.deque(maxlen=50)
                 for i in selflog:
                     temp.append(i)
             else:
                 killmsg = selflog[len(selflog) - 2]
-                timer = int(msg.strip())
+                timer = int(ctx.message.content[2:].lower().strip())
 
                 # Animated countdown because screw rate limit amirite
                 destroy = await self.bot.edit_message(ctx.message, isBot + 'The above message will self-destruct in:')
