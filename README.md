@@ -1,6 +1,6 @@
 # A Discord selfbot with various commands
 
-A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord. **Note: The in-built command prefix is ``>`` but custom commands use the prefix ``.``**
+A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord.
 
 ## Features
 
@@ -26,16 +26,28 @@ Start off by setting up the config.json file:
 	"mal_username" : "",
     "mal_password" : "",
 	"set_afk" : "off",
-	"afk_message" : ""
+	"afk_message" : "",
+	"cmd_prefix": ">",
+	"customcmd_prefix": ".",
+	"bot_identifier": ":robot:"
 }
 ```
 
-- ``my_id`` - your discord ID
-- ``token`` - our token obtained from ``localStorage.token``
+- ``my_id`` - your discord ID. On Discord go to settings > Appearance and Enable Developer Mode. Rightclick yourself on the sidebar or chat and click copy ID to get your ID.
+- ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) Don't give this out to anyone!
 - ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See **Google API** section below for instructions.
 - ``mal_username`` and ``mal_password`` - MyAnimeList username and password which is required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
 - ``set_afk`` - does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``.
 - ``afk_message`` - the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
+- ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported for customcmds. You may set them as the same but be careful not to make a custom cmd with the same name as in in-built.
+- ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
+
+## Running the selfbot
+
+Note: You must have Python 3.5.2 or above installed.
+
+1. Run ``pip install -r requirements.txt`` to install all required modules.
+2. Run the bot with ``python appuselfbot.py`` and that should be it. If you want to run it and forget about it, consider hosting on a server.
 
 ## All Commands:
 - ``>restart`` - restart the bot.
@@ -51,11 +63,11 @@ Start off by setting up the config.json file:
 - ``>add <command> <response>`` or ``>add <command> <response_name> <response> - Add a custom command. See the **Custom Commands** section for more info.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 - ``>d`` or ``>d <seconds>`` - Remove the last message you sent (along with this one). ``>d`` will immediately delete but ``>d <seconds>`` will wait out the number of seconds. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
+- ``>about`` - link to this github project
 
 ## Things to note:
-- Free custom search has a limit of 100 calls per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
-- Try not to keep setafk on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
-- All commands besides quick commands are invoked with the ``>`` prefix, **however, custom commands use the prefix** ``.``
+- Free custom search has a limit of 100 searches per day. This should be more than enough in my opinion but feel free to pay for more if you would like, although I don't think it's needed.
+- Try not to keep ``setafk`` on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
 - The bot sets you to idle when you are not on discord. If you open up discord again, you will be online and you can freely change your status but when you go offline the bot changes it back to idle.
 - Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
@@ -90,8 +102,10 @@ In order to use the ``>g`` command to search the web/images and in order to get 
 
 Follow these steps to obtain them:
 
-1. Use the [Google API Console](https://console.developers.google.com/) to obtain an API key. [Follow these steps](https://developers.google.com/maps/documentation/android-api/signup) if you are not sure how to go about it. Once you have it, paste it into the empty quotes for ``google_api_key``.
+1. Use the [Google API Console](https://console.developers.google.com/) to obtain an API key. Once you are in the Console, create a new project.  Make sure to add ``Custom Search API`` from the Library and enable it in the dashboard too. Once you have they key, paste it into the empty quotes for ``google_api_key``.
 2. Add the Custom Search API to the list of APIs.
-3. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (don't change anything in the Add page)
-4. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web by emphasize included sites``. You should have no sites included so this will just do a normal google search like we want.
+3. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
+4. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
 5. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
+
+Note: Google may take a little while to properly register your key so the search feature may not work right away. If it's still not working after a few hours, then you may have messed up somewhere.
