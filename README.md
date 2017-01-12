@@ -103,7 +103,7 @@ In order to use the ``>g`` command to search the web/images and in order to get 
 
 Follow these steps to obtain them:
 
-1. Use the [Google API Console](https://console.developers.google.com/) to obtain an API key. Once you are in the Console, create a new project.
+1. Visit the [Google API Console](https://console.developers.google.com/). Once you are in the Console, create a new project.
 2. Go to ``Library`` and search ``Custom Search API``. Click it and enable it.
 3. Go to ``Credentials`` and click ``create credentials`` and choose ``API Key`` (no need to restrict the key). The value under "Key" is your api key. Paste this into the config.json under ``google_api_key``.
 4. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
