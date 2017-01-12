@@ -2,8 +2,9 @@ import discord
 import datetime
 import collections
 import asyncio
-from appuselfbot import isBot, selflog
+from appuselfbot import isBot
 from discord.ext import commands
+import utils.settings
 
 
 class Misc:
@@ -57,14 +58,14 @@ class Misc:
         # If number of seconds are specified
         if len(ctx.message.content.lower().strip()) > 2:
             if ctx.message.content[3] == '!':
-                await self.bot.delete_message(selflog.pop())
+                await self.bot.delete_message(utils.settings.selflog.pop())
                 for i in range(int(ctx.message.content[4])):
-                    await self.bot.delete_message(selflog.pop())
+                    await self.bot.delete_message(utils.settings.selflog.pop())
                 temp = collections.deque(maxlen=50)
-                for i in selflog:
+                for i in utils.settings.selflog:
                     temp.append(i)
             else:
-                killmsg = selflog[len(selflog) - 2]
+                killmsg = utils.settings.selflog[len(utils.settings.selflog) - 2]
                 timer = int(ctx.message.content[2:].lower().strip())
 
                 # Animated countdown because screw rate limit amirite
@@ -113,7 +114,7 @@ class Misc:
         # If no number specified, delete message immediately
         else:
             await self.bot.delete_message(ctx.message)
-            await self.bot.delete_message(selflog[len(selflog) - 2])
+            await self.bot.delete_message(utils.settings.selflog[len(utils.settings.selflog) - 2])
 
 def setup(bot):
     bot.add_cog(Misc(bot))
