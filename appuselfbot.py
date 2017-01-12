@@ -4,14 +4,14 @@ import os
 import sys
 from discord.ext import commands
 from utils.allmsgs import *
-
+import utils.settings
 
 with open('config.json', 'r') as f:
     config = json.load(f)
 
 extensions = ['utils.afk', 'utils.customcmds', 'utils.google', 'utils.mal', 'utils.misc', 'utils.userinfo']
 
-selflog = collections.deque(maxlen=200)
+utils.settings.selflog = collections.deque(maxlen=200)
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
     isBot = ''
@@ -58,7 +58,7 @@ async def on_message(message):
 
     # If the message was sent by me
     if message.author.id == config['my_id']:
-        selflog.append(message)
+        utils.settings.selflog.append(message)
         if message.content.startswith(config['customcmd_prefix'][0]):
             response = custom(message.content.lower().strip())
             if response is None:
