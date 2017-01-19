@@ -32,9 +32,10 @@ class Userinfo:
                     for i in settings['servers']:
                         server = self.bot.get_server(i)
                         msg += str(server) + ', '
-                    msg = msg[:-2] + '```'
+                    msg = msg[:-2]
                 else:
-                    msg += 'All Servers```'
+                    msg += 'All Servers'
+                msg += '\n\nContext length: %s messages```' % settings['context_len']
             await self.bot.send_message(ctx.message.channel, isBot + msg)
 
 
@@ -67,7 +68,7 @@ class Userinfo:
     async def context(self, ctx):
         if ctx.message.content[12:].strip():
             if ctx.message.content[12:].strip().isdigit():
-                if 0 < int(ctx.message.content[12:].strip()) < 11:
+                if 0 < int(ctx.message.content[12:].strip()) < 21:
                     with open('utils/log.json', 'r+') as log:
                         settings = json.load(log)
                         settings['context_len'] = ctx.message.content[12:].strip()

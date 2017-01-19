@@ -2,17 +2,12 @@ import asyncio
 import os
 import sys
 import math
+import time
 from datetime import timezone
 from discord.ext import commands
 from utils.allmsgs import *
 import utils.settings
 
-# Discord Logger
-# logger = logging.getLogger('discord')
-# logger.setLevel(logging.DEBUG)
-# handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-# logger.addHandler(handler)
 
 def load_config():
     with open('config.json', 'r') as f:
@@ -27,6 +22,13 @@ isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
     isBot = ''
 allLogs = {}
+
+
+def hasPassed(oldtime):
+    if time.time() - 10 < oldtime:
+        return False
+    utils.settings.oldtime = time.time()
+    return True
 
 
 bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
@@ -54,13 +56,20 @@ async def restart(ctx):
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
+# @bot.event
+# async def on_error(event, args):
+#     pass
+#     if event is ConnectionResetError or ConnectionRefusedError or ConnectionError or ConnectionAbortedError or TimeoutError:
+#         sys.exit(1)
+
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
 @bot.event
 async def on_message(message):
 
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
-    await bot.change_presence(status='invisible', afk=True)
+    if hasPassed(utils.settings.oldtime):
+        await bot.change_presence(status='invisible', afk=True)
     # if message.channel.id not in utils.settings.load_config():
     #     utils.settings.alllog[message.channel.id] = collections.deque(maxlen=500)
     # utils.settings.alllog[message.channel.id]
@@ -160,8 +169,7 @@ async def on_message(message):
                         else:
                             await bot.send_message(server.get_channel(location[0]), '```%s```' % i)
 
-    except Exception as e:
-        raise e
+    except:
         pass
 
     await bot.process_commands(message)

@@ -1,7 +1,9 @@
 import collections
+import time
 
 selflog = collections.deque(maxlen=200)
 alllog = {}
+oldtime = time.time()
 
 
 def load_selflog():
