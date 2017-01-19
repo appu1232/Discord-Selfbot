@@ -4,14 +4,15 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 
 ## Features
 
-- Simple calculator
 - Google search (web or image).
+- Keyword/mention logger. Log messages from any or all servers that have one of the keywords you specify. Useful for seeing if someone mentioned your name or your favorite show/book/whatever else keyword.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
-- Ping command that shows the response time.
 - Set yourself as afk and message a user telling them you are away if they message/mention you.
 - Dynamically add custom commands. Stored in ``commands.json`` which has some sample commands added to start with.
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
+- Simple calculator
+- Ping command that shows the response time.
 
 ## Setup
 
@@ -57,8 +58,10 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result.
 - ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result.
+- ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands for logging.
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
+- ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on or off.
 - ``>setafkmsg <msg>`` - Set the afk message.
 - ``>customcmds`` - List all custom commands.
@@ -94,8 +97,25 @@ In order to have multiple responses to one command, you need to use the ``list``
 If *any* one of these are multiple words, you must put *all three* in quotes. Ex:
 ``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"``
 or:
-``>"get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
+``>add "get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
 
+
+## Keyword Logger
+
+The Keyword logger can be used for mentions (just like the recent mentions tab on discord) and also for any keywords you want. Here is what it looks like when the bot finds a message with the specified keyword: ![img](http://i.imgur.com/TIqzsf0.png)
+
+As you can see, it shows the context, the keyword it matched, the time, the server and channel, and the usernames of the people.
+
+So, here's how you get started with setting up the logger:
+1. Make a channel where you want to receive these log messages. You can set it to be anwhere you want really, but if you don't want anyone else to read/send messages where it logs, create a server for just yourself and use a channel there.
+2. In this channel, do ``>log location`` to set the log location to this channel. Now do ``>log`` and you should see that ``Log location:`` is set to this current channel in this server.
+3. Add the keywords you want to log. ``>log addkey <word>`` Each key can be more than one word and case does not matter. Removing is just ``>log removekey <word>``. If you want to add mentions to the keywords, just tag yourself or the specified user as if you were mentioning them. When you view the keywords with ``>log``, the mentions will look like <@1287683643986> or something but that's fine.
+4. Add the servers you want to log or set it to log all servers. Go to a server and in any channel, do ``>log add`` to let the logger check that server for keywords. Removing is just ``>log remove``. If you want to set to all servers, do ``>log toggle``. Do it again to toggle back to only the specified servers.
+5. Set the context length. This is the number of messages to show in the log message. The default is set to 4 (this is 4 messages before keyword message + the keyword message). Set it with ``>log context <number>``. You can go up to 20 messages.
+
+**Note:** Only other people can trigger the log message. You yourself saying a keyword won't log the message.
+
+That should be it. Check your settings any time with ``>log``.
 
 ## Google API
 
