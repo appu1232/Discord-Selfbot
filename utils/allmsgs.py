@@ -47,14 +47,13 @@ def custom(message):
                 # If the commands resulting reply is a list instead of a str
                 if type(commands[i]) is list:
                     try:
-
                         # If index from list is specified, get that result.
                         if message[len(i) + 1:].isdigit():
                             index = int(message.content[len(i) + 1:].strip())
                         else:
                             title = message[len(i) + 1:]
                             for b, j in enumerate(commands[i]):
-                                if j[0] == title:
+                                if j[0] == title.strip():
                                     index = int(b)
                                     break
                         mimetype, encoding = mimetypes.guess_type(commands[i][index][1])
