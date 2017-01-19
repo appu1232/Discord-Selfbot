@@ -1,11 +1,7 @@
 {
-    "context_len": "6",
-    "keywords": [
-        "testingthis"
-    ],
-    "allservers": "True",
-    "servers": [
-        "259921092586504202"
-    ],
-    "log_location": "212317904190832641 173145817127976960"
+    "context_len": "4",
+    "keywords": [],
+    "allservers": "False",
+    "servers": [],
+    "log_location": ""
 }
