@@ -10,7 +10,7 @@ class Userinfo:
         self.bot = bot
 
     # Get user info
-    @commands.command(pass_context=True)
+    @commands.group(pass_context=True)
     async def info(self, ctx):
         if ctx.invoked_subcommand is None:
             name = ctx.message.content[5:].strip()
@@ -37,6 +37,26 @@ class Userinfo:
             await self.bot.send_message(ctx.message.channel, embed=em)
             await asyncio.sleep(2)
             await self.bot.delete_message(ctx.message)
+
+    @info.command(pass_context=True)
+    async def avi(self, ctx):
+        name = ctx.message.content[9:].strip()
+        if name:
+            try:
+                name = ctx.message.mentions[0]
+            except:
+                name = ctx.message.server.get_member_named(name)
+            if not name:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find user.')
+                return
+        else:
+            name = ctx.message.author
+
+        em = discord.Embed(colour=0x708DD0)
+        em.set_image(url=name.avatar_url)
+        await self.bot.send_message(ctx.message.channel, embed=em)
+        await asyncio.sleep(2)
+        await self.bot.delete_message(ctx.message)
 
 
 def setup(bot):

@@ -1,6 +1,5 @@
 import discord
 import datetime
-import collections
 import asyncio
 from appuselfbot import isBot
 from discord.ext import commands
@@ -55,15 +54,13 @@ class Misc:
     # Deletes previous message immediately or after specified number of seconds (because why not)
     @commands.command(pass_context=True)
     async def d(self, ctx):
+
         # If number of seconds are specified
         if len(ctx.message.content.lower().strip()) > 2:
             if ctx.message.content[3] == '!':
-                await self.bot.delete_message(utils.settings.selflog.pop())
+                await self.bot.delete_message(utils.settings.remove_selflog())
                 for i in range(int(ctx.message.content[4])):
-                    await self.bot.delete_message(utils.settings.selflog.pop())
-                temp = collections.deque(maxlen=50)
-                for i in utils.settings.selflog:
-                    temp.append(i)
+                    await self.bot.delete_message(utils.settings.remove_selflog())
             else:
                 killmsg = utils.settings.selflog[len(utils.settings.selflog) - 2]
                 timer = int(ctx.message.content[2:].lower().strip())
@@ -113,8 +110,9 @@ class Misc:
 
         # If no number specified, delete message immediately
         else:
-            await self.bot.delete_message(ctx.message)
-            await self.bot.delete_message(utils.settings.selflog[len(utils.settings.selflog) - 2])
+            await self.bot.delete_message(utils.settings.remove_selflog())
+            await self.bot.delete_message(utils.settings.remove_selflog())
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))

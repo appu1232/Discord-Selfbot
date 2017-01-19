@@ -115,7 +115,6 @@ class Mal:
                                        spice.init_auth(config['mal_username'], config['mal_password']))
                 results = allresults[0]
 
-
         # On any exception, search spice instead
         except:
             allresults = spice.search(msg.strip(), spice.get_medium('manga'),
@@ -163,7 +162,6 @@ class Mal:
             em.set_thumbnail(url=selection.image_url)
             em.set_author(name='MyAnimeList', icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
             await self.bot.send_message(ctx.message.channel, embed=em)
-
 
 
 def setup(bot):
