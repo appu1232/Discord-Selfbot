@@ -106,6 +106,7 @@ The Keyword logger can be used for mentions (just like the recent mentions tab o
 As you can see, it shows the context, the keyword it matched, the time, the server and channel, and the usernames of the people.
 
 So, here's how you get started with setting up the logger:
+
 1. Make a channel where you want to receive these log messages. You can set it to be anwhere you want really, but if you don't want anyone else to read/send messages where it logs, create a server for just yourself and use a channel there.
 2. In this channel, do ``>log location`` to set the log location to this channel. Now do ``>log`` and you should see that ``Log location:`` is set to this current channel in this server.
 3. Add the keywords you want to log. ``>log addkey <word>`` Each key can be more than one word and case does not matter. Removing is just ``>log removekey <word>``. If you want to add mentions to the keywords, just tag yourself or the specified user as if you were mentioning them. When you view the keywords with ``>log``, the mentions will look like <@1287683643986> or something but that's fine.
