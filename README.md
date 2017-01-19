@@ -11,7 +11,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 - Dynamically add custom commands. Stored in ``commands.json`` which has some sample commands added to start with.
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
-- Simple calculator
+- Simple calculator.
 - Ping command that shows the response time.
 
 ## Setup
@@ -98,7 +98,6 @@ If *any* one of these are multiple words, you must put *all three* in quotes. Ex
 ``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"``
 or:
 ``>add "get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
-
 
 ## Keyword Logger
 
