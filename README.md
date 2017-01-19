@@ -113,7 +113,10 @@ So, here's how you get started with setting up the logger:
 4. Add the servers you want to log or set it to log all servers. Go to a server and in any channel, do ``>log add`` to let the logger check that server for keywords. Do ``>log remove`` to remove the server you are in from the logger. If you want to set to all servers, do ``>log toggle``. Do it again to toggle back to only the specified servers.
 5. Set the context length. This is the number of messages to show in the log message. The default is set to 4 (this is 4 messages before keyword message + the keyword message). Set it with ``>log context <number>``. You can go up to 20 messages.
 
-**Note:** Only other people can trigger the log message. You yourself saying a keyword won't log the message.
+**Things to Note:**
+
+1. Only other people can trigger the log message. You yourself saying a keyword won't log the message.
+2. If the logged message + context is too long, the log message will be split up into multiple messages. These mutiple messages will not use embeds so it won't look as neat, sadly. This shouldn't happen often though.
 
 That should be it. Check your settings any time with ``>log``.
 
