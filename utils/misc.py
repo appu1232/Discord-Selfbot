@@ -14,11 +14,9 @@ class Misc:
     # Links to the Selfbot project on Github
     @commands.command(pass_context=True)
     async def about(self, ctx):
-        em = discord.Embed(description='by appu1232#2569\n\nhttps://github.com/appu1232/Selfbot-for-Discord',
-                           colour=0x593bd3)
-        em.set_image(url='https://github.com/appu1232/Selfbot-for-Discord')
-        em.set_author(name='Discord Selfbot', icon_url='http://i.imgur.com/mvyVEqw.jpg')
-        await self.bot.send_message(ctx.message.channel, embed=em)
+        await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
+        await asyncio.sleep(2)
+        await self.bot.delete_message(ctx.message)
 
     # Get response time
     @commands.command(pass_context=True)
