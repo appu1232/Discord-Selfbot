@@ -9,7 +9,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 - Dynamically add custom commands/reactions. Stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
-- Set yourself as afk and message a user telling them you are away if they message/mention you.
+- Set yourself as afk and reply to a user telling them you are away if they message/mention you.
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
 - Simple calculator.
@@ -50,8 +50,8 @@ The Google and MAL info is not needed in order to get the bot running. However, 
 
 Note: You must have Python 3.5.2 or above installed.
 
-1. Run ``pip install -r requirements.txt`` to install all required modules.
-2. Run the bot with ``python appuselfbot.py`` and that should be it. If you want to run it and forget about it, consider hosting on a server.
+1. Windows: ``python -m pip install -r requirements.txt`` Mac/Linux: ``pip install -r requirements.txt`` to install all required modules.
+2. ``python appuselfbot.py`` to run the bot. Do ``python loopself.py`` instead to let the bot autorestart if it crashes.
 
 ## All Commands:
 - ``>restart`` - restart the bot.
@@ -59,8 +59,8 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result.
 - ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result.
-- ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands for logging.
-- ``>log history <n>`` or ``>log history save <n>`` - Output/save the last <n> number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
+- ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands used for keyword logging.
+- ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
@@ -124,11 +124,11 @@ That should be it. Check your settings any time with ``>log``.
 
 ## Save Chat Messages
 
-You can only save chat messages in the servers you are logging (see **Keyword Logger** section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the limit for the logger is 1000 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``utils`` folder. You can increase this value if you want; the upper limit is well over 1000.
+You can only save chat messages in the servers you are logging (see **Keyword Logger** section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the logger holds the latest 1000 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``utils`` folder. You can increase this value if you want; the upper limit is well over 1000.
 When you want to save some kind of memorable discussion/funny moment/important reminder or want to shame someone for a message they deleted or something, use the ``>log history`` command:
 
-``>log history <number>`` outputs the last <n> number of messages from the chat you just used the command in. <n> can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages.
-``>log history save <number>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages.
+``>log history <n>`` outputs the last <n> number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages.
+``>log history save <n>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages.
 
 **Warning** - You probably want to stick with using ``save`` when grabbing large amounts of messages. Outputting walls of text by doing ``>log history 200`` might get you banned from most public servers.
 
