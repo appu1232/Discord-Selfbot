@@ -49,6 +49,7 @@ class Customcmds:
 
         with open('commands.json', 'r') as commands:
             cmds = json.load(commands)
+            save = cmds
 
         try:
 
@@ -99,6 +100,9 @@ class Customcmds:
                                    isBot + 'Successfully added ``%s`` to ``%s``' % (entry[1], entry[0]))
 
         except Exception as e:
+            with open('commands.json', 'w') as commands:
+                commands.truncate()
+                json.dump(save, commands, indent=4)
             await self.bot.send_message(ctx.message.channel, isBot + 'Error, seomthing went wrong. Exception: ``%s``' % e)
 
         # Update commands.json
@@ -113,6 +117,7 @@ class Customcmds:
 
         with open('commands.json', 'r') as commands:
             cmds = json.load(commands)
+            save = cmds
 
         try:
 
@@ -190,6 +195,9 @@ class Customcmds:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Could not find specified command.')
 
         except Exception as e:
+            with open('commands.json', 'w') as commands:
+                commands.truncate()
+                json.dump(save, commands, indent=4)
             await self.bot.send_message(ctx.message.channel, isBot + 'Error, something went wrong. Exception: ``%s``' % e)
 
         # Update commands.json

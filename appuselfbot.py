@@ -70,9 +70,6 @@ async def on_message(message):
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
     if hasPassed(utils.settings.oldtime):
         await bot.change_presence(status='invisible', afk=True)
-    # if message.channel.id not in utils.settings.load_config():
-    #     utils.settings.alllog[message.channel.id] = collections.deque(maxlen=500)
-    # utils.settings.alllog[message.channel.id]
 
     # If the message was sent by me
     if message.author.id == config['my_id']:
@@ -135,8 +132,8 @@ async def on_message(message):
                     msg = ''
                     for i in range(0, int(loginfo['context_len'])):
                         temp = context[len(context)-i-1]
-                        msg += 'User: %s | %s\n' % (temp.author.name, temp.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content + '\n\n'
-                    msg += 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content
+                        msg += 'User: %s | %s\n' % (temp.author.name, temp.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
+                    msg += 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
                     success = True
                 except:
                     success = False

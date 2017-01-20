@@ -17,6 +17,7 @@ class Google:
         # If >g then google web search with specified words
         config = load_config()
         if ctx.invoked_subcommand is None:
+            fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Searching...')
             if not ctx.message.content[3].isdigit():
                 searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
                             ctx.message.content[
@@ -59,10 +60,12 @@ class Google:
                                    colour=0x2D5AF9)
                 em.set_author(name='Google Results:\n\n')
                 await self.bot.send_message(ctx.message.channel, embed=em)
+            await self.bot.delete_message(fetch)
 
     @g.command(pass_context=True)
     async def i(self, ctx):
         # If >g i then google image search with specified words
+        fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Searching...')
         config = load_config()
         if not ctx.message.content[5].isdigit():
             searchUrl = "https://www.googleapis.com/customsearch/v1?q=" + \
@@ -94,6 +97,7 @@ class Google:
             em = discord.Embed()
             await self.bot.send_message(ctx.message.channel, content=None,
                                    embed=em.set_image(url=result['items'][int(ctx.message.content[5])]['link']))
+        await self.bot.delete_message(fetch)
 
 
 def setup(bot):

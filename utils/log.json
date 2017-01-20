@@ -3,5 +3,6 @@
     "keywords": [],
     "allservers": "False",
     "servers": [],
-    "log_location": ""
+    "log_location": "",
+	"log_size": "1000"
 }
