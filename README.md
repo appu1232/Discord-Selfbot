@@ -127,8 +127,8 @@ That should be it. Check your settings any time with ``>log``.
 You can only save chat messages in the servers you are logging (see **Keyword Logger** section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the logger holds the latest 1000 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``utils`` folder. You can increase this value if you want; the upper limit is well over 1000.
 When you want to save some kind of memorable discussion/funny moment/important reminder or want to shame someone for a message they deleted or something, use the ``>log history`` command:
 
-``>log history <n>`` outputs the last <n> number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages.
-``>log history save <n>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages.
+- ``>log history <n>`` outputs the last <n> number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages.
+- ``>log history save <n>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages.
 
 **Warning** - You probably want to stick with using ``save`` when grabbing large amounts of messages. Outputting walls of text by doing ``>log history 200`` might get you banned from most public servers.
 
