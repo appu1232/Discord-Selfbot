@@ -6,9 +6,10 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 
 - Google search (web or image).
 - Keyword/mention logger. Log messages from any or all servers that have one of the keywords you specify. Useful for seeing if someone mentioned your name or your favorite show/book/whatever else keyword.
+- Dynamically add custom commands/reactions. Stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
+- Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Set yourself as afk and message a user telling them you are away if they message/mention you.
-- Dynamically add custom commands. Stored in ``commands.json`` which has some sample commands added to start with.
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
 - Simple calculator.
@@ -59,6 +60,7 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result.
 - ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result.
 - ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands for logging.
+- ``>log history <n>`` or ``>log history save <n>`` - Output/save the last <n> number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
@@ -120,6 +122,16 @@ So, here's how you get started with setting up the logger:
 
 That should be it. Check your settings any time with ``>log``.
 
+## Save Chat Messages
+
+You can only save chat messages in the servers you are logging (see **Keyword Logger** section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the limit for the logger is 1000 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``utils`` folder. You can increase this value if you want; the upper limit is well over 1000.
+When you want to save some kind of memorable discussion/funny moment/important reminder or want to shame someone for a message they deleted or something, use the ``>log history`` command:
+
+``>log history <number>`` outputs the last <n> number of messages from the chat you just used the command in. <n> can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages.
+``>log history save <number>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages.
+
+**Warning** - You probably want to stick with using ``save`` when grabbing large amounts of messages. Outputting walls of text by doing ``>log history 200`` might get you banned from most public servers.
+
 ## Google API
 
 In order to use the ``>g`` command to search the web/images and in order to get more accurate MyAnimeList search results, you will need a Google API key and a Custom Search Engine ID.
@@ -133,4 +145,4 @@ Follow these steps to obtain them:
 5. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
 6. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
 
-Note: Google may take a little while to properly register your key so the search feature may not work right away. If it's still not working after a few hours, then you may have messed up somewhere.
+**Note:** Google may take a little while to properly register your key so the search feature may not work right away. If it's still not working after a few hours, then you may have messed up somewhere.
