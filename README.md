@@ -56,17 +56,17 @@ Note: You must have Python 3.5.2 or above installed.
 ## All Commands:
 - ``>restart`` - restart the bot.
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
-- ``>ping`` - Responds with ``pong`` and also gives the response time.
-- ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result.
-- ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result.
-- ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands used for keyword logging.
+- ``>ping`` - Responds with ``pong`` and also gives the response time. How the ping response looks: ![img](http://i.imgur.com/XhzTYaW.png)
+- ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result. A search result: ![img](http://i.imgur.com/qBqFRBA.png)
+- ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result. An image search result: ![img](http://i.imgur.com/4uneQCN.png)
+- ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands used for keyword logging. A logged message: ![img](http://i.imgur.com/4I8B2IW.png)
 - ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
-- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
+- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well. An mal search result: ![img](http://i.imgur.com/NmqmzdM.png)
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
-- ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
+- ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture. ![img](http://i.imgur.com/n4mSRyD.png)
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on or off.
 - ``>setafkmsg <msg>`` - Set the afk message.
-- ``>customcmds`` - List all custom commands.
+- ``>customcmds`` - List all custom commands. A sample custom command that outputs a picture: ![img](http://i.imgur.com/gBoKnjQ.png)
 - ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 - ``>d`` or ``>d <seconds>`` - Remove the last message you sent (along with this one). ``>d`` will immediately delete but ``>d <seconds>`` will wait out the number of seconds. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
@@ -103,9 +103,9 @@ or:
 
 ## Keyword Logger
 
-The Keyword logger can be used for mentions (just like the recent mentions tab on discord) and also for any keywords you want. Here is what it looks like when the bot finds a message with the specified keyword: ![img](http://i.imgur.com/TIqzsf0.png)
+The Keyword logger can be used for mentions (just like the recent mentions tab on discord) and also for any keywords you want. Here is another example of what it looks like when the bot finds a message with the specified keyword: ![img](http://i.imgur.com/TIqzsf0.png)
 
-As you can see, it shows the context, the keyword it matched, the time, the server and channel, and the usernames of the people.
+As you can see, it shows the context, the keyword it matched, time message was sent, server, channel, and the names of the users in the context.
 
 So, here's how you get started with setting up the logger:
 
@@ -118,7 +118,7 @@ So, here's how you get started with setting up the logger:
 **Things to Note:**
 
 1. Only other people can trigger the log message. You yourself saying a keyword won't log the message.
-2. If the logged message + context is too long, the log message will be split up into multiple messages. These mutiple messages will not use embeds so it won't look as neat, sadly. This shouldn't happen often though.
+2. If the logged message + context is too long, the log message will be split up into multiple messages. These mutiple messages don't use embeds so it won't look as neat, sadly. This shouldn't happen often though.
 
 That should be it. Check your settings any time with ``>log``.
 
@@ -127,10 +127,10 @@ That should be it. Check your settings any time with ``>log``.
 You can only save chat messages in the servers you are logging (see **Keyword Logger** section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the logger holds the latest 1000 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``utils`` folder. You can increase this value if you want; the upper limit is well over 1000.
 When you want to save some kind of memorable discussion/funny moment/important reminder or want to shame someone for a message they deleted or something, use the ``>log history`` command:
 
-- ``>log history <n>`` outputs the last <n> number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages.
-- ``>log history save <n>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages.
+- ``>log history <n>`` outputs the last <n> number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages. A screencap of what it looks like: ![img](http://i.imgur.com/snAWT7C.png)
+- ``>log history save <n>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages. A screencap of what it looks like: ![img](http://i.imgur.com/MUwOhgp.png)
 
-**Warning** - You probably want to stick with using ``save`` when grabbing large amounts of messages. Outputting walls of text by doing ``>log history 200`` might get you banned from most public servers.
+**Warning:** You probably want to stick with using ``save`` when grabbing large amounts of messages. Outputting walls of text by doing ``>log history 200`` might get you banned from most public servers.
 
 ## Google API
 
