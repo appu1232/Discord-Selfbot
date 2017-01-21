@@ -92,7 +92,7 @@ Note: You must have Python 3.5.2 or above installed.
 - Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
 ## Custom Commands:
-There are two types of commands: commands that have a ``string`` as a response and commands that have a ``list`` as a response (multiple possible responses).
+There are two types of commands: ``string`` commands which only have one response and ``list`` commands which can have multiple responses.
 
 **String commands**:
 - 90% of the time you will probably be using the ``string`` command type with something like ``.<command>`` to get the response. Ex: ``.hakomari`` leads to the response ``https://myanimelist.net/manga/55215/Utsuro_no_Hako_to_Zero_no_Maria``
@@ -104,8 +104,8 @@ In order to have multiple responses to one command, you need to use the ``list``
 - Add a second parameter between the command and the response like so: ``>add <command> <response_name> <response>`` Ex: ``>add kaguya cute http://i.imgur.com/LtdE1zW.jpg``.
 - Adding different ``<response_name>`` and ``<response>`` to the same ``<command>`` will append it to the list of responses for that command.
 - Invoke a specific response with: ``.<command> <response_name>`` or ``.<command> <index>``
-- Random responses: If more than one response name and response are in a command, get a random response with ``.<command>``.
-- Removing follows the logical syntax: ``>remove <command> <response_name>`` to remove a specific response from the command and ``>remove <command>`` to remove the entire command.
+- Random responses: If more than one response name and response are in a command, get a random response with ``.<command>``
+- ``>remove <command> <response_name>`` to remove a specific response from the command or ``>remove <command>`` to remove the entire command.
 - **Important Note:** You cannot make a command that was initially a string command into a list command by adding a second response to it. You must remove the string command and add it as a list command.
 
 **Adding commands with more than one word for the command/response_name/response:**
