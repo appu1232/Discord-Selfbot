@@ -117,7 +117,9 @@ or:
 
 ## Keyword Logger
 
-The Keyword logger can be used for mentions (just like the recent mentions tab on discord) and also for any keywords you want. Here is another example of what it looks like when the bot finds a message with the specified keyword: ![img](http://i.imgur.com/TIqzsf0.png)
+The Keyword logger can be used for mentions (just like the recent mentions tab on discord) and also for any keywords you want. Here is another example of what it looks like when the bot finds a message with the specified keyword:
+
+![img](http://i.imgur.com/TIqzsf0.png)
 
 As you can see, it shows the context, the keyword it matched, time message was sent, server, channel, and the names of the users in the context.
 
