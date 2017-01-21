@@ -29,8 +29,13 @@ class Google:
                 try:
                     webpage = urllib.request.urlopen(result['items'][0]['link']).read()
                 except:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
-                    return
+                    try:
+                        await self.bot.send_message(ctx.message.channel, isBot + result['items'][0]['link'])
+                    except:
+                        await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                    finally:
+                        await self.bot.delete_message(fetch)
+                        return
                 try:
                     title = str(webpage).split('<title>')[1].split('</title>')[0]
                 except:
@@ -50,8 +55,13 @@ class Google:
                 try:
                     webpage = urllib.request.urlopen(result['items'][int(ctx.message.content[3])]['link']).read()
                 except:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
-                    return
+                    try:
+                        await self.bot.send_message(ctx.message.channel, isBot + result['items'][int(ctx.message.content[3])]['link'])
+                    except:
+                        await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                    finally:
+                        await self.bot.delete_message(fetch)
+                        return
                 try:
                     title = str(webpage).split('<title>')[1].split('</title>')[0]
                 except:
