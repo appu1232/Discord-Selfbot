@@ -108,10 +108,6 @@ class Userinfo:
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
 
-        else:
-            await self.bot.send_message(ctx.message.channel, isBot + 'The last ``%d`` messages have been logged from this channel.' % len(utils.settings.alllog[ctx.message.channel + ' ' + ctx.message.server]))
-
-
     @log.command(pass_context=True)
     async def location(self, ctx):
         with open('utils/log.json', 'r+') as log:
