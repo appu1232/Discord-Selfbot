@@ -1,6 +1,11 @@
 from discord.ext import commands
 from appuselfbot import isBot
+import utils.settings
 import json
+import math
+import os
+import io
+from datetime import timezone
 
 keywords = []
 log_servers = []
@@ -37,6 +42,74 @@ class Userinfo:
                     msg += 'All Servers'
                 msg += '\n\nContext length: %s messages```' % settings['context_len']
             await self.bot.send_message(ctx.message.channel, isBot + msg)
+
+
+    @log.command(pass_context=True)
+    async def history(self, ctx):
+        if ctx.message.content.strip()[12:]:
+            if ctx.message.content[12:].strip().startswith('save'):
+                if ctx.message.content[17:].strip():
+                    size = ctx.message.content[17:].strip()
+                    if size.isdigit():
+                        save = True
+                        fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Saving messages...')
+                    else:
+                        await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
+                        return
+                else:
+                    await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
+                    return
+            else:
+                save = False
+                fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Fetching messages...')
+                size = ctx.message.content.strip()[12:]
+            if size.isdigit:
+                size = int(size)
+                msg = ''
+                comments = utils.settings.alllog[ctx.message.channel.id + ' ' + ctx.message.server.id]
+                if len(comments)-2 < size:
+                    size = len(comments)-2
+                    if size < 0:
+                        size = 0
+                for i in range(len(comments)-size-2, len(comments)-2):
+                    msg += 'User: %s  |  %s\r\n' % (comments[i].author.name,
+                                     comments[i].timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__(
+                                             '%x @ %X')) + comments[i].clean_content.replace('`', '') + '\r\n\r\n'
+                if save is True:
+                    with open('saved_chat.txt', 'w') as file:
+                        msg = 'Server: %s\r\nChannel: %s\r\nTime:%s\r\n\r\n' % (ctx.message.server.name, ctx.message.channel.name, ctx.message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
+                        file.write(msg)
+                    with open('saved_chat.txt', 'rb') as file:
+                        await self.bot.send_file(ctx.message.channel, file)
+                    os.remove('saved_chat.txt')
+                    await self.bot.delete_message(fetch)
+                else:
+                    part = int(math.ceil(len(msg) / 1950))
+                    if part == 1:
+                        await self.bot.send_message(ctx.message.channel,
+                                                    isBot + 'Showing last ``%s`` messages: ```%s```' % (
+                                                    ctx.message.content.strip()[12:], msg))
+                        await self.bot.delete_message(fetch)
+                    else:
+                        splitList = [msg[i:i + 1950] for i in range(0, len(msg), 1950)]
+                        allWords = []
+                        splitmsg = ''
+                        for i, blocks in enumerate(splitList):
+                            for b in blocks.split('\n'):
+                                splitmsg += b + '\n'
+                            allWords.append(splitmsg)
+                            splitmsg = ''
+                        for b, i in enumerate(allWords):
+                            if b == 0:
+                                await self.bot.send_message(ctx.message.channel, isBot + 'Showing last ``%s`` messages: ```%s```' % (ctx.message.content.strip()[12:], i))
+                            else:
+                                await self.bot.send_message(ctx.message.channel, '```%s```' % i)
+                        await self.bot.delete_message(fetch)
+            else:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
+
+        else:
+            await self.bot.send_message(ctx.message.channel, isBot + 'The last ``%d`` messages have been logged from this channel.' % len(utils.settings.alllog[ctx.message.channel + ' ' + ctx.message.server]))
 
 
     @log.command(pass_context=True)
