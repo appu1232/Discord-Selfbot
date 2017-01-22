@@ -31,7 +31,7 @@ class Misc:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
         em.add_field(name=':clock2: Uptime', value=time, inline=False)
         em.add_field(name=':outbox_tray: Messages sent', value=str(self.bot.icount))
-        em.add_field(name=':inbox_tray: Messages recieved', value=':envelope_with_arrow: ' + str(self.bot.message_count))
+        em.add_field(name=':inbox_tray: Messages recieved', value=str(self.bot.message_count))
         em.add_field(name=':exclamation: Mentions received', value=str(self.bot.mention_count))
         em.add_field(name=':crossed_swords: Servers', value=str(len(self.bot.servers)))
         em.add_field(name=':pencil2: Keywords logged', value=str(self.bot.keyword_log))
