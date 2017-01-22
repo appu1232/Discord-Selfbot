@@ -53,7 +53,13 @@ class Userinfo:
             name = ctx.message.author
 
         em = discord.Embed(colour=0x708DD0)
-        em.set_image(url=name.avatar_url)
+
+        # Thanks to IgneelDxD for help on this
+        if name.avatar_url[60:].startswith('a_'):
+            avi = 'https://images.discordapp.net/avatars/' + name.avatar_url[33:][:18] + name.avatar_url[59:-3] + 'gif'
+        else:
+            avi = name.avatar_url
+        em.set_image(url=avi)
         await self.bot.send_message(ctx.message.channel, embed=em)
         await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
