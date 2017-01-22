@@ -147,7 +147,7 @@ class Mal:
                 chapters = 'Unknown'
             else:
                 chapters = selection.chapters
-            em.add_field(name='Chapters', value=chapters, inline=True)
+            em.add_field(name='Chapters', value=chapters)
             em.add_field(name='Score', value=selection.score + '/10')
             try:
                 english = selection.english
