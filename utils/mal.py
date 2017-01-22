@@ -67,14 +67,14 @@ class Mal:
                     em.add_field(name='English Title', value=english, inline=False)
             except:
                 pass
-            em.add_field(name='Type', value=selection.anime_type, inline=True)
+            em.add_field(name='Type', value=selection.anime_type)
             if selection.episodes == '0':
                 episodes = 'Unknown'
             else:
                 episodes = selection.episodes
-            em.add_field(name='Episodes', value=episodes, inline=True)
-            em.add_field(name='Score', value=selection.score + '/10', inline=True)
-            em.add_field(name='Status', value=selection.status, inline=True)
+            em.add_field(name='Episodes', value=episodes)
+            em.add_field(name='Score', value=selection.score + '/10')
+            em.add_field(name='Status', value=selection.status)
             try:
                 synop = synopsis.get_text()[:400].split('.')
                 text = ''
@@ -90,7 +90,7 @@ class Mal:
                 else:
                     date = selection.dates[0] + "  -  " + selection.dates[1]
                 if date:
-                    em.add_field(name='Airing Time:', value=date, inline=True)
+                    em.add_field(name='Airing Time:', value=date)
             except:
                 pass
             em.set_thumbnail(url=selection.image_url)
@@ -142,13 +142,13 @@ class Mal:
             em = discord.Embed(description='{}'.format('https://myanimelist.net/manga/%s' % selection.id),
                                colour=0x0066CC)
 
-            em.add_field(name='Type', value=selection.manga_type, inline=True)
+            em.add_field(name='Type', value=selection.manga_type)
             if selection.chapters == '0':
                 chapters = 'Unknown'
             else:
                 chapters = selection.chapters
             em.add_field(name='Chapters', value=chapters, inline=True)
-            em.add_field(name='Score', value=selection.score + '/10', inline=True)
+            em.add_field(name='Score', value=selection.score + '/10')
             try:
                 english = selection.english
                 if english:
@@ -156,7 +156,7 @@ class Mal:
             except:
                 pass
 
-            em.add_field(name='Status', value=selection.status, inline=True)
+            em.add_field(name='Status', value=selection.status)
             try:
                 synop = synopsis.get_text()[:400].split('.')
                 text = ''
@@ -172,7 +172,7 @@ class Mal:
                 else:
                     date = selection.dates[0] + "  -  " + selection.dates[1]
                 if date:
-                    em.add_field(name='Publishing Time:', value=date, inline=True)
+                    em.add_field(name='Publishing Time:', value=date)
             except:
                 pass
 
