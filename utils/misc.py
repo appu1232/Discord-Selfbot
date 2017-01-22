@@ -34,7 +34,7 @@ class Misc:
         em.add_field(name=':inbox_tray: Messages recieved', value=':envelope_with_arrow: ' + str(self.bot.message_count))
         em.add_field(name=':exclamation: Mentions received', value=str(self.bot.mention_count))
         em.add_field(name=':crossed_swords: Servers', value=str(len(self.bot.servers)))
-        em.add_field(name=':pencil2: Keywords logged', value=str(self.bot.keywords))
+        em.add_field(name=':pencil2: Keywords logged', value=str(self.bot.keyword_log))
         await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
