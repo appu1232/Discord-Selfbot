@@ -85,7 +85,7 @@ class Userinfo:
                                 attachments += 'Attachment: ' + j['url'] + '\r\n'
                             for j in comments[i][0].embeds:
                                 embed = re.findall("'url': '(.*?)'", str(j))
-                                attachments += 'Embed: ' + str(embed[0]) + '\r\n'
+                                attachments += 'Embed: ' + str(j) + '\r\n'
                         msg += 'User: %s  |  %s\r\n' % (comments[i][0].author.name,
                                      comments[i][0].timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__(
                                              '%x @ %X')) + comments[i][0].clean_content.replace('`', '') + attachments + '\r\n'
@@ -95,12 +95,13 @@ class Userinfo:
                                                             tz=None).__format__(
                                                             '%x @ %X'), comments[i][1].replace('`', '') + attachments, comments[i][0].clean_content.replace('`', '') + attachments)
                 if save is True:
-                    with open('saved_chat.txt', 'w') as file:
+                    save_file = 'saved_chat_%s_at_%s.txt' % (ctx.message.timestamp.__format__('%x').replace('/', '_'), ctx.message.timestamp.__format__('%X').replace(':', '_'))
+                    with open(save_file, 'w') as file:
                         msg = 'Server: %s\r\nChannel: %s\r\nTime:%s\r\n\r\n' % (ctx.message.server.name, ctx.message.channel.name, ctx.message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
                         file.write(msg)
-                    with open('saved_chat.txt', 'rb') as file:
+                    with open(save_file, 'rb') as file:
                         await self.bot.send_file(ctx.message.channel, file)
-                    os.remove('saved_chat.txt')
+                    os.remove(save_file)
                     await self.bot.delete_message(fetch)
                 else:
                     part = int(math.ceil(len(msg) / 1950))

@@ -148,8 +148,6 @@ class Mal:
             else:
                 chapters = selection.chapters
             em.add_field(name='Chapters', value=chapters, inline=True)
-            print(selection.chapters)
-            print(type(selection.chapters))
             em.add_field(name='Score', value=selection.score + '/10', inline=True)
             try:
                 english = selection.english
