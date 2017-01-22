@@ -1,10 +1,9 @@
 from discord.ext import commands
 from appuselfbot import isBot
-import utils.settings
 import json
 import math
 import os
-import io
+import re
 from datetime import timezone
 
 keywords = []
@@ -52,6 +51,7 @@ class Userinfo:
                     size = ctx.message.content[17:].strip()
                     if size.isdigit():
                         save = True
+                        skip = 0
                         fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Saving messages...')
                     else:
                         await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
@@ -61,20 +61,39 @@ class Userinfo:
                     return
             else:
                 save = False
-                fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Fetching messages...')
-                size = ctx.message.content.strip()[12:]
+                skip = 2
+                await self.bot.send_message(ctx.message.channel, isBot + 'Are you sure you want to output all the messages here? Reply with ``y``  in the next 10 seconds to continue.')
+                reply = await self.bot.wait_for_message(timeout=10, author=ctx.message.author, content='y')
+                if reply:
+                    fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Fetching messages...')
+                    size = ctx.message.content.strip()[12:]
+                else:
+                    return
             if size.isdigit:
                 size = int(size)
                 msg = ''
-                comments = utils.settings.alllog[ctx.message.channel.id + ' ' + ctx.message.server.id]
-                if len(comments)-2 < size:
-                    size = len(comments)-2
+                comments = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id]
+                if len(comments)-2-skip < size:
+                    size = len(comments)-2-skip
                     if size < 0:
                         size = 0
-                for i in range(len(comments)-size-2, len(comments)-2):
-                    msg += 'User: %s  |  %s\r\n' % (comments[i].author.name,
-                                     comments[i].timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__(
-                                             '%x @ %X')) + comments[i].clean_content.replace('`', '') + '\r\n\r\n'
+                for i in range(len(comments)-size-2-skip, len(comments)-2-skip):
+                    if comments[i][0].clean_content.replace('`', '') == comments[i][1].replace('`', ''):
+                        attachments = '\r\n'
+                        if comments[i][0].attachments != [] or comments[i][0].embeds != []:
+                            for j in comments[i][0].attachments:
+                                attachments += 'Attachment: ' + j['url'] + '\r\n'
+                            for j in comments[i][0].embeds:
+                                embed = re.findall("'url': '(.*?)'", str(j))
+                                attachments += 'Embed: ' + str(embed[0]) + '\r\n'
+                        msg += 'User: %s  |  %s\r\n' % (comments[i][0].author.name,
+                                     comments[i][0].timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__(
+                                             '%x @ %X')) + comments[i][0].clean_content.replace('`', '') + attachments + '\r\n'
+                    else:
+                        msg += 'User: %s  |  %s\r\n[BEFORE EDIT]\r\n%s\r\n[AFTER EDIT]\r\n%s\r\n' % (comments[i][0].author.name,
+                                                        comments[i][0].timestamp.replace(tzinfo=timezone.utc).astimezone(
+                                                            tz=None).__format__(
+                                                            '%x @ %X'), comments[i][1].replace('`', '') + attachments, comments[i][0].clean_content.replace('`', '') + attachments)
                 if save is True:
                     with open('saved_chat.txt', 'w') as file:
                         msg = 'Server: %s\r\nChannel: %s\r\nTime:%s\r\n\r\n' % (ctx.message.server.name, ctx.message.channel.name, ctx.message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg

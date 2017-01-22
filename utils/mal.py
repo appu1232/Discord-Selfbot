@@ -1,5 +1,4 @@
 import spice_api as spice
-import urllib
 import json
 import requests
 import re

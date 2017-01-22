@@ -3,7 +3,6 @@ import datetime
 import asyncio
 from appuselfbot import isBot
 from discord.ext import commands
-import utils.settings
 
 
 class Misc:
@@ -17,6 +16,34 @@ class Misc:
         await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
         await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
+
+    # Bot stats, thanks IgneelDxD for the design
+    @commands.command(pass_context=True)
+    async def stats(self, ctx):
+        em = discord.Embed(title='Bot Stats', color=0x32441c)
+        uptime = (datetime.datetime.now() - self.bot.uptime)
+        hours, rem = divmod(int(uptime.total_seconds()), 3600)
+        minutes, seconds = divmod(rem, 60)
+        days, hours = divmod(hours, 24)
+        if days:
+            time = '%s days, %s hours, %s minutes, and %s seconds' % (days, hours, minutes, seconds)
+        else:
+            time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
+        em.add_field(name=':clock2: Uptime', value=time, inline=False)
+        em.add_field(name=':outbox_tray: Messages sent', value=str(self.bot.icount))
+        em.add_field(name=':inbox_tray: Messages recieved', value=':envelope_with_arrow: ' + str(self.bot.message_count))
+        em.add_field(name=':exclamation: Mentions received', value=str(self.bot.mention_count))
+        em.add_field(name=':crossed_swords: Servers', value=str(len(self.bot.servers)))
+        em.add_field(name=':pencil2: Keywords logged', value=str(self.bot.keywords))
+        await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        await asyncio.sleep(2)
+        await self.bot.delete_message(ctx.message)
+
+    # # Stats about current server
+    # @commands.command(pass_context=True)
+    # async def server(self, ctx):
+    #     em = discord.Embed(title='Bot Stats', color=0x32441c)
+
 
     # Get response time
     @commands.command(pass_context=True)
@@ -56,11 +83,16 @@ class Misc:
         # If number of seconds are specified
         if len(ctx.message.content.lower().strip()) > 2:
             if ctx.message.content[3] == '!':
-                await self.bot.delete_message(utils.settings.remove_selflog())
-                for i in range(int(ctx.message.content[4])):
-                    await self.bot.delete_message(utils.settings.remove_selflog())
+                await self.bot.delete_message(self.bot.self_log.pop())
+                i = 0
+                while i != int(ctx.message.content[4]):
+                    try:
+                        await self.bot.delete_message(self.bot.self_log.pop())
+                        i += 1
+                    except:
+                        pass
             else:
-                killmsg = utils.settings.selflog[len(utils.settings.selflog) - 2]
+                killmsg = self.bot.self_log[len(self.bot.self_log) - 2]
                 timer = int(ctx.message.content[2:].lower().strip())
 
                 # Animated countdown because screw rate limit amirite
@@ -108,8 +140,8 @@ class Misc:
 
         # If no number specified, delete message immediately
         else:
-            await self.bot.delete_message(utils.settings.remove_selflog())
-            await self.bot.delete_message(utils.settings.remove_selflog())
+            await self.bot.delete_message(self.bot.self_log.pop())
+            await self.bot.delete_message(self.bot.self_log.pop())
 
 
 def setup(bot):

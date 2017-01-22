@@ -3,10 +3,12 @@ import os
 import sys
 import math
 import time
+import datetime
+import collections
+import traceback
 from datetime import timezone
 from discord.ext import commands
 from utils.allmsgs import *
-import utils.settings
 
 
 def load_config():
@@ -15,19 +17,17 @@ def load_config():
 
 config = load_config()
 
-extensions = ['utils.afk', 'utils.customcmds', 'utils.google', 'utils.keywordlog', 'utils.mal', 'utils.misc', 'utils.userinfo']
+extensions = ['utils.afk', 'utils.customcmds', 'utils.debugger', 'utils.google', 'utils.keywordlog', 'utils.mal', 'utils.misc', 'utils.userinfo']
 
-utils.settings.keywordlog = {}
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
     isBot = ''
-allLogs = {}
 
 
 def hasPassed(oldtime):
     if time.time() - 10 < oldtime:
         return False
-    utils.settings.oldtime = time.time()
+    bot.refresh_time = time.time()
     return True
 
 
@@ -40,6 +40,22 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    if not hasattr(bot, 'uptime'):
+        bot.uptime = datetime.datetime.now()
+    if not hasattr(bot, 'icount'):
+        bot.icount = 0
+    if not hasattr(bot, 'message_count'):
+        bot.message_count = 0
+    if not hasattr(bot, 'mention_count'):
+        bot.mention_count = 0
+    if not hasattr(bot, 'self_log'):
+        bot.self_log = collections.deque(maxlen=200)
+    if not hasattr(bot, 'all_log'):
+        bot.all_log = {}
+    if not hasattr(bot, 'keyword_log'):
+        bot.keyword_log = 0
+    if not hasattr(bot, 'refresh_time'):
+        bot.refresh_time = time.time()
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
@@ -56,24 +72,25 @@ async def restart(ctx):
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-# @bot.event
-# async def on_error(event, args):
-#     pass
-#     if event is ConnectionResetError or ConnectionRefusedError or ConnectionError or ConnectionAbortedError or TimeoutError:
-#         sys.exit(1)
-
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
 @bot.event
 async def on_message(message):
 
+    await bot.wait_until_ready()
+    await bot.wait_until_login()
+    if hasattr(bot, 'message_count'):
+        bot.message_count += 1
+
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
-    if hasPassed(utils.settings.oldtime):
-        await bot.change_presence(status='invisible', afk=True)
+    if hasattr(bot, 'refresh_time'):
+        if hasPassed(bot.refresh_time):
+            await bot.change_presence(status='invisible', afk=True)
 
     # If the message was sent by me
     if message.author.id == config['my_id']:
-        utils.settings.add_selflog(message)
+        bot.icount += 1
+        bot.self_log.append(message)
         if message.content.startswith(config['customcmd_prefix'][0]):
             response = custom(message.content.lower().strip())
             if response is None:
@@ -93,6 +110,9 @@ async def on_message(message):
 
     notified = message.mentions
     if notified:
+        for i in notified:
+            if i.id == config['my_id']:
+                bot.mention_count += 1
         response = afk(notified)
         if response:
             await bot.send_message(message.channel, response)
@@ -102,20 +122,21 @@ async def on_message(message):
         with open('utils/log.json', 'r') as log:
             loginfo = json.load(log)
         if loginfo['allservers'] == 'True':
-            utils.settings.add_alllog(message.channel.id, message.server.id, message)
+            add_alllog(message.channel.id, message.server.id, message)
             for word in loginfo['keywords']:
-                if word.lower() in message.content.lower() and message.author.id != config['my_id']:
+                if word.lower() in message.content.lower():
                     wordfound = True
                     break
         else:
             if str(message.server.id) in loginfo['servers']:
-                utils.settings.add_alllog(message.channel.id, message.server.id, message)
+                add_alllog(message.channel.id, message.server.id, message)
                 for word in loginfo['keywords']:
                     if word.lower() in message.content.lower() and message.author.id != config['my_id']:
                         wordfound = True
                         break
 
         if wordfound is True:
+            bot.keyword_log += 1
             location = loginfo['log_location'].split()
             server = bot.get_server(location[1])
             if message.channel.id != location[0] and message.server.id != location[1]:
@@ -128,10 +149,10 @@ async def on_message(message):
                 try:
                     context = []
                     for i in range(0, int(loginfo['context_len'])):
-                        context.append(utils.settings.alllog[message.channel.id + ' ' + message.server.id][len(utils.settings.alllog[message.channel.id + ' ' + message.server.id])-i-2])
+                        context.append(bot.all_log[message.channel.id + ' ' + message.server.id][len(bot.all_log[message.channel.id + ' ' + message.server.id])-i-2])
                     msg = ''
                     for i in range(0, int(loginfo['context_len'])):
-                        temp = context[len(context)-i-1]
+                        temp = context[len(context)-i-1][0]
                         msg += 'User: %s | %s\n' % (temp.author.name, temp.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
                     msg += 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
                     success = True
@@ -144,7 +165,7 @@ async def on_message(message):
                     em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title='%s mentioned: %s' % (message.author.name, word), description='Server: ``%s``\nChannel: ``%s``\n\n**Context:**' % (str(message.server), str(message.channel)))
                     for i in range(0, int(loginfo['context_len'])):
                         temp = context.pop()
-                        em.add_field(name='%s' % temp.author.name, value=temp.clean_content, inline=False)
+                        em.add_field(name='%s' % temp[0].author.name, value=temp[0].clean_content, inline=False)
                     em.add_field(name='%s' % message.author.name, value=message.clean_content, inline=False)
                     try:
                         em.set_thumbnail(url=message.author.avatar_url)
@@ -170,6 +191,19 @@ async def on_message(message):
         pass
 
     await bot.process_commands(message)
+
+def add_alllog(channel, server, message):
+    if channel + ' ' + server in bot.all_log:
+        bot.all_log[channel + ' ' + server].append((message, message.clean_content))
+    else:
+        with open('utils/log.json') as f:
+            config = json.load(f)
+            bot.all_log[channel + ' ' + server] = collections.deque(maxlen=int(config['log_size']))
+            bot.all_log[channel + ' ' + server].append((message, message.clean_content))
+
+
+def remove_alllog(channel, server):
+    del bot.all_log[channel + ' ' + server]
 
 
 if __name__ == '__main__':
