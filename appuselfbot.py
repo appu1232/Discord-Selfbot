@@ -5,7 +5,6 @@ import math
 import time
 import datetime
 import collections
-import traceback
 from datetime import timezone
 from discord.ext import commands
 from utils.allmsgs import *
@@ -17,7 +16,7 @@ def load_config():
 
 config = load_config()
 
-extensions = ['utils.afk', 'utils.customcmds', 'utils.google', 'utils.keywordlog', 'utils.mal', 'utils.misc', 'utils.userinfo']
+extensions = ['utils.afk', 'utils.customcmds', 'utils.debugger', 'utils.google', 'utils.keywordlog', 'utils.mal', 'utils.misc', 'utils.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
@@ -136,10 +135,10 @@ async def on_message(message):
                         break
 
         if wordfound is True:
-            bot.keyword_log += 1
             location = loginfo['log_location'].split()
             server = bot.get_server(location[1])
             if message.channel.id != location[0] and message.server.id != location[1]:
+                bot.keyword_log += 1
                 msg = message.clean_content.replace('`', '')
                 if word.startswith('<@'):
                     user = message.server.get_member(word[2:-1])
