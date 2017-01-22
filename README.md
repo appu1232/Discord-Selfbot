@@ -9,7 +9,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 - Dynamically add custom commands/reactions. Stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
-- Set yourself as afk and reply to a user telling them you are away if they message/mention you.
+- Set yourself as afk and reply to a user telling them you are away if they message/mention you. (technically frowned upon by Discord so use it as a joke occasionally, not practical use)
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
 - Simple calculator.
@@ -39,7 +39,7 @@ Start off by setting up the config.json file:
 - ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) Don't give this out to anyone!
 - ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See the **Google API** section below for instructions.
 - ``mal_username`` and ``mal_password`` - MyAnimeList username and password which is required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
-- ``set_afk`` - does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``.
+- ``set_afk`` - does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``. Warning: As mentioned, this is not something Discord wants selfbots to do. More of a joke than anything.
 - ``afk_message`` - the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
 - ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as in in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
