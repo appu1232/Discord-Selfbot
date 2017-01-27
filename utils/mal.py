@@ -54,6 +54,10 @@ class Mal:
                 await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
                 return
 
+            if not ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+                await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/anime/%s' % results.id)
+                return
+
             # Formatting embed
             selection = results
             synopsis = BeautifulSoup(selection.synopsis, 'lxml')
@@ -134,6 +138,10 @@ class Mal:
             # No results found for specified tags
             if not results:
                 await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                return
+
+            if not ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+                await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/manga/%s' % results.id)
                 return
 
             # Formatting
