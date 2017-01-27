@@ -1,6 +1,8 @@
 import discord
 import datetime
 import asyncio
+import os
+import prettytable
 from appuselfbot import isBot
 from discord.ext import commands
 
@@ -20,7 +22,6 @@ class Misc:
     # Bot stats, thanks IgneelDxD for the design
     @commands.command(pass_context=True)
     async def stats(self, ctx):
-        em = discord.Embed(title='Bot Stats', color=0x32441c)
         uptime = (datetime.datetime.now() - self.bot.uptime)
         hours, rem = divmod(int(uptime.total_seconds()), 3600)
         minutes, seconds = divmod(rem, 60)
@@ -29,21 +30,161 @@ class Misc:
             time = '%s days, %s hours, %s minutes, and %s seconds' % (days, hours, minutes, seconds)
         else:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
-        em.add_field(name=':clock2: Uptime', value=time, inline=False)
-        em.add_field(name=':outbox_tray: Messages sent', value=str(self.bot.icount))
-        em.add_field(name=':inbox_tray: Messages recieved', value=str(self.bot.message_count))
-        em.add_field(name=':exclamation: Mentions received', value=str(self.bot.mention_count))
-        em.add_field(name=':crossed_swords: Servers', value=str(len(self.bot.servers)))
-        em.add_field(name=':pencil2: Keywords logged', value=str(self.bot.keyword_log))
-        await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            em = discord.Embed(title='Bot Stats', color=0x32441c)
+            em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
+            em.add_field(name=u'\U0001F4E4 Messages sent', value=str(self.bot.icount))
+            em.add_field(name=u'\U0001F4E5 Messages recieved', value=str(self.bot.message_count))
+            em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
+            em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
+            em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
+            em.add_field(name=u'\U0001F3AE Game', value=ctx.message.author.game)
+            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        else:
+            msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), ctx.message.author.game)
+            await self.bot.send_message(ctx.message.channel, isBot + msg)
         await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
 
-    # # Stats about current server
-    # @commands.command(pass_context=True)
-    # async def server(self, ctx):
-    #     em = discord.Embed(title='Bot Stats', color=0x32441c)
+    # Stats about current server
+    @commands.group(pass_context=True)
+    async def server(self, ctx):
+        if ctx.invoked_subcommand is None:
+            if ctx.message.content[7:]:
+                server = None
+                for i in self.bot.servers:
+                    if i.name.lower() == ctx.message.content[7:].lower().strip():
+                        server = i
+                        break
+                if not server:
+                    await self.bot.send_message(ctx.message.channel, isBot + 'Could not find server. Note: You must be a member of the server you are trying to search.')
+                    return
+            else:
+                server = ctx.message.server
 
+            online = 0
+            for i in server.members:
+                if str(i.status) == 'online':
+                    online += 1
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+                em = discord.Embed(title='Server Info', color=0xea7938)
+                em.add_field(name='Name', value=server.name)
+                em.add_field(name='Owner', value=server.owner, inline=False)
+                em.add_field(name='Members', value=server.member_count)
+                em.add_field(name='Currently Online', value=online)
+                em.add_field(name='Region', value=server.region)
+                em.add_field(name='Verification Level', value=str(server.verification_level))
+                em.add_field(name='Highest role:', value=server.role_hierarchy[0])
+                em.add_field(name='Default Channel', value=server.default_channel)
+                em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
+                em.set_thumbnail(url=server.icon_url)
+                await self.bot.send_message(ctx.message.channel, embed=em)
+            else:
+                msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (server.name, server.owner, server.member_count, online, server.region, str(server.verfication_level), server.role_hierarchy[0], server.default_channel, server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
+                await self.bot.send_message(ctx.message.channel, isBot + msg)
+            await asyncio.sleep(2)
+            await self.bot.delete_message(ctx.message)
+
+    @server.group(pass_context=True)
+    async def emojis(self, ctx):
+        msg = ''
+        for i in ctx.message.server.emojis:
+            msg += str(i)
+        await self.bot.send_message(ctx.message.channel, msg)
+
+    @server.group(pass_context=True)
+    async def avi(self, ctx):
+        if ctx.message.content[11:]:
+            server = None
+            for i in self.bot.servers:
+                if i.name.lower() == ctx.message.content[11:].lower().strip():
+                    server = i
+                    break
+            if not server:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find server. Note: You must be a member of the server you are trying to search.')
+                return
+        else:
+            server = ctx.message.server
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            em = discord.Embed()
+            em.set_image(url=server.icon_url)
+            await self.bot.send_message(ctx.message.channel, embed=em)
+        else:
+            await self.bot.send_message(ctx.message.channel, isBot + server.icon_url)
+        await asyncio.sleep(2)
+        await self.bot.delete_message(ctx.message)
+
+    #
+    # @server.group(pass_context=True)
+    # async def role(self, ctx):
+    #     pass
+    #
+    # @server.group(pass_context=True)
+    # async def member(self, ctx):
+    #     pass
+    #
+    # @server.group(pass_context=True)
+    # async def channel(self, ctx):
+    #     pass
+
+    @server.group(pass_context=True)
+    async def members(self, ctx):
+        msg = prettytable.PrettyTable(['User', 'Nickname', 'Join Date', 'Account Created', 'Color', 'Top Role', 'Is bot', 'Avatar url', 'All Roles'])
+        for i in ctx.message.server.members:
+            roles = ''
+            for j in i.roles:
+                if j.name != '@everyone':
+                    roles += j.name + ', '
+            if i.avatar_url[60:].startswith('a_'):
+                avi = 'https://images.discordapp.net/avatars/' + i.avatar_url[33:][:18] + i.avatar_url[59:-3] + 'gif'
+            else:
+                avi = i.avatar_url
+            msg.add_row([str(i.name), i.nick, i.joined_at.__format__('%x at %X'), i.created_at.__format__('%x at %X'), i.color, i.top_role, str(i.bot), avi, roles[:-2]])
+        name = ctx.message.server.name
+        keep_characters = (' ', '.', '_')
+        name = ''.join(c for c in name if c.isalnum() or c in keep_characters).rstrip()
+        name = name.replace(' ', '_')
+        save_file = '%s_members.txt' % name
+        try:
+            msg = msg.get_string(sortby='User')
+        except:
+            pass
+        with open(save_file, 'w') as file:
+            file.write(str(msg))
+        with open(save_file, 'rb') as file:
+            await self.bot.send_file(ctx.message.channel, file)
+        os.remove(save_file)
+
+    # Set playing status. Note: this won't be visible to you but everyone else can see it.
+    @commands.command(pass_context=True)
+    async def game(self, ctx):
+        if ctx.message.content[6:]:
+            await self.bot.change_presence(game=discord.Game(name=ctx.message.content[6:].strip()))
+            self.bot.game = ctx.message.content[6:].strip()
+            await self.bot.send_message(ctx.message.channel, isBot + 'Set game to ``%s``' % ctx.message.content[6:])
+        else:
+            await self.bot.change_presence(game=None)
+            self.bot.game = None
+            await self.bot.send_message(ctx.message.channel, isBot + 'Set playing status off')
+
+    # Get url of emoji
+    @commands.command(pass_context=True)
+    async def emoji(self, ctx):
+        if ctx.message.content[6:]:
+            emoji = ctx.message.content[6:].split(':')
+            success = False
+            emoji_url = None
+            for i in self.bot.servers:
+                try:
+                    emoji_url = discord.Emoji(id=emoji[2][:-1], server=i).url
+                except:
+                    pass
+            if emoji_url:
+                await self.bot.send_message(ctx.message.channel, emoji_url)
+            else:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find emoji.')
+        else:
+            await self.bot.send_message(ctx.message.channel, isBot + 'Specify an emoji.')
 
     # Get response time
     @commands.command(pass_context=True)
@@ -52,9 +193,12 @@ class Misc:
         await self.bot.send_message(ctx.message.channel, isBot + ' pong')
         now = datetime.datetime.now()
         ping = now - msgtime
-        pong = discord.Embed(title='Response Time:', description=str(ping), color=0x7A0000)
-        pong.set_thumbnail(url='http://odysseedupixel.fr/wp-content/gallery/pong/pong.jpg')
-        await self.bot.send_message(ctx.message.channel, content=None, embed=pong)
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            pong = discord.Embed(title='Response Time:', description=str(ping), color=0x7A0000)
+            pong.set_thumbnail(url='http://odysseedupixel.fr/wp-content/gallery/pong/pong.jpg')
+            await self.bot.send_message(ctx.message.channel, content=None, embed=pong)
+        else:
+            await self.bot.send_message(ctx.message.channel, isBot + '``Response Time: %s``' % str(ping))
 
     # Simple calculator
     @commands.command(pass_context=True)
@@ -142,6 +286,7 @@ class Misc:
         else:
             await self.bot.delete_message(self.bot.self_log.pop())
             await self.bot.delete_message(self.bot.self_log.pop())
+
 
 
 def setup(bot):
