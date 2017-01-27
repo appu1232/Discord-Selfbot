@@ -27,22 +27,12 @@ class Google:
                 response = r.content.decode('utf-8')
                 result = json.loads(response)
                 try:
-                    webpage = urllib.request.urlopen(result['items'][0]['link']).read()
+                    await self.bot.send_message(ctx.message.channel, isBot + '**Google Search Result:**\n' + result['items'][0]['link'])
                 except:
-                    try:
-                        await self.bot.send_message(ctx.message.channel, isBot + result['items'][0]['link'])
-                    except:
-                        await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
-                    finally:
-                        await self.bot.delete_message(fetch)
-                        return
-                try:
-                    title = str(webpage).split('<title>')[1].split('</title>')[0]
-                except:
-                    title = ''
-                em = discord.Embed(title=result['items'][0]['link'], description=title, colour=0x2D5AF9)
-                em.set_author(name='Google Results:\n\n')
-                await self.bot.send_message(ctx.message.channel, embed=em)
+                    await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                finally:
+                    await self.bot.delete_message(fetch)
+                    return
 
             # >g <n> leads to nth result in google results.
             else:
@@ -53,24 +43,12 @@ class Google:
                 response = r.content.decode('utf-8')
                 result = json.loads(response)
                 try:
-                    webpage = urllib.request.urlopen(result['items'][int(ctx.message.content[3])]['link']).read()
+                    await self.bot.send_message(ctx.message.channel, isBot + '**Google Search Result:**\n' + result['items'][int(ctx.message.content[3])]['link'])
                 except:
-                    try:
-                        await self.bot.send_message(ctx.message.channel, isBot + result['items'][int(ctx.message.content[3])]['link'])
-                    except:
-                        await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
-                    finally:
-                        await self.bot.delete_message(fetch)
-                        return
-                try:
-                    title = str(webpage).split('<title>')[1].split('</title>')[0]
-                except:
-                    title = ''
-                em = discord.Embed(title=result['items'][int(ctx.message.content[3])]['link'], description=title,
-                                   colour=0x2D5AF9)
-                em.set_author(name='Google Results:\n\n')
-                await self.bot.send_message(ctx.message.channel, embed=em)
-            await self.bot.delete_message(fetch)
+                    await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                finally:
+                    await self.bot.delete_message(fetch)
+                    return
 
     @g.command(pass_context=True)
     async def i(self, ctx):
@@ -89,8 +67,11 @@ class Google:
 
             # Send as embed
             em = discord.Embed()
-            await self.bot.send_message(ctx.message.channel, content=None,
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+                await self.bot.send_message(ctx.message.channel, content=None,
                                    embed=em.set_image(url=result['items'][0]['link']))
+            else:
+                await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
 
         # >g i <n> leads to nth result in google image results.
         else:
@@ -105,8 +86,11 @@ class Google:
 
             # Send as embed
             em = discord.Embed()
-            await self.bot.send_message(ctx.message.channel, content=None,
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+                await self.bot.send_message(ctx.message.channel, content=None,
                                    embed=em.set_image(url=result['items'][int(ctx.message.content[5])]['link']))
+            else:
+                await self.bot.send_message(ctx.message.channel, result['items'][int(ctx.message.content[5])]['link'])
         await self.bot.delete_message(fetch)
 
 

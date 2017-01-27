@@ -62,13 +62,13 @@ class Userinfo:
             else:
                 save = False
                 skip = 2
-                await self.bot.send_message(ctx.message.channel, isBot + 'Are you sure you want to output all the messages here? Reply with ``y``  in the next 10 seconds to continue.')
-                reply = await self.bot.wait_for_message(timeout=10, author=ctx.message.author, content='y')
-                if reply:
-                    fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Fetching messages...')
-                    size = ctx.message.content.strip()[12:]
-                else:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Are you sure you want to output all the messages here? ``y/n``.')
+                reply = await self.bot.wait_for_message(author=ctx.message.author)
+                if reply.content.lower().strip() != 'y':
+                    await self.bot.send_message(ctx.message.channel, isBot + 'Cancelled.')
                     return
+                fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Fetching messages...')
+                size = ctx.message.content.strip()[12:]
             if size.isdigit:
                 size = int(size)
                 msg = ''
@@ -78,8 +78,8 @@ class Userinfo:
                     if size < 0:
                         size = 0
                 for i in range(len(comments)-size-2-skip, len(comments)-2-skip):
+                    attachments = '\r\n'
                     if comments[i][0].clean_content.replace('`', '') == comments[i][1].replace('`', ''):
-                        attachments = '\r\n'
                         if comments[i][0].attachments != [] or comments[i][0].embeds != []:
                             for j in comments[i][0].attachments:
                                 attachments += 'Attachment: ' + j['url'] + '\r\n'
@@ -92,8 +92,7 @@ class Userinfo:
                     else:
                         msg += 'User: %s  |  %s\r\n[BEFORE EDIT]\r\n%s\r\n[AFTER EDIT]\r\n%s\r\n' % (comments[i][0].author.name,
                                                         comments[i][0].timestamp.replace(tzinfo=timezone.utc).astimezone(
-                                                            tz=None).__format__(
-                                                            '%x @ %X'), comments[i][1].replace('`', '') + attachments, comments[i][0].clean_content.replace('`', '') + attachments)
+                                                            tz=None).__format__('%x @ %X'), comments[i][1].replace('`', '') + attachments, comments[i][0].clean_content.replace('`', '') + attachments)
                 if save is True:
                     save_file = 'saved_chat_%s_at_%s.txt' % (ctx.message.timestamp.__format__('%x').replace('/', '_'), ctx.message.timestamp.__format__('%X').replace(':', '_'))
                     with open(save_file, 'w') as file:

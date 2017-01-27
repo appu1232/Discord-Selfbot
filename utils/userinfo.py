@@ -25,16 +25,27 @@ class Userinfo:
             else:
                 name = ctx.message.author
 
-            em = discord.Embed(timestamp=ctx.message.timestamp, colour=0x708DD0)
-            em.add_field(name='User ID', value=name.id, inline=True)
-            em.add_field(name='Nick', value=name.nick, inline=True)
-            em.add_field(name='Status', value=name.status, inline=True)
-            em.add_field(name='In Voice', value=name.voice_channel, inline=True)
-            em.add_field(name='Account Created', value=name.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-            em.add_field(name='Join Date', value=name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-            em.set_thumbnail(url=name.avatar_url)
-            em.set_author(name=name, icon_url='https://i.imgur.com/RHagTDg.png')
-            await self.bot.send_message(ctx.message.channel, embed=em)
+            # Thanks to IgneelDxD for help on this
+            if name.avatar_url[60:].startswith('a_'):
+                avi = 'https://images.discordapp.net/avatars/' + name.avatar_url[33:][:18] + name.avatar_url[59:-3] + 'gif'
+            else:
+                avi = name.avatar_url
+
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+                em = discord.Embed(timestamp=ctx.message.timestamp, colour=0x708DD0)
+                em.add_field(name='User ID', value=name.id, inline=True)
+                em.add_field(name='Nick', value=name.nick, inline=True)
+                em.add_field(name='Status', value=name.status, inline=True)
+                em.add_field(name='In Voice', value=name.voice_channel, inline=True)
+                em.add_field(name='Account Created', value=name.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
+                em.add_field(name='Join Date', value=name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
+                em.set_thumbnail(url=avi)
+                em.set_author(name=name, icon_url='https://i.imgur.com/RHagTDg.png')
+                await self.bot.send_message(ctx.message.channel, embed=em)
+            else:
+                msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (name.id, name.nick, name.status, name.voice_channel, name.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
+                await self.bot.send_message(ctx.message.channel, isBot + msg)
+
             await asyncio.sleep(2)
             await self.bot.delete_message(ctx.message)
 
@@ -52,15 +63,17 @@ class Userinfo:
         else:
             name = ctx.message.author
 
-        em = discord.Embed(colour=0x708DD0)
-
         # Thanks to IgneelDxD for help on this
         if name.avatar_url[60:].startswith('a_'):
             avi = 'https://images.discordapp.net/avatars/' + name.avatar_url[33:][:18] + name.avatar_url[59:-3] + 'gif'
         else:
             avi = name.avatar_url
-        em.set_image(url=avi)
-        await self.bot.send_message(ctx.message.channel, embed=em)
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            em = discord.Embed(colour=0x708DD0)
+            em.set_image(url=avi)
+            await self.bot.send_message(ctx.message.channel, embed=em)
+        else:
+            await self.bot.send_message(ctx.message.channel, isBot + avi)
         await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
 

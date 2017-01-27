@@ -5,6 +5,8 @@ import math
 import time
 import datetime
 import collections
+import gc
+import traceback
 from datetime import timezone
 from discord.ext import commands
 from utils.allmsgs import *
@@ -16,7 +18,7 @@ def load_config():
 
 config = load_config()
 
-extensions = ['utils.afk', 'utils.customcmds', 'utils.google', 'utils.keywordlog', 'utils.mal', 'utils.misc', 'utils.userinfo']
+extensions = ['utils.afk', 'utils.customcmds', 'utils.google', 'utils.keywordlog', 'utils.mal', 'utils.misc', 'utils.spellcheck', 'utils.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
@@ -39,6 +41,10 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+    if not hasattr(bot, 'subprocesses'):
+        bot.subprocesses = 0
+    if not hasattr(bot, 'running_procs'):
+        bot.running_procs = []
     if not hasattr(bot, 'uptime'):
         bot.uptime = datetime.datetime.now()
     if not hasattr(bot, 'icount'):
@@ -55,6 +61,8 @@ async def on_ready():
         bot.keyword_log = 0
     if not hasattr(bot, 'refresh_time'):
         bot.refresh_time = time.time()
+    if not hasattr(bot, 'game'):
+        bot.game = None
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
@@ -71,6 +79,23 @@ async def restart(ctx):
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
+@bot.command(pass_context=True)
+async def quit(ctx):
+    await bot.send_message(ctx.message.channel, isBot + 'Bot has been killed.')
+    exit()
+
+# Comment out these two functions if you want to see full traceback for errors
+# @bot.event
+# async def on_error(event, *args):
+#     if event is ConnectionAbortedError or event is ConnectionError or event is ConnectionRefusedError or event is ConnectionResetError:
+#         gc.collect()
+#         sys.exit(1)
+#
+# # Comment out to see the traceback
+# @bot.event
+# async def on_command_error(error, ctx):
+#     if isinstance(error, commands.NoPrivateMessage):
+#         await bot.send_message(ctx.message.channel, 'This command is not supported in direct messages.')
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
 @bot.event
@@ -84,7 +109,10 @@ async def on_message(message):
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
     if hasattr(bot, 'refresh_time'):
         if hasPassed(bot.refresh_time):
-            await bot.change_presence(status='invisible', afk=True)
+            if bot.game is None:
+                await bot.change_presence(status='invisible', afk=True)
+            else:
+                await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
 
     # If the message was sent by me
     if message.author.id == config['my_id']:
@@ -95,7 +123,7 @@ async def on_message(message):
             if response is None:
                 pass
             else:
-                if response[0] == 'embed':
+                if response[0] == 'embed' and message.author.permissions_in(message.channel).attach_files:
                     await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
                 else:
                     await bot.send_message(message.channel, response[1])
@@ -138,12 +166,7 @@ async def on_message(message):
             location = loginfo['log_location'].split()
             server = bot.get_server(location[1])
             if message.channel.id != location[0] and message.server.id != location[1]:
-                bot.keyword_log += 1
                 msg = message.clean_content.replace('`', '')
-                if word.startswith('<@'):
-                    user = message.server.get_member(word[2:-1])
-                    user = user.name
-                    word = user
 
                 try:
                     context = []
@@ -185,11 +208,13 @@ async def on_message(message):
                             await bot.send_message(server.get_channel(location[0]), isBot + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i))
                         else:
                             await bot.send_message(server.get_channel(location[0]), '```%s```' % i)
+                bot.keyword_log += 1
 
     except:
         pass
 
     await bot.process_commands(message)
+
 
 def add_alllog(channel, server, message):
     if channel + ' ' + server in bot.all_log:

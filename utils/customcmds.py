@@ -178,8 +178,7 @@ class Customcmds:
                             del cmds[entry[0]]
                             success = True
                             await self.bot.send_message(ctx.message.channel,
-                                                   isBot + 'Successfully removed ``%s`` from %``s``' % (
-                                                   entry[1], entry[0]))
+                                                   isBot + 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
 
                 # Item for key is string
                 else:
