@@ -1,5 +1,6 @@
 discord.py==0.16.0
+prettytable==0.7.2
 requests==2.12.4
 spice_api==1.0.4
 beautifulsoup4==4.5.3
-lxml
+pyenchant==1.6.8
