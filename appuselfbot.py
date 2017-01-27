@@ -84,18 +84,23 @@ async def quit(ctx):
     await bot.send_message(ctx.message.channel, isBot + 'Bot has been killed.')
     exit()
 
-# Comment out these two functions if you want to see full traceback for errors
-# @bot.event
-# async def on_error(event, *args):
-#     if event is ConnectionAbortedError or event is ConnectionError or event is ConnectionRefusedError or event is ConnectionResetError:
-#         gc.collect()
-#         sys.exit(1)
-#
-# # Comment out to see the traceback
-# @bot.event
-# async def on_command_error(error, ctx):
-#     if isinstance(error, commands.NoPrivateMessage):
-#         await bot.send_message(ctx.message.channel, 'This command is not supported in direct messages.')
+@bot.command(pass_context=True)
+async def reload(ctx):
+    utils = []
+    for i in bot.extensions:
+        utils.append(i)
+    fail = False
+    for i in utils:
+        bot.unload_extension(i)
+        try:
+            bot.load_extension(i)
+        except:
+            await bot.send_message(ctx.message.channel, isBot + 'Failed to reload extension ``%s``' % i)
+            fail = True
+    if fail:
+        await bot.send_message(ctx.message.channel, isBot + 'Reloaded remaining extensions.')
+    else:
+        await bot.send_message(ctx.message.channel, isBot + 'Reloaded all extensions.')
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
 @bot.event
