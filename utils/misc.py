@@ -67,7 +67,7 @@ class Misc:
                 if str(i.status) == 'online':
                     online += 1
             if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
-                em = discord.Embed(title='Server Info', color=0xea7938)
+                em = discord.Embed(color=0xea7938)
                 em.add_field(name='Name', value=server.name)
                 em.add_field(name='Owner', value=server.owner, inline=False)
                 em.add_field(name='Members', value=server.member_count)
@@ -78,6 +78,7 @@ class Misc:
                 em.add_field(name='Default Channel', value=server.default_channel)
                 em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=server.icon_url)
+                em.set_author(name='Server Info', icon_url='https://i.imgur.com/RHagTDg.png')
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (server.name, server.owner, server.member_count, online, server.region, str(server.verfication_level), server.role_hierarchy[0], server.default_channel, server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
