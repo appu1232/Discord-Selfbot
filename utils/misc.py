@@ -162,7 +162,7 @@ class Misc:
         if ctx.message.content[6:]:
             await self.bot.change_presence(game=discord.Game(name=ctx.message.content[6:].strip()))
             self.bot.game = ctx.message.content[6:].strip()
-            await self.bot.send_message(ctx.message.channel, isBot + 'Set game to ``%s``' % ctx.message.content[6:])
+            await self.bot.send_message(ctx.message.channel, isBot + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
         else:
             await self.bot.change_presence(game=None)
             self.bot.game = None
@@ -201,6 +201,39 @@ class Misc:
         else:
             await self.bot.send_message(ctx.message.channel, isBot + '``Response Time: %s``' % str(ping))
 
+    # Quote someone in said channel
+    @commands.command(pass_context=True)
+    async def quote(self, ctx):
+        result = None
+        if ctx.message.content[6:]:
+            length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
+            if length < 201:
+                size = length
+            else:
+                size = 200
+
+            for i in range(length-2, length-size, -1):
+                search = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id][i]
+                if ctx.message.clean_content[6:].lower().strip() in search[0].clean_content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote '):
+                    result = [search[0], search[0].author, search[0].timestamp]
+                    break
+                if ctx.message.clean_content[6:].strip() == search[0].id:
+                    result = [search[0], search[0].author, search[0].timestamp]
+                    break
+        else:
+            search = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id][-2]
+            result = [search[0], search[0].author, search[0].timestamp]
+        if result:
+            await self.bot.delete_message(ctx.message)
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files and result[0].content:
+                em = discord.Embed(description=result[0].clean_content, timestamp=result[2], color=0xbc0b0b)
+                em.set_author(name=result[1].name, icon_url=result[1].avatar_url)
+                await self.bot.send_message(ctx.message.channel, embed=em)
+            else:
+                await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result[1].name, result[2], result[0].clean_content))
+        else:
+            await self.bot.send_message(ctx.message.channel, isBot + 'No quote found.')
+
     # Simple calculator
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, msg: str):
@@ -225,20 +258,11 @@ class Misc:
     @commands.command(pass_context=True)
     async def d(self, ctx):
 
-        # If number of seconds are specified
+        # If number of seconds/messages are specified
         if len(ctx.message.content.lower().strip()) > 2:
             if ctx.message.content[3] == '!':
-                await self.bot.delete_message(self.bot.self_log.pop())
-                i = 0
-                while i != int(ctx.message.content[4]):
-                    try:
-                        await self.bot.delete_message(self.bot.self_log.pop())
-                        i += 1
-                    except:
-                        pass
-            else:
                 killmsg = self.bot.self_log[len(self.bot.self_log) - 2]
-                timer = int(ctx.message.content[2:].lower().strip())
+                timer = int(ctx.message.content[4:].lower().strip())
 
                 # Animated countdown because screw rate limit amirite
                 destroy = await self.bot.edit_message(ctx.message, isBot + 'The above message will self-destruct in:')
@@ -282,6 +306,13 @@ class Misc:
                 await asyncio.sleep(.5)
                 await self.bot.delete_message(msg)
                 await self.bot.delete_message(killmsg)
+            else:
+                await self.bot.delete_message(self.bot.self_log.pop())
+                for i in range(0, int(ctx.message.content[3:])):
+                    try:
+                        await self.bot.delete_message(self.bot.self_log.pop())
+                    except:
+                        pass
 
         # If no number specified, delete message immediately
         else:
