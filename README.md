@@ -6,9 +6,12 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 
 - Google search (web or image).
 - Keyword/mention logger. Log messages from any or all servers that have one of the keywords you specify. Useful for seeing if someone mentioned your name or your favorite show/book/whatever else keyword.
+- Set your game to anything quickly and easily.
 - Dynamically add custom commands/reactions. Stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
+- Get detailed information about a server and all of its members.
+- Quote a message from a user.
 - Set yourself as afk and reply to a user telling them you are away if they message/mention you. (technically frowned upon by Discord so use it as a joke occasionally, not practical use)
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
@@ -55,7 +58,11 @@ Note: You must have Python 3.5.2 or above installed.
 
 ## All Commands:
 - ``>restart`` - restart the bot.
+- ``>game`` - Set your game. This won't show for yourself but other people can see it.
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
+- ``>stats`` - Bot stats as well as to an extent, user stats. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
+
+![img](http://i.imgur.com/x7aEacJ.png)
 - ``>ping`` - Responds with ``pong`` and also gives the response time. How the ping response looks:
 
 ![img](http://i.imgur.com/XhzTYaW.png)
@@ -72,10 +79,18 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well. An mal search result:
 
 ![img](http://i.imgur.com/NmqmzdM.png)
-- ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
+- ``>server`` or ``>server <name of server>`` - Get various information about the server. What it looks like:
+
+![img](http://i.imgur.com/gPF7K73.png)
+- ``>server members`` - Uploads a txt file containing detailed information about every member on the server including join date, account created, color, top role, and more.
+- ``>server avi`` or ``>server avi <name of server>`` - Gets the server image.
+- ``>server emojis`` - Lists all the custom emojis for the current server.
+- ``>emoji <emoji>`` - Gets the image url for the specified emoji.
+- ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that.
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
 ![img](http://i.imgur.com/n4mSRyD.png)
+- ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on or off.
 - ``>setafkmsg <msg>`` - Set the afk message.
 - ``>customcmds`` - List all custom commands. A sample custom command that outputs a picture:
@@ -83,7 +98,7 @@ Note: You must have Python 3.5.2 or above installed.
 ![img](http://i.imgur.com/gBoKnjQ.png)
 - ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
-- ``>d`` or ``>d <seconds>`` - Remove the last message you sent (along with this one). ``>d`` will immediately delete but ``>d <seconds>`` will wait out the number of seconds. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
+- ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>about`` - link to this github project
 
 ## Things to note:
