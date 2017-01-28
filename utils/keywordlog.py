@@ -31,14 +31,25 @@ class Userinfo:
                 msg += 'Keywords: '
                 for i in settings['keywords']:
                     msg += i + ', '
-                msg = msg[:-2] + '\n\nServers: '
+                msg = msg.rstrip(', ') + '\n\nServers: '
                 if settings['allservers'] == 'False':
                     for i in settings['servers']:
                         server = self.bot.get_server(i)
                         msg += str(server) + ', '
-                    msg = msg[:-2]
+                    msg = msg.rstrip(', ')
                 else:
                     msg += 'All Servers'
+                msg += '\n\nBlacklisted Users: '
+                name = None
+                names = []
+                for i in self.bot.servers:
+                    for j in settings['blacklisted_users']:
+                        name = i.get_member(j)
+                        if name:
+                            if name.name not in names:
+                                names.append(name.name)
+                                msg += name.name + ', '
+                msg = msg.rstrip(', ')
                 msg += '\n\nContext length: %s messages```' % settings['context_len']
             await self.bot.send_message(ctx.message.channel, isBot + msg)
 
@@ -224,6 +235,58 @@ class Userinfo:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Removed keyword ``%s`` from the logger.' % msg)
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'This keyword ``%s`` is not in the logger.' % msg)
+
+    @log.command(pass_context=True)
+    async def addblacklist(self, ctx, *, msg: str):
+        with open('utils/log.json', 'r+') as log:
+            settings = json.load(log)
+            try:
+                name = ctx.message.mentions[0].id
+            except:
+                name = ctx.message.server.get_member_named(msg)
+                if not name:
+                    name = ctx.message.server.get_member(msg)
+                if name:
+                    name = name.id
+            if not name:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find user. They must be in the server you are currently using this command in.')
+                return
+            if name in settings['blacklisted_users']:
+                await self.bot.send_message(ctx.message.channel, isBot + 'User is already blacklisted from the keyword logger.')
+                return
+            else:
+                settings['blacklisted_users'].append(name)
+                log.seek(0)
+                log.truncate()
+                json.dump(settings, log, indent=4)
+            name = ctx.message.server.get_member(name)
+            await self.bot.send_message(ctx.message.channel, isBot + 'Blacklisted ``%s`` from the keyword logger.' % name)
+
+    @log.command(pass_context=True)
+    async def removeblacklist(self, ctx, *, msg: str):
+        with open('utils/log.json', 'r+') as log:
+            settings = json.load(log)
+            try:
+                name = ctx.message.mentions[0].id
+            except:
+                name = ctx.message.server.get_member_named(msg)
+                if not name:
+                    name = ctx.message.server.get_member(msg)
+                if name:
+                    name = name.id
+            if not name:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find user. They must be in the server you are currently using this command in.')
+                return
+            if name in settings['blacklisted_users']:
+                settings['blacklisted_users'].remove(name)
+                log.seek(0)
+                log.truncate()
+                json.dump(settings, log, indent=4)
+            else:
+                await self.bot.send_message(ctx.message.channel, isBot + 'User is not in the blacklist for the keyword logger.')
+                return
+            name = ctx.message.server.get_member(name)
+            await self.bot.send_message(ctx.message.channel, isBot + 'Removed ``%s`` from the blacklist for the keyword logger.' % name)
 
 
 def setup(bot):

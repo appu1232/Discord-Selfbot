@@ -158,6 +158,10 @@ async def on_message(message):
             for word in loginfo['keywords']:
                 if word.lower() in message.content.lower() and message.author.id != config['my_id']:
                     wordfound = True
+                    for x in loginfo['blacklisted_users']:
+                        if message.author.id == x:
+                            wordfound = False
+                            break
                     break
         else:
             if str(message.server.id) in loginfo['servers']:
@@ -165,12 +169,16 @@ async def on_message(message):
                 for word in loginfo['keywords']:
                     if word.lower() in message.content.lower() and message.author.id != config['my_id']:
                         wordfound = True
+                        for x in loginfo['blacklisted_users']:
+                            if message.author.id == x:
+                                wordfound = False
+                                break
                         break
 
         if wordfound is True:
             location = loginfo['log_location'].split()
             server = bot.get_server(location[1])
-            if message.channel.id != location[0] and message.server.id != location[1]:
+            if message.channel.id != location[0]:
                 msg = message.clean_content.replace('`', '')
 
                 try:
