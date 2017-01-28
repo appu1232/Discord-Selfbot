@@ -60,7 +60,7 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>restart`` - restart the bot.
 - ``>game`` - Set your game. This won't show for yourself but other people can see it.
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
-- ``>stats`` - Bot stats as well as to an extent, user stats. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
+- ``>stats`` - Bot stats and some user info. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
 
 ![img](http://i.imgur.com/x7aEacJ.png)
 - ``>ping`` - Responds with ``pong`` and also gives the response time. How the ping response looks:
