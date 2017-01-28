@@ -30,7 +30,7 @@ class Misc:
             time = '%s days, %s hours, %s minutes, and %s seconds' % (days, hours, minutes, seconds)
         else:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
-        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
             em.add_field(name=u'\U0001F4E4 Messages sent', value=str(self.bot.icount))
@@ -66,7 +66,7 @@ class Misc:
             for i in server.members:
                 if str(i.status) == 'online':
                     online += 1
-            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
                 em = discord.Embed(color=0xea7938)
                 em.add_field(name='Name', value=server.name)
                 em.add_field(name='Owner', value=server.owner, inline=False)
@@ -106,7 +106,7 @@ class Misc:
                 return
         else:
             server = ctx.message.server
-        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
             em = discord.Embed()
             em.set_image(url=server.icon_url)
             await self.bot.send_message(ctx.message.channel, embed=em)
@@ -194,7 +194,7 @@ class Misc:
         await self.bot.send_message(ctx.message.channel, isBot + ' pong')
         now = datetime.datetime.now()
         ping = now - msgtime
-        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
             pong = discord.Embed(title='Response Time:', description=str(ping), color=0x7A0000)
             pong.set_thumbnail(url='http://odysseedupixel.fr/wp-content/gallery/pong/pong.jpg')
             await self.bot.send_message(ctx.message.channel, content=None, embed=pong)
@@ -225,7 +225,7 @@ class Misc:
             result = [search[0], search[0].author, search[0].timestamp]
         if result:
             await self.bot.delete_message(ctx.message)
-            if ctx.message.author.permissions_in(ctx.message.channel).attach_files and result[0].content:
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links and result[0].content:
                 em = discord.Embed(description=result[0].clean_content, timestamp=result[2], color=0xbc0b0b)
                 em.set_author(name=result[1].name, icon_url=result[1].avatar_url)
                 await self.bot.send_message(ctx.message.channel, embed=em)

@@ -67,7 +67,7 @@ class Google:
 
             # Send as embed
             em = discord.Embed()
-            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
                 await self.bot.send_message(ctx.message.channel, content=None,
                                    embed=em.set_image(url=result['items'][0]['link']))
             else:
@@ -86,7 +86,7 @@ class Google:
 
             # Send as embed
             em = discord.Embed()
-            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
                 await self.bot.send_message(ctx.message.channel, content=None,
                                    embed=em.set_image(url=result['items'][int(ctx.message.content[5])]['link']))
             else:

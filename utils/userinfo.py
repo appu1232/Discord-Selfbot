@@ -31,7 +31,7 @@ class Userinfo:
             else:
                 avi = name.avatar_url
 
-            if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+            if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
                 em = discord.Embed(timestamp=ctx.message.timestamp, colour=0x708DD0)
                 em.add_field(name='User ID', value=name.id, inline=True)
                 em.add_field(name='Nick', value=name.nick, inline=True)
@@ -68,7 +68,7 @@ class Userinfo:
             avi = 'https://images.discordapp.net/avatars/' + name.avatar_url[33:][:18] + name.avatar_url[59:-3] + 'gif'
         else:
             avi = name.avatar_url
-        if ctx.message.author.permissions_in(ctx.message.channel).attach_files:
+        if ctx.message.author.permissions_in(ctx.message.channel).attach_files and ctx.message.author.permissions_in(ctx.message.channel).embed_links:
             em = discord.Embed(colour=0x708DD0)
             em.set_image(url=avi)
             await self.bot.send_message(ctx.message.channel, embed=em)

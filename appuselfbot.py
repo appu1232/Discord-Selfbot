@@ -128,7 +128,7 @@ async def on_message(message):
             if response is None:
                 pass
             else:
-                if response[0] == 'embed' and message.author.permissions_in(message.channel).attach_files:
+                if response[0] == 'embed' and message.author.permissions_in(message.channel).attach_files and message.author.permissions_in(message.channel).embed_links:
                     await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
                 else:
                     await bot.send_message(message.channel, response[1])
