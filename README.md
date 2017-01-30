@@ -4,12 +4,12 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 
 1. [Features](#features)
 2. [Setup](#setup)
-3. [Running the Selfbot](#Running the selfbot)
-5. [Custom Commands](#Custom Commands)
-6. [Keyword Logger](#Keyword Logger)
-7. [Save Chat Messages](#Save Chat Messages)
-8. [Google API](#Google API)
-9. [Other Things to Note](#Other Things to Note)
+3. [Running the Selfbot](#running the selfbot)
+5. [Custom Commands](#custom commands)
+6. [Keyword Logger](#keyword logger)
+7. [Save Chat Messages](#save chat messages)
+8. [Google API](#google api)
+9. [Other Things to Note](#other things to note)
 
 ## Features
 
