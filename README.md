@@ -2,6 +2,15 @@
 
 A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord.
 
+1. [Features](#Features)
+2. [Setup](#Setup)
+3. [Running the Selfbot](#Running the selfbot)
+5. [Custom Commands](#Custom Commands)
+6. [Keyword Logger](#Keyword Logger)
+7. [Save Chat Messages](#Save Chat Messages)
+8. [Google API](#Google API)
+9. [Other Things to Note](#Other Things to Note)
+
 ## Features
 
 - Google search (web or image).
@@ -101,11 +110,6 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>about`` - link to this github project
 
-## Things to note:
-- Free custom search has a limit of 100 searches per day. The commands ``>g``, ``>g i``, and ``>mal`` use this search. Still, this should be more than enough but feel free to pay for more if you would like, although I don't think it's needed.
-- Try not to keep ``setafk`` on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
-- Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
-
 ## Custom Commands:
 There are two types of commands: ``string`` commands which only have one response and ``list`` commands which can have multiple responses.
 
@@ -147,7 +151,7 @@ So, here's how you get started with setting up the logger:
 5. Set the context length. This is the number of messages to show in the log message. The default is set to 4 (this is 4 messages before keyword message + the keyword message). Set it with ``>log context <number>``. You can go up to 20 messages.
 6. Add users to the blacklist. These users won't trigger the keyword logger. Add them by going to a channel in a server you are both part of and doing ``>log addblacklist <user>`` where ``<user>`` can be their name + discriminator, a mention, or their user id. Remove people with ``>log removeblacklist <user>``
 
-**Things to Note:**
+**Note:**
 
 1. Only other people can trigger the log message. You yourself saying a keyword won't log the message.
 2. If the logged message + context is too long, the log message will be split up into multiple messages. These mutiple messages don't use embeds so it won't look as neat, sadly. This shouldn't happen often though.
@@ -182,3 +186,8 @@ Follow these steps to obtain them:
 6. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
 
 **Note:** Google may take a little while to properly register your key so the search feature may not work right away. If it's still not working after a few hours, then you may have messed up somewhere.
+
+## Other Things to Note
+- Free custom search has a limit of 100 searches per day. The commands ``>g``, ``>g i``, and ``>mal`` use this search. Still, this should be more than enough but feel free to pay for more if you would like, although I don't think it's needed.
+- Try not to keep ``setafk`` on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
+- Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
