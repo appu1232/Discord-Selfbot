@@ -2,8 +2,8 @@
 
 A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord.
 
-1. [Features](#Features)
-2. [Setup](#Setup)
+1. [Features](#features)
+2. [Setup](#setup)
 3. [Running the Selfbot](#Running the selfbot)
 5. [Custom Commands](#Custom Commands)
 6. [Keyword Logger](#Keyword Logger)
