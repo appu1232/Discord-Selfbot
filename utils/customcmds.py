@@ -10,12 +10,41 @@ class Customcmds:
         self.bot = bot
 
     # List all custom commands
-    @commands.command(pass_context=True)
+    @commands.group(pass_context=True)
     async def customcmds(self, ctx):
+        if ctx.invoked_subcommand is None:
+            with open('commands.json', 'r') as commands:
+                cmds = json.load(commands)
+            sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
+            msgs = []
+            part = ''
+            for cmd in sortedcmds:
+                if type(cmds[cmd]) is list:
+                    check = cmd + ': '
+                    for i in cmds[cmd]:
+                        check += str(i[0]) + ' | '
+                    check = check.rstrip(' | ') + '\n\n'
+                else:
+                    check = cmd + '\n\n'
+                if len(part + check) > 1900:
+                    msgs.append(part)
+                    part = check
+                else:
+                    part += check
+            msgs.append(part)
+            if len(msgs) == 1:
+                await self.bot.send_message(ctx.message.channel, '```css\n[List of Custom Commands]\n%s ```' % msgs[0].rstrip())
+            else:
+                for b, i in enumerate(msgs):
+                    await self.bot.send_message(ctx.message.channel, '```css\n[List of Custom Commands %s/%s]\n%s ```' % (b + 1, len(msgs), i.rstrip()))
+
+    @customcmds.command(pass_context=True)
+    async def long(self, ctx):
         with open('commands.json', 'r') as commands:
             cmds = json.load(commands)
-        msg = '```json\nList of Custom Commands: {\n'
-        for cmd in cmds:
+        msg = ''
+        sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
+        for cmd in sortedcmds:
             msg += '"' + cmd + '" : "'
             if type(cmds[cmd]) == list:
                 for i in cmds[cmd]:
@@ -27,14 +56,14 @@ class Customcmds:
         msg += '}```'
         part = int(math.ceil(len(msg) / 1900))
         if part == 1:
-            await self.bot.send_message(ctx.message.channel, isBot + msg)
+            await self.bot.send_message(ctx.message.channel, isBot + '```json\nList of Custom Commands: {\n' + msg)
         else:
             msg = msg[7:-3]
             splitList = [msg[i:i + 1900] for i in range(0, len(msg), 1900)]
             allWords = []
             splitmsg = ''
             for i, blocks in enumerate(splitList):
-                splitmsg += 'List of Custom Commands: %s of %s\n' % (i + 1, part)
+                splitmsg += 'List of Custom Commands: %s of %s\n\n' % (i + 1, part)
                 for b in blocks.split('\n'):
                     splitmsg += b + '\n'
                 allWords.append(splitmsg)
