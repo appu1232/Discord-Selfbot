@@ -102,7 +102,7 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on or off.
 - ``>setafkmsg <msg>`` - Set the afk message.
-- ``>customcmds`` - List all custom commands. A sample custom command that outputs a picture:
+- ``>customcmds`` or ``>customcmds long`` - List all custom commands. The long version is more detailed (shows all the replies for each cmd as well). A sample custom command that outputs a picture:
 
 ![img](http://i.imgur.com/gBoKnjQ.png)
 - ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
@@ -183,6 +183,7 @@ Follow these steps to obtain them:
 3. Go to ``Credentials`` and click ``create credentials`` and choose ``API Key`` (no need to restrict the key). The value under "Key" is your api key. Paste this into the config.json under ``google_api_key``.
 4. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
 5. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
+6. Make sure the ``Image search`` option is enabled and make sure to click the ``Update`` button at the bottom when you are done with the changes!
 6. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
 
 **Note:** Google may take a little while to properly register your key so the search feature may not work right away. If it's still not working after a few hours, then you may have messed up somewhere.
