@@ -54,7 +54,11 @@ class Mal:
                 await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
                 return
 
-            if not ctx.message.author.permissions_in(ctx.message.channel).attach_files or not ctx.message.author.permissions_in(ctx.message.channel).embed_links:
+            try:
+                perms = not ctx.message.author.permissions_in(ctx.message.channel).attach_files or not ctx.message.author.permissions_in(ctx.message.channel).embed_links
+            except:
+                perms = False
+            if perms:
                 await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/anime/%s' % results.id)
                 return
 
@@ -139,8 +143,11 @@ class Mal:
             if not results:
                 await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
                 return
-
-            if not ctx.message.author.permissions_in(ctx.message.channel).attach_files or not ctx.message.author.permissions_in(ctx.message.channel).embed_links:
+            try:
+                perms = not ctx.message.author.permissions_in(ctx.message.channel).attach_files or not ctx.message.author.permissions_in(ctx.message.channel).embed_links
+            except:
+                perms = False
+            if perms:
                 await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/manga/%s' % results.id)
                 return
 
