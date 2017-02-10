@@ -152,7 +152,15 @@ class Misc:
                 avi = 'https://images.discordapp.net/avatars/' + i.avatar_url[33:][:18] + i.avatar_url[59:-3] + 'gif'
             else:
                 avi = i.avatar_url
-            msg.add_row([str(i.name), i.nick, i.joined_at.__format__('%x at %X'), i.created_at.__format__('%x at %X'), i.color, i.top_role, str(i.bot), avi, roles[:-2]])
+            try:
+                join = i.joined_at.__format__('%x at %X')
+            except:
+                join = 'N/A'
+            try:
+                create = i.created_at.__format__('%x at %X')
+            except:
+                create = 'N/A'
+            msg.add_row([str(i.name), i.nick, join, create, i.color, i.top_role, str(i.bot), avi, roles[:-2]])
         name = ctx.message.server.name
         keep_characters = (' ', '.', '_')
         name = ''.join(c for c in name if c.isalnum() or c in keep_characters).rstrip()
