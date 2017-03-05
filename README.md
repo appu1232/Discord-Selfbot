@@ -60,9 +60,9 @@ The Google and MAL info is not needed in order to get the bot running. However, 
 
 ## Running the selfbot
 
-Note: You must have Python 3.5.2 or above installed.
+Note: You must have Python 3.5.2 or above installed. **When installing python, make sure you check "Add Python to PATH" in the install window.**
 
-1. Windows: ``python -m pip install -r requirements.txt`` Mac/Linux: ``pip install -r requirements.txt`` to install all required modules.
+1. Windows: Double click ``run.bat`` to start the bot. If everything in the config is setup properly you should log in fine. If you have a weak internet connection, the bot could take several minutes to log in.
 2. ``python appuselfbot.py`` to run the bot. Do ``python loopself.py`` instead to let the bot autorestart if it crashes.
 
 ## All Commands:
@@ -75,12 +75,15 @@ Note: You must have Python 3.5.2 or above installed.
 - ``>ping`` - Responds with ``pong`` and also gives the response time. How the ping response looks:
 
 ![img](http://i.imgur.com/XhzTYaW.png)
-- ``>g <tags>`` - Google search. ``>g <n> <tags>`` gives the nth result. A search result:
+- ``>g <tags>`` - Google search. Depending on the type of result, certain google cards can be parsed. Some result:
 
+![img](http://i.imgur.com/0AzT1Ah.png)
+![img](http://i.imgur.com/xaqzej9.png)
+![img](http://i.imgur.com/6isT5T0.png)
 ![img](http://i.imgur.com/qBqFRBA.png)
-- ``>g i <tags>`` - Google image search. ``>g i <n> <tags>`` gives the nth result. An image search result:
+- ``>i <tags>`` - Google image search. ``>i <n> <tags>`` gives the nth result. An image search result:
 
-![img](http://i.imgur.com/4uneQCN.png)
+![img](http://i.imgur.com/neisYXe.png)
 - ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands used for keyword logging. A logged message:
 
 ![img](http://i.imgur.com/4I8B2IW.png)
@@ -192,3 +195,8 @@ Follow these steps to obtain them:
 - Free custom search has a limit of 100 searches per day. The commands ``>g``, ``>g i``, and ``>mal`` use this search. Still, this should be more than enough but feel free to pay for more if you would like, although I don't think it's needed.
 - Try not to keep ``setafk`` on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
 - Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
+
+
+## Acknowledgements
+
+Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards. Also thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
