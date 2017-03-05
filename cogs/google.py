@@ -156,7 +156,10 @@ class Google:
         card = None
         async with aiohttp.get('https://www.google.com/search', params=params, headers=headers) as resp:
             if resp.status != 200:
-                raise RuntimeError('Google somehow failed to respond.')
+                config = load_config()
+                async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+                    result = json.loads(await resp.text())
+                return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
 
             root = etree.fromstring(await resp.text(), etree.HTMLParser())
             card_node = root.find(".//div[@id='topstuff']")
@@ -173,35 +176,32 @@ class Google:
                 entries.append(url)
         return card, entries
 
-    @commands.group(pass_context=True)
+    @commands.command(pass_context=True)
     async def g(self, ctx, *, query):
-        if ctx.invoked_subcommand is None:
-            if not embed_perms(ctx.message):
-                config = load_config()
-                async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
-                    if resp.status != 200:
-                        await self.bot.send_message(ctx.message.channel, 'Google failed to respond.')
-                    result = json.loads(await resp.text())
-                return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
-            try:
-                card, entries = await self.get_google_entries(query)
-            except RuntimeError as e:
-                await self.bot.send_message(ctx.message.channel, str(e))
+        if not embed_perms(ctx.message):
+            config = load_config()
+            async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+                result = json.loads(await resp.text())
+            return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
+        try:
+            card, entries = await self.get_google_entries(query)
+        except RuntimeError as e:
+            await self.bot.send_message(ctx.message.channel, str(e))
+        else:
+            if card:
+                value = '\n'.join(entries[:2])
+                if value:
+                    card.add_field(name='Search Results', value=value, inline=False)
+                return await self.bot.send_message(ctx.message.channel, embed=card)
+            if len(entries) == 0:
+                return await self.bot.send_message(ctx.message.channel, 'No results.')
+            next_two = entries[1:3]
+            if next_two:
+                formatted = '\n'.join(map(lambda x: '<%s>' % x, next_two))
+                msg = '{}\n\n**See also:**\n{}'.format(entries[0], formatted)
             else:
-                if card:
-                    value = '\n'.join(entries[:2])
-                    if value:
-                        card.add_field(name='Search Results', value=value, inline=False)
-                    return await self.bot.send_message(ctx.message.channel, embed=card)
-                if len(entries) == 0:
-                    return await self.bot.send_message(ctx.message.channel, 'No results.')
-                next_two = entries[1:3]
-                if next_two:
-                    formatted = '\n'.join(map(lambda x: '<%s>' % x, next_two))
-                    msg = '{}\n\n**See also:**\n{}'.format(entries[0], formatted)
-                else:
-                    msg = entries[0]
-                await self.bot.send_message(ctx.message.channel, msg)
+                msg = entries[0]
+            await self.bot.send_message(ctx.message.channel, msg)
 
     @commands.command(pass_context=True)
     async def i(self, ctx, *, query):
