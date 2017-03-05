@@ -127,16 +127,16 @@ async def on_message(message):
                 pass
             else:
                 if response[0] == 'embed' and embed_perms(message):
-                    await message.channel.send(content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
+                    await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
                 else:
-                    await message.channel.send(response[1])
+                    await bot.send_message(message.channel, response[1])
                 await asyncio.sleep(2)
-                await message.delete()
+                await bot.delete_message(message)
         else:
             response = quickcmds(message.content.lower().strip())
             if response:
-                await message.delete()
-                await message.channel.send(response)
+                await bot.delete_message(message)
+                await bot.send_message(message.channel, response)
 
     notified = message.mentions
     if notified:
@@ -145,7 +145,7 @@ async def on_message(message):
                 bot.mention_count += 1
         response = afk(notified)
         if response:
-            await message.channel.send(response)
+            await bot.send_message(message.channel, response)
 
     try:
         wordfound = False
