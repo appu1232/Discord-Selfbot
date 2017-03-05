@@ -1,9 +1,0 @@
-{
-    "context_len": "4",
-    "keywords": [],
-    "allservers": "False",
-    "servers": [],
-    "log_location": "",
-    "log_size": "1000",
-	"blacklisted_users": []
-}

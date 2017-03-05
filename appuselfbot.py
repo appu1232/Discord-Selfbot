@@ -5,11 +5,10 @@ import math
 import time
 import datetime
 import collections
-import gc
-import traceback
 from datetime import timezone
 from discord.ext import commands
-from utils.allmsgs import *
+from cogs.allmsgs import *
+from cogs.utils.checks import *
 
 
 def load_config():
@@ -18,21 +17,13 @@ def load_config():
 
 config = load_config()
 
-extensions = ['utils.afk', 'utils.customcmds', 'utils.google', 'utils.keywordlog', 'utils.mal', 'utils.misc', 'utils.userinfo']
+extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
     isBot = ''
 
-
-def hasPassed(oldtime):
-    if time.time() - 10 < oldtime:
-        return False
-    bot.refresh_time = time.time()
-    return True
-
-
-bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
+bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''')
 
 # Startup
 @bot.event
@@ -68,6 +59,11 @@ async def on_ready():
             channel = bot.get_channel(re.readline())
             await bot.send_message(channel, isBot + 'Bot has restarted.')
         os.remove('restart.txt')
+    if os.path.isfile('game.txt'):
+        with open('game.txt', 'r') as g:
+            game = g.readline()
+        bot.game = game
+        await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
 
 
 # Restart selfbot
@@ -79,10 +75,12 @@ async def restart(ctx):
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
+
 @bot.command(pass_context=True)
 async def quit(ctx):
     await bot.send_message(ctx.message.channel, isBot + 'Bot has been killed.')
     exit()
+
 
 @bot.command(pass_context=True)
 async def reload(ctx):
@@ -113,7 +111,7 @@ async def on_message(message):
 
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
     if hasattr(bot, 'refresh_time'):
-        if hasPassed(bot.refresh_time):
+        if hasPassed(bot, bot.refresh_time):
             if bot.game is None:
                 await bot.change_presence(status='invisible', afk=True)
             else:
@@ -128,21 +126,17 @@ async def on_message(message):
             if response is None:
                 pass
             else:
-                try:
-                    perms = message.author.permissions_in(message.channel).attach_files and message.author.permissions_in(message.channel).embed_links
-                except:
-                    perms = True
-                if response[0] == 'embed' and perms:
-                    await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
+                if response[0] == 'embed' and embed_perms(message):
+                    await message.channel.send(content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
                 else:
-                    await bot.send_message(message.channel, response[1])
+                    await message.channel.send(response[1])
                 await asyncio.sleep(2)
-                await bot.delete_message(message)
+                await message.delete()
         else:
             response = quickcmds(message.content.lower().strip())
             if response:
-                await bot.delete_message(message)
-                await bot.send_message(message.channel, response)
+                await message.delete()
+                await message.channel.send(response)
 
     notified = message.mentions
     if notified:
@@ -151,11 +145,11 @@ async def on_message(message):
                 bot.mention_count += 1
         response = afk(notified)
         if response:
-            await bot.send_message(message.channel, response)
+            await message.channel.send(response)
 
     try:
         wordfound = False
-        with open('utils/log.json', 'r') as log:
+        with open('cogs/log.json', 'r') as log:
             loginfo = json.load(log)
         if loginfo['allservers'] == 'True':
             add_alllog(message.channel.id, message.server.id, message)
@@ -237,7 +231,7 @@ def add_alllog(channel, server, message):
     if channel + ' ' + server in bot.all_log:
         bot.all_log[channel + ' ' + server].append((message, message.clean_content))
     else:
-        with open('utils/log.json') as f:
+        with open('cogs/log.json') as f:
             config = json.load(f)
             bot.all_log[channel + ' ' + server] = collections.deque(maxlen=int(config['log_size']))
             bot.all_log[channel + ' ' + server].append((message, message.clean_content))
