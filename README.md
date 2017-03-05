@@ -78,9 +78,8 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>g <tags>`` - Google search. Depending on the type of result, certain google cards can be parsed. Some result:
 
 ![img](http://i.imgur.com/0AzT1Ah.png)
-![img](http://i.imgur.com/xaqzej9.png)
+![img](http://i.imgur.com/xaqzej9.png?2)
 ![img](http://i.imgur.com/6isT5T0.png)
-![img](http://i.imgur.com/qBqFRBA.png)
 - ``>i <tags>`` - Google image search. ``>i <n> <tags>`` gives the nth result. An image search result:
 
 ![img](http://i.imgur.com/neisYXe.png)
