@@ -7,6 +7,7 @@ from urllib.parse import parse_qs
 from lxml import etree
 
 
+# Used Rapptz's implementation of google cards.
 class Google:
 
     def __init__(self, bot):
