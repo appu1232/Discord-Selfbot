@@ -180,13 +180,13 @@ class Google:
                 config = load_config()
                 async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
                     if resp.status != 200:
-                        await self.bot.send_message(ctx.message.channel, 'Google failed to respond.', delete_after=3)
+                        await self.bot.send_message(ctx.message.channel, 'Google failed to respond.')
                     result = json.loads(await resp.text())
                 return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
             try:
                 card, entries = await self.get_google_entries(query)
             except RuntimeError as e:
-                await self.bot.send_message(ctx.message.channel, str(e), delete_after=3)
+                await self.bot.send_message(ctx.message.channel, str(e))
             else:
                 if card:
                     value = '\n'.join(entries[:2])
@@ -213,7 +213,7 @@ class Google:
             item = 0
         async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + "&searchType=image") as resp:
             if resp.status != 200:
-                await self.bot.send_message(ctx.message.channel, 'Google failed to respond.', delete_after=3)
+                await self.bot.send_message(ctx.message.channel, 'Google failed to respond.')
             result = json.loads(await resp.text())
             em = discord.Embed()
             if embed_perms(ctx.message):
