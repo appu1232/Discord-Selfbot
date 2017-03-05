@@ -1,4 +1,4 @@
-discord.py==0.16.0
+discord.py==0.16.6
 prettytable==0.7.2
 requests==2.12.4
 spice_api==1.0.4
