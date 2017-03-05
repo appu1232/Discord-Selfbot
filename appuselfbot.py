@@ -23,7 +23,7 @@ isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
     isBot = ''
 
-bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''')
+bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
 
 # Startup
 @bot.event
