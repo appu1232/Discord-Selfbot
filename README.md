@@ -62,7 +62,7 @@ The Google and MAL info is not needed in order to get the bot running. However, 
 
 Note: You must have Python 3.5.2 or above installed. **When installing python, make sure you check "Add Python to PATH" in the install window.**
 
-1. Windows: Double click ``run.bat`` to start the bot. If everything in the config is setup properly you should log in fine. If you have a weak internet connection, the bot could take several minutes to log in.
+1. Windows: Double click ``run.bat`` to start the bot. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
 2. ``python appuselfbot.py`` to run the bot. Do ``python loopself.py`` instead to let the bot autorestart if it crashes.
 
 ## All Commands:
@@ -176,7 +176,7 @@ When you want to save some kind of memorable discussion/funny moment/important r
 
 ## Google API
 
-In order to use the ``>g`` command to search the web/images and in order to get more accurate MyAnimeList search results, you will need a Google API key and a Custom Search Engine ID.
+In order to use the ``>i`` command to image search and in order to get more accurate MyAnimeList search results, you will need a Google API key and a Custom Search Engine ID.
 
 Follow these steps to obtain them:
 
