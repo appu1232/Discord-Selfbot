@@ -31,6 +31,10 @@ class Misc:
             time = '%s days, %s hours, %s minutes, and %s seconds' % (days, hours, minutes, seconds)
         else:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
+        if not ctx.message.author.game:
+            game = 'None'
+        else:
+            game = ctx.message.author.game
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
@@ -39,10 +43,10 @@ class Misc:
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
-            em.add_field(name=u'\U0001F3AE Game', value=ctx.message.author.game)
+            em.add_field(name=u'\U0001F3AE Game', value=game)
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
-            msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), ctx.message.author.game)
+            msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), game)
             await self.bot.send_message(ctx.message.channel, isBot + msg)
         await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
