@@ -127,7 +127,10 @@ async def on_message(message):
                 pass
             else:
                 if response[0] == 'embed' and embed_perms(message):
-                    await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
+                    try:
+                        await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
+                    except:
+                        await bot.send_message(message.channel, response[1])
                 else:
                     await bot.send_message(message.channel, response[1])
                 await asyncio.sleep(2)
