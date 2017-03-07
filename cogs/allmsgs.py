@@ -3,6 +3,7 @@ import json
 import mimetypes
 from random import randint
 
+quick = [('shrug', '¯\_(ツ)_/¯'), ('flip', '(╯°□°）╯︵ ┻━┻'), ('unflip', '┬─┬﻿ ノ( ゜-゜ノ)'), ('lenny', '( ͡° ͜ʖ ͡°)'), ('comeatmebro', '(ง’̀-‘́)ง')]
 
 def afk(notified):
     with open('config.json') as f:
@@ -15,18 +16,10 @@ def afk(notified):
 # Quick cmds for da memes
 def quickcmds(message):
 
-    if message == 'shrug':
-        return '¯\_(ツ)_/¯'
-    elif message == 'flip':
-        return '(╯°□°）╯︵ ┻━┻'
-    elif message == 'unflip':
-        return '┬─┬﻿ ノ( ゜-゜ノ)'
-    elif message == 'lenny':
-        return '( ͡° ͜ʖ ͡°)'
-    elif message == 'comeatmebro':
-        return '(ง’̀-‘́)ง'
-    else:
-        return None
+    for i in quick:
+        if message == i[0]:
+            return i[1]
+    return None
 
 
 # Searches commands.json for the inputted command. If exists, return the response associated with the command.
@@ -82,5 +75,5 @@ def custom(message):
                         return 'embed', commands[i]
                     else:
                         return 'message', commands[i]
-    if success == True:
+    if success is True:
         return None

@@ -133,7 +133,6 @@ async def on_message(message):
                         await bot.send_message(message.channel, response[1])
                 else:
                     await bot.send_message(message.channel, response[1])
-                await asyncio.sleep(2)
                 await bot.delete_message(message)
         else:
             response = quickcmds(message.content.lower().strip())

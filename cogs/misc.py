@@ -17,7 +17,6 @@ class Misc:
     @commands.command(pass_context=True)
     async def about(self, ctx):
         await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
-        await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
 
     # Bot stats, thanks IgneelDxD for the design
@@ -48,7 +47,13 @@ class Misc:
         else:
             msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), game)
             await self.bot.send_message(ctx.message.channel, isBot + msg)
-        await asyncio.sleep(2)
+        await self.bot.delete_message(ctx.message)
+
+    #Embed text
+    @commands.command(pass_context=True)
+    async def embed(self, ctx, *, msg):
+        em = discord.Embed(description=msg)
+        await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         await self.bot.delete_message(ctx.message)
 
     # Stats about current server
@@ -88,7 +93,6 @@ class Misc:
             else:
                 msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (server.name, server.owner, server.member_count, online, server.region, str(server.verification_level), server.role_hierarchy[0], server.default_channel, server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
                 await self.bot.send_message(ctx.message.channel, isBot + msg)
-            await asyncio.sleep(2)
             await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
@@ -97,6 +101,7 @@ class Misc:
         for i in ctx.message.server.emojis:
             msg += str(i)
         await self.bot.send_message(ctx.message.channel, msg)
+        await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
     async def avi(self, ctx):
@@ -117,7 +122,6 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, embed=em)
         else:
             await self.bot.send_message(ctx.message.channel, isBot + server.icon_url)
-        await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
 
     #
@@ -184,6 +188,7 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, isBot + 'Set playing status off')
             if os.path.isfile('game.txt'):
                 os.remove('game.txt')
+        await self.bot.delete_message(ctx.message)
 
     # Get url of emoji
     @commands.command(pass_context=True)
@@ -203,6 +208,7 @@ class Misc:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Could not find emoji.')
         else:
             await self.bot.send_message(ctx.message.channel, isBot + 'Specify an emoji.')
+        await self.bot.delete_message(ctx.message)
 
     # Get response time
     @commands.command(pass_context=True)
@@ -250,6 +256,7 @@ class Misc:
                 await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result[1].name, result[2], result[0].clean_content))
         else:
             await self.bot.send_message(ctx.message.channel, isBot + 'No quote found.')
+        await self.bot.delete_message(ctx.message)
 
     # Simple calculator
     @commands.command(pass_context=True)
@@ -270,6 +277,7 @@ class Misc:
         for word in words:
             lmgtfy += word + '+'
         await self.bot.send_message(ctx.message.channel, isBot + lmgtfy[:-1])
+        await self.bot.delete_message(ctx.message)
 
     # Deletes previous message immediately or after specified number of seconds (because why not)
     @commands.command(pass_context=True)

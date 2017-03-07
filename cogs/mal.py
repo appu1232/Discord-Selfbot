@@ -53,10 +53,14 @@ class Mal:
             # No results found for specified tags
             if not results:
                 await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                await self.bot.delete_message(fetch)
+                await self.bot.delete_message(ctx.message)
                 return
 
-            if not embed_perms(ctx.message):
+            if not embed_perms(ctx.message) or msg.startswith('[link]'):
                 await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/anime/%s' % results.id)
+                await self.bot.delete_message(fetch)
+                await self.bot.delete_message(ctx.message)
                 return
 
             # Formatting embed
@@ -102,6 +106,7 @@ class Mal:
 
             await self.bot.send_message(ctx.message.channel, embed=em)
             await self.bot.delete_message(fetch)
+            await self.bot.delete_message(ctx.message)
         except:
             await self.bot.send_message(ctx.message.channel, isBot + 'No results')
             await self.bot.delete_message(fetch)
@@ -138,10 +143,14 @@ class Mal:
             # No results found for specified tags
             if not results:
                 await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                await self.bot.delete_message(fetch)
+                await self.bot.delete_message(ctx.message)
                 return
 
-            if not embed_perms(ctx.message):
+            if not embed_perms(ctx.message) or msg.startswith('[link]'):
                 await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/manga/%s' % results.id)
+                await self.bot.delete_message(fetch)
+                await self.bot.delete_message(ctx.message)
                 return
 
             # Formatting
@@ -186,6 +195,7 @@ class Mal:
                           icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
             await self.bot.send_message(ctx.message.channel, embed=em)
             await self.bot.delete_message(fetch)
+            await self.bot.delete_message(ctx.message)
         except:
             await self.bot.send_message(ctx.message.channel, isBot + 'No results')
             await self.bot.delete_message(fetch)

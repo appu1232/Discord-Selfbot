@@ -47,7 +47,6 @@ class Userinfo:
                 msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (name.id, name.nick, name.status, name.voice_channel, name.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
                 await self.bot.send_message(ctx.message.channel, isBot + msg)
 
-            await asyncio.sleep(2)
             await self.bot.delete_message(ctx.message)
 
     @info.command(pass_context=True)
@@ -75,7 +74,6 @@ class Userinfo:
             await self.bot.send_message(ctx.message.channel, embed=em)
         else:
             await self.bot.send_message(ctx.message.channel, isBot + avi)
-        await asyncio.sleep(2)
         await self.bot.delete_message(ctx.message)
 
 
