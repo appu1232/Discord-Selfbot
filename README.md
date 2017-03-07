@@ -30,7 +30,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 
 ## Setup
 
-Start off by setting up the config.json file:
+Start off by setting up the ``config.json`` file in the ``settings`` folder:
 
 ```json
 {
@@ -63,8 +63,9 @@ The Google and MAL info is not needed in order to get the bot running. However, 
 
 Note: You must have Python 3.5.2 or above installed. **When installing python, make sure you check "Add Python to PATH" in the install window.**
 
-1. Windows: Double click ``run.bat`` to start the bot. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
-2. ``python appuselfbot.py`` to run the bot. Do ``python loopself.py`` instead to let the bot autorestart if it crashes.
+**Windows:** Double click ``run.bat`` to start the bot. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
+
+**Mac/Linux:** Navigate to the bot's folder in terminal/shell and run: ``pip install -r requirements.txt`` Once it's finished, run: ``python loopself.py`` to start the bot.
 
 ## All Commands:
 - ``>restart`` - restart the bot.
