@@ -13,7 +13,7 @@ class Customcmds:
     @commands.group(pass_context=True)
     async def customcmds(self, ctx):
         if ctx.invoked_subcommand is None:
-            with open('commands.json', 'r') as commands:
+            with open('settings/commands.json', 'r') as commands:
                 cmds = json.load(commands)
             sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
             msgs = []
@@ -40,7 +40,7 @@ class Customcmds:
 
     @customcmds.command(pass_context=True)
     async def long(self, ctx):
-        with open('commands.json', 'r') as commands:
+        with open('settings/commands.json', 'r') as commands:
             cmds = json.load(commands)
         msg = ''
         sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
@@ -76,7 +76,7 @@ class Customcmds:
     async def add(self, ctx, *, msg: str):
         words = msg.strip()
 
-        with open('commands.json', 'r') as commands:
+        with open('settings/commands.json', 'r') as commands:
             cmds = json.load(commands)
             save = cmds
 
@@ -129,13 +129,13 @@ class Customcmds:
                                    isBot + 'Successfully added ``%s`` to ``%s``' % (entry[1], entry[0]))
 
         except Exception as e:
-            with open('commands.json', 'w') as commands:
+            with open('settings/commands.json', 'w') as commands:
                 commands.truncate()
                 json.dump(save, commands, indent=4)
             await self.bot.send_message(ctx.message.channel, isBot + 'Error, seomthing went wrong. Exception: ``%s``' % e)
 
         # Update commands.json
-        with open('commands.json', 'w') as commands:
+        with open('settings/commands.json', 'w') as commands:
             commands.truncate()
             json.dump(cmds, commands, indent=4)
 
@@ -144,7 +144,7 @@ class Customcmds:
     async def remove(self, ctx, *, msg: str):
         words = msg.strip()
 
-        with open('commands.json', 'r') as commands:
+        with open('settings/commands.json', 'r') as commands:
             cmds = json.load(commands)
             save = cmds
 
@@ -223,13 +223,13 @@ class Customcmds:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Could not find specified command.')
 
         except Exception as e:
-            with open('commands.json', 'w') as commands:
+            with open('settings/commands.json', 'w') as commands:
                 commands.truncate()
                 json.dump(save, commands, indent=4)
             await self.bot.send_message(ctx.message.channel, isBot + 'Error, something went wrong. Exception: ``%s``' % e)
 
         # Update commands.json
-        with open('commands.json', 'w') as commands:
+        with open('settings/commands.json', 'w') as commands:
             commands.truncate()
             json.dump(cmds, commands, indent=4)
 

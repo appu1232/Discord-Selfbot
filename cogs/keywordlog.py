@@ -19,7 +19,7 @@ class Userinfo:
     @commands.group(pass_context=True)
     async def log(self, ctx):
         if ctx.invoked_subcommand is None:
-            with open('cogs/log.json', 'r+') as log:
+            with open('settings/log.json', 'r+') as log:
                 settings = json.load(log)
                 msg = 'Message logger info:```Log location: '
                 if settings['log_location'] == '':
@@ -144,7 +144,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def location(self, ctx):
-        with open('cogs/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['log_location'] = ctx.message.channel.id + ' ' + ctx.message.server.id
             log.seek(0)
@@ -154,7 +154,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def toggle(self, ctx):
-        with open('cogs/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if settings['allservers'] == 'False':
                 settings['allservers'] = 'True'
@@ -172,7 +172,7 @@ class Userinfo:
         if ctx.message.content[12:].strip():
             if ctx.message.content[12:].strip().isdigit():
                 if 0 < int(ctx.message.content[12:].strip()) < 21:
-                    with open('cogs/log.json', 'r+') as log:
+                    with open('settings/log.json', 'r+') as log:
                         settings = json.load(log)
                         settings['context_len'] = ctx.message.content[12:].strip()
                         log.seek(0)
@@ -188,7 +188,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def add(self, ctx):
-        with open('cogs/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if ctx.message.server.id not in settings['servers']:
                 settings['servers'].append(ctx.message.server.id)
@@ -201,7 +201,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def remove(self, ctx):
-        with open('cogs/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if ctx.message.server.id in settings['servers']:
                 settings['servers'].remove(ctx.message.server.id)
@@ -214,7 +214,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def addkey(self, ctx, *, msg: str):
-        with open('cogs/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if msg not in settings['keywords'] and msg is not None:
                 settings['keywords'].append(msg)
@@ -229,7 +229,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def removekey(self, ctx, *, msg: str):
-        with open('cogs/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if msg in settings['keywords']:
                 settings['keywords'].remove(msg)
@@ -242,7 +242,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def addblacklist(self, ctx, *, msg: str):
-        with open('cogs/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             try:
                 name = ctx.message.mentions[0].id
@@ -268,7 +268,7 @@ class Userinfo:
 
     @log.command(pass_context=True)
     async def removeblacklist(self, ctx, *, msg: str):
-        with open('cogs/utils/log.json', 'r+') as log:
+        with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             try:
                 name = ctx.message.mentions[0].id

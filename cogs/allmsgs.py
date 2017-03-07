@@ -6,7 +6,7 @@ from random import randint
 quick = [('shrug', '¯\_(ツ)_/¯'), ('flip', '(╯°□°）╯︵ ┻━┻'), ('unflip', '┬─┬﻿ ノ( ゜-゜ノ)'), ('lenny', '( ͡° ͜ʖ ͡°)'), ('comeatmebro', '(ง’̀-‘́)ง')]
 
 def afk(notified):
-    with open('config.json') as f:
+    with open('settings/config.json') as f:
         config = json.load(f)
     for i in notified:
         if i.id == config['my_id'] and config['set_afk'] == 'on':
@@ -27,10 +27,10 @@ def custom(message):
 
     success = False
 
-    with open('config.json') as f:
+    with open('settings/config.json') as f:
         config = json.load(f)
     if message.startswith(config['customcmd_prefix'][0]):
-        with open('commands.json', 'r') as f:
+        with open('settings/commands.json', 'r') as f:
             commands = json.load(f)
             file = discord.Embed(colour=0x27007A)
         for i in commands:

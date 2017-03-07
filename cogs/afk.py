@@ -12,7 +12,7 @@ class Afk:
     @commands.command(pass_context=True)
     async def setafk(self, ctx, *, msg: str):
         if msg.lower().strip() == 'on':
-            with open('config.json', 'r+') as conf:
+            with open('settings/config.json', 'r+') as conf:
                 cf = json.load(conf)
                 cf['set_afk'] = 'on'
                 conf.seek(0)
@@ -20,7 +20,7 @@ class Afk:
                 json.dump(cf, conf, indent=4)
             await self.bot.send_message(ctx.message.channel, isBot + 'AFK on')
         elif msg.lower().strip() == 'off':
-            with open('config.json', 'r+') as conf:
+            with open('settings/config.json', 'r+') as conf:
                 cf = json.load(conf)
                 cf['set_afk'] = 'off'
                 conf.seek(0)
@@ -33,7 +33,7 @@ class Afk:
     # Set afk message
     @commands.command(pass_context=True)
     async def setafkmsg(self, ctx, *, msg: str):
-        with open('config.json', 'r+') as conf:
+        with open('settings/config.json', 'r+') as conf:
             cf = json.load(conf)
             cf['afk_message'] = msg
             conf.seek(0)
