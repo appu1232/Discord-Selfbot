@@ -205,4 +205,4 @@ Follow these steps to obtain them:
 
 ## Acknowledgements
 
-Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards. Also thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
+Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards and the debugger. Also thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
