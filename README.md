@@ -88,7 +88,7 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 
 ![img](http://i.imgur.com/4I8B2IW.png)
 - ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
-- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well. An mal search result:
+- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well. To just get the link instead of the full info, put ``[link]`` before the tags. An mal search result:
 
 ![img](http://i.imgur.com/NmqmzdM.png)
 - ``>server`` or ``>server <name of server>`` - Get various information about the server. What it looks like:
@@ -99,6 +99,7 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>server emojis`` - Lists all the custom emojis for the current server.
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that.
+- ``>embed <words>`` - Make an embed out of the message.
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
 ![img](http://i.imgur.com/n4mSRyD.png)
@@ -112,11 +113,11 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 - ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>about`` - link to this github project
-- ``>py`` - python debugging. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Example usage:
+- ``>py`` - python debugging. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load`` and ``>unload`` cmds to load/unload modules. Example usage:
 
 ![img](http://i.imgur.com/MpAtJ7W.png)
 
-![img](http://i.imgur.com/SpeOy1D.png)
+![img](http://i.imgur.com/PF0inrv.png)
 
 ## Custom Commands:
 There are two types of commands: ``string`` commands which only have one response and ``list`` commands which can have multiple responses.
