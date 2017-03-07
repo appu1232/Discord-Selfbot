@@ -16,12 +16,12 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 - Google search (web or image).
 - Keyword/mention logger. Log messages from any or all servers that have one of the keywords you specify. Useful for seeing if someone mentioned your name or your favorite show/book/whatever else keyword.
 - Set your game to anything quickly and easily.
-- Dynamically add custom commands/reactions. Stored in ``commands.json`` which has some sample commands added to start with.
+- Add custom commands/reactions. The commands get stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
-- Python debugger. Modeled off of RoboDanny's ?debug command.
+- Python debugger. Modeled off of RoboDanny's ?debug command. Does both exec() and eval().
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
-- Quote a message from a user.
+- Quote a message from a user, even if it was deleted.
 - Set yourself as afk and reply to a user telling them you are away if they message/mention you. (technically frowned upon by Discord so use it as a joke occasionally, not practical use)
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
@@ -169,7 +169,7 @@ That should be it. Check your settings any time with ``>log``.
 
 ## Save Chat Messages
 
-You can only save chat messages in the servers you are logging (see **Keyword Logger** section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the logger holds the latest 1000 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``utils`` folder. You can increase this value if you want; the upper limit is well over 1000.
+You can only save chat messages in the servers you are logging (see **Keyword Logger** section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the logger holds the latest 500 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``utils`` folder. You can increase this value if you want; the upper limit is well over 500.
 When you want to save some kind of memorable discussion/funny moment/important reminder or want to shame someone for a message they deleted or something, use the ``>log history`` command:
 
 - ``>log history <n>`` outputs the last ``<n>`` number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages. A screencap of what it looks like:
