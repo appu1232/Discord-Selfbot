@@ -18,6 +18,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 - Set your game to anything quickly and easily.
 - Dynamically add custom commands/reactions. Stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
+- Python debugger. Modeled off of RoboDanny's ?debug command.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
 - Quote a message from a user.
@@ -111,6 +112,10 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 - ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>about`` - link to this github project
+- ``>py`` - python debugging. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Example usage:
+
+![img](http://i.imgur.com/MpAtJ7W.png)
+![img](http://i.imgur.com/SpeOy1D.png)
 
 ## Custom Commands:
 There are two types of commands: ``string`` commands which only have one response and ``list`` commands which can have multiple responses.
