@@ -12,7 +12,7 @@ from cogs.utils.checks import *
 
 
 def load_config():
-    with open('config.json', 'r') as f:
+    with open('settings/config.json', 'r') as f:
         return json.load(f)
 
 config = load_config()
@@ -151,7 +151,7 @@ async def on_message(message):
 
     try:
         wordfound = False
-        with open('cogs/log.json', 'r') as log:
+        with open('settings/log.json', 'r') as log:
             loginfo = json.load(log)
         if loginfo['allservers'] == 'True':
             add_alllog(message.channel.id, message.server.id, message)
@@ -233,7 +233,7 @@ def add_alllog(channel, server, message):
     if channel + ' ' + server in bot.all_log:
         bot.all_log[channel + ' ' + server].append((message, message.clean_content))
     else:
-        with open('cogs/log.json') as f:
+        with open('settings/log.json') as f:
             config = json.load(f)
             bot.all_log[channel + ' ' + server] = collections.deque(maxlen=int(config['log_size']))
             bot.all_log[channel + ' ' + server].append((message, message.clean_content))
@@ -250,4 +250,3 @@ if __name__ == '__main__':
         except Exception as e:
             print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
     bot.run(config['token'], bot=False)
-
