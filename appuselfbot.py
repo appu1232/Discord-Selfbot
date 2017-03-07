@@ -17,7 +17,7 @@ def load_config():
 
 config = load_config()
 
-extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.userinfo']
+extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.debugger', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
@@ -251,3 +251,4 @@ if __name__ == '__main__':
         except Exception as e:
             print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
     bot.run(config['token'], bot=False)
+
