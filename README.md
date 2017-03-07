@@ -115,6 +115,7 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>py`` - python debugging. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Example usage:
 
 ![img](http://i.imgur.com/MpAtJ7W.png)
+
 ![img](http://i.imgur.com/SpeOy1D.png)
 
 ## Custom Commands:
