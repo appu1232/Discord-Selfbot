@@ -5,5 +5,7 @@
 	"servers": [],
 	"keywords": [],
     "blacklisted_users": [],
+	"blacklisted_words": [],
+	"blacklisted_servers": [],
 	"context_len": "10"
 }
