@@ -26,7 +26,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
 - Simple calculator.
-- Ping command that shows the response time.
+- Various other misc commands.
 
 ## Setup
 
@@ -101,6 +101,7 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that.
 - ``>embed <words>`` - Make an embed out of the message.
+- ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
 ![img](http://i.imgur.com/n4mSRyD.png)
