@@ -282,7 +282,7 @@ class Userinfo:
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg in settings['blacklisted_words']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This word is already blacklisted.' % msg)
+                    return await self.bot.send_message(ctx.message.channel, isBot + 'This word is already blacklisted.')
                 settings['blacklisted_words'].append(msg)
                 log.seek(0)
                 log.truncate()
@@ -292,7 +292,7 @@ class Userinfo:
                 if 'blacklisted_servers' not in settings:
                     settings['blacklisted_servers'] = []
                 if ctx.message.server.id in settings['blacklisted_servers']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This server is already blacklisted.' % msg)
+                    return await self.bot.send_message(ctx.message.channel, isBot + 'This server is already blacklisted.')
                 if ctx.message.server.id in settings['servers']:
                     settings['servers'].remove(ctx.message.server.id)
                 settings['blacklisted_servers'].append(ctx.message.server.id)
@@ -333,7 +333,7 @@ class Userinfo:
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg not in settings['blacklisted_words']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This word is not blacklisted.' % msg)
+                    return await self.bot.send_message(ctx.message.channel, isBot + 'This word is not blacklisted.')
                 settings['blacklisted_words'].remove(msg)
                 log.seek(0)
                 log.truncate()
@@ -343,7 +343,7 @@ class Userinfo:
                 if 'blacklisted_servers' not in settings:
                     settings['blacklisted_servers'] = []
                 if ctx.message.server.id not in settings['blacklisted_servers']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This server is not blacklisted.' % msg)
+                    return await self.bot.send_message(ctx.message.channel, isBot + 'This server is not blacklisted.')
                 settings['blacklisted_servers'].remove(ctx.message.server.id)
                 log.seek(0)
                 log.truncate()
