@@ -168,7 +168,7 @@ It's just for convenience. If you have 50+ servers and only a handful that you d
 
 **Note:**
 
-1. Only other people can trigger the log message. You yourself saying a keyword won't log the message.
+1. Only other people can trigger the log message. You yourself saying a keyword won't log the message. Also, the channel the keyword logger is logging in is exempt from the keyword search.
 2. If the logged message + context is too long, the log message will be split up into multiple messages. These mutiple messages don't use embeds so it won't look as neat, sadly. This shouldn't happen often though.
 
 That should be it. Check your settings any time with ``>log``.
