@@ -3,6 +3,7 @@ import datetime
 import asyncio
 import os
 import prettytable
+import strawpy
 from appuselfbot import isBot
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -258,9 +259,25 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, isBot + 'No quote found.')
         await self.bot.delete_message(ctx.message)
 
+    # Creates a strawpoll with the given options
+    @commands.command(pass_context=True)
+    async def poll(self, ctx, *, msg):
+        try:
+            options = [op.strip() for op in msg.split('|')]
+            if '=' in options[0]:
+                title, options[0] = options[0].split('=')
+                options[0] = options[0].strip()
+            else:
+                title = 'Poll by %s' % ctx.message.author.name
+        except:
+            return await self.bot.send_message(ctx.message.channel, isBot + 'Invalid Syntax. Example use: ``>poll Favorite color = Blue | Red | Green | Purple``')
+
+        poll = strawpy.create_poll(title.strip(), options)
+        await self.bot.send_message(ctx.message.channel, isBot + poll.url)
+
     # Simple calculator
     @commands.command(pass_context=True)
-    async def calc(self, ctx, *, msg: str):
+    async def calc(self, ctx, *, msg):
         equation = msg.strip()
         if '=' in equation:
             left = eval(equation.split('=')[0])
