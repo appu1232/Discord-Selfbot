@@ -59,6 +59,15 @@ async def on_ready():
             channel = bot.get_channel(re.readline())
             await bot.send_message(channel, isBot + 'Bot has restarted.')
         os.remove('restart.txt')
+    with open('settings/log.json', 'r+') as log:
+        loginfo = json.load(log)
+        if 'blacklisted_words' not in loginfo:
+            loginfo['blacklisted_words'] = []
+        if 'blacklisted_servers' not in loginfo:
+            loginfo['blacklisted_servers'] = []
+        log.seek(0)
+        log.truncate()
+        json.dump(loginfo, log, indent=4)
     if os.path.isfile('game.txt'):
         with open('game.txt', 'r') as g:
             game = g.readline()
@@ -153,13 +162,17 @@ async def on_message(message):
         wordfound = False
         with open('settings/log.json', 'r') as log:
             loginfo = json.load(log)
-        if loginfo['allservers'] == 'True':
+        if loginfo['allservers'] == 'True' and message.server.id not in loginfo['blacklisted_servers']:
             add_alllog(message.channel.id, message.server.id, message)
             for word in loginfo['keywords']:
                 if word.lower() in message.content.lower() and message.author.id != config['my_id']:
                     wordfound = True
                     for x in loginfo['blacklisted_users']:
                         if message.author.id == x:
+                            wordfound = False
+                            break
+                    for x in loginfo['blacklisted_words']:
+                        if x.lower() in message.content.lower():
                             wordfound = False
                             break
                     break
@@ -171,6 +184,10 @@ async def on_message(message):
                         wordfound = True
                         for x in loginfo['blacklisted_users']:
                             if message.author.id == x:
+                                wordfound = False
+                                break
+                        for x in loginfo['blacklisted_words']:
+                            if x.lower() in message.content.lower():
                                 wordfound = False
                                 break
                         break
@@ -250,3 +267,4 @@ if __name__ == '__main__':
         except Exception as e:
             print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
     bot.run(config['token'], bot=False)
+
