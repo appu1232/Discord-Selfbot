@@ -51,7 +51,7 @@ Start off by setting up the ``config.json`` file in the ``settings`` folder:
 - ``my_id`` - your discord ID. On Discord go to settings > Appearance and Enable Developer Mode. Right-click yourself on the sidebar or chat and click copy ID to get your ID.
 - ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) Don't give this out to anyone!
 - ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See the **Google API** section below for instructions.
-- ``mal_username`` and ``mal_password`` - MyAnimeList username and password which is required in order to do an MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
+- ``mal_username`` and ``mal_password`` - MyAnimeList username and password which is required in order to do a MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
 - ``set_afk`` - does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``. Warning: As mentioned, this is not something Discord wants selfbots to do. More of a joke than anything.
 - ``afk_message`` - the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
 - ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as in in-built.
@@ -89,7 +89,7 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 
 ![img](http://i.imgur.com/4I8B2IW.png)
 - ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
-- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well. To just get the link instead of the full info, put ``[link]`` before the tags. An mal search result:
+- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well. To just get the link instead of the full info, put ``[link]`` before the tags. a MAL search result:
 
 ![img](http://i.imgur.com/NmqmzdM.png)
 - ``>server`` or ``>server <name of server>`` - Get various information about the server. What it looks like:
