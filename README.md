@@ -121,6 +121,8 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 
 ![img](http://i.imgur.com/PF0inrv.png)
 
+![img](http://i.imgur.com/P7J4wVb.png)
+
 ## Custom Commands:
 There are two types of commands: ``string`` commands which only have one response and ``list`` commands which can have multiple responses.
 
