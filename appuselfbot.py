@@ -175,7 +175,7 @@ async def on_message(message):
         if loginfo['allservers'] == 'True' and message.server.id not in loginfo['blacklisted_servers']:
             add_alllog(message.channel.id, message.server.id, message)
             for word in loginfo['keywords']:
-                if word.lower() in message.content.lower():
+                if word.lower() in message.content.lower() and message.author.id != config['my_id']:
                     wordfound = True
                     for x in loginfo['blacklisted_users']:
                         if message.author.id == x:
