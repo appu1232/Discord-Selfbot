@@ -1,0 +1,7 @@
+```count = 0
+for user in server.members:
+    for guild in bot.servers:
+        if guild.get_member(user.id) and guild.id != server.id and not user.bot:
+            count += 1
+            break
+print('\nTotal members: {} \n\nMembers I share another server with: {}'.format(server.member_count, count))```
