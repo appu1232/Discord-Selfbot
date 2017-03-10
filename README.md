@@ -197,10 +197,10 @@ So, here's how you get started with setting up the logger:
 When keywords get logged, the bot doesn't notify you. This is because the bot is running on your account. Just like you can't ping and notify yourself, the bot can't either. However, it is possible to recieve notifications through a second bot account. The setup is easy:
 
 1. Create a Discord bot account and get the bot's token. Then add the bot to the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
-2. Make sure to give the bot read, send, and edit messages, and embed permissions in the channel you are keyword logging in.
+2. Make sure to give the bot read, send, edit messages, and embed permissions in the channel you are keyword logging in.
 3. Do ``>notify token <token>`` where ``<token>`` is the token you grabbed in step 1. Make sure you grabbed the **token** not the client secret!
-4. Enable the notifier bot with ``>notify on``. Now you should see the bot you created come online in the sidebar. ``>notify off`` to disabled the notifier bot.
-5. Set how to get notifications. Do ``>notify ping`` - pinged when a keyword gets logged. ``>notify dm`` - send log to direct message. ``>notify none`` - post in the keyword logger channel (no ping).
+4. Enable the notifier bot with ``>notify on``. You should see the bot you created come online on the sidebar. ``>notify off`` to disabled the notifier bot.
+5. Set how to get notifications. ``>notify ping`` - get pinged when a keyword gets logged. ``>notify dm`` - the bot direct messages you the log. ``>notify none`` - posts in the keyword logger channel (no ping).
 
 **Why would I need to blacklist words/servers?**
 
