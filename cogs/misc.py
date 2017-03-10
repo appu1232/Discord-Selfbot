@@ -368,7 +368,17 @@ class Misc:
         else:
             await self.bot.delete_message(self.bot.self_log.pop())
             await self.bot.delete_message(self.bot.self_log.pop())
-
+    
+    @commands.command(pass_context=True)
+    async def spoiler(self, ctx, *, msg : str):
+        try:
+            (spoiled_work, _, spoiler) = msg.lower().partition(" ")
+            await self.bot.send_message(ctx.message.channel, isBot + 'Spoiler for `' + spoiled_work + '` = \n`'
+            + ''.join(map(lambda c: chr(ord('a') + (((ord(c) - ord('a')) + 13) % 26)) if c >= 'a' and c <= 'z' else c, spoiler))
+            + '`\n' + isBot + 'Use http://rot13.com to decode')
+        except:
+            await self.bot.send_message(ctx.message.channel, isBot + 'Spoilering failed')
+        await self.bot.delete_message(ctx.message)
 
 
 def setup(bot):
