@@ -79,8 +79,10 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>customcmds`` or ``>customcmds long`` - List all custom commands. The long version is more detailed (shows all the replies for each cmd as well). A sample custom command that outputs a picture:
 
 ![img](http://i.imgur.com/gBoKnjQ.png)
-- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
-- ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
+- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command.
+- ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command.
+
+See the **Custom Commands** section for more info on how to invoke commands and set up multiple responses to the same command.
 
 **Google web and image search commands**
 
