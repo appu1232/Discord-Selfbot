@@ -2,8 +2,8 @@ import subprocess, traceback
 
 while True:
     try:
-        p = subprocess.call(['python3', 'appuselfbot.py'])
+        p = subprocess.Popen(['python3', 'appuselfbot.py'])
     except (SyntaxError, FileNotFoundError):
-        p = subprocess.call(['python', 'appuselfbot.py'])
+        p = subprocess.Popen(['python', 'appuselfbot.py'])
     except:
         traceback.print_exc()

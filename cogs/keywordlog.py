@@ -4,6 +4,7 @@ import json
 import math
 import os
 import re
+import subprocess
 from datetime import timezone
 
 keywords = []
@@ -351,6 +352,89 @@ class Userinfo:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Removed server ``%s`` from the blacklist.' % ctx.message.server.name)
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. Usage: ``>log removeblacklist [user] someone#2341`` or ``>log removeblacklist [word] word`` or ``>log removeblacklist [server]``')
+
+    # Notify bot
+    @commands.group(pass_context=True)
+    async def notify(self, ctx):
+        if ctx.invoked_subcommand is None:
+            error = 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the notifier bot.\n``>notify on/off`` - turn notifier on or off.\n``>notify dm`` - recieve notifications via direct message\n``>notify ping`` - recieve notifications via mention in your keyword logger channel.\n``>notify none`` - repost to keyword logger channel without any mention (get notification if you have notification settings set to all messages in that server).'
+            if not ctx.message.content[8:].strip():
+                await self.bot.send_message(ctx.message.channel, isBot + error)
+            elif ctx.message.content[8:].strip() == 'ping':
+                with open('cogs/utils/notify.json', 'r+') as n:
+                    notify = json.load(n)
+                    notify['type'] = 'ping'
+                    n.seek(0)
+                    n.truncate()
+                    json.dump(notify, n, indent=4)
+                await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``ping``.')
+            elif ctx.message.content[8:].lower().strip() == 'dm' or ctx.message.content[8:].lower().strip() == 'pm' or ctx.message.content[8:].lower().strip() == 'direct message':
+                with open('cogs/utils/notify.json', 'r+') as n:
+                    notify = json.load(n)
+                    notify['type'] = 'dm'
+                    n.seek(0)
+                    n.truncate()
+                    json.dump(notify, n, indent=4)
+                await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``direct messages``.')
+            elif ctx.message.content[8:].strip() == 'none':
+                with open('cogs/utils/notify.json', 'r+') as n:
+                    notify = json.load(n)
+                    notify['type'] = 'none'
+                    n.seek(0)
+                    n.truncate()
+                    json.dump(notify, n, indent=4)
+                await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``none``.')
+            else:
+                await self.bot.send_message(ctx.message.channel, isBot + error)
+
+    # Turn on the notifier
+    @notify.command(pass_context=True)
+    async def on(self, ctx):
+        with open('settings/log.json', 'r+') as l:
+            log = json.load(l)
+        token = log['notifier_bot_token']
+        channel = log['log_location'].split(' ')[0]
+        with open('cogs/utils/notify.json', 'r+') as n:
+            notify = json.load(n)
+            if notify['bot_token'] == '':
+                return await self.bot.send_message(ctx.message.channel, isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
+            notify['channel'] = channel
+            notify['author'] = ctx.message.author.id
+            notify['notify'] = 'on'
+            notify['bot_token'] = token
+            n.seek(0)
+            n.truncate()
+            json.dump(notify, n, indent=4)
+        await self.bot.send_message(ctx.message.channel, isBot + 'Turned on notifications for the keyword logger.')
+        try:
+            p = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+        except (SyntaxError, FileNotFoundError):
+            p = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+        except:
+            pass
+
+    # Turn off the notifier
+    @notify.command(pass_context=True)
+    async def off(self, ctx):
+        with open('cogs/utils/notify.json', 'r+') as n:
+            notify = json.load(n)
+            notify['notify'] = 'off'
+            n.seek(0)
+            n.truncate()
+            json.dump(notify, n, indent=4)
+        await self.bot.send_message(ctx.message.channel, isBot + 'Turned off notifications for the keyword logger.')
+
+    # Set bot token
+    @notify.command(pass_context=True)
+    async def token(self, ctx, *, msg):
+        msg = msg.strip('<').strip('>')
+        with open('settings/log.json', 'r+') as l:
+            log = json.load(l)
+            log['notifier_bot_token'] = msg
+            l.seek(0)
+            l.truncate()
+            json.dump(log, l, indent=4)
+        await self.bot.send_message(ctx.message.channel, isBot + 'Notifier bot token set.')
 
 
 def setup(bot):

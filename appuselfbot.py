@@ -3,6 +3,7 @@ import os
 import sys
 import math
 import time
+import subprocess
 import datetime
 import collections
 from datetime import timezone
@@ -17,7 +18,7 @@ def load_config():
 
 config = load_config()
 
-extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.debugger', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.userinfo']
+extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.debugger', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.spellcheck', 'cogs.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
@@ -68,6 +69,15 @@ async def on_ready():
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
+    with open('cogs/utils/notify.json', 'r') as n:
+        notif = json.load(n)
+    if notif['notify'] == 'on':
+        try:
+            p = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+        except (SyntaxError, FileNotFoundError):
+            p = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+        except:
+            pass
     if os.path.isfile('game.txt'):
         with open('game.txt', 'r') as g:
             game = g.readline()
@@ -165,7 +175,7 @@ async def on_message(message):
         if loginfo['allservers'] == 'True' and message.server.id not in loginfo['blacklisted_servers']:
             add_alllog(message.channel.id, message.server.id, message)
             for word in loginfo['keywords']:
-                if word.lower() in message.content.lower() and message.author.id != config['my_id']:
+                if word.lower() in message.content.lower():
                     wordfound = True
                     for x in loginfo['blacklisted_users']:
                         if message.author.id == x:
