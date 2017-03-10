@@ -74,6 +74,14 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 
 ![img](http://i.imgur.com/x7aEacJ.png)
 
+**Custom Commands**
+
+- ``>customcmds`` or ``>customcmds long`` - List all custom commands. The long version is more detailed (shows all the replies for each cmd as well). A sample custom command that outputs a picture:
+
+![img](http://i.imgur.com/gBoKnjQ.png)
+- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
+- ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
+
 **Google web and image search commands**
 
 - ``>g <tags>`` - Google search. Depending on the type of result, certain google cards can be parsed. Some result:
@@ -92,6 +100,7 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 ![img](http://i.imgur.com/4I8B2IW.png)
 - ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
 
+
 **MyAnimeList commands**
 
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
@@ -109,14 +118,6 @@ A MAL search result:
 - ``>server members`` - Uploads a txt file containing detailed information about every member on the server including join date, account created, color, top role, and more.
 - ``>server avi`` or ``>server avi <name of server>`` - Gets the server image.
 - ``>server emojis`` - Lists all the custom emojis for the current server.
-
-**Custom Commands**
-
-- ``>customcmds`` or ``>customcmds long`` - List all custom commands. The long version is more detailed (shows all the replies for each cmd as well). A sample custom command that outputs a picture:
-
-![img](http://i.imgur.com/gBoKnjQ.png)
-- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
-- ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
 
 **Python Interpreter**
 
