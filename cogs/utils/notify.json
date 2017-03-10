@@ -1,7 +1,7 @@
 {
-    "author": "124910128582361092",
-    "bot_token": "Mjg5NTkxMjg2MTYyNTIyMTEz.C6OmaQ.QL2eQ2YHbVtOZR-573zU9tBz8bU",
-    "type": "none",
-    "notify": "on",
-    "channel": "271434827767611392"
+    "author": "",
+    "bot_token": "",
+    "type": "dm",
+    "notify": "off",
+    "channel": ""
 }
