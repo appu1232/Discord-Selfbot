@@ -147,7 +147,7 @@ class Google:
     async def get_google_entries(self, query):
         params = {
             'q': query,
-            'safe': 'on'
+            'safe': 'off'
         }
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64)'
@@ -159,7 +159,7 @@ class Google:
                 config = load_config()
                 async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
                     result = json.loads(await resp.text())
-                return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
+                return None, result['items'][0]['link']
 
             root = etree.fromstring(await resp.text(), etree.HTMLParser())
             card_node = root.find(".//div[@id='topstuff']")
