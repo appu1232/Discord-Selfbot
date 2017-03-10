@@ -194,11 +194,11 @@ So, here's how you get started with setting up the logger:
 
 **Setting up a notifier for the keyword logger**
 
-When keywords get logged, the bot can't notify you. This is because the bot is running on your account so it is essentially you and you can't get notifications from yourself. However, it is possible to recieve notifications through a second bot account. The setup is easy:
+When keywords get logged, the bot can't notify you. This is because the bot is running on your account. Just like you can't ping and notify yourself, the bot can't either. However, it is possible to recieve notifications through a second bot account. The setup is easy:
 
-1. Create a Discord bot account and get the bot's token. Then add the bot the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
+1. Create a Discord bot account and get the bot's token. Then add the bot to the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
 2. Make sure to give the bot read, send, and edit messages, and embed permissions in the channel you are keyword logging in.
-3. Do ``>notify token <token>`` where <token> is the token you grabbed in step 1. Make sure you grab the **token** not the client secret!
+3. Do ``>notify token <token>`` where ``<token>`` is the token you grabbed in step 1. Make sure you grabbed the **token** not the client secret!
 4. Enable the notifier bot with ``>notify on``. Now you should see the bot you created come online in the sidebar. ``>notify off`` to disabled the notifier bot.
 5. Do ``>notify ping`` to get pinged when a keyword gets logged. ``>notify dm`` to get the log via direct message. ``>notify none`` to just post in the keyword logger channel (no ping).
 
