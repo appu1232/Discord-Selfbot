@@ -192,6 +192,15 @@ So, here's how you get started with setting up the logger:
 5. Set the context length. This is the number of messages to show in the log message. The default is set to 4 (this is 4 messages before keyword message + the keyword message). Set it with ``>log context <number>``. You can go up to 20 messages.
 6. Add users, words, or servers to the blacklist. These won't trigger the keyword logger even if a match is made. The syntax is: ``>log addblacklist [user] <user>`` or ``>log addblacklist [word] <word>`` or ``>log addblacklist [server]`` When blacklisting users, ``<user>`` can be their name + discriminator, a mention, or their user id. Removing is more or less the same but with ``>log removeblacklist`` instead.
 
+**Setting up a notifier for the keyword logger**
+
+When keywords get logged, the bot can't notify you. This is because the bot is running on your account so it is essentially you and you can't get notifications from yourself. However, it is possible to recieve notifications through a second bot account. The setup is easy:
+1. Create a Discord bot account and get the bot's token. Then add the bot the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
+2. Make sure to give the bot the read, send, and edit messages, and embed permissions in the channel you are keyword logging in.
+3. Do ``>notify token <token>`` where <token> is the token you grabbed in step 1. Make sure you grab the **token** not the client secret!
+4. Enable the notifier bot with ``>notify on``. Now you should see the bot you created come online in the sidebar. ``>notify off`` to disabled the notifier bot.
+5. Do ``>notify ping`` to get pinged when a keyword gets logged. ``>notify dm`` to get the log via direct message. ``>notify none`` to just post in the keyword logger channel (no ping). If you have your notification settings set to all messages, you will get notified for this. Useful if you want to get notified but don't want a ping.
+
 **Why would I need to blacklist words/servers?**
 
 It's just for convenience. If you have 50+ servers and only a handful that you don't want to log, it would be a hastle to add every one to the ``servers`` list so instead you can just enable all servers and add the few to the blacklist. For words being blacklisted, this is just to allow you to specify more in-depth what kind of messages you are trying to look for with the keyword logger.
