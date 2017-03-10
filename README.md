@@ -50,7 +50,7 @@ Start off by setting up the ``config.json`` file in the ``settings`` folder:
 
 - ``my_id`` - your discord ID. On Discord go to settings > Appearance and Enable Developer Mode. Right-click yourself on the sidebar or chat and click copy ID to get your ID.
 - ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) Don't give this out to anyone!
-- ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See the **Google API** section below for instructions.
+- ``google_api_key`` and ``custom_search_engine`` need to be obtained from Google. See the [Google API](#google-api) section below for instructions.
 - ``mal_username`` and ``mal_password`` - MyAnimeList username and password which is required in order to do a MAL search. This is required in order to use the MAL API to grab anime/manga information and is not used for anything else. A normal MAL account will suffice.
 - ``set_afk`` - does not need to be changed. It defaults to ``off`` and can be changed through Discord by doing ``>setafk on`` or ``>setafk off``. Warning: As mentioned, this is not something Discord wants selfbots to do. More of a joke than anything.
 - ``afk_message`` - the message that is sent when ``set_afk`` is enabled and someone pings you in a channel. This can be edited through Discord with the ``>setafkmsg`` cmd.
@@ -82,7 +82,7 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command.
 
-See the **Custom Commands** section for more info on how to invoke commands and set up multiple responses to the same command.
+See the [Custom Commands](#custom-commands) section for more info on how to invoke commands and set up multiple responses to the same command.
 
 **Google web and image search commands**
 
@@ -97,7 +97,7 @@ See the **Custom Commands** section for more info on how to invoke commands and 
 
 **Logging commands**
 
-- ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands used for keyword logging. A logged message:
+- ``>log`` - See what where and how you are logging. See the [Keyword Logger](#keyword-logger) section below for more commands used for keyword logging. A logged message:
 
 ![img](http://i.imgur.com/4I8B2IW.png)
 - ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
@@ -236,7 +236,7 @@ Follow these steps to obtain them:
 ## Other Things to Note
 - Free custom search has a limit of 100 searches per day. The commands ``>i`` and ``>mal`` use this search. Still, this should be more than enough but feel free to pay for more if you would like, although I don't think it's needed.
 - Try not to keep ``setafk`` on for too long or use it too frequently. Technically, responding to someone else's ping with an automated response is not something Discord likes selfbots doing. I highly suggest this be used as a fun gimmick rather than for actual use all the time.
-- Custom commands have a lot of other quirks and flexablility. Check the **Custom commands** section below to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
+- Custom commands have a lot of other quirks and flexablility. Check the [Custom Commands](#custom-commands) section to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
 
 ## Acknowledgements
