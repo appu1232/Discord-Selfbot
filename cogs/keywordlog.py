@@ -392,12 +392,15 @@ class Userinfo:
     async def on(self, ctx):
         with open('settings/log.json', 'r+') as l:
             log = json.load(l)
+        if 'notifier_bot_token' not in log:
+            log['notifier_bot_token'] = ''
         token = log['notifier_bot_token']
+        if log['notifier_bot_token'] == '':
+            return await self.bot.send_message(ctx.message.channel,
+                                               isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
         channel = log['log_location'].split(' ')[0]
         with open('cogs/utils/notify.json', 'r+') as n:
             notify = json.load(n)
-            if notify['bot_token'] == '':
-                return await self.bot.send_message(ctx.message.channel, isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
             notify['channel'] = channel
             notify['author'] = ctx.message.author.id
             notify['notify'] = 'on'
