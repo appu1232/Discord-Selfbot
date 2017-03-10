@@ -6,6 +6,7 @@ for user in server.members:
                 data[user] = []
            data[user].append(guild.name)
 
+del data[author]
 print('Users I share a server with:\nUser - Servers\n')
 for user in data:
     servers = ''.join(data[user])
