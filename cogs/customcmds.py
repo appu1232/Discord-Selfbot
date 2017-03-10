@@ -71,7 +71,6 @@ class Customcmds:
                 splitmsg = ''
             for i in allWords:
                 await self.bot.send_message(ctx.message.channel, '```%s```' % i)
-        await self.bot.delete_message(ctx.message)
 
     # Add a custom command
     @commands.command(pass_context=True)
