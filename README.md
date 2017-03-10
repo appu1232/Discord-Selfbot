@@ -70,13 +70,12 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 ## All Commands:
 - ``>restart`` - restart the bot.
 - ``>game`` - Set your game. This won't show for yourself but other people can see it.
-- ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
 - ``>stats`` - Bot stats and some user info. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
 
 ![img](http://i.imgur.com/x7aEacJ.png)
-- ``>ping`` - Responds with ``pong`` and also gives the response time. How the ping response looks:
 
-![img](http://i.imgur.com/XhzTYaW.png)
+**Google web and image search commands**
+
 - ``>g <tags>`` - Google search. Depending on the type of result, certain google cards can be parsed. Some result:
 
 ![img](http://i.imgur.com/xaqzej9.png?2)
@@ -134,15 +133,17 @@ Example usage of the python interpreter:
 
 **Misc**
 
-- ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>about`` - link to this github project
-- ``>emoji <emoji>`` - Gets the image url for the specified emoji.
-- ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that.
-- ``>embed <words>`` - Make an embed out of the message.
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
+- ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
+- ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
 ![img](http://i.imgur.com/n4mSRyD.png)
+- ``>ping`` - Responds with ``pong`` and also gives the response time.
+- ``>emoji <emoji>`` - Gets the image url for the specified emoji.
+- ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that.
+- ``>embed <words>`` - Make an embed out of the message.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on or off.
 - ``>setafkmsg <msg>`` - Set the afk message.
