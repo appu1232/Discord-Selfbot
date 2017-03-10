@@ -132,7 +132,7 @@ Example usage of the python interpreter:
 
 ![img](http://i.imgur.com/PF0inrv.png)
 
-![img](http://i.imgur.com/P7J4wVb.png)
+![img](http://i.imgur.com/gYUmyHC.png)
 
 **Misc**
 
