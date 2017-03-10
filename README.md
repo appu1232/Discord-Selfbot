@@ -138,7 +138,7 @@ Example usage of the python interpreter:
 
 - ``>about`` - link to this github project
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
-- ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)`` (note: exponents are done with **)
+- ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
 - ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
