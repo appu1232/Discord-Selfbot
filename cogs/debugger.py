@@ -41,14 +41,53 @@ class Debugger:
     def __init__(self, bot):
         self.bot = bot
 
-    # Standalone can be used for quick evals/execs.
+    # Posts code to hastebin and retrieves link.
+    async def post_to_hastebin(self, string):
+        '''Posts a string to hastebin.'''
+        data = string.encode('utf-8')
+
+        url = 'https://hastebin.com/documents'
+        try:
+            response = requests.post(url, data=data)
+        except requests.exceptions.RequestException as e:
+            return 'Error'
+
+        try:
+            return 'https://hastebin.com/{}'.format(response.json()['key'])
+        except Exception as e:
+            return 'Error'
+
+    # Executes/evaluates code. Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
+    async def interpreter(self, env, code):
+        try:
+            result = eval(code, env)
+            if inspect.isawaitable(result):
+                result = await result
+        except SyntaxError:
+            try:
+                with stdoutIO() as s:
+                    result = exec(code, env)
+                    if inspect.isawaitable(result):
+                        result = await result
+                result = s.getvalue()
+            except Exception as g:
+                return appuselfbot.isBot + '```{}```'.format(type(g).__name__ + ': ' + str(g))
+
+        except Exception as e:
+            return appuselfbot.isBot + '```{}```'.format(type(e).__name__ + ': ' + str(e))
+
+        if len(str(result)) > 1950:
+            url = await self.post_to_hastebin(result)
+            return appuselfbot.isBot + 'Large output. Posted to hastebin: %s' % url
+        else:
+            return appuselfbot.isBot + '```{}```'.format(result)
+
+    # Main command for running scripts.
     @commands.group(pass_context=True)
     async def py(self, ctx):
 
-        # Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
         if ctx.invoked_subcommand is None:
-            code = ctx.message.content[3:].strip('` ')
-            python = '```py\n{}\n```'
+            code = ctx.message.content[4:].strip('` ')
 
             env = {
                 'bot': self.bot,
@@ -59,24 +98,135 @@ class Debugger:
                 'author': ctx.message.author
             }
             env.update(globals())
-            try:
-                result = eval(code, env)
-                if inspect.isawaitable(result):
-                    result = await result
-            except SyntaxError:
+
+            result = await self.interpreter(env, code)
+
+            os.chdir(os.getcwd())
+            with open('%s/cogs/utils/temp.txt' % os.getcwd(), 'w') as temp:
+                temp.write(ctx.message.content[4:])
+
+            await self.bot.send_message(ctx.message.channel, result)
+
+    # Save last >py cmd/script.
+    @py.command(pass_context=True)
+    async def save(self, ctx, *, msg):
+        msg = msg.strip()[:-3] if msg.strip().endswith('.txt') else msg.strip()
+        os.chdir(os.getcwd())
+        if not os.path.exists('%s/cogs/utils/temp.txt' % os.getcwd()):
+            return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Nothing to save. Run a ``>py`` cmd/script first.')
+        if not os.path.isdir('%s/cogs/utils/save/' % os.getcwd()):
+            os.makedirs('%s/cogs/utils/save/' % os.getcwd())
+        if os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg)):
+            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '``%s.txt`` already exists. Overwrite? ``y/n``.' % msg)
+            reply = await self.bot.wait_for_message(author=ctx.message.author)
+            if reply.content.lower().strip() != 'y':
+                return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Cancelled.')
+            if os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg)):
+                os.remove('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg))
+
+        try:
+            shutil.move('%s/cogs/utils/temp.txt' % os.getcwd(), '%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Saved last run cmd/script as ``%s.txt``' % msg)
+        except:
+            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error saving file as ``%s.txt``' % msg)
+
+    # Load a cmd/script saved with the >save cmd
+    @py.command(pass_context=True)
+    async def run(self, ctx, *, msg):
+        save_file = msg[:-3].strip() if msg.endswith('.txt') else msg.strip()
+        if not os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)):
+            return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Could not find file ``%s.txt``' % save_file)
+
+        script = open('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)).read()
+
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'message': ctx.message,
+            'server': ctx.message.server,
+            'channel': ctx.message.channel,
+            'author': ctx.message.author
+        }
+        env.update(globals())
+
+        result = await self.interpreter(env, script.strip('` '))
+
+        await self.bot.send_message(ctx.message.channel, result)
+
+    # List saved cmd/scripts
+    @py.command(pass_context=True)
+    async def list(self, ctx):
+        os.chdir('%s/cogs/utils/save/' % os.getcwd())
+        try:
+            if ctx.message.content[8:]:
+                numb = ctx.message.content[8:].strip()
+                if numb.isdigit():
+                    numb = int(numb)
+                else:
+                    await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Invalid syntax. Ex: ``>py list 1``')
+            else:
+                numb = 1
+            filelist = glob.glob('*.txt')
+            if len(filelist) == 0:
+                return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'No saved cmd/scripts.')
+            filelist.sort()
+            msg = ''
+            pages = math.ceil(len(filelist) / 10)
+            if numb < 1:
+                numb = 1
+            elif numb > pages:
+                numb = pages
+
+            for i in range(10):
                 try:
-                    with stdoutIO() as s:
-                        result = exec(code, env)
-                        if inspect.isawaitable(result):
-                            result = await result
-                    result = s.getvalue()
-                except Exception as g:
-                    return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + python.format(type(g).__name__ + ': ' + str(g)))
+                    msg += filelist[i + (10 * (numb-1))] + '\n'
+                except:
+                    break
 
-            except Exception as e:
-                return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + python.format(type(e).__name__ + ': ' + str(e)))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'List of saved cmd/scripts. Page ``%s of %s`` ```%s```' % (numb, pages, msg))
+        except Exception as e:
+            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error, something went wrong: ``%s``' % e)
+        finally:
+            os.chdir('..')
+            os.chdir('..')
+            os.chdir('..')
 
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + python.format(result))
+    # View a saved cmd/script
+    @py.group(pass_context=True)
+    async def view(self, ctx, *, msg: str):
+        msg = msg.strip()[:-3] if msg.strip().endswith('.txt') else msg.strip()
+        os.chdir('%s/cogs/utils/save/' % os.getcwd())
+        try:
+            if os.path.exists('%s.txt' % msg):
+                f = open('%s.txt' % msg, 'r').read()
+                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Viewing ``%s.txt``: ```%s```' % (msg, f.strip('` ')))
+            else:
+                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '``%s.txt`` does not exist.' % msg)
+
+        except Exception as e:
+            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error, something went wrong: ``%s``' % e)
+        finally:
+            os.chdir('..')
+            os.chdir('..')
+            os.chdir('..')
+
+    # Delete a saved cmd/script
+    @py.group(pass_context=True)
+    async def delete(self, ctx, *, msg: str):
+        msg = msg.strip()[:-3] if msg.strip().endswith('.txt') else msg.strip()
+        os.chdir('%s/cogs/utils/save/' % os.getcwd())
+        try:
+            if os.path.exists('%s.txt' % msg):
+                os.remove('%s.txt' % msg)
+                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Deleted ``%s.txt`` from saves.' % msg)
+            else:
+                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '``%s.txt`` does not exist.' % msg)
+        except Exception as e:
+            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error, something went wrong: ``%s``' % e)
+        finally:
+            os.chdir('..')
+            os.chdir('..')
+            os.chdir('..')
 
     # Load an extension
     @commands.command(pass_context=True)
