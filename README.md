@@ -18,7 +18,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 - Set your game to anything quickly and easily.
 - Add custom commands/reactions. The commands get stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
-- Python debugger. Modeled off of RoboDanny's ?debug command. Does both exec() and eval().
+- Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
 - Quote a message from a user, even if it was deleted.
@@ -85,19 +85,57 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>i <tags>`` - Google image search. ``>i <n> <tags>`` gives the nth result. An image search result:
 
 ![img](http://i.imgur.com/neisYXe.png)
+
+**Logging commands**
+
 - ``>log`` - See what where and how you are logging. See the **Keyword Logger** section below for more commands used for keyword logging. A logged message:
 
 ![img](http://i.imgur.com/4I8B2IW.png)
 - ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See **Save Chat Messages** section for more details.
-- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well. To just get the link instead of the full info, put ``[link]`` before the tags. a MAL search result:
+
+**MyAnimeList commands**
+
+- ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
+- ``>mal anime [link] <tags> or ``>mal manga [link] <tags>`` - Just gets the link to the MAL page instead of the full info.\
+
+A MAL search result:
 
 ![img](http://i.imgur.com/NmqmzdM.png)
+
+**Server commands**
+
 - ``>server`` or ``>server <name of server>`` - Get various information about the server. What it looks like:
 
 ![img](http://i.imgur.com/gPF7K73.png)
 - ``>server members`` - Uploads a txt file containing detailed information about every member on the server including join date, account created, color, top role, and more.
 - ``>server avi`` or ``>server avi <name of server>`` - Gets the server image.
 - ``>server emojis`` - Lists all the custom emojis for the current server.
+
+**Custom Commands**
+
+- ``>customcmds`` or ``>customcmds long`` - List all custom commands. The long version is more detailed (shows all the replies for each cmd as well). A sample custom command that outputs a picture:
+
+![img](http://i.imgur.com/gBoKnjQ.png)
+- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
+- ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
+
+**Python Interpreter**
+
+- ``>py <code>`` - python interpreter. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load`` and ``>unload`` cmds to load/unload modules.
+- ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
+
+Example usage of the python interpreter:
+
+![img](http://i.imgur.com/MpAtJ7W.png)
+
+![img](http://i.imgur.com/PF0inrv.png)
+
+![img](http://i.imgur.com/P7J4wVb.png)
+
+**Misc**
+
+- ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
+- ``>about`` - link to this github project
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that.
 - ``>embed <words>`` - Make an embed out of the message.
@@ -108,20 +146,6 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on or off.
 - ``>setafkmsg <msg>`` - Set the afk message.
-- ``>customcmds`` or ``>customcmds long`` - List all custom commands. The long version is more detailed (shows all the replies for each cmd as well). A sample custom command that outputs a picture:
-
-![img](http://i.imgur.com/gBoKnjQ.png)
-- ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command. See the **Custom Commands** section for more info.
-- ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command. See the **Custom Commands** section for more info.
-- ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
-- ``>about`` - link to this github project
-- ``>py`` - python debugging. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load`` and ``>unload`` cmds to load/unload modules. Example usage:
-
-![img](http://i.imgur.com/MpAtJ7W.png)
-
-![img](http://i.imgur.com/PF0inrv.png)
-
-![img](http://i.imgur.com/P7J4wVb.png)
 
 ## Custom Commands:
 There are two types of commands: ``string`` commands which only have one response and ``list`` commands which can have multiple responses.
