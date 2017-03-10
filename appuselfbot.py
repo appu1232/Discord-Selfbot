@@ -18,7 +18,7 @@ def load_config():
 
 config = load_config()
 
-extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.debugger', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.spellcheck', 'cogs.userinfo']
+extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.debugger', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
