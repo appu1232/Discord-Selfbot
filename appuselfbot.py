@@ -277,4 +277,3 @@ if __name__ == '__main__':
         except Exception as e:
             print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
     bot.run(config['token'], bot=False)
-
