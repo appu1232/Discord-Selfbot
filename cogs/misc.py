@@ -372,13 +372,15 @@ class Misc:
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg : str):
         try:
-            (spoiled_work, _, spoiler) = msg.lower().partition(" ")
-            await self.bot.send_message(ctx.message.channel, isBot + 'Spoiler for `' + spoiled_work + '` = \n`'
+            if " | " in msg:
+                spoiled_work, spoiler = msg.lower().split(" | ", 1)
+            else:
+                spoiled_work, _, spoiler = msg.lower().partition(" ")
+            await self.bot.edit_message(ctx.message, isBot + 'Spoiler for `' + spoiled_work + '`: \n`'
             + ''.join(map(lambda c: chr(ord('a') + (((ord(c) - ord('a')) + 13) % 26)) if c >= 'a' and c <= 'z' else c, spoiler))
             + '`\n' + isBot + 'Use http://rot13.com to decode')
         except:
-            await self.bot.send_message(ctx.message.channel, isBot + 'Spoilering failed')
-        await self.bot.delete_message(ctx.message)
+            await self.bot.send_message(ctx.message.channel, isBot + 'Could not encrypt spoiler.')
 
 
 def setup(bot):
