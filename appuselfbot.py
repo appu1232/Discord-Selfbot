@@ -73,7 +73,7 @@ async def on_ready():
         try:
             bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
-            bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+            bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
         except:
             pass
     if os.path.isfile('game.txt'):
