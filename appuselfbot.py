@@ -1,14 +1,12 @@
-import asyncio
 import os
 import sys
 import math
-import time
 import subprocess
 import datetime
 import collections
 from datetime import timezone
 from discord.ext import commands
-from cogs.allmsgs import *
+from cogs.utils.allmsgs import *
 from cogs.utils.checks import *
 
 
@@ -17,8 +15,6 @@ def load_config():
         return json.load(f)
 
 config = load_config()
-
-extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.debugger', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
@@ -69,7 +65,7 @@ async def on_ready():
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
-    with open('cogs/utils/notify.json', 'r') as n:
+    with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['notify'] == 'on':
         try:
@@ -271,9 +267,12 @@ def remove_alllog(channel, server):
 
 
 if __name__ == '__main__':
-    for extension in extensions:
-        try:
-            bot.load_extension(extension)
-        except Exception as e:
-            print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
+
+    for extension in os.listdir("cogs"):
+        if extension.endswith('.py'):
+            try:
+                bot.load_extension("cogs." + extension.rstrip(".py"))
+            except Exception as e:
+                print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
+
     bot.run(config['token'], bot=False)

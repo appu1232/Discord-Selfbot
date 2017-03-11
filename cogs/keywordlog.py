@@ -392,19 +392,20 @@ class Userinfo:
     async def on(self, ctx):
         with open('settings/log.json', 'r+') as l:
             log = json.load(l)
-        if 'notifier_bot_token' not in log:
-            log['notifier_bot_token'] = ''
-        token = log['notifier_bot_token']
-        if log['notifier_bot_token'] == '':
-            return await self.bot.send_message(ctx.message.channel,
-                                               isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
+        if log['log_location'] == '':
+            return await self.bot.send_message(ctx.message.channel, isBot + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
         channel = log['log_location'].split(' ')[0]
-        with open('cogs/utils/notify.json', 'r+') as n:
+        with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
+            if notify['bot_token'] == '':
+                return await self.bot.send_message(ctx.message.channel,
+                                                   isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
+            if notify['notify'] == 'on':
+                return await self.bot.send_message(ctx.message.channel,
+                                            isBot + 'Notifier is already on.')
             notify['channel'] = channel
             notify['author'] = ctx.message.author.id
             notify['notify'] = 'on'
-            notify['bot_token'] = token
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
@@ -419,7 +420,7 @@ class Userinfo:
     # Turn off the notifier
     @notify.command(pass_context=True)
     async def off(self, ctx):
-        with open('cogs/utils/notify.json', 'r+') as n:
+        with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             notify['notify'] = 'off'
             n.seek(0)
@@ -431,12 +432,12 @@ class Userinfo:
     @notify.command(pass_context=True)
     async def token(self, ctx, *, msg):
         msg = msg.strip('<').strip('>')
-        with open('settings/log.json', 'r+') as l:
-            log = json.load(l)
-            log['notifier_bot_token'] = msg
-            l.seek(0)
-            l.truncate()
-            json.dump(log, l, indent=4)
+        with open('settings/notify.json', 'r+') as n:
+            notify = json.load(n)
+            notify['bot_token'] = msg
+            n.seek(0)
+            n.truncate()
+            json.dump(notify, n, indent=4)
         await self.bot.send_message(ctx.message.channel, isBot + 'Notifier bot token set.')
 
 
