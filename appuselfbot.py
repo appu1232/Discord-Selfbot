@@ -56,14 +56,18 @@ async def on_ready():
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
+            print('Bot has restarted.')
             await bot.send_message(channel, isBot + 'Bot has restarted.')
         os.remove('restart.txt')
     with open('settings/log.json', 'r+') as log:
         loginfo = json.load(log)
-        if 'blacklisted_words' not in loginfo:
-            loginfo['blacklisted_words'] = []
-        if 'blacklisted_servers' not in loginfo:
-            loginfo['blacklisted_servers'] = []
+        try:
+            if 'blacklisted_words' not in loginfo:
+                loginfo['blacklisted_words'] = []
+            if 'blacklisted_servers' not in loginfo:
+                loginfo['blacklisted_servers'] = []
+        except:
+            pass
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
@@ -77,30 +81,33 @@ async def on_ready():
         except:
             pass
     if os.path.isfile('game.txt'):
-        with open('game.txt', 'r') as g:
+        with open('game.txt', 'rb') as g:
             game = g.readline()
         bot.game = game
-        await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
+        await bot.change_presence(game=discord.Game(name=bot.game.decode('utf-8')), status='invisible', afk=True)
 
 
 # Restart selfbot
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, aliases=['reboot'])
 async def restart(ctx):
+    print('Restarting...')
     await bot.edit_message(ctx.message, isBot + 'Restarting...')
     if bot.subpro:
         bot.subpro.kill()
     with open('restart.txt', 'w') as re:
         re.write(str(ctx.message.channel.id))
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
+    os._exit(0)
 
 
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, aliases=['exit'])
 async def quit(ctx):
+    print('Bot exiting...')
     if bot.subpro:
         bot.subpro.kill()
-    await bot.send_message(ctx.message.channel, isBot + 'Bot has been killed.')
-    exit()
+    with open('quit.txt', 'w') as q:
+        q.write('.')
+    await bot.send_message(ctx.message.channel, isBot + 'Bot shut down.')
+    os._exit(0)
 
 
 @bot.command(pass_context=True)
@@ -134,9 +141,9 @@ async def on_message(message):
     if hasattr(bot, 'refresh_time'):
         if hasPassed(bot, bot.refresh_time):
             if bot.game is None:
-                await bot.change_presence(status='invisible', afk=True)
+                await bot.change_presence(game=discord.Game(name=None), status='invisible', afk=True)
             else:
-                await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
+                await bot.change_presence(game=discord.Game(name=bot.game.decode('utf-8')), status='invisible', afk=True)
 
     # If the message was sent by me
     if message.author.id == config['my_id']:

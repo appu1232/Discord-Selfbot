@@ -178,14 +178,15 @@ class Misc:
     @commands.command(pass_context=True)
     async def game(self, ctx):
         if ctx.message.content[6:]:
-            await self.bot.change_presence(game=discord.Game(name=ctx.message.content[6:].strip()))
-            self.bot.game = ctx.message.content[6:].strip()
+            game = ctx.message.clean_content[6:].encode('utf-8')
+            await self.bot.change_presence(game=discord.Game(name=game.decode('utf-8')))
+            self.bot.game = game
             await self.bot.send_message(ctx.message.channel, isBot + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
-            with open('game.txt', 'w') as g:
-                g.write(ctx.message.content[6:])
+            with open('game.txt', 'wb') as g:
+                g.write(game)
         else:
-            await self.bot.change_presence(game=None)
             self.bot.game = None
+            await self.bot.change_presence(game=None)
             await self.bot.send_message(ctx.message.channel, isBot + 'Set playing status off')
             if os.path.isfile('game.txt'):
                 os.remove('game.txt')

@@ -445,6 +445,8 @@ class Userinfo:
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        if self.bot.subpro:
+            self.bot.subpro.kill()
         await self.bot.send_message(ctx.message.channel, isBot + 'Turned off notifications for the keyword logger.')
 
     # Set bot token
