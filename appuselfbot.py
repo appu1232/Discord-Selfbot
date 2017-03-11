@@ -51,6 +51,8 @@ async def on_ready():
         bot.refresh_time = time.time()
     if not hasattr(bot, 'game'):
         bot.game = None
+    if not hasattr(bot, 'subpro'):
+        bot.subpro = None
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
@@ -69,9 +71,9 @@ async def on_ready():
         notif = json.load(n)
     if notif['notify'] == 'on':
         try:
-            p = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+            bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
-            p = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+            bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except:
             pass
     if os.path.isfile('game.txt'):
@@ -85,6 +87,8 @@ async def on_ready():
 @bot.command(pass_context=True)
 async def restart(ctx):
     await bot.edit_message(ctx.message, isBot + 'Restarting...')
+    if bot.subpro:
+        bot.subpro.kill()
     with open('restart.txt', 'w') as re:
         re.write(str(ctx.message.channel.id))
     python = sys.executable
@@ -93,6 +97,8 @@ async def restart(ctx):
 
 @bot.command(pass_context=True)
 async def quit(ctx):
+    if bot.subpro:
+        bot.subpro.kill()
     await bot.send_message(ctx.message.channel, isBot + 'Bot has been killed.')
     exit()
 

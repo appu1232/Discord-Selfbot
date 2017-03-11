@@ -49,7 +49,7 @@ class Userinfo:
                     if '[server]' in i:
                         word, id = i.split('[server]')
                         name = self.bot.get_server(id)
-                        msg += word + '(for server: %s)' % str(name)
+                        msg += word + '(for server: %s)' % str(name) + ', '
                     else:
                         msg += i + ', '
                 msg = msg.rstrip(', ')
@@ -430,9 +430,9 @@ class Userinfo:
             json.dump(notify, n, indent=4)
         await self.bot.send_message(ctx.message.channel, isBot + 'Turned on notifications for the keyword logger.')
         try:
-            p = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+            self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
-            p = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+            self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
         except:
             pass
 
