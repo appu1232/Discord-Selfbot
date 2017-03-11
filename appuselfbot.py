@@ -186,7 +186,7 @@ async def on_message(message):
                     for x in loginfo['blacklisted_words']:
                         if '[server]' in x:
                             bword, id = x.split('[server]')
-                            if bword.strip() in message.content.lower() and message.server.id == id:
+                            if bword.strip().lower() in message.content.lower() and message.server.id == id:
                                 wordfound = False
                                 break
                         if x.lower() in message.content.lower():
@@ -204,6 +204,11 @@ async def on_message(message):
                                 wordfound = False
                                 break
                         for x in loginfo['blacklisted_words']:
+                            if '[server]' in x:
+                                bword, id = x.split('[server]')
+                                if bword.strip().lower() in message.content.lower() and message.server.id == id:
+                                    wordfound = False
+                                    break
                             if x.lower() in message.content.lower():
                                 wordfound = False
                                 break
