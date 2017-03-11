@@ -138,6 +138,7 @@ Example usage of the python interpreter:
 
 - ``>about`` - link to this github project
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
+- ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler someshow The main villain is actually his twin brother.``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
 - ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
