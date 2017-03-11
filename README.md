@@ -192,6 +192,8 @@ So, here's how you get started with setting up the logger:
 5. Set the context length. This is the number of messages to show in the log message. The default is set to 4 (this is 4 messages before keyword message + the keyword message). Set it with ``>log context <number>``. You can go up to 20 messages.
 6. Add users, words, or servers to the blacklist. These won't trigger the keyword logger even if a match is made. The syntax is: ``>log addblacklist [user] <user>`` or ``>log addblacklist [word] <word>`` or ``>log addblacklist [server]`` When blacklisting users, ``<user>`` can be their name + discriminator, a mention, or their user id. Removing is more or less the same but with ``>log removeblacklist`` instead.
 
+Note: You can blacklist a word only for a certain server by doing ``>log addblacklist [word] [here] <word>``. For example, if you have ``overwatch`` as a keyword but you don't want to recieve notifications if it was said in the Overwatch Discord server, you go to the Overwatch server and in any channel, type ``>log addblacklist [word] [here] overwatch``. Removing is the same: ``>log removeblacklist [word] [here] overwatch``.
+
 **Setting up a notifier for the keyword logger**
 
 When keywords get logged, the bot doesn't notify you. This is because the bot is running on your account. Just like you can't ping and notify yourself, the bot can't either. However, it is possible to recieve notifications through a second bot account. The setup is easy:
