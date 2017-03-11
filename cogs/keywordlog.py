@@ -380,7 +380,7 @@ class Userinfo:
             if not ctx.message.content[8:].strip():
                 await self.bot.send_message(ctx.message.channel, isBot + error)
             elif ctx.message.content[8:].strip() == 'ping':
-                with open('cogs/utils/notify.json', 'r+') as n:
+                with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'ping'
                     n.seek(0)
@@ -388,7 +388,7 @@ class Userinfo:
                     json.dump(notify, n, indent=4)
                 await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``ping``.')
             elif ctx.message.content[8:].lower().strip() == 'dm' or ctx.message.content[8:].lower().strip() == 'pm' or ctx.message.content[8:].lower().strip() == 'direct message':
-                with open('cogs/utils/notify.json', 'r+') as n:
+                with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'dm'
                     n.seek(0)
@@ -396,7 +396,7 @@ class Userinfo:
                     json.dump(notify, n, indent=4)
                 await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``direct messages``.')
             elif ctx.message.content[8:].strip() == 'none':
-                with open('cogs/utils/notify.json', 'r+') as n:
+                with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'none'
                     n.seek(0)
