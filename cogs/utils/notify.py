@@ -38,7 +38,6 @@ async def on_message(message):
 
 @bot.event
 async def on_ready():
-    print('Logged in')
     pass
 
 bot.run(notif["bot_token"])
