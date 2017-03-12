@@ -396,7 +396,7 @@ class Misc:
         # If number of seconds/messages are specified
         if len(ctx.message.content.lower().strip()) > 2:
             if ctx.message.content[3] == '!':
-                killmsg = self.bot.self_log[len(self.bot.self_log) - 2]
+                killmsg = self.bot.self_log[ctx.message.channel.id][len(self.bot.self_log[ctx.message.channel.id]) - 2]
                 timer = int(ctx.message.content[4:].lower().strip())
 
                 # Animated countdown because screw rate limit amirite
@@ -442,10 +442,10 @@ class Misc:
                 await self.bot.delete_message(msg)
                 await self.bot.delete_message(killmsg)
             else:
-                await self.bot.delete_message(self.bot.self_log.pop())
+                await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
                 for i in range(0, int(ctx.message.content[3:])):
                     try:
-                        await self.bot.delete_message(self.bot.self_log.pop())
+                        await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
                     except:
                         pass
 

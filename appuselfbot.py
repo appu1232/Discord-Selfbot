@@ -38,7 +38,7 @@ async def on_ready():
     if not hasattr(bot, 'mention_count'):
         bot.mention_count = 0
     if not hasattr(bot, 'self_log'):
-        bot.self_log = collections.deque(maxlen=200)
+        bot.self_log = {}
     if not hasattr(bot, 'all_log'):
         bot.all_log = {}
     if not hasattr(bot, 'keyword_log'):
@@ -145,8 +145,10 @@ async def on_message(message):
 
     # If the message was sent by me
     if message.author.id == config['my_id']:
+        if message.channel.id not in bot.self_log:
+            bot.self_log[message.channel.id] = collections.deque(maxlen=100)
+        bot.self_log[message.channel.id].append(message)
         bot.icount += 1
-        bot.self_log.append(message)
         if message.content.startswith(config['customcmd_prefix'][0]):
             response = custom(message.content.lower().strip())
             if response is None:
