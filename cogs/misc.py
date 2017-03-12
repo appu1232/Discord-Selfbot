@@ -218,14 +218,14 @@ class Misc:
                             await self.bot.send_message(ctx.message.channel,
                                                         isBot + 'Game set. Game will change every ``%s`` seconds' % reply.content.strip())
 
-                        current_game = len(game)
+                        current_game = len(games)
                         next_game = current_game
                         if os.path.isfile('game.txt'):
                             os.remove('game.txt')
 
                         while self.bot.game_interval:
                             if random:
-                                while next_game != current_game:
+                                while next_game == current_game:
                                     next_game = randint(0, len(games) - 1)
                                 current_game = next_game
                                 await self.bot.change_presence(game=discord.Game(name=games[current_game]))
