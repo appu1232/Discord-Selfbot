@@ -182,7 +182,7 @@ class Mal:
             except:
                 text = synopsis.get_text()
             em.add_field(name='Synopsis',
-                         value=text + ' [Read more »](https://myanimelist.net/anime/%s)' % selection.id)
+                         value=text + ' [Read more »](https://myanimelist.net/manga/%s)' % selection.id)
 
             if selection.status == "Publishing":
                 date = selection.raw_data.start_date.text + " -"
