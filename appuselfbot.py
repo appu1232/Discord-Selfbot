@@ -29,10 +29,6 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    if not hasattr(bot, 'subprocesses'):
-        bot.subprocesses = 0
-    if not hasattr(bot, 'running_procs'):
-        bot.running_procs = []
     if not hasattr(bot, 'uptime'):
         bot.uptime = datetime.datetime.now()
     if not hasattr(bot, 'icount'):
@@ -51,6 +47,8 @@ async def on_ready():
         bot.refresh_time = time.time()
     if not hasattr(bot, 'game'):
         bot.game = None
+    if not hasattr(bot, 'game_interval'):
+        bot.game_interval = None
     if not hasattr(bot, 'subpro'):
         bot.subpro = None
     if os.path.isfile('restart.txt'):
@@ -139,7 +137,7 @@ async def on_message(message):
 
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
     if hasattr(bot, 'refresh_time'):
-        if hasPassed(bot, bot.refresh_time):
+        if hasPassed(bot, bot.refresh_time) and not bot.game_interval:
             if bot.game is None:
                 await bot.change_presence(game=discord.Game(name=None), status='invisible', afk=True)
             else:

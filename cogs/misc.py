@@ -4,6 +4,7 @@ import asyncio
 import os
 import prettytable
 import strawpy
+from random import randint
 from appuselfbot import isBot
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -179,18 +180,94 @@ class Misc:
     async def game(self, ctx):
         if ctx.message.content[6:]:
             game = ctx.message.clean_content[6:].encode('utf-8')
-            await self.bot.change_presence(game=discord.Game(name=game.decode('utf-8')))
-            self.bot.game = game
-            await self.bot.send_message(ctx.message.channel, isBot + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
-            with open('game.txt', 'wb') as g:
-                g.write(game)
+
+            # Cycle games if more than one game is given.
+            if ' | ' in ctx.message.content[6:]:
+                self.bot.game = game
+                with open('game.txt', 'wb') as g:
+                    g.write(game)
+                await self.bot.send_message(ctx.message.channel, isBot + 'Input interval in seconds to wait before changing to the next game (``n`` to cancel):')
+
+                def check(msg):
+                    return msg.content.isdigit() or msg.content.lower().strip() == 'n'
+
+                def check2(msg):
+                    return msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o'
+
+                reply = await self.bot.wait_for_message(author=ctx.message.author, check=check, timeout=60)
+                if reply.content.lower().strip() == 'n':
+                    return await self.bot.send_message(ctx.message.channel, isBot + 'Cancelled')
+                elif reply.content.strip().isdigit():
+                    interval = int(reply.content.strip())
+                    if interval > 4:
+                        self.bot.game_interval = interval
+                        games = self.bot.game.decode('utf-8').split(' | ')
+                        if len(games) != 2:
+                            await self.bot.send_message(ctx.message.channel, isBot + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
+                            s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
+                            if s.content.strip() == 'r' or s.content.strip() == 'random':
+                                random = True
+                            else:
+                                random = False
+                        else:
+                            random = False
+
+                        games = self.bot.game.decode('utf-8').split(' | ')
+                        current_game = len(game)
+                        if os.path.isfile('game.txt'):
+                            os.remove('game.txt')
+                        while self.bot.game_interval:
+                            if random:
+                                while next_game != current_game:
+                                    next_game = randint(0, len(games) - 1)
+                                current_game = next_game
+                                await self.bot.change_presence(game=discord.Game(name=games[current_game]))
+                                await asyncio.sleep(interval)
+                            else:
+                                for j in games:
+                                    await self.bot.change_presence(game=discord.Game(name=j))
+                                    await asyncio.sleep(interval)
+                                    if not self.bot.game_interval:
+                                        break
+                        return
+                    else:
+                        return await self.bot.send_message(ctx.message.channel, isBot + 'Interval is too short. Must be at least 5 seconds.')
+
+            # Set game if only one game is given.
+            else:
+                self.bot.game = game
+                self.bot.game_interval = None
+                await self.bot.change_presence(game=discord.Game(name=game.decode('utf-8')))
+                await self.bot.send_message(ctx.message.channel, isBot + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
+                with open('game.txt', 'wb') as g:
+                    g.write(game)
+
+        # Remove game status.
+        else:
+            self.bot.game = None
+            self.bot.game_interval = None
+            await self.bot.change_presence(game=None)
+            await self.bot.send_message(ctx.message.channel, isBot + 'Set playing status off')
+            if os.path.isfile('game.txt'):
+                os.remove('game.txt')
+        await self.bot.delete_message(ctx.message)
+
+    # Set playing status. Note: this won't be visible to you but everyone else can see it.
+    @commands.command(pass_context=True)
+    async def rotategame(self, ctx):
+        if ctx.message.content[12:]:
+            if ' | ' in ctx.message.content[12:]:
+                self.bot.game = ctx.message.content[12:]
+                with open('game.txt', 'wb') as g:
+                    g.write(ctx.message.content[12:])
+            else:
+                await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. Example usage: ``>rotategame life | with toys | with fire``')
         else:
             self.bot.game = None
             await self.bot.change_presence(game=None)
             await self.bot.send_message(ctx.message.channel, isBot + 'Set playing status off')
             if os.path.isfile('game.txt'):
                 os.remove('game.txt')
-        await self.bot.delete_message(ctx.message)
 
     # Get url of emoji
     @commands.command(pass_context=True)
