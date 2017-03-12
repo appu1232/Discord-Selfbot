@@ -15,7 +15,7 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 
 - Google search (web or image).
 - Keyword/mention logger. Log messages from any or all servers that have one of the keywords you specify. Useful for seeing if someone mentioned your name or your favorite show/book/whatever else keyword.
-- Set your game to anything quickly and easily.
+- Set your game to anything or set up multiple and cycle through them.
 - Add custom commands/reactions. The commands get stored in ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
