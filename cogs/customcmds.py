@@ -102,8 +102,9 @@ class Customcmds:
 
                 # Item for key is string
                 else:
-                    if type(cmds[entry[0]]) is list:
-                        return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
+                    if entry[0] in cmds:
+                        if type(cmds[entry[0]]) is list:
+                            return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
                     cmds[entry[0]] = entry[1]
 
             # No quotes so spaces seperate params
@@ -126,8 +127,9 @@ class Customcmds:
                 # Item for key is string
                 else:
                     entry = words.split(' ', 1)
-                    if type(cmds[entry[0]]) is list:
-                        return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
+                    if entry[0] in cmds:
+                        if type(cmds[entry[0]]) is list:
+                            return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
                     cmds[entry[0]] = entry[1]
 
             await self.bot.send_message(ctx.message.channel,
