@@ -451,8 +451,8 @@ class Misc:
 
         # If no number specified, delete message immediately
         else:
-            await self.bot.delete_message(self.bot.self_log.pop())
-            await self.bot.delete_message(self.bot.self_log.pop())
+            await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
+            await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
     
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg : str):
