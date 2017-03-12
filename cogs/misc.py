@@ -9,6 +9,7 @@ from appuselfbot import isBot
 from discord.ext import commands
 from cogs.utils.checks import *
 
+'''Module for miscellaneous commands including game set, server commands, and more.'''
 
 class Misc:
 

@@ -10,6 +10,7 @@ from datetime import timezone
 keywords = []
 log_servers = []
 
+'''Module for the keyword logger and chat history.'''
 
 class Userinfo:
 

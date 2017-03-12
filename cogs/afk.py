@@ -2,6 +2,7 @@ import json
 from appuselfbot import isBot
 from discord.ext import commands
 
+'''Module for the the AFK setup.'''
 
 class Afk:
 

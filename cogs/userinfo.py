@@ -4,6 +4,7 @@ from discord.ext import commands
 from cogs.utils.checks import *
 import asyncio
 
+'''Module for the >info command.'''
 
 class Userinfo:
 

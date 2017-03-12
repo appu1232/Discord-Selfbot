@@ -4,6 +4,8 @@ import re
 from appuselfbot import isBot
 from discord.ext import commands
 
+'''Module for custom commands adding, removing, and viewing.'''
+
 class Customcmds:
 
     def __init__(self, bot):

@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 from appuselfbot import isBot, config
 from cogs.utils.checks import *
 
+'''Module for MyAnimeList search of anime, manga, and light novels.'''
+
 class Mal:
 
     def __init__(self, bot):

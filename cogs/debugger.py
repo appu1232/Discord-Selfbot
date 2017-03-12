@@ -26,6 +26,8 @@ from bs4 import BeautifulSoup
 import urllib
 import requests
 
+'''Module for the python interpreter as well as saving, loading, viewing, etc. the cmds/scripts ran with the interpreter.'''
+
 # Used to get the output of exec()
 @contextlib.contextmanager
 def stdoutIO(stdout=None):

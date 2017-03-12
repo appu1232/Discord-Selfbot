@@ -6,6 +6,7 @@ import aiohttp
 from urllib.parse import parse_qs
 from lxml import etree
 
+'''Module for google web and image search.'''
 
 # Used Rapptz's implementation of google cards.
 class Google:
