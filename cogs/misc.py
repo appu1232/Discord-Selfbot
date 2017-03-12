@@ -206,16 +206,23 @@ class Misc:
                             await self.bot.send_message(ctx.message.channel, isBot + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
                             s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
+                                await self.bot.send_message(ctx.message.channel,
+                                                            isBot + 'Game set. Game will randomly change every ``%s`` seconds' % reply.content.strip())
                                 random = True
                             else:
                                 random = False
                         else:
                             random = False
 
-                        games = self.bot.game.decode('utf-8').split(' | ')
+                        if not random:
+                            await self.bot.send_message(ctx.message.channel,
+                                                        isBot + 'Game set. Game will change every ``%s`` seconds' % reply.content.strip())
+
                         current_game = len(game)
+                        next_game = current_game
                         if os.path.isfile('game.txt'):
                             os.remove('game.txt')
+
                         while self.bot.game_interval:
                             if random:
                                 while next_game != current_game:
