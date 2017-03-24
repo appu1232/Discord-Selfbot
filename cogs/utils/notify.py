@@ -1,7 +1,7 @@
 import discord
 import json
 
-with open('cogs/utils/notify.json', 'r') as f:
+with open('settings/notify.json', 'r') as f:
     notif = json.load(f)
 description = '''Subreddit keyword notifier by appu1232'''
 
@@ -10,7 +10,7 @@ bot = discord.Client()
 
 @bot.event
 async def on_message(message):
-    with open('cogs/utils/notify.json', 'r') as f:
+    with open('settings/notify.json', 'r') as f:
         notif = json.load(f)
     if notif['notify'] == 'on':
         if message.author.id == notif['author'] and message.channel.id == notif['channel']:
@@ -38,6 +38,7 @@ async def on_message(message):
 
 @bot.event
 async def on_ready():
+    print('Notifier bot enabled.')
     pass
 
 bot.run(notif["bot_token"])
