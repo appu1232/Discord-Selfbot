@@ -13,20 +13,19 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 
 ## Features
 
-- Google search (web or image).
-- Keyword/mention logger. Log messages from any or all servers that have one of the keywords you specify. Useful for seeing if someone mentioned your name or your favorite show/book/whatever else keyword.
-- Set your game to anything quickly and easily.
-- Add custom commands/reactions. The commands get stored in ``commands.json`` which has some sample commands added to start with.
+- Google web and image search.
+- Keyword/mention logger. Log messages and/or get notified when keywords you specified are said in any of your servers. Useful to track if someone mentioned your name or your favorite show/book/whatever else keywords and you want to stalk— I mean, talk to them about it.
+- Set your game to anything or set up multiple and cycle through them.
+- Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
-- Quote a message from a user, even if it was deleted.
-- Set yourself as afk and reply to a user telling them you are away if they message/mention you. (technically frowned upon by Discord so use it as a joke occasionally, not practical use)
+- Set yourself as afk and reply to a user telling them you are away if they message/mention you. (note: frowned upon by Discord so not for practical use; meant to be used as a joke)
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
-- Self-destruct your previous message with animated text and a countdown. Yes, it's very pointless and abuses the rate-limit...but it looks cool.
+- Purge the last n messages you sent in a channel.
 - Simple calculator.
-- Various other misc commands.
+- Various other misc commands like spoiler tagging text (encrypts the text), creating strawpolls, embeding text, server/user info commands, and more.
 
 ## Setup
 
@@ -47,6 +46,8 @@ Start off by setting up the ``config.json`` file in the ``settings`` folder:
 	"bot_identifier": ":robot:"
 }
 ```
+The Google API, custom search engine, and MAL info are **not** necessary in order to get the bot running. However, they provide some very nice features like MAL search and google image search so do fill them in if you want to use the bot to its full potential.
+
 
 - ``my_id`` - your discord ID. On Discord go to settings > Appearance and Enable Developer Mode. Right-click yourself on the sidebar or chat and click copy ID to get your ID.
 - ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) Don't give this out to anyone!
@@ -57,8 +58,6 @@ Start off by setting up the ``config.json`` file in the ``settings`` folder:
 - ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as in in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
 
-The Google and MAL info is not needed in order to get the bot running. However, they provide some very nice features so do fill them in if you want to use the bot to its full potential.
-
 ## Running the selfbot
 
 Note: You must have Python 3.5.2 or above installed. **When installing python, make sure you check "Add Python to PATH" in the install window.**
@@ -67,9 +66,13 @@ Note: You must have Python 3.5.2 or above installed. **When installing python, m
 
 **Mac/Linux:** Navigate to the bot's folder in terminal/shell and run: ``pip install -r requirements.txt`` Once it's finished, run: ``python loopself.py`` to start the bot.
 
+**Updating the bot:**
+
+Unless otherwise stated, all you need to do is save your ``settings`` folder and its contents, delete everything else, download the newest version, and then replace the ``settings`` folder with your ``settings`` folder.
+
 ## All Commands:
 - ``>restart`` - restart the bot.
-- ``>game`` - Set your game. This won't show for yourself but other people can see it.
+- ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. The game won't show for yourself but other people can see it.
 - ``>stats`` - Bot stats and some user info. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
 
 ![img](http://i.imgur.com/x7aEacJ.png)
@@ -86,7 +89,7 @@ See the [Custom Commands](#custom-commands) section for more info on how to invo
 
 **Google web and image search commands**
 
-- ``>g <tags>`` - Google search. Depending on the type of result, certain google cards can be parsed. Some result:
+- ``>g <tags>`` - Google search. Depending on the type of result, certain google cards can be parsed. Some results:
 
 ![img](http://i.imgur.com/xaqzej9.png?2)
 ![img](http://i.imgur.com/6isT5T0.png)
@@ -97,7 +100,7 @@ See the [Custom Commands](#custom-commands) section for more info on how to invo
 
 **Logging commands**
 
-- ``>log`` - See what where and how you are logging. See the [Keyword Logger](#keyword-logger) section below for more commands used for keyword logging. A logged message:
+- ``>log`` - See what, where, and how you are logging/tracking. See the [Keyword Logger](#keyword-logger) section below for more commands used for keyword logging. A logged message:
 
 ![img](http://i.imgur.com/4I8B2IW.png)
 - ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See [Save Chat Messages](#save-chat-messages) section for more details.
@@ -106,7 +109,7 @@ See the [Custom Commands](#custom-commands) section for more info on how to invo
 **MyAnimeList commands**
 
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
-- ``>mal anime [link] <tags> or ``>mal manga [link] <tags>`` - Just gets the link to the MAL page instead of the full info.\
+- ``>mal anime [link] <tags>`` or ``>mal manga [link] <tags>`` - Just gets the link to the MAL page instead of the full info.
 
 A MAL search result:
 
@@ -117,13 +120,14 @@ A MAL search result:
 - ``>server`` or ``>server <name of server>`` - Get various information about the server. What it looks like:
 
 ![img](http://i.imgur.com/gPF7K73.png)
+- ``>server role <name of role>`` - Get info about said role.
 - ``>server members`` - Uploads a txt file containing detailed information about every member on the server including join date, account created, color, top role, and more.
 - ``>server avi`` or ``>server avi <name of server>`` - Gets the server image.
 - ``>server emojis`` - Lists all the custom emojis for the current server.
 
 **Python Interpreter**
 
-- ``>py <code>`` - python interpreter. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load`` and ``>unload`` cmds to load/unload modules.
+- ``>py <code>`` - python interpreter. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load <module>`` ``>unload <module>`` and ``>reload`` cmds to load, unload, and reload modules.
 - ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
 
 Example usage of the python interpreter:
@@ -138,42 +142,43 @@ Example usage of the python interpreter:
 
 - ``>about`` - link to this github project
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
+- ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler Book He lives`` or ``>spoiler Some movie | He was his brother all along``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
-- ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, but it's pretty funny to see people's reactions. :P
+- ``>choose <Option 1> | <Option 2> | ...`` - Randomly chooses one of the given options.
+- ``>d`` or ``>d <n>`` - Remove the last message or last n messages you sent (along with this one). ``>d !<n>`` will wait ``<n>`` seconds before deleting the message. It will also repeatedly edit the message and count down the seconds and show a little animation. Very stupid, very unnecessary, and it abuses the rate-limit...but it's pretty funny to see people's reactions. :P
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
 ![img](http://i.imgur.com/n4mSRyD.png)
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
-- ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that.
+- ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that. Deleted messages can be quoted.
 - ``>embed <words>`` - Make an embed out of the message.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>setafk on`` or ``>setafk off`` - Turn the afk message trigger on or off.
 - ``>setafkmsg <msg>`` - Set the afk message.
 
 ## Custom Commands:
-There are two types of commands: ``string`` commands which only have one response and ``list`` commands which can have multiple responses.
+**There are two ways to add custom commands.** The first way:
 
-**String commands**:
-- 90% of the time you will probably be using the ``string`` command type with something like ``.<command>`` to get the response. Ex: ``.hakomari`` leads to the response ``https://myanimelist.net/manga/55215/Utsuro_no_Hako_to_Zero_no_Maria``
-- To add a command, you would do ``>add <command> <response>`` and to remove a command, you would do ``>remove <command>``
+- ``>add <command> <response>`` Now, if you do ``.<command>`` you will receive ``<response>``.
 
-In order to have multiple responses to one command, you need to use the ``list`` command type:
+Example: ``>add nervous http://i.imgur.com/K9gMjWo.gifv`` Then, doing ``.nervous`` will output this imgur link (images and gifs will auto embed)
 
-**List commands**:
-- Add a second parameter between the command and the response like so: ``>add <command> <response_name> <response>`` Ex: ``>add kaguya cute http://i.imgur.com/LtdE1zW.jpg``.
-- Adding different ``<response_name>`` and ``<response>`` to the same ``<command>`` will append it to the list of responses for that command.
-- Invoke a specific response with: ``.<command> <response_name>`` or ``.<command> <index>``
-- Random responses: If more than one response name and response are in a command, get a random response with ``.<command>``
-- ``>remove <command> <response_name>`` to remove a specific response from the command or ``>remove <command>`` to remove the entire command.
-- **Important Note:** You cannot make a command that was initially a string command into a list command by adding a second response to it. You must remove the string command and add it as a list command.
+However, **you may want to add multiple responses to the same command.** So the second way:
 
-**Adding commands with more than one word for the command/response_name/response:**
+- ``>add <command> <response_name> <response>``. This way, you can add multiple responses to the same command.
 
-If *any* one of these are multiple words, you must put *all three* in quotes. Ex:
-``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"``
-or:
-``>add "get good" "https://cdn.discordapp.com/attachments/240823952459431936/266807454506024961/lpLiH3n.png"`` etc.
+Example: ``>add kaguya present http://i.imgur.com/7Px7EZx.png`` then you can add another to the ``.kaguya`` command: ``>add kaguya yes http://i.imgur.com/y0yAp1j.png``.
+
+Invoke a specific response with ``.<command> <response_name>`` or get a random response for that command with ``.<command>``
+
+
+**Removing commands:**
+- ``>remove <command>`` or ``>remove <command> <response_name>`` if you want to remove a specific response for a command.
+
+**Adding/removing commands/responses with multiple words:** 
+
+If anything you are adding/removing is more than one word, **you must put each part in quotes**. Example: ``>add "kaguya" "how cute" "http://i.imgur.com/LtdE1zW.jpg"`` or ``>add "copypasta" "I identify as an attack helicopter."``
 
 ## Keyword Logger
 
@@ -192,6 +197,8 @@ So, here's how you get started with setting up the logger:
 5. Set the context length. This is the number of messages to show in the log message. The default is set to 4 (this is 4 messages before keyword message + the keyword message). Set it with ``>log context <number>``. You can go up to 20 messages.
 6. Add users, words, or servers to the blacklist. These won't trigger the keyword logger even if a match is made. The syntax is: ``>log addblacklist [user] <user>`` or ``>log addblacklist [word] <word>`` or ``>log addblacklist [server]`` When blacklisting users, ``<user>`` can be their name + discriminator, a mention, or their user id. Removing is more or less the same but with ``>log removeblacklist`` instead.
 
+Note: You can blacklist a word only for a certain server by doing ``>log addblacklist [word] [here] <word>``. For example, if you have ``overwatch`` as a keyword but you don't want to log it if it was said in the Overwatch Discord server, you go to the Overwatch server and in any channel, type ``>log addblacklist [word] [here] overwatch``. Removing is the same: ``>log removeblacklist [word] [here] overwatch``.
+
 **Setting up a notifier for the keyword logger**
 
 When keywords get logged, the bot doesn't notify you. This is because the bot is running on your account. Just like you can't ping and notify yourself, the bot can't either. However, it is possible to recieve notifications through a second bot account. The setup is easy:
@@ -208,7 +215,7 @@ It's just for convenience. If you have 50+ servers and only a handful that you d
 
 **Note:**
 
-1. Only other people can trigger the log message. You yourself saying a keyword won't log the message. Also, the channel the keyword logger is logging in is exempt from the keyword search.
+1. Only other people can trigger the log message. You yourself saying a keyword won't log the message. The channel the keyword logger is logging in is exempt from the keyword search as well.
 2. If the logged message + context is too long, the log message will be split up into multiple messages. These mutiple messages don't use embeds so it won't look as neat, sadly. This shouldn't happen often though.
 
 That should be it. Check your settings any time with ``>log``.
