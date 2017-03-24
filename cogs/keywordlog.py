@@ -10,15 +10,16 @@ from datetime import timezone
 keywords = []
 log_servers = []
 
+'''Module for the keyword logger and chat history.'''
 
-class Userinfo:
+class KeywordLogger:
 
     def __init__(self, bot):
         self.bot = bot
 
-    # Get user info
     @commands.group(pass_context=True)
     async def log(self, ctx):
+        """Get info about keyworld logger. See the README for more info."""
         if ctx.invoked_subcommand is None:
             with open('settings/log.json', 'r+') as log:
                 settings = json.load(log)
@@ -46,7 +47,12 @@ class Userinfo:
                     msg += 'All Servers'
                 msg += '\n\nBlacklisted Words: '
                 for i in settings['blacklisted_words']:
-                    msg += i + ', '
+                    if '[server]' in i:
+                        word, id = i.split('[server]')
+                        name = self.bot.get_server(id)
+                        msg += word + '(for server: %s)' % str(name) + ', '
+                    else:
+                        msg += i + ', '
                 msg = msg.rstrip(', ')
                 msg += '\n\nBlacklisted Users: '
                 name = None
@@ -280,6 +286,9 @@ class Userinfo:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Blacklisted user ``%s`` from the keyword logger.' % name)
             elif msg.startswith('[word]'):
                 msg = msg[6:].strip()
+                if msg.startswith('[here] '):
+                    msg = msg[6:].strip()
+                    msg += ' [server]' + ctx.message.server.id
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg in settings['blacklisted_words']:
@@ -288,7 +297,11 @@ class Userinfo:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Blacklisted the word ``%s`` from the keyword logger.' % msg)
+                if ' [server]' in msg:
+                    await self.bot.send_message(ctx.message.channel,
+                                                isBot + 'Blacklisted the word ``%s`` for this server from the keyword logger.' % msg.split(' [server]')[0])
+                else:
+                    await self.bot.send_message(ctx.message.channel, isBot + 'Blacklisted the word ``%s`` from the keyword logger.' % msg)
             elif msg.startswith('[server]'):
                 if 'blacklisted_servers' not in settings:
                     settings['blacklisted_servers'] = []
@@ -331,6 +344,9 @@ class Userinfo:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Removed ``%s`` from the blacklist for the keyword logger.' % name)
             elif msg.startswith('[word]'):
                 msg = msg[6:].strip()
+                if msg.startswith('[here] '):
+                    msg = msg[6:].strip()
+                    msg += ' [server]' + ctx.message.server.id
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg not in settings['blacklisted_words']:
@@ -339,7 +355,11 @@ class Userinfo:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + '``%s`` removed from the blacklist.' % msg)
+                if ' [server]' in msg:
+                    await self.bot.send_message(ctx.message.channel,
+                                                isBot + '``%s`` removed from the blacklist for this server.' % msg.split(' [server]')[0])
+                else:
+                    await self.bot.send_message(ctx.message.channel, isBot + '``%s`` removed from the blacklist.' % msg)
             elif msg.startswith('[server]'):
                 if 'blacklisted_servers' not in settings:
                     settings['blacklisted_servers'] = []
@@ -353,15 +373,15 @@ class Userinfo:
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. Usage: ``>log removeblacklist [user] someone#2341`` or ``>log removeblacklist [word] word`` or ``>log removeblacklist [server]``')
 
-    # Notify bot
     @commands.group(pass_context=True)
     async def notify(self, ctx):
+        """Manage notifier bot for keyworld logger. See the README for more info."""
         if ctx.invoked_subcommand is None:
             error = 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the notifier bot.\n``>notify on/off`` - turn notifier on or off.\n``>notify dm`` - recieve notifications via direct message\n``>notify ping`` - recieve notifications via mention in your keyword logger channel.\n``>notify none`` - repost to keyword logger channel without any mention (get notification if you have notification settings set to all messages in that server).'
             if not ctx.message.content[8:].strip():
                 await self.bot.send_message(ctx.message.channel, isBot + error)
             elif ctx.message.content[8:].strip() == 'ping':
-                with open('cogs/utils/notify.json', 'r+') as n:
+                with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'ping'
                     n.seek(0)
@@ -369,7 +389,7 @@ class Userinfo:
                     json.dump(notify, n, indent=4)
                 await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``ping``.')
             elif ctx.message.content[8:].lower().strip() == 'dm' or ctx.message.content[8:].lower().strip() == 'pm' or ctx.message.content[8:].lower().strip() == 'direct message':
-                with open('cogs/utils/notify.json', 'r+') as n:
+                with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'dm'
                     n.seek(0)
@@ -377,7 +397,7 @@ class Userinfo:
                     json.dump(notify, n, indent=4)
                 await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``direct messages``.')
             elif ctx.message.content[8:].strip() == 'none':
-                with open('cogs/utils/notify.json', 'r+') as n:
+                with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'none'
                     n.seek(0)
@@ -392,53 +412,56 @@ class Userinfo:
     async def on(self, ctx):
         with open('settings/log.json', 'r+') as l:
             log = json.load(l)
-        if 'notifier_bot_token' not in log:
-            log['notifier_bot_token'] = ''
-        token = log['notifier_bot_token']
-        if log['notifier_bot_token'] == '':
-            return await self.bot.send_message(ctx.message.channel,
-                                               isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
+        if log['log_location'] == '':
+            return await self.bot.send_message(ctx.message.channel, isBot + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
         channel = log['log_location'].split(' ')[0]
-        with open('cogs/utils/notify.json', 'r+') as n:
+        with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
+            if notify['bot_token'] == '':
+                return await self.bot.send_message(ctx.message.channel,
+                                                   isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
+            if notify['notify'] == 'on':
+                return await self.bot.send_message(ctx.message.channel,
+                                            isBot + 'Notifier is already on.')
             notify['channel'] = channel
             notify['author'] = ctx.message.author.id
             notify['notify'] = 'on'
-            notify['bot_token'] = token
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
         await self.bot.send_message(ctx.message.channel, isBot + 'Turned on notifications for the keyword logger.')
         try:
-            p = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+            self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
-            p = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+            self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
         except:
             pass
 
     # Turn off the notifier
     @notify.command(pass_context=True)
     async def off(self, ctx):
-        with open('cogs/utils/notify.json', 'r+') as n:
+        with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             notify['notify'] = 'off'
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        if self.bot.subpro:
+            self.bot.subpro.kill()
         await self.bot.send_message(ctx.message.channel, isBot + 'Turned off notifications for the keyword logger.')
 
     # Set bot token
     @notify.command(pass_context=True)
     async def token(self, ctx, *, msg):
         msg = msg.strip('<').strip('>')
-        with open('settings/log.json', 'r+') as l:
-            log = json.load(l)
-            log['notifier_bot_token'] = msg
-            l.seek(0)
-            l.truncate()
-            json.dump(log, l, indent=4)
+        with open('settings/notify.json', 'r+') as n:
+            notify = json.load(n)
+            notify['bot_token'] = msg
+            n.seek(0)
+            n.truncate()
+            json.dump(notify, n, indent=4)
         await self.bot.send_message(ctx.message.channel, isBot + 'Notifier bot token set.')
 
 
 def setup(bot):
-    bot.add_cog(Userinfo(bot))
+    bot.add_cog(KeywordLogger(bot))

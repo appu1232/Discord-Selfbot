@@ -1,14 +1,11 @@
-import asyncio
 import os
-import sys
 import math
-import time
 import subprocess
 import datetime
 import collections
 from datetime import timezone
 from discord.ext import commands
-from cogs.allmsgs import *
+from cogs.utils.allmsgs import *
 from cogs.utils.checks import *
 
 
@@ -17,8 +14,6 @@ def load_config():
         return json.load(f)
 
 config = load_config()
-
-extensions = ['cogs.afk', 'cogs.customcmds', 'cogs.debugger', 'cogs.google', 'cogs.keywordlog', 'cogs.mal', 'cogs.misc', 'cogs.userinfo']
 
 isBot = config['bot_identifier'] + ' '
 if isBot == ' ':
@@ -29,14 +24,13 @@ bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbo
 # Startup
 @bot.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
+    print('Logging in...')
+    try:
+        print(bot.user.name)
+    except:
+        print(bot.user.name.encode("utf-8"))
     print(bot.user.id)
     print('------')
-    if not hasattr(bot, 'subprocesses'):
-        bot.subprocesses = 0
-    if not hasattr(bot, 'running_procs'):
-        bot.running_procs = []
     if not hasattr(bot, 'uptime'):
         bot.uptime = datetime.datetime.now()
     if not hasattr(bot, 'icount'):
@@ -46,7 +40,7 @@ async def on_ready():
     if not hasattr(bot, 'mention_count'):
         bot.mention_count = 0
     if not hasattr(bot, 'self_log'):
-        bot.self_log = collections.deque(maxlen=200)
+        bot.self_log = {}
     if not hasattr(bot, 'all_log'):
         bot.all_log = {}
     if not hasattr(bot, 'keyword_log'):
@@ -55,54 +49,66 @@ async def on_ready():
         bot.refresh_time = time.time()
     if not hasattr(bot, 'game'):
         bot.game = None
+    if not hasattr(bot, 'game_interval'):
+        bot.game_interval = None
+    if not hasattr(bot, 'subpro'):
+        bot.subpro = None
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
+            print('Bot has restarted.')
             await bot.send_message(channel, isBot + 'Bot has restarted.')
         os.remove('restart.txt')
     with open('settings/log.json', 'r+') as log:
         loginfo = json.load(log)
-        if 'blacklisted_words' not in loginfo:
-            loginfo['blacklisted_words'] = []
-        if 'blacklisted_servers' not in loginfo:
-            loginfo['blacklisted_servers'] = []
+        try:
+            if 'blacklisted_words' not in loginfo:
+                loginfo['blacklisted_words'] = []
+            if 'blacklisted_servers' not in loginfo:
+                loginfo['blacklisted_servers'] = []
+        except:
+            pass
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
-    with open('cogs/utils/notify.json', 'r') as n:
+    with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['notify'] == 'on':
         try:
-            p = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+            bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
-            p = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+            bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
         except:
             pass
-    if os.path.isfile('game.txt'):
-        with open('game.txt', 'r') as g:
-            game = g.readline()
-        bot.game = game
-        await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
 
 
-# Restart selfbot
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, aliases=['reboot'])
 async def restart(ctx):
+    """Restarts the bot."""
+    print('Restarting...')
     await bot.edit_message(ctx.message, isBot + 'Restarting...')
+    if bot.subpro:
+        bot.subpro.kill()
     with open('restart.txt', 'w') as re:
         re.write(str(ctx.message.channel.id))
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
+    os._exit(0)
 
 
-@bot.command(pass_context=True)
+@bot.command(pass_context=True, aliases=['exit'])
 async def quit(ctx):
-    await bot.send_message(ctx.message.channel, isBot + 'Bot has been killed.')
-    exit()
+    """Quits the bot."""
+    print('Bot exiting...')
+    if bot.subpro:
+        bot.subpro.kill()
+    with open('quit.txt', 'w') as q:
+        q.write('.')
+    await bot.send_message(ctx.message.channel, isBot + 'Bot shut down.')
+    os._exit(0)
 
 
 @bot.command(pass_context=True)
 async def reload(ctx):
+    """Reloads all modules."""
     utils = []
     for i in bot.extensions:
         utils.append(i)
@@ -130,16 +136,18 @@ async def on_message(message):
 
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
     if hasattr(bot, 'refresh_time'):
-        if hasPassed(bot, bot.refresh_time):
+        if hasPassed(bot, bot.refresh_time) and not bot.game_interval:
             if bot.game is None:
-                await bot.change_presence(status='invisible', afk=True)
+                await bot.change_presence(game=discord.Game(name=None), status='invisible', afk=True)
             else:
-                await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
+                await bot.change_presence(game=discord.Game(name=bot.game.decode('utf-8')), status='invisible', afk=True)
 
     # If the message was sent by me
     if message.author.id == config['my_id']:
+        if message.channel.id not in bot.self_log:
+            bot.self_log[message.channel.id] = collections.deque(maxlen=100)
+        bot.self_log[message.channel.id].append(message)
         bot.icount += 1
-        bot.self_log.append(message)
         if message.content.startswith(config['customcmd_prefix'][0]):
             response = custom(message.content.lower().strip())
             if response is None:
@@ -182,6 +190,11 @@ async def on_message(message):
                             wordfound = False
                             break
                     for x in loginfo['blacklisted_words']:
+                        if '[server]' in x:
+                            bword, id = x.split('[server]')
+                            if bword.strip().lower() in message.content.lower() and message.server.id == id:
+                                wordfound = False
+                                break
                         if x.lower() in message.content.lower():
                             wordfound = False
                             break
@@ -197,6 +210,11 @@ async def on_message(message):
                                 wordfound = False
                                 break
                         for x in loginfo['blacklisted_words']:
+                            if '[server]' in x:
+                                bword, id = x.split('[server]')
+                                if bword.strip().lower() in message.content.lower() and message.server.id == id:
+                                    wordfound = False
+                                    break
                             if x.lower() in message.content.lower():
                                 wordfound = False
                                 break
@@ -271,9 +289,12 @@ def remove_alllog(channel, server):
 
 
 if __name__ == '__main__':
-    for extension in extensions:
-        try:
-            bot.load_extension(extension)
-        except Exception as e:
-            print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
+
+    for extension in os.listdir("cogs"):
+        if extension.endswith('.py'):
+            try:
+                bot.load_extension("cogs." + extension.rstrip(".py"))
+            except Exception as e:
+                print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
+
     bot.run(config['token'], bot=False)

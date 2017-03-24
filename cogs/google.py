@@ -6,6 +6,7 @@ import aiohttp
 from urllib.parse import parse_qs
 from lxml import etree
 
+'''Module for google web and image search.'''
 
 # Used Rapptz's implementation of google cards.
 class Google:
@@ -178,6 +179,7 @@ class Google:
 
     @commands.command(pass_context=True)
     async def g(self, ctx, *, query):
+        """Google web search. Ex: >g what is discordapp?"""
         if not embed_perms(ctx.message):
             config = load_config()
             async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
@@ -205,6 +207,7 @@ class Google:
 
     @commands.command(pass_context=True)
     async def i(self, ctx, *, query):
+        """Google image search. >i Lillie pokemon sun and moon"""
         config = load_config()
         if query[0].isdigit():
             item = int(query[0])

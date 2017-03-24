@@ -4,6 +4,8 @@ import re
 from appuselfbot import isBot
 from discord.ext import commands
 
+'''Module for custom commands adding, removing, and viewing.'''
+
 class Customcmds:
 
     def __init__(self, bot):
@@ -12,6 +14,7 @@ class Customcmds:
     # List all custom commands
     @commands.group(pass_context=True)
     async def customcmds(self, ctx):
+        """Lists all customcmds."""
         if ctx.invoked_subcommand is None:
             with open('settings/commands.json', 'r') as commands:
                 cmds = json.load(commands)
@@ -41,6 +44,7 @@ class Customcmds:
 
     @customcmds.command(pass_context=True)
     async def long(self, ctx):
+        """Lists detailed version of customcmds."""
         with open('settings/commands.json', 'r') as commands:
             cmds = json.load(commands)
         msg = ''
@@ -75,6 +79,7 @@ class Customcmds:
     # Add a custom command
     @commands.command(pass_context=True)
     async def add(self, ctx, *, msg: str):
+        """Add a new customcmd. See the README for more info."""
         words = msg.strip()
 
         with open('settings/commands.json', 'r') as commands:
@@ -102,8 +107,9 @@ class Customcmds:
 
                 # Item for key is string
                 else:
-                    if type(cmds[entry[0]]) is list:
-                        return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
+                    if entry[0] in cmds:
+                        if type(cmds[entry[0]]) is list:
+                            return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
                     cmds[entry[0]] = entry[1]
 
             # No quotes so spaces seperate params
@@ -126,8 +132,9 @@ class Customcmds:
                 # Item for key is string
                 else:
                     entry = words.split(' ', 1)
-                    if type(cmds[entry[0]]) is list:
-                        return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
+                    if entry[0] in cmds:
+                        if type(cmds[entry[0]]) is list:
+                            return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
                     cmds[entry[0]] = entry[1]
 
             await self.bot.send_message(ctx.message.channel,
@@ -147,6 +154,7 @@ class Customcmds:
     # Remove a custom command
     @commands.command(pass_context=True)
     async def remove(self, ctx, *, msg: str):
+        """Remove a customcmd. See the README for more info."""
         words = msg.strip()
 
         with open('settings/commands.json', 'r') as commands:

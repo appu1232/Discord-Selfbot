@@ -26,6 +26,8 @@ from bs4 import BeautifulSoup
 import urllib
 import requests
 
+'''Module for the python interpreter as well as saving, loading, viewing, etc. the cmds/scripts ran with the interpreter.'''
+
 # Used to get the output of exec()
 @contextlib.contextmanager
 def stdoutIO(stdout=None):
@@ -82,9 +84,9 @@ class Debugger:
         else:
             return appuselfbot.isBot + '```{}```'.format(result)
 
-    # Main command for running scripts.
     @commands.group(pass_context=True)
     async def py(self, ctx):
+        """Python interpreter. See the README for more info. Ex: >py print('Hello World!')"""
 
         if ctx.invoked_subcommand is None:
             code = ctx.message.content[4:].strip('` ')
@@ -228,9 +230,9 @@ class Debugger:
             os.chdir('..')
             os.chdir('..')
 
-    # Load an extension
     @commands.command(pass_context=True)
     async def load(self, ctx, *, msg):
+        """Load a module"""
         try:
             self.bot.load_extension(msg)
         except Exception as e:
@@ -240,9 +242,9 @@ class Debugger:
             await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Loaded module: `{}`'.format(msg))
         await self.bot.delete_message(ctx.message)
 
-    # Unload an extension
     @commands.command(pass_context=True)
     async def unload(self, ctx, *, msg):
+        """Unload a module"""
         try:
             self.bot.unload_extension(msg)
         except Exception as e:

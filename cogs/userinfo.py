@@ -4,15 +4,16 @@ from discord.ext import commands
 from cogs.utils.checks import *
 import asyncio
 
+'''Module for the >info command.'''
 
 class Userinfo:
 
     def __init__(self, bot):
         self.bot = bot
 
-    # Get user info
     @commands.group(pass_context=True)
     async def info(self, ctx):
+        """Get user info. Ex: >info @user"""
         if ctx.invoked_subcommand is None:
             name = ctx.message.content[5:].strip()
             if name:
