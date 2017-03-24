@@ -86,7 +86,7 @@ class Debugger:
 
     @commands.group(pass_context=True)
     async def py(self, ctx):
-        """Python interpreter. See the README for more info. Ex: >py print('Hello World!')"""
+        """Python interpreter. See the README for more info."""
 
         if ctx.invoked_subcommand is None:
             code = ctx.message.content[4:].strip('` ')

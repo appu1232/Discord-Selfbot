@@ -375,7 +375,7 @@ class KeywordLogger:
 
     @commands.group(pass_context=True)
     async def notify(self, ctx):
-        """Manage notifier bot for keyworld logger. See the README for more info."""
+        """Manage notifier bot. See the README for more info."""
         if ctx.invoked_subcommand is None:
             error = 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the notifier bot.\n``>notify on/off`` - turn notifier on or off.\n``>notify dm`` - recieve notifications via direct message\n``>notify ping`` - recieve notifications via mention in your keyword logger channel.\n``>notify none`` - repost to keyword logger channel without any mention (get notification if you have notification settings set to all messages in that server).'
             if not ctx.message.content[8:].strip():

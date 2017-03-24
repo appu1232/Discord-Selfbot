@@ -459,7 +459,7 @@ class Misc:
     
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg : str):
-        """Spoiler tags the message using rot13. Ex: >spoiler Some book | They get married."""
+        """Spoiler tag. Ex: >spoiler Some book | They get married."""
         try:
             if " | " in msg:
                 spoiled_work, spoiler = msg.lower().split(" | ", 1)
