@@ -21,6 +21,7 @@ if isBot == ' ':
 
 bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
 
+
 # Startup
 @bot.event
 async def on_ready():
@@ -53,6 +54,9 @@ async def on_ready():
         bot.game_interval = None
     if not hasattr(bot, 'subpro'):
         bot.subpro = None
+    if not hasattr(bot, 'log_conf'):
+        with open('settings/log.json', 'r') as log:
+            bot.log_conf = json.load(log)
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
@@ -125,6 +129,7 @@ async def reload(ctx):
     else:
         await bot.send_message(ctx.message.channel, isBot + 'Reloaded all extensions.')
 
+
 # On all messages sent (for quick commands, custom commands, and logging messages)
 @bot.event
 async def on_message(message):
@@ -177,75 +182,79 @@ async def on_message(message):
             await bot.send_message(message.channel, response)
 
     try:
-        wordfound = False
-        with open('settings/log.json', 'r') as log:
-            loginfo = json.load(log)
-        if loginfo['allservers'] == 'True' and message.server.id not in loginfo['blacklisted_servers']:
+        word_found = False
+        if not hasattr(bot, 'log_conf'):
+            with open('settings/log.json', 'r') as log:
+                bot.log_conf = json.load(log)
+        if bot.log_conf['allservers'] == 'True' and message.server.id not in bot.log_conf['blacklisted_servers']:
             add_alllog(message.channel.id, message.server.id, message)
-            for word in loginfo['keywords']:
-                if word.lower() in message.content.lower() and message.author.id != config['my_id']:
-                    wordfound = True
-                    for x in loginfo['blacklisted_users']:
+            for word in bot.log_conf['keywords']:
+                if word.lower() in message.content.lower():
+                    word_found = True
+                    for x in bot.log_conf['blacklisted_users']:
                         if message.author.id == x:
-                            wordfound = False
+                            word_found = False
                             break
-                    for x in loginfo['blacklisted_words']:
+                    for x in bot.log_conf['blacklisted_words']:
                         if '[server]' in x:
                             bword, id = x.split('[server]')
                             if bword.strip().lower() in message.content.lower() and message.server.id == id:
-                                wordfound = False
+                                word_found = False
                                 break
                         if x.lower() in message.content.lower():
-                            wordfound = False
+                            word_found = False
                             break
                     break
         else:
-            if str(message.server.id) in loginfo['servers']:
+            if str(message.server.id) in bot.log_conf['servers']:
                 add_alllog(message.channel.id, message.server.id, message)
-                for word in loginfo['keywords']:
+                for word in bot.log_conf['keywords']:
                     if word.lower() in message.content.lower() and message.author.id != config['my_id']:
-                        wordfound = True
-                        for x in loginfo['blacklisted_users']:
+                        word_found = True
+                        for x in bot.log_conf['blacklisted_users']:
                             if message.author.id == x:
-                                wordfound = False
+                                word_found = False
                                 break
-                        for x in loginfo['blacklisted_words']:
+                        for x in bot.log_conf['blacklisted_words']:
                             if '[server]' in x:
                                 bword, id = x.split('[server]')
                                 if bword.strip().lower() in message.content.lower() and message.server.id == id:
-                                    wordfound = False
+                                    word_found = False
                                     break
                             if x.lower() in message.content.lower():
-                                wordfound = False
+                                word_found = False
                                 break
                         break
 
-        if wordfound is True:
-            location = loginfo['log_location'].split()
+        if word_found is True:
+            location = bot.log_conf['log_location'].split()
             server = bot.get_server(location[1])
             if message.channel.id != location[0]:
                 msg = message.clean_content.replace('`', '')
 
+                context = []
                 try:
-                    context = []
-                    for i in range(0, int(loginfo['context_len'])):
+                    for i in range(0, int(bot.log_conf['context_len'])):
                         context.append(bot.all_log[message.channel.id + ' ' + message.server.id][len(bot.all_log[message.channel.id + ' ' + message.server.id])-i-2])
                     msg = ''
-                    for i in range(0, int(loginfo['context_len'])):
+                    for i in range(0, int(bot.log_conf['context_len'])):
                         temp = context[len(context)-i-1][0]
-                        msg += 'User: %s | %s\n' % (temp.author.name, temp.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
+                        if temp.clean_content:
+                            msg += 'User: %s | %s\n' % (temp.author.name, temp.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
                     msg += 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
                     success = True
                 except:
                     success = False
                     msg = 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
 
+                print(msg)
                 part = int(math.ceil(len(msg) / 1950))
                 if part == 1 and success is True:
                     em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title='%s mentioned: %s' % (message.author.name, word), description='Server: ``%s``\nChannel: ``%s``\n\n**Context:**' % (str(message.server), str(message.channel)))
-                    for i in range(0, int(loginfo['context_len'])):
+                    for i in range(0, int(bot.log_conf['context_len'])):
                         temp = context.pop()
-                        em.add_field(name='%s' % temp[0].author.name, value=temp[0].clean_content, inline=False)
+                        if temp[0].clean_content:
+                            em.add_field(name='%s' % temp[0].author.name, value=temp[0].clean_content, inline=False)
                     em.add_field(name='%s' % message.author.name, value=message.clean_content, inline=False)
                     try:
                         em.set_thumbnail(url=message.author.avatar_url)
@@ -253,15 +262,15 @@ async def on_message(message):
                         pass
                     await bot.send_message(server.get_channel(location[0]), embed=em)
                 else:
-                    splitList = [msg[i:i + 1950] for i in range(0, len(msg), 1950)]
-                    allWords = []
-                    splitmsg = ''
-                    for i, blocks in enumerate(splitList):
+                    split_list = [msg[i:i + 1950] for i in range(0, len(msg), 1950)]
+                    all_words = []
+                    split_msg = ''
+                    for i, blocks in enumerate(split_list):
                         for b in blocks.split('\n'):
-                            splitmsg += b + '\n'
-                        allWords.append(splitmsg)
-                        splitmsg = ''
-                    for b,i in enumerate(allWords):
+                            split_msg += b + '\n'
+                        all_words.append(split_msg)
+                        split_msg = ''
+                    for b,i in enumerate(all_words):
                         if b == 0:
                             await bot.send_message(server.get_channel(location[0]), isBot + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i))
                         else:
@@ -275,6 +284,8 @@ async def on_message(message):
 
 
 def add_alllog(channel, server, message):
+    if not hasattr(bot, 'all_log'):
+        bot.all_log = {}
     if channel + ' ' + server in bot.all_log:
         bot.all_log[channel + ' ' + server].append((message, message.clean_content))
     else:

@@ -171,6 +171,8 @@ class KeywordLogger:
             log.truncate()
             json.dump(settings, log, indent=4)
         await self.bot.send_message(ctx.message.channel, isBot + 'Set log location to this channel.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
     async def toggle(self, ctx):
@@ -186,6 +188,8 @@ class KeywordLogger:
             log.truncate()
             json.dump(settings, log, indent=4)
         await self.bot.send_message(ctx.message.channel, isBot + msg)
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
     async def context(self, ctx):
@@ -198,6 +202,8 @@ class KeywordLogger:
                         log.seek(0)
                         log.truncate()
                         json.dump(settings, log, indent=4)
+                    with open('settings/log.json', 'r') as log:
+                        self.bot.log_conf = json.load(log)
                     await self.bot.send_message(ctx.message.channel, isBot + 'Set context length to ``%s``.' % ctx.message.content[12:])
                 else:
                     await self.bot.send_message(ctx.message.channel, isBot + 'Invalid context length.')
@@ -218,6 +224,8 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Added server to logger.')
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'This server is already in the logger.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
     async def remove(self, ctx):
@@ -231,6 +239,8 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Removed server from the logger.')
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'This server is not in the logger.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
     async def addkey(self, ctx, *, msg: str):
@@ -246,6 +256,8 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Added keyword ``%s`` to logger.' % msg)
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'The keyword ``%s`` is already in the logger.' % msg)
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
     async def removekey(self, ctx, *, msg: str):
@@ -259,6 +271,8 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Removed keyword ``%s`` from the logger.' % msg)
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'This keyword ``%s`` is not in the logger.' % msg)
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
     async def addblacklist(self, ctx, *, msg: str):
@@ -316,6 +330,8 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Server ``%s`` has been blacklisted from the keyword logger.' % ctx.message.server.name)
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. Usage: ``>log addblacklist [user] someone#2341`` or ``>log addblacklist [word] word`` or ``>log addblacklist [server]``')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
     async def removeblacklist(self, ctx, *, msg: str):
@@ -372,6 +388,8 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Removed server ``%s`` from the blacklist.' % ctx.message.server.name)
             else:
                 await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. Usage: ``>log removeblacklist [user] someone#2341`` or ``>log removeblacklist [word] word`` or ``>log removeblacklist [server]``')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @commands.group(pass_context=True)
     async def notify(self, ctx):
