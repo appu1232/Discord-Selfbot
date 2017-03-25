@@ -247,7 +247,6 @@ async def on_message(message):
                     success = False
                     msg = 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
 
-                print(msg)
                 part = int(math.ceil(len(msg) / 1950))
                 if part == 1 and success is True:
                     em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title='%s mentioned: %s' % (message.author.name, word), description='Server: ``%s``\nChannel: ``%s``\n\n**Context:**' % (str(message.server), str(message.channel)))
