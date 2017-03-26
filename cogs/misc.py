@@ -5,7 +5,6 @@ import os
 import prettytable
 import strawpy
 import random
-import psutil
 from appuselfbot import isBot
 from discord.ext import commands
 from cogs.utils.checks import *
