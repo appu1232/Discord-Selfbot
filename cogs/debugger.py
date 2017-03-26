@@ -61,6 +61,11 @@ class Debugger:
 
     # Executes/evaluates code. Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
     async def interpreter(self, env, code):
+        if code.startswith('[m]'):
+            code = code[3:].strip()
+            code_block = False
+        else:
+            code_block = True
         try:
             result = eval(code, env)
             if inspect.isawaitable(result):
@@ -82,7 +87,10 @@ class Debugger:
             url = await self.post_to_hastebin(result)
             return appuselfbot.isBot + 'Large output. Posted to hastebin: %s' % url
         else:
-            return appuselfbot.isBot + '```{}```'.format(result)
+            if code_block:
+                return appuselfbot.isBot + '```py\n{}\n```'.format(result)
+            else:
+                return result
 
     @commands.group(pass_context=True)
     async def py(self, ctx):

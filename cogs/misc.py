@@ -34,10 +34,12 @@ class Misc:
             time = '%s days, %s hours, %s minutes, and %s seconds' % (days, hours, minutes, seconds)
         else:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
-        if not ctx.message.author.game or ctx.message.author.game is not str:
+        try:
+            game = str(ctx.message.author.game)
+        except:
+            await self.bot.change_presence(game=None)
+            self.bot.game = None
             game = 'None'
-        else:
-            game = ctx.message.author.game
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
@@ -221,13 +223,13 @@ class Misc:
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
                                 await self.bot.send_message(ctx.message.channel,
                                                             isBot + 'Game set. Game will randomly change every ``%s`` seconds' % reply.content.strip())
-                                random = True
+                                rand = True
                             else:
-                                random = False
+                                rand = False
                         else:
-                            random = False
+                            rand = False
 
-                        if not random:
+                        if not rand:
                             await self.bot.send_message(ctx.message.channel,
                                                         isBot + 'Game set. Game will change every ``%s`` seconds' % reply.content.strip())
 
@@ -235,7 +237,7 @@ class Misc:
                         next_game = current_game
 
                         while self.bot.game_interval:
-                            if random:
+                            if rand:
                                 while next_game == current_game:
                                     next_game = random.randint(0, len(games) - 1)
                                 current_game = next_game

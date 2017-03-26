@@ -3,6 +3,7 @@ import math
 import re
 from appuselfbot import isBot
 from discord.ext import commands
+from cogs.utils.checks import *
 
 '''Module for custom commands adding, removing, and viewing.'''
 
@@ -16,8 +17,8 @@ class Customcmds:
     async def customcmds(self, ctx):
         """Lists all customcmds."""
         if ctx.invoked_subcommand is None:
-            with open('settings/commands.json', 'r') as commands:
-                cmds = json.load(commands)
+            with open('settings/commands.json', 'r') as c:
+                cmds = json.load(c)
             sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
             msgs = []
             part = ''
