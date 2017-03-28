@@ -70,6 +70,15 @@ class Debugger:
             result = eval(code, env)
             if inspect.isawaitable(result):
                 result = await result
+            if not result:
+                try:
+                    with stdoutIO() as s:
+                        result = exec(code, env)
+                        if inspect.isawaitable(result):
+                            result = await result
+                    result = s.getvalue()
+                except Exception as g:
+                    return appuselfbot.isBot + '```{}```'.format(type(g).__name__ + ': ' + str(g))
         except SyntaxError:
             try:
                 with stdoutIO() as s:
