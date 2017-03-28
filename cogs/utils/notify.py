@@ -15,7 +15,16 @@ async def on_message(message):
     if notif['notify'] == 'on':
         if message.author.id == notif['author'] and message.channel.id == notif['channel']:
             if notif['type'] == 'ping':
-                await bot.send_message(message.channel, message.author.mention)
+                if message.content:
+                    desc, context = message.content.split('Context:', 1)
+                    channel = context.split('User: ')[0].strip()
+                    await bot.send_message(message.channel, desc + '\n' + channel[3:] + '\n' + message.author.mention)
+                else:
+                    em = discord.Embed()
+                    em = em.from_data(message.embeds[0])
+                    title = em.title
+                    desc = em.description.split('Context:')[0]
+                    await bot.send_message(message.channel, title + '\n' + desc.strip()[:-2] + message.author.mention)
             elif notif['type'] == 'dm':
                 if message.content:
                     await bot.send_message(message.author, message.content)
@@ -38,7 +47,6 @@ async def on_message(message):
 
 @bot.event
 async def on_ready():
-    print('Notifier bot enabled.')
     pass
 
 bot.run(notif["bot_token"])
