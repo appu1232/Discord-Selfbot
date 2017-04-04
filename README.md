@@ -35,10 +35,10 @@ Start off by setting up the ``config.json`` file in the ``settings`` folder:
 
 ```json
 {
-	"token" : "",
-	"cmd_prefix": ">",
-	"customcmd_prefix": ".",
-	"bot_identifier": ":robot:"
+    "token" : "",
+    "cmd_prefix": ">",
+    "customcmd_prefix": ".",
+    "bot_identifier": ":robot:"
 }
 ```
 
@@ -52,12 +52,10 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 
 ```json
 {
-
-	"google_api_key" : "",
+    "google_api_key" : "",
     "custom_search_engine" : "",
-	"mal_username" : "",
+    "mal_username" : "",
     "mal_password" : ""
-
 }
 ```
 
