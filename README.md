@@ -255,7 +255,6 @@ Doing ``>notify dm`` will turn the proxy bot back on and you will recieve direct
 ## Save Chat Messages
 
 You can only save chat messages in the servers you are logging (see [Keyword Notifier](#keyword-notifier) section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the notifier holds the latest 500 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``settings`` folder. You can increase this value if you want; the upper limit is well over 500.
-When you want to save some kind of memorable discussion/funny moment/important reminder or want to shame someone for a message they deleted or something, use the ``>log history`` command:
 
 - ``>log history <n>`` outputs the last ``<n>`` number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages. A screencap of what it looks like:
 
