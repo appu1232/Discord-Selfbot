@@ -1,4 +1,6 @@
 {
+	"keyword_logging": "on",
+	"webhook_url": "",
     "log_location": "",
 	"log_size": "500",
 	"allservers": "True",

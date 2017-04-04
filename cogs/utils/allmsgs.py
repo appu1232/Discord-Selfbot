@@ -5,13 +5,6 @@ from random import randint
 
 quick = [('shrug', '¯\_(ツ)_/¯'), ('flip', '(╯°□°）╯︵ ┻━┻'), ('unflip', '┬─┬﻿ ノ( ゜-゜ノ)'), ('lenny', '( ͡° ͜ʖ ͡°)'), ('comeatmebro', '(ง’̀-‘́)ง')]
 
-def afk(notified):
-    with open('settings/config.json') as f:
-        config = json.load(f)
-    for i in notified:
-        if i.id == config['my_id'] and config['set_afk'] == 'on':
-            return config['afk_message']
-
 
 # Quick cmds for da memes
 def quickcmds(message):

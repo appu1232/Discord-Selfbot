@@ -1,11 +1,11 @@
-import json
 import math
 import re
-from appuselfbot import isBot
+from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
 '''Module for custom commands adding, removing, and viewing.'''
+
 
 class Customcmds:
 
@@ -62,7 +62,7 @@ class Customcmds:
         msg += '}```'
         part = int(math.ceil(len(msg) / 1900))
         if part == 1:
-            await self.bot.send_message(ctx.message.channel, isBot + '```json\nList of Custom Commands: {\n' + msg)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + '```json\nList of Custom Commands: {\n' + msg)
         else:
             msg = msg[7:-3]
             splitList = [msg[i:i + 1900] for i in range(0, len(msg), 1900)]
@@ -110,7 +110,7 @@ class Customcmds:
                 else:
                     if entry[0] in cmds:
                         if type(cmds[entry[0]]) is list:
-                            return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
+                            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
                     cmds[entry[0]] = entry[1]
 
             # No quotes so spaces seperate params
@@ -135,17 +135,17 @@ class Customcmds:
                     entry = words.split(' ', 1)
                     if entry[0] in cmds:
                         if type(cmds[entry[0]]) is list:
-                            return await self.bot.send_message(ctx.message.channel, isBot + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
+                            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Error, this is a list command. To append to this command, you need a <response name>. Ex: ``>add cmd response_name response``')
                     cmds[entry[0]] = entry[1]
 
             await self.bot.send_message(ctx.message.channel,
-                                   isBot + 'Successfully added ``%s`` to ``%s``' % (entry[1], entry[0]))
+                                   bot_prefix + 'Successfully added ``%s`` to ``%s``' % (entry[1], entry[0]))
 
         except Exception as e:
             with open('settings/commands.json', 'w') as commands:
                 commands.truncate()
                 json.dump(save, commands, indent=4)
-            await self.bot.send_message(ctx.message.channel, isBot + 'Error, something went wrong. Exception: ``%s``' % e)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Error, something went wrong. Exception: ``%s``' % e)
 
         # Update commands.json
         with open('settings/commands.json', 'w') as commands:
@@ -179,7 +179,7 @@ class Customcmds:
                             if entry[1] == i[0]:
                                 cmds[entry[0]].remove(i)
                                 await self.bot.send_message(ctx.message.channel,
-                                                       isBot + 'Successfully removed ``%s`` from ``%s``' % (
+                                                       bot_prefix + 'Successfully removed ``%s`` from ``%s``' % (
                                                        entry[1], entry[0]))
                                 success = True
                     else:
@@ -187,7 +187,7 @@ class Customcmds:
                             del cmds[entry[0]]
                             success = True
                             await self.bot.send_message(ctx.message.channel,
-                                                   isBot + 'Successfully removed ``%s`` from ``%s``' % (
+                                                   bot_prefix + 'Successfully removed ``%s`` from ``%s``' % (
                                                    entry[1], entry[0]))
 
 
@@ -195,15 +195,15 @@ class Customcmds:
                 else:
                     if entry[0] in cmds:
                         if type(cmds[entry[0]]) is list:
-                            await self.bot.send_message(ctx.message.channel, isBot + 'This will delete all responses for this list command. Enter ``y`` to proceed.')
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'This will delete all responses for this list command. Enter ``y`` to proceed.')
                             reply = await self.bot.wait_for_message(author=ctx.message.author)
                             if reply.content.lower().strip() != 'y':
-                                return await self.bot.send_message(ctx.message.channel, isBot + 'Cancelled.')
+                                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
                         oldValue = cmds[entry[0]]
                         del cmds[entry[0]]
                         success = True
                         await self.bot.send_message(ctx.message.channel,
-                                               isBot + 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
+                                               bot_prefix + 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
 
             # No quotes so spaces seperate params
             else:
@@ -218,7 +218,7 @@ class Customcmds:
                             if entry[1] == i[0]:
                                 cmds[entry[0]].remove(i)
                                 await self.bot.send_message(ctx.message.channel,
-                                                       isBot + 'Successfully removed ``%s`` from ``%s``' % (
+                                                       bot_prefix + 'Successfully removed ``%s`` from ``%s``' % (
                                                        entry[1], entry[0]))
                                 success = True
                     else:
@@ -226,31 +226,31 @@ class Customcmds:
                             del cmds[entry[0]]
                             success = True
                             await self.bot.send_message(ctx.message.channel,
-                                                   isBot + 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
+                                                   bot_prefix + 'Successfully removed ``%s`` from ``%s``' % (entry[1], entry[0]))
 
                 # Item for key is string
                 else:
                     entry = words.split(' ', 1)
                     if entry[0] in cmds:
                         if type(cmds[entry[0]]) is list:
-                            await self.bot.send_message(ctx.message.channel, isBot + 'This will delete all responses for this list command. Enter ``y`` to proceed.')
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'This will delete all responses for this list command. Enter ``y`` to proceed.')
                             reply = await self.bot.wait_for_message(author=ctx.message.author)
                             if reply.content.lower().strip() != 'y':
-                                return await self.bot.send_message(ctx.message.channel, isBot + 'Cancelled.')
+                                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
                         oldValue = cmds[entry[0]]
                         del cmds[entry[0]]
                         success = True
                         await self.bot.send_message(ctx.message.channel,
-                                               isBot + 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
+                                               bot_prefix + 'Successfully removed ``%s`` from ``%s``' % (oldValue, entry[0]))
 
             if success == False:
-                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find specified command.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find specified command.')
 
         except Exception as e:
             with open('settings/commands.json', 'w') as commands:
                 commands.truncate()
                 json.dump(save, commands, indent=4)
-            await self.bot.send_message(ctx.message.channel, isBot + 'Error, something went wrong. Exception: ``%s``' % e)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Error, something went wrong. Exception: ``%s``' % e)
 
         # Update commands.json
         with open('settings/commands.json', 'w') as commands:

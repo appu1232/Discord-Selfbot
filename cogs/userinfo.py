@@ -1,8 +1,7 @@
 import discord
-from appuselfbot import isBot
+from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
-import asyncio
 
 '''Module for the >info command.'''
 
@@ -22,7 +21,7 @@ class Userinfo:
                 except:
                     name = ctx.message.server.get_member_named(name)
                 if not name:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Could not find user.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user.')
                     return
             else:
                 name = ctx.message.author
@@ -46,7 +45,7 @@ class Userinfo:
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (name.id, name.nick, name.status, name.voice_channel, name.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
-                await self.bot.send_message(ctx.message.channel, isBot + msg)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
 
             await self.bot.delete_message(ctx.message)
 
@@ -59,7 +58,7 @@ class Userinfo:
             except:
                 name = ctx.message.server.get_member_named(name)
             if not name:
-                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find user.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user.')
                 return
         else:
             name = ctx.message.author
@@ -74,7 +73,7 @@ class Userinfo:
             em.set_image(url=avi)
             await self.bot.send_message(ctx.message.channel, embed=em)
         else:
-            await self.bot.send_message(ctx.message.channel, isBot + avi)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + avi)
         await self.bot.delete_message(ctx.message)
 
 

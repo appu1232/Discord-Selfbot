@@ -1,4 +1,3 @@
-from appuselfbot import isBot, load_config
 import discord
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -7,6 +6,7 @@ from urllib.parse import parse_qs
 from lxml import etree
 
 '''Module for google web and image search.'''
+
 
 # Used Rapptz's implementation of google cards.
 class Google:
@@ -157,7 +157,7 @@ class Google:
         card = None
         async with aiohttp.get('https://www.google.com/search', params=params, headers=headers) as resp:
             if resp.status != 200:
-                config = load_config()
+                config = load_optional_config()
                 async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
                     result = json.loads(await resp.text())
                 return None, result['items'][0]['link']
@@ -181,7 +181,7 @@ class Google:
     async def g(self, ctx, *, query):
         """Google web search. Ex: >g what is discordapp?"""
         if not embed_perms(ctx.message):
-            config = load_config()
+            config = load_optional_config()
             async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
                 result = json.loads(await resp.text())
             return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
@@ -208,7 +208,7 @@ class Google:
     @commands.command(pass_context=True)
     async def i(self, ctx, *, query):
         """Google image search. >i Lillie pokemon sun and moon"""
-        config = load_config()
+        config = load_optional_config()
         if query[0].isdigit():
             item = int(query[0])
             query = query[1:]

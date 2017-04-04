@@ -6,12 +6,13 @@ import shutil
 import appuselfbot
 import glob
 import math
-import json
-import gc
+import requests
 from discord.ext import commands
 from io import StringIO
 
 # Common imports that can be used by the debugger.
+import json
+import gc
 import datetime
 import time
 import traceback
@@ -24,9 +25,9 @@ import random
 import subprocess
 from bs4 import BeautifulSoup
 import urllib
-import requests
 
 '''Module for the python interpreter as well as saving, loading, viewing, etc. the cmds/scripts ran with the interpreter.'''
+
 
 # Used to get the output of exec()
 @contextlib.contextmanager
@@ -37,6 +38,7 @@ def stdoutIO(stdout=None):
     sys.stdout = stdout
     yield stdout
     sys.stdout = old
+
 
 class Debugger:
 
@@ -78,7 +80,7 @@ class Debugger:
                             result = await result
                     result = s.getvalue()
                 except Exception as g:
-                    return appuselfbot.isBot + '```{}```'.format(type(g).__name__ + ': ' + str(g))
+                    return appuselfbot.bot_prefix + '```{}```'.format(type(g).__name__ + ': ' + str(g))
         except SyntaxError:
             try:
                 with stdoutIO() as s:
@@ -87,17 +89,17 @@ class Debugger:
                         result = await result
                 result = s.getvalue()
             except Exception as g:
-                return appuselfbot.isBot + '```{}```'.format(type(g).__name__ + ': ' + str(g))
+                return appuselfbot.bot_prefix + '```{}```'.format(type(g).__name__ + ': ' + str(g))
 
         except Exception as e:
-            return appuselfbot.isBot + '```{}```'.format(type(e).__name__ + ': ' + str(e))
+            return appuselfbot.bot_prefix + '```{}```'.format(type(e).__name__ + ': ' + str(e))
 
         if len(str(result)) > 1950:
             url = await self.post_to_hastebin(result)
-            return appuselfbot.isBot + 'Large output. Posted to hastebin: %s' % url
+            return appuselfbot.bot_prefix + 'Large output. Posted to hastebin: %s' % url
         else:
             if code_block:
-                return appuselfbot.isBot + '```py\n{}\n```'.format(result)
+                return appuselfbot.bot_prefix + '```py\n{}\n```'.format(result)
             else:
                 return result
 
@@ -132,29 +134,29 @@ class Debugger:
         msg = msg.strip()[:-3] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir(os.getcwd())
         if not os.path.exists('%s/cogs/utils/temp.txt' % os.getcwd()):
-            return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Nothing to save. Run a ``>py`` cmd/script first.')
+            return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Nothing to save. Run a ``>py`` cmd/script first.')
         if not os.path.isdir('%s/cogs/utils/save/' % os.getcwd()):
             os.makedirs('%s/cogs/utils/save/' % os.getcwd())
         if os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg)):
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '``%s.txt`` already exists. Overwrite? ``y/n``.' % msg)
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + '``%s.txt`` already exists. Overwrite? ``y/n``.' % msg)
             reply = await self.bot.wait_for_message(author=ctx.message.author)
             if reply.content.lower().strip() != 'y':
-                return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Cancelled.')
+                return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Cancelled.')
             if os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg)):
                 os.remove('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg))
 
         try:
             shutil.move('%s/cogs/utils/temp.txt' % os.getcwd(), '%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg))
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Saved last run cmd/script as ``%s.txt``' % msg)
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Saved last run cmd/script as ``%s.txt``' % msg)
         except:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error saving file as ``%s.txt``' % msg)
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Error saving file as ``%s.txt``' % msg)
 
     # Load a cmd/script saved with the >save cmd
     @py.command(pass_context=True)
     async def run(self, ctx, *, msg):
         save_file = msg[:-3].strip() if msg.endswith('.txt') else msg.strip()
         if not os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)):
-            return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Could not find file ``%s.txt``' % save_file)
+            return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Could not find file ``%s.txt``' % save_file)
 
         script = open('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)).read()
 
@@ -182,12 +184,12 @@ class Debugger:
                 if numb.isdigit():
                     numb = int(numb)
                 else:
-                    await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Invalid syntax. Ex: ``>py list 1``')
+                    await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Invalid syntax. Ex: ``>py list 1``')
             else:
                 numb = 1
             filelist = glob.glob('*.txt')
             if len(filelist) == 0:
-                return await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'No saved cmd/scripts.')
+                return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'No saved cmd/scripts.')
             filelist.sort()
             msg = ''
             pages = math.ceil(len(filelist) / 10)
@@ -202,9 +204,9 @@ class Debugger:
                 except:
                     break
 
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'List of saved cmd/scripts. Page ``%s of %s`` ```%s```' % (numb, pages, msg))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'List of saved cmd/scripts. Page ``%s of %s`` ```%s```' % (numb, pages, msg))
         except Exception as e:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error, something went wrong: ``%s``' % e)
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Error, something went wrong: ``%s``' % e)
         finally:
             os.chdir('..')
             os.chdir('..')
@@ -218,12 +220,12 @@ class Debugger:
         try:
             if os.path.exists('%s.txt' % msg):
                 f = open('%s.txt' % msg, 'r').read()
-                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Viewing ``%s.txt``: ```%s```' % (msg, f.strip('` ')))
+                await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Viewing ``%s.txt``: ```%s```' % (msg, f.strip('` ')))
             else:
-                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '``%s.txt`` does not exist.' % msg)
+                await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + '``%s.txt`` does not exist.' % msg)
 
         except Exception as e:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error, something went wrong: ``%s``' % e)
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Error, something went wrong: ``%s``' % e)
         finally:
             os.chdir('..')
             os.chdir('..')
@@ -237,11 +239,11 @@ class Debugger:
         try:
             if os.path.exists('%s.txt' % msg):
                 os.remove('%s.txt' % msg)
-                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Deleted ``%s.txt`` from saves.' % msg)
+                await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Deleted ``%s.txt`` from saves.' % msg)
             else:
-                await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '``%s.txt`` does not exist.' % msg)
+                await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + '``%s.txt`` does not exist.' % msg)
         except Exception as e:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Error, something went wrong: ``%s``' % e)
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Error, something went wrong: ``%s``' % e)
         finally:
             os.chdir('..')
             os.chdir('..')
@@ -253,10 +255,10 @@ class Debugger:
         try:
             self.bot.load_extension(msg)
         except Exception as e:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Failed to load module: `{}`'.format(msg))
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '{}: {}'.format(type(e).__name__, e))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Failed to load module: `{}`'.format(msg))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Loaded module: `{}`'.format(msg))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Loaded module: `{}`'.format(msg))
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
@@ -265,10 +267,10 @@ class Debugger:
         try:
             self.bot.unload_extension(msg)
         except Exception as e:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Failed to unload module: `{}`'.format(msg))
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + '{}: {}'.format(type(e).__name__, e))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Failed to unload module: `{}`'.format(msg))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.send_message(ctx.message.channel, appuselfbot.isBot + 'Unloaded module: `{}`'.format(msg))
+            await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Unloaded module: `{}`'.format(msg))
         await self.bot.delete_message(ctx.message)
 
 

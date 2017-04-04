@@ -5,11 +5,12 @@ import os
 import prettytable
 import strawpy
 import random
-from appuselfbot import isBot
+from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
 '''Module for miscellaneous commands including game set, server commands, and more.'''
+
 
 class Misc:
 
@@ -51,7 +52,7 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
             msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), game)
-            await self.bot.send_message(ctx.message.channel, isBot + msg)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
@@ -73,7 +74,7 @@ class Misc:
                         server = i
                         break
                 if not server:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Could not find server. Note: You must be a member of the server you are trying to search.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
                     return
             else:
                 server = ctx.message.server
@@ -98,7 +99,7 @@ class Misc:
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (server.name, server.owner, server.member_count, online, server.region, str(server.verification_level), server.role_hierarchy[0], server.default_channel, server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
-                await self.bot.send_message(ctx.message.channel, isBot + msg)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
             await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
@@ -120,7 +121,7 @@ class Misc:
                     server = i
                     break
             if not server:
-                await self.bot.send_message(ctx.message.channel, isBot + 'Could not find server. Note: You must be a member of the server you are trying to search.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
                 return
         else:
             server = ctx.message.server
@@ -129,7 +130,7 @@ class Misc:
             em.set_image(url=server.icon_url)
             await self.bot.send_message(ctx.message.channel, embed=em)
         else:
-            await self.bot.send_message(ctx.message.channel, isBot + server.icon_url)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + server.icon_url)
         await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
@@ -150,7 +151,7 @@ class Misc:
                 em.add_field(name='Mentionable', value=role.mentionable)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
                 return await self.bot.send_message(ctx.message.channel, content=None, embed=em)
-        await self.bot.send_message(ctx.message.channel, isBot + 'Could not find role ``%s``' % msg)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find role ``%s``' % msg)
 
     @server.group(pass_context=True)
     async def members(self, ctx):
@@ -197,8 +198,7 @@ class Misc:
 
             # Cycle games if more than one game is given.
             if ' | ' in ctx.message.content[6:]:
-                self.bot.game = game
-                await self.bot.send_message(ctx.message.channel, isBot + 'Input interval in seconds to wait before changing to the next game (``n`` to cancel):')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Input interval in seconds to wait before changing to the next game (``n`` to cancel):')
 
                 def check(msg):
                     return msg.content.isdigit() or msg.content.lower().strip() == 'n'
@@ -208,71 +208,61 @@ class Misc:
 
                 reply = await self.bot.wait_for_message(author=ctx.message.author, check=check, timeout=60)
                 if reply.content.lower().strip() == 'n':
-                    self.bot.game = None
-                    await self.bot.change_presence(game=discord.Game(name=None))
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'Cancelled')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled')
                 elif reply.content.strip().isdigit():
                     interval = int(reply.content.strip())
                     if interval >= 10:
                         self.bot.game_interval = interval
-                        games = self.bot.game.decode('utf-8').split(' | ')
+                        games = game.decode('utf-8').split(' | ')
                         if len(games) != 2:
-                            await self.bot.send_message(ctx.message.channel, isBot + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
                             s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
                                 await self.bot.send_message(ctx.message.channel,
-                                                            isBot + 'Game set. Game will randomly change every ``%s`` seconds' % reply.content.strip())
-                                rand = True
+                                                            bot_prefix + 'Game set. Game will randomly change every ``%s`` seconds' % reply.content.strip())
+                                loop_type = 'random'
                             else:
-                                rand = False
+                                loop_type = 'ordered'
                         else:
-                            rand = False
+                            loop_type = 'ordered'
 
-                        if not rand:
+                        if loop_type == 'ordered':
                             await self.bot.send_message(ctx.message.channel,
-                                                        isBot + 'Game set. Game will change every ``%s`` seconds' % reply.content.strip())
+                                                        bot_prefix + 'Game set. Game will change every ``%s`` seconds' % reply.content.strip())
 
-                        current_game = len(games)
-                        next_game = current_game
+                        games = {'games': game.decode('utf-8').split(' | '), 'interval': interval, 'type': loop_type}
+                        with open('settings/games.json', 'w') as g:
+                            json.dump(games, g, indent=4)
 
-                        while self.bot.game_interval:
-                            if rand:
-                                while next_game == current_game:
-                                    next_game = random.randint(0, len(games) - 1)
-                                current_game = next_game
-                                await self.bot.change_presence(game=discord.Game(name=games[current_game]))
-                                await asyncio.sleep(interval)
-                            else:
-                                for j in games:
-                                    await self.bot.change_presence(game=discord.Game(name=j))
-                                    await asyncio.sleep(interval)
-                                    if not self.bot.game_interval:
-                                        break
-                        return
+                        self.bot.game = game
+
                     else:
-                        return await self.bot.send_message(ctx.message.channel, isBot + 'Interval is too short. Must be at least 10 seconds.')
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Interval is too short. Must be at least 10 seconds.')
 
             # Set game if only one game is given.
             else:
                 self.bot.game = game
                 self.bot.game_interval = None
+                games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none'}
+                with open('settings/games.json', 'w') as g:
+                    json.dump(games, g, indent=4)
                 await self.bot.change_presence(game=discord.Game(name=game.decode('utf-8')))
-                await self.bot.send_message(ctx.message.channel, isBot + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
 
         # Remove game status.
         else:
             self.bot.game = None
             self.bot.game_interval = None
             await self.bot.change_presence(game=None)
-            await self.bot.send_message(ctx.message.channel, isBot + 'Set playing status off')
-            if os.path.isfile('game.txt'):
-                os.remove('game.txt')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set playing status off')
+            if os.path.isfile('settings/games.json'):
+                os.remove('settings/games.json')
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
     async def choose(self, ctx, *, choices: str):
         """Choose randomly from the options you give. >choose this | that"""
-        await self.bot.send_message(ctx.message.channel, isBot + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
 
     @commands.command(pass_context=True)
     async def emoji(self, ctx, *, msg):
@@ -296,7 +286,7 @@ class Misc:
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
         else:
-            await self.bot.send_message(ctx.message.channel, isBot + 'Could not find emoji.')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find emoji.')
 
         return await self.bot.delete_message(ctx.message)
 
@@ -304,7 +294,7 @@ class Misc:
     async def ping(self, ctx):
         """Get response time."""
         msgtime = ctx.message.timestamp.now()
-        await self.bot.send_message(ctx.message.channel, isBot + ' pong')
+        await self.bot.send_message(ctx.message.channel, bot_prefix + ' pong')
         now = datetime.datetime.now()
         ping = now - msgtime
         if embed_perms(ctx.message):
@@ -312,7 +302,7 @@ class Misc:
             pong.set_thumbnail(url='http://odysseedupixel.fr/wp-content/gallery/pong/pong.jpg')
             await self.bot.send_message(ctx.message.channel, content=None, embed=pong)
         else:
-            await self.bot.send_message(ctx.message.channel, isBot + '``Response Time: %s``' % str(ping))
+            await self.bot.send_message(ctx.message.channel, bot_prefix + '``Response Time: %s``' % str(ping))
 
     @commands.command(pass_context=True)
     async def quote(self, ctx):
@@ -345,7 +335,7 @@ class Misc:
             else:
                 await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result[1].name, result[2], result[0].clean_content))
         else:
-            await self.bot.send_message(ctx.message.channel, isBot + 'No quote found.')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'No quote found.')
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
@@ -359,10 +349,10 @@ class Misc:
             else:
                 title = 'Poll by %s' % ctx.message.author.name
         except:
-            return await self.bot.send_message(ctx.message.channel, isBot + 'Invalid Syntax. Example use: ``>poll Favorite color = Blue | Red | Green | Purple``')
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid Syntax. Example use: ``>poll Favorite color = Blue | Red | Green | Purple``')
 
         poll = strawpy.create_poll(title.strip(), options)
-        await self.bot.send_message(ctx.message.channel, isBot + poll.url)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + poll.url)
 
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, msg):
@@ -381,7 +371,7 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
             await self.bot.delete_message(ctx.message)
         else:
-            await self.bot.send_message(ctx.message.channel, isBot + answer)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + answer)
 
     @commands.command(pass_context=True)
     async def l2g(self, ctx, *, msg: str):
@@ -390,7 +380,7 @@ class Misc:
         words = msg.lower().strip().split(' ')
         for word in words:
             lmgtfy += word + '+'
-        await self.bot.send_message(ctx.message.channel, isBot + lmgtfy[:-1])
+        await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy[:-1])
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
@@ -404,7 +394,7 @@ class Misc:
                 timer = int(ctx.message.content[4:].lower().strip())
 
                 # Animated countdown because screw rate limit amirite
-                destroy = await self.bot.edit_message(ctx.message, isBot + 'The above message will self-destruct in:')
+                destroy = await self.bot.edit_message(ctx.message, bot_prefix + 'The above message will self-destruct in:')
                 msg = await self.bot.send_message(ctx.message.channel, '``%s  |``' % timer)
                 for i in range(0, timer, 4):
                     if timer - 1 - i == 0:
@@ -466,11 +456,11 @@ class Misc:
                 spoiled_work, spoiler = msg.lower().split(" | ", 1)
             else:
                 spoiled_work, _, spoiler = msg.lower().partition(" ")
-            await self.bot.edit_message(ctx.message, isBot + 'Spoiler for `' + spoiled_work + '`: \n`'
+            await self.bot.edit_message(ctx.message, bot_prefix + 'Spoiler for `' + spoiled_work + '`: \n`'
             + ''.join(map(lambda c: chr(ord('a') + (((ord(c) - ord('a')) + 13) % 26)) if c >= 'a' and c <= 'z' else c, spoiler))
-            + '`\n' + isBot + 'Use http://rot13.com to decode')
+            + '`\n' + bot_prefix + 'Use http://rot13.com to decode')
         except:
-            await self.bot.send_message(ctx.message.channel, isBot + 'Could not encrypt spoiler.')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not encrypt spoiler.')
 
 
 def setup(bot):

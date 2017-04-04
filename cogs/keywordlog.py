@@ -1,5 +1,5 @@
 from discord.ext import commands
-from appuselfbot import isBot
+from appuselfbot import bot_prefix
 import json
 import math
 import os
@@ -11,6 +11,7 @@ keywords = []
 log_servers = []
 
 '''Module for the keyword logger and chat history.'''
+
 
 class KeywordLogger:
 
@@ -75,8 +76,7 @@ class KeywordLogger:
                     msg += str(server) + ', '
                 msg = msg.rstrip(', ')
                 msg += '\n\nContext length: %s messages```' % settings['context_len']
-            await self.bot.send_message(ctx.message.channel, isBot + msg)
-
+            await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
 
     @log.command(pass_context=True)
     async def history(self, ctx):
@@ -87,22 +87,22 @@ class KeywordLogger:
                     if size.isdigit():
                         save = True
                         skip = 0
-                        fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Saving messages...')
+                        fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Saving messages...')
                     else:
-                        await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
                         return
                 else:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
                     return
             else:
                 save = False
                 skip = 2
-                await self.bot.send_message(ctx.message.channel, isBot + 'Are you sure you want to output all the messages here? ``y/n``.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Are you sure you want to output all the messages here? ``y/n``.')
                 reply = await self.bot.wait_for_message(author=ctx.message.author)
                 if reply.content.lower().strip() != 'y':
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Cancelled.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
                     return
-                fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Fetching messages...')
+                fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Fetching messages...')
                 size = ctx.message.content.strip()[12:]
             if size.isdigit:
                 size = int(size)
@@ -141,7 +141,7 @@ class KeywordLogger:
                     part = int(math.ceil(len(msg) / 1950))
                     if part == 1:
                         await self.bot.send_message(ctx.message.channel,
-                                                    isBot + 'Showing last ``%s`` messages: ```%s```' % (
+                                                    bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (
                                                     ctx.message.content.strip()[12:], msg))
                         await self.bot.delete_message(fetch)
                     else:
@@ -155,12 +155,12 @@ class KeywordLogger:
                             splitmsg = ''
                         for b, i in enumerate(allWords):
                             if b == 0:
-                                await self.bot.send_message(ctx.message.channel, isBot + 'Showing last ``%s`` messages: ```%s```' % (ctx.message.content.strip()[12:], i))
+                                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (ctx.message.content.strip()[12:], i))
                             else:
                                 await self.bot.send_message(ctx.message.channel, '```%s```' % i)
                         await self.bot.delete_message(fetch)
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
 
     @log.command(pass_context=True)
     async def location(self, ctx):
@@ -170,7 +170,7 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, isBot + 'Set log location to this channel.')
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set log location to this channel.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -187,7 +187,31 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, isBot + msg)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+
+    @log.command(aliases=['on'], pass_context=True)
+    async def start(self, ctx):
+        with open('settings/log.json', 'r+') as log:
+            settings = json.load(log)
+            settings['keyword_logging'] = 'on'
+            log.seek(0)
+            log.truncate()
+            json.dump(settings, log, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned on the keyword logger.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+
+    @log.command(aliases=['off'], pass_context=True)
+    async def stop(self, ctx):
+        with open('settings/log.json', 'r+') as log:
+            settings = json.load(log)
+            settings['keyword_logging'] = 'off'
+            log.seek(0)
+            log.truncate()
+            json.dump(settings, log, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off the keyword logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -204,13 +228,13 @@ class KeywordLogger:
                         json.dump(settings, log, indent=4)
                     with open('settings/log.json', 'r') as log:
                         self.bot.log_conf = json.load(log)
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Set context length to ``%s``.' % ctx.message.content[12:])
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set context length to ``%s``.' % ctx.message.content[12:])
                 else:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Invalid context length.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid context length.')
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
         else:
-            await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. No value given.')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. No value given.')
 
     @log.command(pass_context=True)
     async def add(self, ctx):
@@ -221,9 +245,9 @@ class KeywordLogger:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Added server to logger.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Added server to logger.')
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'This server is already in the logger.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is already in the logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -236,9 +260,9 @@ class KeywordLogger:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Removed server from the logger.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed server from the logger.')
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'This server is not in the logger.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is not in the logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -253,9 +277,9 @@ class KeywordLogger:
                 json.dump(settings, log, indent=4)
                 if ctx.message.mentions:
                     msg = ctx.message.mentions[0].name
-                await self.bot.send_message(ctx.message.channel, isBot + 'Added keyword ``%s`` to logger.' % msg)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Added keyword ``%s`` to logger.' % msg)
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'The keyword ``%s`` is already in the logger.' % msg)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'The keyword ``%s`` is already in the logger.' % msg)
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -268,9 +292,9 @@ class KeywordLogger:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Removed keyword ``%s`` from the logger.' % msg)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed keyword ``%s`` from the logger.' % msg)
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'This keyword ``%s`` is not in the logger.' % msg)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'This keyword ``%s`` is not in the logger.' % msg)
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -289,15 +313,15 @@ class KeywordLogger:
                     if name:
                         name = name.id
                 if not name:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'Could not find user. They must be in the server you are currently using this command in.')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user. They must be in the server you are currently using this command in.')
                 if name in settings['blacklisted_users']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'User is already blacklisted from the keyword logger.')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'User is already blacklisted from the keyword logger.')
                 settings['blacklisted_users'].append(name)
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
                 name = ctx.message.server.get_member(name)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Blacklisted user ``%s`` from the keyword logger.' % name)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted user ``%s`` from the keyword logger.' % name)
             elif msg.startswith('[word]'):
                 msg = msg[6:].strip()
                 if msg.startswith('[here] '):
@@ -306,30 +330,30 @@ class KeywordLogger:
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg in settings['blacklisted_words']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This word is already blacklisted.')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This word is already blacklisted.')
                 settings['blacklisted_words'].append(msg)
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
                 if ' [server]' in msg:
                     await self.bot.send_message(ctx.message.channel,
-                                                isBot + 'Blacklisted the word ``%s`` for this server from the keyword logger.' % msg.split(' [server]')[0])
+                                                bot_prefix + 'Blacklisted the word ``%s`` for this server from the keyword logger.' % msg.split(' [server]')[0])
                 else:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Blacklisted the word ``%s`` from the keyword logger.' % msg)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted the word ``%s`` from the keyword logger.' % msg)
             elif msg.startswith('[server]'):
                 if 'blacklisted_servers' not in settings:
                     settings['blacklisted_servers'] = []
                 if ctx.message.server.id in settings['blacklisted_servers']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This server is already blacklisted.')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is already blacklisted.')
                 if ctx.message.server.id in settings['servers']:
                     settings['servers'].remove(ctx.message.server.id)
                 settings['blacklisted_servers'].append(ctx.message.server.id)
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Server ``%s`` has been blacklisted from the keyword logger.' % ctx.message.server.name)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Server ``%s`` has been blacklisted from the keyword logger.' % ctx.message.server.name)
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. Usage: ``>log addblacklist [user] someone#2341`` or ``>log addblacklist [word] word`` or ``>log addblacklist [server]``')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Usage: ``>log addblacklist [user] someone#2341`` or ``>log addblacklist [word] word`` or ``>log addblacklist [server]``')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -348,16 +372,16 @@ class KeywordLogger:
                     if name:
                         name = name.id
                 if not name:
-                    await self.bot.send_message(ctx.message.channel, isBot + 'Could not find user. They must be in the server you are currently using this command in.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user. They must be in the server you are currently using this command in.')
                     return
                 if name not in settings['blacklisted_users']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'User is not in the blacklist for the keyword logger.')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'User is not in the blacklist for the keyword logger.')
                 settings['blacklisted_users'].remove(name)
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
                 name = ctx.message.server.get_member(name)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Removed ``%s`` from the blacklist for the keyword logger.' % name)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed ``%s`` from the blacklist for the keyword logger.' % name)
             elif msg.startswith('[word]'):
                 msg = msg[6:].strip()
                 if msg.startswith('[here] '):
@@ -366,30 +390,46 @@ class KeywordLogger:
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg not in settings['blacklisted_words']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This word is not blacklisted.')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This word is not blacklisted.')
                 settings['blacklisted_words'].remove(msg)
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
                 if ' [server]' in msg:
                     await self.bot.send_message(ctx.message.channel,
-                                                isBot + '``%s`` removed from the blacklist for this server.' % msg.split(' [server]')[0])
+                                                bot_prefix + '``%s`` removed from the blacklist for this server.' % msg.split(' [server]')[0])
                 else:
-                    await self.bot.send_message(ctx.message.channel, isBot + '``%s`` removed from the blacklist.' % msg)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + '``%s`` removed from the blacklist.' % msg)
             elif msg.startswith('[server]'):
                 if 'blacklisted_servers' not in settings:
                     settings['blacklisted_servers'] = []
                 if ctx.message.server.id not in settings['blacklisted_servers']:
-                    return await self.bot.send_message(ctx.message.channel, isBot + 'This server is not blacklisted.')
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is not blacklisted.')
                 settings['blacklisted_servers'].remove(ctx.message.server.id)
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Removed server ``%s`` from the blacklist.' % ctx.message.server.name)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed server ``%s`` from the blacklist.' % ctx.message.server.name)
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + 'Invalid syntax. Usage: ``>log removeblacklist [user] someone#2341`` or ``>log removeblacklist [word] word`` or ``>log removeblacklist [server]``')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Usage: ``>log removeblacklist [user] someone#2341`` or ``>log removeblacklist [word] word`` or ``>log removeblacklist [server]``')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
+
+
+    @commands.command(pass_context=True)
+    async def webhook(self, ctx, *, msg):
+        with open('settings/log.json', 'r+') as l:
+            log = json.load(l)
+            if 'webhook_url' not in log:
+                log['webhook_url'] = ''
+            log['webhook_url'] = msg.lstrip('<').rstrip('>').strip('"')
+            l.seek(0)
+            l.truncate()
+            json.dump(log, l, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set up webhook for keyword notifications!')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+
 
     @commands.group(pass_context=True)
     async def notify(self, ctx):
@@ -397,33 +437,49 @@ class KeywordLogger:
         if ctx.invoked_subcommand is None:
             error = 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the notifier bot.\n``>notify on/off`` - turn notifier on or off.\n``>notify dm`` - recieve notifications via direct message\n``>notify ping`` - recieve notifications via mention in your keyword logger channel.\n``>notify none`` - repost to keyword logger channel without any mention (get notification if you have notification settings set to all messages in that server).'
             if not ctx.message.content[8:].strip():
-                await self.bot.send_message(ctx.message.channel, isBot + error)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + error)
             elif ctx.message.content[8:].strip() == 'ping':
                 with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'ping'
+                    notify['notify'] = 'off'
                     n.seek(0)
                     n.truncate()
                     json.dump(notify, n, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``ping``.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``ping``.')
+                if self.bot.subpro:
+                    self.bot.subpro.kill()
+
             elif ctx.message.content[8:].lower().strip() == 'dm' or ctx.message.content[8:].lower().strip() == 'pm' or ctx.message.content[8:].lower().strip() == 'direct message':
                 with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'dm'
+                    notify['notify'] = 'on'
                     n.seek(0)
                     n.truncate()
                     json.dump(notify, n, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``direct messages``.')
-            elif ctx.message.content[8:].strip() == 'none':
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``direct messages``.')
+                if self.bot.subpro:
+                    self.bot.subpro.kill()
+                try:
+                    self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+                except (SyntaxError, FileNotFoundError):
+                    self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+                except:
+                    pass
+            elif ctx.message.content[8:].strip() == 'none' or ctx.message.content[8:].strip() == 'msg':
                 with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
-                    notify['type'] = 'none'
+                    notify['type'] = 'msg'
+                    notify['notify'] = 'off'
                     n.seek(0)
                     n.truncate()
                     json.dump(notify, n, indent=4)
-                await self.bot.send_message(ctx.message.channel, isBot + 'Set notification type to ``none``.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``.')
+                if self.bot.subpro:
+                    self.bot.subpro.kill()
             else:
-                await self.bot.send_message(ctx.message.channel, isBot + error)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + error)
 
     # Turn on the notifier
     @notify.command(pass_context=True)
@@ -431,23 +487,24 @@ class KeywordLogger:
         with open('settings/log.json', 'r+') as l:
             log = json.load(l)
         if log['log_location'] == '':
-            return await self.bot.send_message(ctx.message.channel, isBot + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
         channel = log['log_location'].split(' ')[0]
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             if notify['bot_token'] == '':
                 return await self.bot.send_message(ctx.message.channel,
-                                                   isBot + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
+                                                   bot_prefix + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
             if notify['notify'] == 'on':
                 return await self.bot.send_message(ctx.message.channel,
-                                            isBot + 'Notifier is already on.')
+                                            bot_prefix + 'Notifier is already on.')
             notify['channel'] = channel
             notify['author'] = ctx.message.author.id
             notify['notify'] = 'on'
+            notify['type'] = 'dm'
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
-        await self.bot.send_message(ctx.message.channel, isBot + 'Turned on notifications for the keyword logger.')
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned on notifications for the keyword logger.')
         try:
             self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
@@ -466,7 +523,7 @@ class KeywordLogger:
             json.dump(notify, n, indent=4)
         if self.bot.subpro:
             self.bot.subpro.kill()
-        await self.bot.send_message(ctx.message.channel, isBot + 'Turned off notifications for the keyword logger.')
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off notifications for the keyword logger.')
 
     # Set bot token
     @notify.command(pass_context=True)
@@ -478,7 +535,7 @@ class KeywordLogger:
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
-        await self.bot.send_message(ctx.message.channel, isBot + 'Notifier bot token set.')
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Notifier bot token set.')
 
 
 def setup(bot):

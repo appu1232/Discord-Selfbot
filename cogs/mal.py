@@ -4,10 +4,11 @@ import re
 import discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
-from appuselfbot import isBot, config
+from appuselfbot import bot_prefix, config
 from cogs.utils.checks import *
 
 '''Module for MyAnimeList search of anime, manga, and light novels.'''
+
 
 class Mal:
 
@@ -20,14 +21,14 @@ class Mal:
         """Search MyAnimeList for an anime/manga. Ex: >mal anime Steins;Gate"""
         if ctx.invoked_subcommand is None:
             await self.bot.send_message(ctx.message.channel,
-                                       isBot + 'Invalid Syntax. Example use: ``>mal anime steins;gate`` or ``>mal manga boku no hero academia``')
+                                       bot_prefix + 'Invalid Syntax. Example use: ``>mal anime steins;gate`` or ``>mal manga boku no hero academia``')
 
     # Anime search for Mal
     @mal.command(pass_context=True)
     async def anime(self, ctx, *, msg: str):
         try:
             link = False
-            fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Searching...')
+            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
             try:
 
                 if msg.startswith('[link]'):
@@ -58,13 +59,13 @@ class Mal:
 
             # No results found for specified tags
             if not results:
-                await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results.')
                 await self.bot.delete_message(fetch)
                 await self.bot.delete_message(ctx.message)
                 return
 
             if not embed_perms(ctx.message) or link is True:
-                await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/anime/%s' % results.id)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'https://myanimelist.net/anime/%s' % results.id)
                 await self.bot.delete_message(fetch)
                 await self.bot.delete_message(ctx.message)
                 return
@@ -114,7 +115,7 @@ class Mal:
             await self.bot.delete_message(fetch)
             await self.bot.delete_message(ctx.message)
         except:
-            await self.bot.send_message(ctx.message.channel, isBot + 'No results')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
             await self.bot.delete_message(fetch)
 
     # Manga search for Mal
@@ -122,7 +123,7 @@ class Mal:
     async def manga(self, ctx, *, msg: str):
         try:
             link = False
-            fetch = await self.bot.send_message(ctx.message.channel, isBot + 'Searching...')
+            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
             try:
 
                 if msg.startswith('[link]'):
@@ -152,13 +153,13 @@ class Mal:
 
             # No results found for specified tags
             if not results:
-                await self.bot.send_message(ctx.message.channel, isBot + 'No results.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results.')
                 await self.bot.delete_message(fetch)
                 await self.bot.delete_message(ctx.message)
                 return
 
             if not embed_perms(ctx.message) or link is True:
-                await self.bot.send_message(ctx.message.channel, isBot + 'https://myanimelist.net/manga/%s' % results.id)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'https://myanimelist.net/manga/%s' % results.id)
                 await self.bot.delete_message(fetch)
                 await self.bot.delete_message(ctx.message)
                 return
@@ -207,7 +208,7 @@ class Mal:
             await self.bot.delete_message(fetch)
             await self.bot.delete_message(ctx.message)
         except:
-            await self.bot.send_message(ctx.message.channel, isBot + 'No results')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
             await self.bot.delete_message(fetch)
 
 
