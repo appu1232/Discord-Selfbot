@@ -1,4 +1,4 @@
-**For anyone updating since April 5th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
+**For anyone that hasn't updated before April 4th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
 
 # A Discord selfbot with various commands
 
@@ -250,16 +250,6 @@ This is possible, but you'll need a proxy bot for this. Here's how you can set t
 - ``>notify ping`` - posts in the keyword notifier channel but also get pinged when it does so (helpful if you want to see your logs in the recent mentions tab).
 
 Doing ``>notify dm`` will turn the proxy bot back on and you will recieve direct messages from the proxy bot again.
-
-**Setting up a notifier to direct message you for the keyword notifier**
-
-In order to receive notifications through direct messages rather than posting in a channel, you can create a second proxy bot account. The setup is easy:
-
-1. Create a Discord bot account and get the bot's token. Then add the bot to the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
-2. Make sure to give the bot read, send, edit messages, and embed permissions in the channel you are keyword logging in.
-3. Do ``>notify token <token>`` where ``<token>`` is the token you grabbed in step 1. Make sure you grabbed the **token** not the client secret!
-4. Enable the notifier bot with ``>notify on``. You should see the bot you created come online on the sidebar. ``>notify off`` to disabled the notifier bot.
-5. Set how to get notifications. ``>notify ping`` - get pinged when a keyword gets logged. ``>notify dm`` - the bot direct messages you the log. ``>notify none`` - posts in the keyword notifier channel (no ping).
 
 
 ## Save Chat Messages
