@@ -77,7 +77,7 @@ Unless otherwise stated, all you need to do is save your ``settings`` folder and
 
 ## All Commands:
 - ``>restart`` - restart the bot.
-- ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. The game won't show for yourself but other people can see it.
+- ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. The game won't show for yourself but other people can see it. The bot sets the game status on startup as well if you set it up once. Do ``>game`` with nothing else to turn off your game.
 - ``>stats`` - Bot stats and some user info. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
 
 ![img](http://i.imgur.com/x7aEacJ.png)
