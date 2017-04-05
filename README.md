@@ -1,4 +1,4 @@
-**For anyone that hasn't updated before April 4th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
+**For anyone that hasn't updated since April 4th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
 
 # A Discord selfbot with various commands
 
