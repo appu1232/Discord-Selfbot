@@ -346,8 +346,8 @@ def remove_alllog(channel, server):
 async def game(bot):
     await bot.wait_until_ready()
     await bot.wait_until_login()
-    current_game = ''
-    next_game = current_game
+    current_game = 0
+    next_game = 0
     game_count = 0
     while True:
         if hasattr(bot, 'game_time') and hasattr(bot, 'game'):
