@@ -8,11 +8,12 @@ A selfbot that has various in-built commands as well as the ability to dynamical
 2. [Setup](#setup)
 3. [Optional Setup](#optional-setup)
 4. [Running the Selfbot](#running-the-selfbot)
-5. [Custom Commands](#custom-commands)
-6. [Keyword Notifier](#keyword-notifier)
-7. [Save Chat Messages](#save-chat-messages)
-8. [Google API](#google-api)
-9. [Other Things to Note](#other-things-to-note)
+5. [All Commands](#all-commands)
+6. [Custom Commands](#custom-commands)
+7. [Keyword Notifier](#keyword-notifier)
+8. [Save Chat Messages](#save-chat-messages)
+9. [Google API](#google-api)
+10. [Other Things to Note](#other-things-to-note)
 
 ## Features
 
