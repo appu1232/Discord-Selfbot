@@ -207,7 +207,7 @@ So, here's how you get started with setting up the notifier:
 
 - **View settings and turn on and off the keyword logging:**
   + ``>log`` - All settings related to keyword logging. Will be mostly empty if nothing is setup yet.
-  + ``>log on`` - Turn on keyword logging.
+  + ``>log on`` - Turn on keyword logging. (should be on by default)
   + ``>log off`` - Turn off keyword logging.
   + ``>log context <number>`` - set how many messages before the logged message to show when logging a keyword. Default is four.
   + ``>log location`` - sets the channel you typed this in as the log and notification location for the logger (unless you have it set to direct messages)
@@ -226,6 +226,12 @@ So, here's how you get started with setting up the notifier:
   + ``>log addblacklist [word] <word>`` - blacklists this word from the keyword notifier.
   + ``>log addblacklist [server]`` - blacklists the current server from the keyword notifier.
   + ``>log removeblacklist [user] <user>`` or ``>log removeblacklist [word] <word>`` or ``>log removeblacklist [server]`` - self-explanatory.
+  
+- **Set how you want to receive notifications:**
+  + ``>notify msg`` - posts in the keyword notifier channel using the webhook. (default)
+  + ``>notify ping`` - posts in the keyword notifier channel but also get pinged when it does so (helpful if you want to see your logs in the recent mentions tab).
+  + ``>notify dm`` - recieve via direct message. **This requires the proxy bot to be set up. See below**
+  + ``>notify off`` - don't recieve any notifications (keywords will still be logged if keyword logging is on but no notifications will be sent)
 	
 **Things to note:**
 
@@ -240,7 +246,7 @@ It's just for convenience. If you have 50+ servers and only a handful that you d
 
 **What if I want to recieve notifications via direct message instead?**
 
-This is possible, but you'll need a proxy bot for this. Here's how you can set that up:
+This is possible, but you'll need a **proxy bot** for this. Here's how you can set that up:
 
 1. First, go to the channel where you are getting notifications in and do ``>log location``. This lets the proxy bot know that this is where it should take the logs from to send to you via direct message.
 2. Create a Discord bot account and get the bot's token. Then add the bot to the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
@@ -249,13 +255,7 @@ This is possible, but you'll need a proxy bot for this. Here's how you can set t
 5. Enable the proxy bot with ``>notify on``. You should see the bot you created come online on the sidebar. ``>notify off`` to disabled the proxy bot.
 6. ``>notify dm`` - will set it so this proxy bot direct messages you the log. 
 
-**To switch back to the webhook method of posting notifications in channels:**
-- ``>notify msg`` - posts in the keyword notifier channel using the webhook.
-- ``>notify ping`` - posts in the keyword notifier channel but also get pinged when it does so (helpful if you want to see your logs in the recent mentions tab).
-
-Doing ``>notify dm`` will turn the proxy bot back on and you will recieve direct messages from the proxy bot again.
-
-To turn off all notifications from tye webhook and the proxy bot, do ``>notify none``
+To switch back to the webhook method of posting notifications in channels, just do ``>notify msg`` or ``>notify ping`` again.
 
 ## Save Chat Messages
 
