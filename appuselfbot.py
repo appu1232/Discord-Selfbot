@@ -71,7 +71,7 @@ async def on_ready():
             if 'blacklisted_servers' not in loginfo:
                 loginfo['blacklisted_servers'] = []
             if 'keyword_logging' not in loginfo:
-                loginfo['keyword_logging'] = 'off'
+                loginfo['keyword_logging'] = 'on'
             if 'webhook_url' not in loginfo:
                 loginfo['webhook_url'] = ''
         except:

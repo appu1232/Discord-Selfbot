@@ -24,7 +24,7 @@ class KeywordLogger:
         if ctx.invoked_subcommand is None:
             with open('settings/log.json', 'r+') as log:
                 settings = json.load(log)
-                msg = 'Message logger info:```Log location: '
+                msg = 'Message logger info:```Keyword logging: %s\n\nLog location: ' % settings['keyword_logging']
                 if settings['log_location'] == '':
                     msg += 'No log location set.\n\n'
                 else:
@@ -32,9 +32,7 @@ class KeywordLogger:
                     server = self.bot.get_server(location[1])
                     msg += '%s in server %s\n\n' % (str(server.get_channel(location[0])), str(server))
                 msg += 'Keywords: '
-                for i in settings['keywords']:
-                    msg += i + ', '
-                msg = msg.rstrip(', ') + '\n\nServers: '
+                msg += ', '.join(settings['keywords']) + '\n\nServers: '
                 if settings['allservers'] == 'False':
                     server = ''
                     for i in settings['servers']:
