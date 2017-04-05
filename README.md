@@ -199,8 +199,9 @@ So, here's how you get started with setting up the notifier:
 3. Go to your **Server Settings** ([it's here](https://i.imgur.com/PofYpiZ.png)) and go to **WebHooks** near the bottom. Create a webhook.
 4. Give it whatever name and avatar you like and change the channel to the channel where you want to receive notifications. Copy the url and **make sure you hit save.** [It should look something like this.](https://i.imgur.com/AmaaMaA.png)
 5. Do ``>webhook <url>`` where ``<url>`` is the webhook url.
-6. Do ``>notify msg`` to enable notifications through this webhook. ``>notify ping`` will send the notification and also ping you. To disable the webhook and all notifications, do ``>notify none``
-6. Personalize your keyword notifier for specific servers/words and more:
+6. In the channel you want to receive notifications, do ``>log location``
+7. Do ``>notify msg`` to enable notifications through this webhook. ``>notify ping`` will send the notification and also ping you. To disable the webhook and all notifications, do ``>notify none``
+8. Personalize your keyword notifier for specific servers/words and more:
 
 ----
 
@@ -209,6 +210,7 @@ So, here's how you get started with setting up the notifier:
   + ``>log on`` - Turn on keyword logging.
   + ``>log off`` - Turn off keyword logging.
   + ``>log context <number>`` - set how many messages before the logged message to show when logging a keyword. Default is four.
+  + ``>log location`` - sets the channel you typed this in as the log and notification location for the logger (unless you have it set to direct messages)
 
 - **Set up words to log for:**
   + ``>log addkey <word>`` - adds this word (or words) as a keyword. Ex: ``>log addkey appu`` or ``>log addkey kaguya wants to be confessed to``
