@@ -131,7 +131,7 @@ class Debugger:
     # Save last >py cmd/script.
     @py.command(pass_context=True)
     async def save(self, ctx, *, msg):
-        msg = msg.strip()[:-3] if msg.strip().endswith('.txt') else msg.strip()
+        msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir(os.getcwd())
         if not os.path.exists('%s/cogs/utils/temp.txt' % os.getcwd()):
             return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Nothing to save. Run a ``>py`` cmd/script first.')
@@ -154,7 +154,7 @@ class Debugger:
     # Load a cmd/script saved with the >save cmd
     @py.command(pass_context=True)
     async def run(self, ctx, *, msg):
-        save_file = msg[:-3].strip() if msg.endswith('.txt') else msg.strip()
+        save_file = msg[:-4].strip() if msg.endswith('.txt') else msg.strip()
         if not os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)):
             return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Could not find file ``%s.txt``' % save_file)
 
@@ -215,7 +215,7 @@ class Debugger:
     # View a saved cmd/script
     @py.group(pass_context=True)
     async def view(self, ctx, *, msg: str):
-        msg = msg.strip()[:-3] if msg.strip().endswith('.txt') else msg.strip()
+        msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
             if os.path.exists('%s.txt' % msg):
@@ -234,7 +234,7 @@ class Debugger:
     # Delete a saved cmd/script
     @py.group(pass_context=True)
     async def delete(self, ctx, *, msg: str):
-        msg = msg.strip()[:-3] if msg.strip().endswith('.txt') else msg.strip()
+        msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
             if os.path.exists('%s.txt' % msg):

@@ -1,0 +1,8 @@
+```print('{} role count:\n'.format(server.name))
+for role in server.roles:
+    if role.hoist:
+        role_count = 0
+        for user in server.members:
+                    if role in user.roles:
+                        role_count += 1
+        print('{} - {} users'.format(role, role_count))```
