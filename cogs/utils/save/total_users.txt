@@ -1,6 +1,4 @@
 ```all_users = set([])
-for server in bot.servers:
-    for user in server.members:
-        if not user.bot:
-            all_users.add(user) # will not add the same user twice since it's a set type.
+for user in bot.get_all_members():
+    all_users.add(user) # will not add the same user twice since it's a set type.
 print('Total users in all my servers combined: ' + str(len(all_users)))```

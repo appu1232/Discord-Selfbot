@@ -5,6 +5,7 @@ import math
 import os
 import re
 import subprocess
+import asyncio
 from datetime import timezone
 
 keywords = []
@@ -20,11 +21,14 @@ class KeywordLogger:
 
     @commands.group(pass_context=True)
     async def log(self, ctx):
-        """Get info about keyworld logger. See the README for more info."""
+        """Get info about keyword logger. See the README for more info."""
         if ctx.invoked_subcommand is None:
-            with open('settings/log.json', 'r+') as log:
+            with open('settings/notify.json') as n:
+                notif = json.load(n)
+                notif_type = notif['type']
+            with open('settings/log.json') as log:
                 settings = json.load(log)
-                msg = 'Message logger info:\n```\nKeyword logging: %s\n\nLog location: ' % settings['keyword_logging']
+                msg = 'Message logger info:\n```\nKeyword logging: %s\n\nNotification type: %s\n\nLog location: ' % (settings['keyword_logging'], notif_type)
                 if settings['log_location'] == '':
                     msg += 'No log location set.\n\n'
                 else:
@@ -433,87 +437,70 @@ class KeywordLogger:
     async def notify(self, ctx):
         """Manage notifier bot. See the README for more info."""
         if ctx.invoked_subcommand is None:
-            error = 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the notifier bot.\n``>notify on/off`` - turn notifier on or off.\n``>notify dm`` - recieve notifications via direct message\n``>notify ping`` - recieve notifications via mention in your keyword logger channel.\n``>notify none`` - repost to keyword logger channel without any mention (get notification if you have notification settings set to all messages in that server).'
-            if not ctx.message.content[8:].strip():
-                await self.bot.send_message(ctx.message.channel, bot_prefix + error)
-            elif ctx.message.content[8:].strip() == 'ping':
-                with open('settings/notify.json', 'r+') as n:
-                    notify = json.load(n)
-                    notify['type'] = 'ping'
-                    notify['notify'] = 'off'
-                    n.seek(0)
-                    n.truncate()
-                    json.dump(notify, n, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``ping``.')
-                if self.bot.subpro:
-                    self.bot.subpro.kill()
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the proxy bot.\n``>notify msg`` - sends message to your keyword logger channel through webhook. (get notification if you have notification settings set to all messages in that server).\n``>notify ping`` - recieve notifications via mention in your keyword logger channel through webhook.\n``>notify dm`` - recieve notifications via direct message through proxy bot.\n``>notify off`` - Turn off all notifications.')
 
-            elif ctx.message.content[8:].lower().strip() == 'dm' or ctx.message.content[8:].lower().strip() == 'pm' or ctx.message.content[8:].lower().strip() == 'direct message':
-                with open('settings/notify.json', 'r+') as n:
-                    notify = json.load(n)
-                    notify['type'] = 'dm'
-                    notify['notify'] = 'on'
-                    n.seek(0)
-                    n.truncate()
-                    json.dump(notify, n, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``direct messages``.')
-                if self.bot.subpro:
-                    self.bot.subpro.kill()
-                try:
-                    self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
-                except (SyntaxError, FileNotFoundError):
-                    self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
-                except:
-                    pass
-            elif ctx.message.content[8:].strip() == 'msg':
-                with open('settings/notify.json', 'r+') as n:
-                    notify = json.load(n)
-                    notify['type'] = 'msg'
-                    notify['notify'] = 'off'
-                    n.seek(0)
-                    n.truncate()
-                    json.dump(notify, n, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``.')
-                if self.bot.subpro:
-                    self.bot.subpro.kill()
-            elif ctx.message.content[8:].strip() == 'none':
-                with open('settings/notify.json', 'r+') as n:
-                    notify = json.load(n)
-                    notify['type'] = 'none'
-                    notify['notify'] = 'off'
-                    n.seek(0)
-                    n.truncate()
-                    json.dump(notify, n, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``.')
-                if self.bot.subpro:
-                    self.bot.subpro.kill()
-            else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + error)
-
-    # Turn on the notifier
+    # Set notifications to ping
     @notify.command(pass_context=True)
-    async def on(self, ctx):
-        with open('settings/log.json', 'r+') as l:
-            log = json.load(l)
-        if log['log_location'] == '':
+    async def ping(self, ctx):
+        with open('settings/log.json', 'r+') as log:
+            location = json.load(log)['log_location']
+        if location == '':
             return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
-        channel = log['log_location'].split(' ')[0]
+        with open('settings/notify.json', 'r+') as n:
+            notify = json.load(n)
+            notify['type'] = 'ping'
+            n.seek(0)
+            n.truncate()
+            json.dump(notify, n, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``ping``. The webhook will ping you.')
+        if self.bot.subpro:
+            self.bot.subpro.kill()
+
+    # Set notifications to msg
+    @notify.command(aliases=['message'], pass_context=True)
+    async def msg(self, ctx):
+        with open('settings/log.json') as l:
+            location = json.load(l)['log_location']
+        if location == '':
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
+        with open('settings/notify.json', 'r+') as n:
+            notify = json.load(n)
+            notify['type'] = 'msg'
+            n.seek(0)
+            n.truncate()
+            json.dump(notify, n, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``. The webhook will send notifications to your log location channel. Make sure you have notifications enabled for all messages in that channel.')
+        if self.bot.subpro:
+            self.bot.subpro.kill()
+
+    # Set notifications to dm
+    @notify.command(aliases=['pm', 'pms', 'direct message', 'direct messages', 'dms'], pass_context=True)
+    async def dm(self, ctx):
+        with open('settings/log.json') as l:
+            location = json.load(l)['log_location']
+        if location == '':
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
+        with open('settings/log.json') as l:
+            location = json.load(l)['log_location'].split(' ')[0]
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             if notify['bot_token'] == '':
                 return await self.bot.send_message(ctx.message.channel,
                                                    bot_prefix + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
-            if notify['notify'] == 'on':
+            if notify['type'] == 'dm':
                 return await self.bot.send_message(ctx.message.channel,
-                                            bot_prefix + 'Notifier is already on.')
+                                                   bot_prefix + 'Proxy notifier bot is already on.')
+            notify['type'] = 'dm'
+            channel = location
             notify['channel'] = channel
             notify['author'] = ctx.message.author.id
-            notify['notify'] = 'on'
-            notify['type'] = 'dm'
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned on notifications for the keyword logger.')
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``direct messages``. The proxy bot will direct message you.')
+        if self.bot.subpro:
+            self.bot.subpro.kill()
+        await asyncio.sleep(1)
         try:
             self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
@@ -521,18 +508,18 @@ class KeywordLogger:
         except:
             pass
 
-    # Turn off the notifier
-    @notify.command(pass_context=True)
+    # Set notifications to ping
+    @notify.command(aliases=['none'], pass_context=True)
     async def off(self, ctx):
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
-            notify['notify'] = 'off'
+            notify['type'] = 'off'
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off notifications.')
         if self.bot.subpro:
             self.bot.subpro.kill()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off notifications for the keyword logger.')
 
     # Set bot token
     @notify.command(pass_context=True)

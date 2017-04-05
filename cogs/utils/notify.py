@@ -12,7 +12,7 @@ bot = discord.Client()
 async def on_message(message):
     with open('settings/notify.json', 'r') as f:
         notif = json.load(f)
-    if notif['notify'] == 'on':
+    if notif['type'] == 'dm':
         if message.author.id == notif['author'] and message.channel.id == notif['channel']:
             if notif['type'] == 'ping':
                 if message.content:

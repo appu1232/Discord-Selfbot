@@ -48,7 +48,7 @@ class Debugger:
     # Posts code to hastebin and retrieves link.
     async def post_to_hastebin(self, string):
         '''Posts a string to hastebin.'''
-        data = string.encode('utf-8')
+        data = str(string).encode('utf-8')
 
         url = 'https://hastebin.com/documents'
         try:
@@ -152,7 +152,7 @@ class Debugger:
             await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Error saving file as ``%s.txt``' % msg)
 
     # Load a cmd/script saved with the >save cmd
-    @py.command(pass_context=True)
+    @py.command(aliases=['start'], pass_context=True)
     async def run(self, ctx, *, msg):
         save_file = msg[:-4].strip() if msg.endswith('.txt') else msg.strip()
         if not os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)):
@@ -175,12 +175,16 @@ class Debugger:
         await self.bot.send_message(ctx.message.channel, result)
 
     # List saved cmd/scripts
-    @py.command(pass_context=True)
+    @py.command(aliases=['ls'], pass_context=True)
     async def list(self, ctx):
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
+        if 'list' in ctx.message.content:
+            l = 8
+        else:
+            l = 6
         try:
-            if ctx.message.content[8:]:
-                numb = ctx.message.content[8:].strip()
+            if ctx.message.content[l:]:
+                numb = ctx.message.content[l:].strip()
                 if numb.isdigit():
                     numb = int(numb)
                 else:
@@ -213,7 +217,7 @@ class Debugger:
             os.chdir('..')
 
     # View a saved cmd/script
-    @py.group(pass_context=True)
+    @py.group(aliases=['vi', 'vim'], pass_context=True)
     async def view(self, ctx, *, msg: str):
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
@@ -232,7 +236,7 @@ class Debugger:
             os.chdir('..')
 
     # Delete a saved cmd/script
-    @py.group(pass_context=True)
+    @py.group(aliases=['del', 'rm'], pass_context=True)
     async def delete(self, ctx, *, msg: str):
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
