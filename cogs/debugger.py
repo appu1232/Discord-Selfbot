@@ -25,6 +25,7 @@ import random
 import subprocess
 from bs4 import BeautifulSoup
 import urllib
+import psutil
 
 '''Module for the python interpreter as well as saving, loading, viewing, etc. the cmds/scripts ran with the interpreter.'''
 

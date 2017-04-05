@@ -74,6 +74,8 @@ async def on_ready():
                 loginfo['keyword_logging'] = 'on'
             if 'webhook_url' not in loginfo:
                 loginfo['webhook_url'] = ''
+            if int(loginfo['log_size']) > 25:
+                loginfo['log_size'] = "25"
         except:
             pass
         log.seek(0)

@@ -1,4 +1,4 @@
-**For anyone that hasn't updated since April 4th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
+**For anyone that hasn't updated since April 5th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
 
 # A Discord selfbot with various commands
 
@@ -258,16 +258,12 @@ To switch back to the webhook method of posting notifications in channels, just 
 
 ## Save Chat Messages
 
-You can only save chat messages in the servers you are logging (see [Keyword Notifier](#keyword-notifier) section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. By default, the notifier holds the latest 500 messages per channel. This value is determined by ``log_size`` in ``log.json`` under the ``settings`` folder. You can increase this value if you want; the upper limit is well over 500.
+You can only save chat messages in the servers you are logging (see [Keyword Notifier](#keyword-notifier) section above). Use ``>log`` to see what servers are being logged. Every channel in the enabled servers (or every server if all servers is enabled) will have their messages added to logging. The logger holds the latest 25 messages per channel.
 
 - ``>log history <n>`` outputs the last ``<n>`` number of messages from the chat you just used the command in. ``<n>`` can be as large as the ``log_size``. Increase ``log_size`` in ``log_json`` if you want more messages. A screencap of what it looks like:
 
 ![img](http://i.imgur.com/snAWT7C.png)
-- ``>log history save <n>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages. A screencap of what it looks like:
-
-![img](http://i.imgur.com/MUwOhgp.png)
-
-**Warning:** You probably want to stick with using ``save`` when grabbing large amounts of messages. Outputting walls of text by doing ``>log history 200`` might get you banned from most public servers.
+- ``>log history save <n>`` saves the messages to a file and uploads the file instead. This is useful when saving large number of messages.
 
 ## Google API
 
