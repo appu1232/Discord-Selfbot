@@ -24,7 +24,7 @@ class KeywordLogger:
         if ctx.invoked_subcommand is None:
             with open('settings/log.json', 'r+') as log:
                 settings = json.load(log)
-                msg = 'Message logger info:```Keyword logging: %s\n\nLog location: ' % settings['keyword_logging']
+                msg = 'Message logger info:\n```Keyword logging: %s\n\nLog location: ' % settings['keyword_logging']
                 if settings['log_location'] == '':
                     msg += 'No log location set.\n\n'
                 else:
