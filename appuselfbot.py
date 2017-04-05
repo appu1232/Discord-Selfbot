@@ -158,8 +158,11 @@ async def on_message(message):
 
     # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
     if hasattr(bot, 'refresh_time'):
-        if has_passed(bot, bot.refresh_time) and not bot.game_interval:
-            await bot.change_presence(status='invisible', afk=True)
+        if has_passed(bot, bot.refresh_time):
+            if bot.game:
+                await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
+            else:
+                await bot.change_presence(status='invisible', afk=True)
 
     # If the message was sent by me
     if message.author.id == bot.user.id:
@@ -357,6 +360,7 @@ async def game(bot):
                                 while next_game == current_game:
                                     next_game = random.randint(0, len(games['games']) - 1)
                                 current_game = next_game
+                                bot.game = games['games'][next_game]
                                 await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
                             else:
                                 next_game = games['games'][game_count]
@@ -364,12 +368,14 @@ async def game(bot):
                                     game_count = 0
                                 else:
                                     game_count += 1
+                                    bot.game = games['games'][game_count]
                                     await bot.change_presence(game=discord.Game(name=games['games'][game_count]))
 
                 else:
                     if game_time_check(bot, bot.game_time, 180):
                         with open('settings/games.json') as g:
                             games = json.load(g)
+                        bot.game = games['games'][0]
                         await bot.change_presence(game=discord.Game(name=games['games'][0]))
 
         await asyncio.sleep(5)

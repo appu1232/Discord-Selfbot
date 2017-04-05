@@ -194,7 +194,7 @@ class Misc:
     async def game(self, ctx):
         """Set playing status. Ex: >game napping"""
         if ctx.message.content[6:]:
-            game = ctx.message.clean_content[6:].encode('utf-8')
+            game = str(ctx.message.clean_content[6:])
 
             # Cycle games if more than one game is given.
             if ' | ' in ctx.message.content[6:]:
@@ -213,7 +213,7 @@ class Misc:
                     interval = int(reply.content.strip())
                     if interval >= 10:
                         self.bot.game_interval = interval
-                        games = game.decode('utf-8').split(' | ')
+                        games = game.split(' | ')
                         if len(games) != 2:
                             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
                             s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
@@ -230,11 +230,11 @@ class Misc:
                             await self.bot.send_message(ctx.message.channel,
                                                         bot_prefix + 'Game set. Game will change every ``%s`` seconds' % reply.content.strip())
 
-                        games = {'games': game.decode('utf-8').split(' | '), 'interval': interval, 'type': loop_type}
+                        games = {'games': game.split(' | '), 'interval': interval, 'type': loop_type}
                         with open('settings/games.json', 'w') as g:
                             json.dump(games, g, indent=4)
 
-                        self.bot.game = game
+                        self.bot.game = game.split(' | ')[0]
 
                     else:
                         return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Interval is too short. Must be at least 10 seconds.')
@@ -246,7 +246,7 @@ class Misc:
                 games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none'}
                 with open('settings/games.json', 'w') as g:
                     json.dump(games, g, indent=4)
-                await self.bot.change_presence(game=discord.Game(name=game.decode('utf-8')))
+                await self.bot.change_presence(game=discord.Game(name=game))
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
 
         # Remove game status.
