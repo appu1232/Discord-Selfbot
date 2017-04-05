@@ -252,8 +252,7 @@ This is possible, but you'll need a **proxy bot** for this. Here's how you can s
 2. Create a Discord bot account and get the bot's token. Then add the bot to the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
 3. Make sure to give the bot read, send, edit messages, and embed permissions in the channel you are keyword logging in.
 4. Do ``>notify token <token>`` where ``<token>`` is the token you grabbed in step 1. Make sure you grabbed the **token** not the client secret!
-5. Enable the proxy bot with ``>notify on``. You should see the bot you created come online on the sidebar. ``>notify off`` to disabled the proxy bot.
-6. ``>notify dm`` - will set it so this proxy bot direct messages you the log. 
+5. Enable the proxy bot and set it to send via direct messages with ``>notify dm``. ``>notify off`` will turn off the proxy bot.
 
 To switch back to the webhook method of posting notifications in channels, just do ``>notify msg`` or ``>notify ping`` again.
 
