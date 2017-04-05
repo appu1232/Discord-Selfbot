@@ -2,7 +2,7 @@
 	"keyword_logging": "on",
 	"webhook_url": "",
     "log_location": "",
-	"log_size": "500",
+	"log_size": "25",
 	"allservers": "True",
 	"servers": [],
 	"keywords": [],
