@@ -199,6 +199,7 @@ So, here's how you get started with setting up the notifier:
 3. Go to your **Server Settings** ([it's here](https://i.imgur.com/PofYpiZ.png)) and go to **WebHooks** near the bottom. Create a webhook.
 4. Give it whatever name and avatar you like and change the channel to the channel where you want to receive notifications. Copy the url and **make sure you hit save.** [It should look something like this.](https://i.imgur.com/AmaaMaA.png)
 5. Do ``>webhook <url>`` where ``<url>`` is the webhook url.
+6. Do ``>notify msg`` to enable notifications through this webhook. To disable, do ``>notify none`` This will disable notifications but it will still log the message.
 6. Personalize your keyword notifier for specific servers/words and more:
 
 ----
@@ -252,6 +253,7 @@ This is possible, but you'll need a proxy bot for this. Here's how you can set t
 
 Doing ``>notify dm`` will turn the proxy bot back on and you will recieve direct messages from the proxy bot again.
 
+To turn off all notifications from tye webhook and the proxy bot, do ``>notify none``
 
 ## Save Chat Messages
 
