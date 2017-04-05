@@ -290,6 +290,9 @@ Follow these steps to obtain them:
 - Free custom search has a limit of 100 searches per day. The commands ``>i`` and ``>mal`` use this search. Still, this should be more than enough but feel free to pay for more if you would like, although I don't think it's needed.
 - Custom commands have a lot of other quirks and flexablility. Check the [Custom Commands](#custom-commands) section to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
+## My Info
+
+I'm always willing to answer any questions or recieve feedback in general. I will get back to you within 24 hours if you contact me. You can go through Github, email, Reddit (/u/appu1232) or Discord (appu1232#2569). I don't really mind how.
 
 ## Acknowledgements
 
