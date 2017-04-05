@@ -282,7 +282,7 @@ async def on_message(message):
                             em.set_thumbnail(url=message.author.avatar_url)
                         except:
                             pass
-                        if notify['type'] == 'none' or notify['type'] == 'msg':
+                        if notify['type'] == 'msg':
                             bot.keyword_found = ['embed', em]
                             await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
                         elif notify['type'] == 'ping':
@@ -301,7 +301,7 @@ async def on_message(message):
                             split_msg = ''
                         for b,i in enumerate(all_words):
                             if b == 0:
-                                if notify['type'] == 'none' or notify['type'] == 'msg':
+                                if notify['type'] == 'msg':
                                     bot.keyword_found = ['message', bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i)]
                                     await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
                                 elif notify['type'] == 'ping':
@@ -310,7 +310,7 @@ async def on_message(message):
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i))
                             else:
-                                if notify['type'] == 'none' or notify['type'] == 'msg':
+                                if notify['type'] == 'msg':
                                     bot.keyword_found = ['message', '```%s```' % i]
                                     await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
                                 elif notify['type'] == 'ping':

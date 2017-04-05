@@ -465,10 +465,21 @@ class KeywordLogger:
                     self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
                 except:
                     pass
-            elif ctx.message.content[8:].strip() == 'none' or ctx.message.content[8:].strip() == 'msg':
+            elif ctx.message.content[8:].strip() == 'msg':
                 with open('settings/notify.json', 'r+') as n:
                     notify = json.load(n)
                     notify['type'] = 'msg'
+                    notify['notify'] = 'off'
+                    n.seek(0)
+                    n.truncate()
+                    json.dump(notify, n, indent=4)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``.')
+                if self.bot.subpro:
+                    self.bot.subpro.kill()
+            elif ctx.message.content[8:].strip() == 'none':
+                with open('settings/notify.json', 'r+') as n:
+                    notify = json.load(n)
+                    notify['type'] = 'none'
                     notify['notify'] = 'off'
                     n.seek(0)
                     n.truncate()
