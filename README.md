@@ -291,7 +291,7 @@ Follow these steps to obtain them:
 
 ## My Info
 
-I'm always willing to answer any questions or recieve feedback in general. I will get back to you within 24 hours if you contact me. You can go through Github, email, Reddit (/u/appu1232) or Discord (appu1232#2569). I don't really mind how.
+I'm always willing to answer any questions, recieve feedback, or listen to suggestions. I will get back to you within 24 hours if you contact me. You can go through Github, email, Reddit (/u/appu1232) or Discord (appu1232#2569). I don't really mind how.
 
 ## Acknowledgements
 
