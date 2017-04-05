@@ -9,6 +9,6 @@ for user in server.members:
 del data[author]
 print('Users I share a server with:\nUser - Servers\n')
 for user in data:
-    servers = ''.join(data[user])
-    print(user.name + ' - ' + servers)
+    servers = ', '.join(data[user])
+    print(user.name + ' - ' + servers + '\n')
 print('\nTotal members: {} \n\nMembers I share another server with: {}'.format(server.member_count, len(data)))```
