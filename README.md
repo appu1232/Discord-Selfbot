@@ -186,7 +186,7 @@ If anything you are adding/removing is more than one word, **you must put each p
 
 ## Keyword Notifier
 
-The Keyword notifier can be used for mentions (just like the recent mentions tab on discord) and also for any keywords you want. Here is another example of what it looks like when the bot finds a message with the specified keyword:
+The Keyword notifier can be used to log and get notified when someone says a keyword or words in one of your servers (works for mentions as well). Here is another example of what it looks like when the bot finds a message with the specified keyword:
 
 ![img](https://i.imgur.com/5dMJo27.png)
 
