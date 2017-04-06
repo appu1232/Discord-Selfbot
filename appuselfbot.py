@@ -96,7 +96,7 @@ async def on_ready():
             json.dump(o_conf, oc, indent=4)
     with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
-    if notif['notify'] == 'on':
+    if notif['type'] == 'dm':
         try:
             bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
