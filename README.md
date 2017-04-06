@@ -287,12 +287,8 @@ Follow these steps to obtain them:
 - Free custom search has a limit of 100 searches per day. The commands ``>i`` and ``>mal`` use this search. Still, this should be more than enough but feel free to pay for more if you would like, although I don't think it's needed.
 - Custom commands have a lot of other quirks and flexablility. Check the [Custom Commands](#custom-commands) section to see how you can do stuff like add more than one response for a command, get a random response for a command, add commands that have multiple words, etc.
 
-## My Info
-
-I'm always willing to answer any questions, recieve feedback, or listen to suggestions. I will get back to you within 24 hours if you contact me. You can go through Github, email, Reddit (/u/appu1232) or Discord (appu1232#2569). I don't really mind how.
-
 ## Acknowledgements
 
-- Thanks to [adjnouobsrefUsed](https://github.com/adjnouobsrefUsed) for the spoiler tags.
+- Thanks to [adjnouobsrefUsed](https://github.com/adjnouobsref) for the spoiler tags.
 - Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards and the debugger.
 - Thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
