@@ -1,5 +1,7 @@
 **For anyone that hasn't updated since April 5th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
 
+Come join the dedicated server for this bot: https://discord.gg/TBQE72k Feel free to ask questions, give suggestions, report bugs, or just hang out here. If you need help setting up the bot, I or someone on the server can help too.
+
 # A Discord selfbot with various commands
 
 A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord.
