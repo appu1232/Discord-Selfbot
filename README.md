@@ -2,9 +2,10 @@
 
 Come join the dedicated server for this bot: https://discord.gg/TBQE72k Feel free to ask questions, give suggestions, report bugs, or just hang out here. If you need help setting up the bot, I or someone on the server can help too.
 
-# A Discord selfbot with various commands
+# Discord Selfbot
 
-A selfbot that has various in-built commands as well as the ability to dynamically add commands using the ``>add`` command on discord.
+Has various commands and utilities, keyword logger/notifier, and adding custom commands. A few examples:
+![](http://i.imgur.com/l1tq6vl.gif)
 
 1. [Features](#features)
 2. [Setup](#setup)
@@ -70,6 +71,7 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 Note: You must have Python 3.5.2 or above installed. **When installing python, make sure you check "Add Python to PATH" in the install window.**
 
 **Windows:** Double click ``run.bat`` to start the bot. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
+Optionally, create a shortcut to the .bat file and [add it to startup](http://www.computerhope.com/issues/ch000322.htm) so you don't have to remember to run it every time.
 
 **Mac/Linux:** Navigate to the bot's folder in terminal/shell and run: ``pip install -r requirements.txt`` Once it's finished, run: ``python loopself.py`` to start the bot.
 
@@ -136,15 +138,13 @@ A MAL search result:
 **Python Interpreter**
 
 - ``>py <code>`` - python interpreter. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load <module>`` ``>unload <module>`` and ``>reload`` cmds to load, unload, and reload modules.
-- ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
 
 Example usage of the python interpreter:
 
 ![img](http://i.imgur.com/MpAtJ7W.png)
 
-![img](http://i.imgur.com/PF0inrv.png)
-
-![img](http://i.imgur.com/gYUmyHC.png)
+- ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
+![](http://i.imgur.com/VIGA8iN.gifv)
 
 **Misc**
 
@@ -160,10 +160,14 @@ Example usage of the python interpreter:
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that. Deleted messages can be quoted.
+![](http://i.imgur.com/ayZPaeU.gifv)
+
 - ``>embed <words>`` - Make an embed out of the message.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 
 ## Custom Commands:
+![](http://i.imgur.com/NtYEvFi.gifv)
+
 **There are two ways to add custom commands.** The first way:
 
 - ``>add <command> <response>`` Now, if you do ``.<command>`` you will receive ``<response>``.
