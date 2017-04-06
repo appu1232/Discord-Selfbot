@@ -4,7 +4,7 @@ import re
 import discord
 from discord.ext import commands
 from bs4 import BeautifulSoup
-from appuselfbot import bot_prefix, config
+from appuselfbot import bot_prefix
 from cogs.utils.checks import *
 
 '''Module for MyAnimeList search of anime, manga, and light novels.'''
@@ -34,6 +34,7 @@ class Mal:
                 if msg.startswith('[link]'):
                     msg = msg[6:]
                     link = True
+                config = load_optional_config()
                 # Search google for the anime under site:myanimelist.net
                 searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net anime " + msg.strip() + "&start=" + '1' + "&key=" + \
                             config['google_api_key'] + "&cx=" + config[
@@ -129,6 +130,7 @@ class Mal:
                 if msg.startswith('[link]'):
                     msg = msg[6:]
                     link = True
+                config = load_optional_config()
                 # Search google for the manga under site:myanimelist.net
                 searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net manga " + msg.strip() + "&start=" + '1' + "&key=" + \
                             config['google_api_key'] + "&cx=" + config[
