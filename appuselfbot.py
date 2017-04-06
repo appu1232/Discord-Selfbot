@@ -350,7 +350,6 @@ async def game(bot):
     await bot.wait_until_login()
     current_game = 0
     next_game = 0
-    game_count = 0
     while True:
         if hasattr(bot, 'game_time') and hasattr(bot, 'game'):
             if bot.game:
@@ -365,13 +364,13 @@ async def game(bot):
                                 bot.game = games['games'][next_game]
                                 await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
                             else:
-                                next_game = games['games'][game_count]
-                                if game_count+1 == len(games['games']):
-                                    game_count = 0
+                                if next_game+1 == len(games['games']):
+                                    next_game = 0
                                 else:
-                                    game_count += 1
-                                    bot.game = games['games'][game_count]
-                                    await bot.change_presence(game=discord.Game(name=games['games'][game_count]))
+                                    next_game += 1
+                                bot.game = games['games'][next_game]
+                                await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
+
 
                 else:
                     if game_time_check(bot, bot.game_time, 180):
