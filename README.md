@@ -5,7 +5,8 @@ Come join the dedicated server for this bot: https://discord.gg/TBQE72k Feel fre
 # Discord Selfbot
 
 Has various commands and utilities, keyword logger/notifier, and adding custom commands. A few examples:
-![](http://i.imgur.com/l1tq6vl.gif)
+
+![main](https://cloud.githubusercontent.com/assets/14967932/24776520/22878bf0-1aef-11e7-8e28-fc7a01d3d188.gif)
 
 1. [Features](#features)
 2. [Setup](#setup)
@@ -144,7 +145,7 @@ Example usage of the python interpreter:
 ![img](http://i.imgur.com/MpAtJ7W.png)
 
 - ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
-![](http://i.imgur.com/VIGA8iN.gifv)
+![pyscripts](https://cloud.githubusercontent.com/assets/14967932/24776287/1b93ec36-1aee-11e7-8418-14d91105e5f5.gif)
 
 **Misc**
 
@@ -160,13 +161,13 @@ Example usage of the python interpreter:
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that. Deleted messages can be quoted.
-![](http://i.imgur.com/ayZPaeU.gifv)
+![quote](https://cloud.githubusercontent.com/assets/14967932/24776240/f509e02a-1aed-11e7-95f5-6ecf30eb367a.gif)
 
 - ``>embed <words>`` - Make an embed out of the message.
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 
 ## Custom Commands:
-![](http://i.imgur.com/NtYEvFi.gifv)
+![custom](https://cloud.githubusercontent.com/assets/14967932/24776178/bb6bb5f0-1aed-11e7-94e4-567b993b4ba6.gif)
 
 **There are two ways to add custom commands.** The first way:
 
