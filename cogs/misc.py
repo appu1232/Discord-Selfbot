@@ -5,6 +5,7 @@ import os
 import prettytable
 import strawpy
 import random
+import requests
 from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -16,6 +17,22 @@ class Misc:
 
     def __init__(self, bot):
         self.bot = bot
+
+    # Posts code to hastebin and retrieves link.
+    async def post_to_hastebin(self, string):
+        '''Posts a string to hastebin.'''
+        data = str(string).encode('utf-8')
+
+        url = 'https://hastebin.com/documents'
+        try:
+            response = requests.post(url, data=data)
+        except requests.exceptions.RequestException as e:
+            return 'Error'
+
+        try:
+            return 'https://hastebin.com/{}'.format(response.json()['key'])
+        except Exception as e:
+            return 'Error'
 
     @commands.command(pass_context=True)
     async def about(self, ctx):
@@ -139,16 +156,26 @@ class Misc:
         for role in ctx.message.server.roles:
             if msg == role.name:
                 role_count = 0
+                all_users = []
                 for user in ctx.message.server.members:
                     if role in user.roles:
+                        all_users.append('{}#{}'.format(user.name, user.discriminator))
                         role_count += 1
+                all_users.sort()
+                all = ', '.join(all_users)
                 em = discord.Embed(title='Role Info', color=role.color)
                 em.add_field(name='Name', value=role.name)
                 em.add_field(name='ID', value=role.id, inline=False)
-                em.add_field(name='Members in this role', value=role_count)
+                em.add_field(name='Users in this role', value=role_count)
                 em.add_field(name='Role color hex value', value=str(role.color))
                 em.add_field(name='Role color rgb value', value=role.color.to_tuple())
                 em.add_field(name='Mentionable', value=role.mentionable)
+                if len(all_users) > 10:
+                    all = all.replace(', ', '\n')
+                    url = await self.post_to_hastebin(all)
+                    em.add_field(name='All Users', value='Long list, posted to hastebin:\n %s' % url, inline=False)
+                else:
+                    em.add_field(name='All Users', value=all, inline=False)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
                 return await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find role ``%s``' % msg)
