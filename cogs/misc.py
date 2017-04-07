@@ -234,6 +234,8 @@ class Misc:
                     return msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o'
 
                 reply = await self.bot.wait_for_message(author=ctx.message.author, check=check, timeout=60)
+                if not reply:
+                    return
                 if reply.content.lower().strip() == 'n':
                     return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled')
                 elif reply.content.strip().isdigit():
@@ -242,8 +244,10 @@ class Misc:
                         self.bot.game_interval = interval
                         games = game.split(' | ')
                         if len(games) != 2:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Change game in order or randomly? Input ``o`` for order or ``r`` for random:')
                             s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
+                            if not s:
+                                return
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
                                 await self.bot.send_message(ctx.message.channel,
                                                             bot_prefix + 'Game set. Game will randomly change every ``%s`` seconds' % reply.content.strip())
@@ -264,7 +268,7 @@ class Misc:
                         self.bot.game = game.split(' | ')[0]
 
                     else:
-                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Interval is too short. Must be at least 10 seconds.')
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled. Interval is too short. Must be at least 10 seconds.')
 
             # Set game if only one game is given.
             else:
@@ -284,7 +288,78 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set playing status off')
             if os.path.isfile('settings/games.json'):
                 os.remove('settings/games.json')
+
+    @commands.group(aliases=['avatars'], pass_context=True)
+    async def avatar(self, ctx):
+        """Rotate avatars."""
+
+        if ctx.invoked_subcommand is None:
+            with open('settings/avatars.json', 'r+') as a:
+                avi_config = json.load(a)
+            if avi_config['password'] == '':
+                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cycling avatars requires you to input your password. Your password will not be sent anywhere and no one will have access to it. Enter your password with``>avatar password <password>`` Make sure you are in a private channel where no one can see!')
+            if avi_config['interval'] != '0':
+                self.bot.avatar = None
+                self.bot.avatar_interval = None
+                avi_config['interval'] = '0'
+                with open('settings/avatars.json', 'w') as avi:
+                    json.dump(avi_config, avi, indent=4)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Disabled cycling of avatars.')
+            else:
+                if os.listdir('settings/avatars'):
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Enabled cycling of avatars. Input interval in seconds to wait before changing avatars (``n`` to cancel):')
+
+                    def check(msg):
+                        return msg.content.isdigit() or msg.content.lower().strip() == 'n'
+
+                    def check2(msg):
+                        return msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o'
+                    interval = await self.bot.wait_for_message(author=ctx.message.author, check=check, timeout=60)
+                    if not interval:
+                        return
+                    if interval.content.lower().strip() == 'n':
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
+                    elif int(interval.content) < 300:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled. Interval is too short. Must be at least 300 seconds (5 minutes).')
+                    else:
+                        avi_config['interval'] = int(interval.content)
+                    if len(os.listdir('settings/avatars')) != 2:
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
+                        cycle_type = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
+                        if not cycle_type:
+                            return
+                        if cycle_type.content.strip() == 'r' or cycle_type.content.strip() == 'random':
+                            await self.bot.send_message(ctx.message.channel,
+                                                        bot_prefix + 'Avatar cycling enabled. Avatar will randomly change every ``%s`` seconds' % interval.content.strip())
+                            loop_type = 'random'
+                        else:
+                            loop_type = 'ordered'
+                    else:
+                        loop_type = 'ordered'
+                    avi_config['type'] = loop_type
+                    if loop_type == 'ordered':
+                        await self.bot.send_message(ctx.message.channel,
+                                                    bot_prefix + 'Avatar cycling enabled. Avatar will change every ``%s`` seconds' % interval.content.strip())
+                    with open('settings/avatars.json', 'r+') as avi:
+                        avi.seek(0)
+                        avi.truncate()
+                        json.dump(avi_config, avi, indent=4)
+                    self.bot.avatar_interval = interval.content
+                    self.bot.avatar = random.choice(os.listdir('settings/avatars'))
+
+                else:
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'No images found under ``settings/avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')
+
+    @avatar.command(aliases=['pass', 'pw'], pass_context=True)
+    async def password(self, ctx, *, msg):
+        with open('settings/avatars.json', 'r+') as a:
+            avi_config = json.load(a)
+            avi_config['password'] = msg.strip().strip('"').lstrip('<').rstrip('>')
+            a.seek(0)
+            a.truncate()
+            json.dump(avi_config, a, indent=4)
         await self.bot.delete_message(ctx.message)
+        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Password set. Do ``>avatar`` to toggle cycling avatars.')
 
     @commands.command(pass_context=True)
     async def choose(self, ctx, *, choices: str):

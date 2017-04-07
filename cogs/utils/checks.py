@@ -32,7 +32,7 @@ def game_time_check(bot, oldtime, interval):
 
 
 def avatar_time_check(bot, oldtime, interval):
-    if time.time() - interval < oldtime:
+    if time.time() - float(interval) < oldtime:
         return False
     bot.avatar_time = time.time()
     return True

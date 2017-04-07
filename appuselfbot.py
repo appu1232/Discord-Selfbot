@@ -5,6 +5,7 @@ import os
 import subprocess
 import asyncio
 import random
+import glob
 from datetime import timezone
 from cogs.utils.allmsgs import *
 from cogs.webhook import *
@@ -22,12 +23,12 @@ bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbo
 # Startup
 @bot.event
 async def on_ready():
-    print('Logging in...')
+    print('Logging in as')
     try:
         print(bot.user.name)
     except:
         print(bot.user.name.encode("utf-8"))
-    print(bot.user.id)
+    print('User id:' + bot.user.id)
     print('------')
     if not hasattr(bot, 'uptime'):
         bot.uptime = datetime.datetime.now()
@@ -49,10 +50,14 @@ async def on_ready():
         bot.game = None
     if not hasattr(bot, 'game_interval'):
         bot.game_interval = None
+    if not hasattr(bot, 'avatar'):
+        bot.avatar = None
+    if not hasattr(bot, 'avatar_interval'):
+        bot.avatar_interval = None
     if not hasattr(bot, 'game_time'):
         bot.game_time = time.time()
     if not hasattr(bot, 'avatar_time'):
-        bot.avatar_time = None
+        bot.avatar_time = time.time()
     if not hasattr(bot, 'subpro'):
         bot.subpro = None
     if not hasattr(bot, 'keyword_found'):
@@ -90,6 +95,19 @@ async def on_ready():
             games = json.load(g)
         bot.game_interval = games['interval']
         bot.game = games['games'][0]
+    if not os.path.exists('settings/avatars'):
+        os.makedirs('settings/avatars')
+    if not os.path.isfile('settings/avatars.json'):
+        with open('settings/avatars.json', 'w') as avis:
+            json.dump({'password': '', 'interval': '0', 'type': 'random'}, avis, indent=4)
+    with open('settings/avatars.json', 'r') as g:
+        avatars = json.load(g)
+    bot.avatar_interval = avatars['interval']
+    if os.listdir('settings/avatars') and avatars['interval'] != '0':
+        all_avis = os.listdir('settings/avatars')
+        all_avis.sort()
+        avi = random.choice(all_avis)
+        bot.avatar = avi
     if not os.path.isfile('settings/optional_config.json'):
         conf = load_config()
         o_conf = {'google_api_key': conf['google_api_key'], 'custom_search_engine': conf['custom_search_engine'], 'mal_username': conf['mal_username'], 'mal_password': conf['mal_password']}
@@ -358,19 +376,19 @@ async def game(bot):
                     if game_time_check(bot, bot.game_time, bot.game_interval):
                         with open('settings/games.json') as g:
                             games = json.load(g)
-                            if games['type'] == 'random':
-                                while next_game == current_game:
-                                    next_game = random.randint(0, len(games['games']) - 1)
-                                current_game = next_game
-                                bot.game = games['games'][next_game]
-                                await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
+                        if games['type'] == 'random':
+                            while next_game == current_game:
+                                next_game = random.randint(0, len(games['games']) - 1)
+                            current_game = next_game
+                            bot.game = games['games'][next_game]
+                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
+                        else:
+                            if next_game+1 == len(games['games']):
+                                next_game = 0
                             else:
-                                if next_game+1 == len(games['games']):
-                                    next_game = 0
-                                else:
-                                    next_game += 1
-                                bot.game = games['games'][next_game]
-                                await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
+                                next_game += 1
+                            bot.game = games['games'][next_game]
+                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
 
 
                 else:
@@ -382,7 +400,49 @@ async def game(bot):
 
         await asyncio.sleep(5)
 
-# async def avatar(bot):
+# Set/cycle avatar
+async def avatar(bot):
+    await bot.wait_until_ready()
+    await bot.wait_until_login()
+    current_avatar = 0
+    next_avatar = 0
+    while True:
+        if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
+            if bot.avatar:
+                if bot.avatar_interval:
+                    if avatar_time_check(bot, bot.avatar_time, bot.avatar_interval):
+                        with open('settings/avatars.json') as g:
+                            avi_config = json.load(g)
+                        all_avis = glob.glob('settings/avatars/*.jpg')
+                        all_avis.extend(glob.glob('settings/avatars/*.jpeg'))
+                        all_avis.extend(glob.glob('settings/avatars/*.png'))
+                        all_avis = os.listdir('settings/avatars')
+                        all_avis.sort()
+                        if avi_config['type'] == 'random':
+                            while next_avatar == current_avatar:
+                                next_avatar = random.randint(0, len(all_avis) - 1)
+                            current_avatar = next_avatar
+                            bot.avatar = all_avis[next_avatar]
+                            with open('settings/avatars/%s' % bot.avatar, 'rb') as fp:
+                                await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
+                        else:
+                            if next_avatar+1 == len(all_avis):
+                                next_avatar = 0
+                            else:
+                                next_avatar += 1
+                            bot.avatar = all_avis[next_avatar]
+                            with open('settings/avatars/%s' % bot.avatar, 'rb') as fp:
+                                await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
+
+
+                else:
+                    if game_time_check(bot, bot.game_time, 180):
+                        with open('settings/games.json') as g:
+                            games = json.load(g)
+                        bot.game = games['games'][0]
+                        await bot.change_presence(game=discord.Game(name=games['games'][0]))
+
+        await asyncio.sleep(5)
 
 if __name__ == '__main__':
 
@@ -394,5 +454,5 @@ if __name__ == '__main__':
                 print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
     bot.loop.create_task(game(bot))
-    #bot.loop.create_task(avatar(bot))
+    bot.loop.create_task(avatar(bot))
     bot.run(config['token'], bot=False)
