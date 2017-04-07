@@ -22,6 +22,7 @@ Has various commands and utilities, keyword logger/notifier, and adding custom c
 - Google web and image search.
 - Keyword/mention logger and notifier. Log messages and get notified when keywords you specified are said in any of your servers. Useful to track if someone mentioned your name or your favorite show/book/whatever else keywords and you want to stalk— I mean, talk to them about it.
 - Set your game to anything or set up multiple and cycle through them.
+- Cycle through avatars automatically (minimum 5 minute interval).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
@@ -82,6 +83,8 @@ Unless otherwise stated, all you need to do is save your ``settings`` folder and
 ## All Commands:
 - ``>restart`` - restart the bot.
 - ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. **The game won't show for yourself but other people can see it.** The bot sets the game status on startup as well if you set it up once. Do ``>game`` with nothing else to turn off your game.
+- ``>avatar`` - sets your avatar by cycling through the images you have under ``settings/avatars`` (.jpg, .jpeg, and .png only). It will prompt you with your desired interval and whether to change randomly or in order.
+  + On first use, this command will require your discord password. This is just a limitation of the API. In no way is your password being distributed. It is just stored locally and called on internally to change your avatar. Just make sure you input the password in a private channel so no one sees it.
 - ``>stats`` - Bot stats and some user info. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
 
 ![img](http://i.imgur.com/x7aEacJ.png)
@@ -151,7 +154,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - Input by putting the code in \` like this: \`print('test')\`
 - Make the shell jump to the most recent message with ``>repl jump`` and clear the current shell with ``>repl clear``
 - Quit the shell with \`quit\`
-- Based entirely off of eye-sigil's repl shell. Kind of unnecessarily huge and and fancy but hey, it looks nice.
+- Based entirely off of eye-sigil's repl shell. Kind of unnecessarily huge and fancy but hey, it looks nice.
 
 **Misc**
 
