@@ -58,8 +58,7 @@ async def on_ready():
     if not hasattr(bot, 'keyword_found'):
         bot.keyword_found = None
     if not hasattr(bot, 'log_conf'):
-        with open('settings/log.json', 'r') as log:
-            bot.log_conf = json.load(log)
+        bot.log_conf = None
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
@@ -84,7 +83,8 @@ async def on_ready():
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
-    bot.log_conf = json.load(log)
+    with open('settings/log.json', 'r') as log:
+        bot.log_conf = json.load(log)
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r') as g:
             games = json.load(g)
