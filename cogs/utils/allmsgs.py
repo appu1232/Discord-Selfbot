@@ -25,13 +25,12 @@ def custom(message):
     if message.startswith(config['customcmd_prefix'][0]):
         with open('settings/commands.json', 'r') as f:
             commands = json.load(f)
-            file = discord.Embed(colour=0x27007A)
         for i in commands:
             if message[1:].startswith(i.lower()):
-                success = True
 
                 # If the commands resulting reply is a list instead of a str
                 if type(commands[i]) is list:
+                    index = 0
                     try:
                         # If index from list is specified, get that result.
                         if message[len(i) + 1:].isdigit():
