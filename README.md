@@ -149,7 +149,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 ![img](https://i.imgur.com/jg2dmAq.png)
 
 - Input by putting the code in \` like this: \`print('test')\`
-- Make the shell jump to the most recent message with ``>repl jump`` and clear the current shell with ``repl clear``
+- Make the shell jump to the most recent message with ``>repl jump`` and clear the current shell with ``>repl clear``
 - Quit the shell with \`quit\`
 - Based entirely off of eye-sigil's repl shell. Kind of unnecessarily huge and and fancy but hey, it looks nice.
 

@@ -57,6 +57,9 @@ async def on_ready():
         bot.subpro = None
     if not hasattr(bot, 'keyword_found'):
         bot.keyword_found = None
+    if not hasattr(bot, 'log_conf'):
+        with open('settings/log.json', 'r') as log:
+            bot.log_conf = json.load(log)
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
@@ -81,14 +84,12 @@ async def on_ready():
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
+    bot.log_conf = json.load(log)
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r') as g:
             games = json.load(g)
         bot.game_interval = games['interval']
         bot.game = games['games'][0]
-    if not hasattr(bot, 'log_conf'):
-        with open('settings/log.json', 'r') as log:
-            bot.log_conf = json.load(log)
     if not os.path.isfile('settings/optional_config.json'):
         conf = load_config()
         o_conf = {'google_api_key': conf['google_api_key'], 'custom_search_engine': conf['custom_search_engine'], 'mal_username': conf['mal_username'], 'mal_password': conf['mal_password']}
