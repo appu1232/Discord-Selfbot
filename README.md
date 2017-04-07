@@ -1,5 +1,3 @@
-**For anyone that hasn't updated since April 5th 2017, the keyword notifier is now very different and depending on your settings, may require a few changes to work. Go to the keyword notifier section for more info.**
-
 Come join the dedicated server for this bot: https://discord.gg/TBQE72k Feel free to ask questions, give suggestions, report bugs, or just hang out here. If you need help setting up the bot, I or someone on the server can help too.
 
 # Discord Selfbot
@@ -146,6 +144,14 @@ Example usage of the python interpreter:
 
 - ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
 ![pyscripts](https://cloud.githubusercontent.com/assets/14967932/24776287/1b93ec36-1aee-11e7-8418-14d91105e5f5.gif)
+
+Alternatively, there is also the ``>repl`` command which uses an embed shell like so:
+![img](https://i.imgur.com/jg2dmAq.png)
+
+Input by putting the code in ` like this: \`print('test')\`
+Make the shell jump to the most recent message with ``>repl jump`` and clear the current shell with ``repl clear``
+Quit the shell with \`quit\`
+Based entirely off of eye-sigil's repl shell. Kind of unnecessarily huge and and fancy but hey, it looks nice.
 
 **Misc**
 
@@ -294,6 +300,7 @@ Follow these steps to obtain them:
 
 ## Acknowledgements
 
-- Thanks to [adjnouobsrefUsed](https://github.com/adjnouobsref) for the spoiler tags.
+- Thanks to [adjnouobsref](https://github.com/adjnouobsref) for the spoiler tags.
 - Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards and the debugger.
+- Used [eye-sigil's](https://github.com/eye-sigil) code for the >repl command.
 - Thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
