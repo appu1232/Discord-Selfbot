@@ -2,7 +2,7 @@ Come join the dedicated server for this bot: https://discord.gg/TBQE72k Feel fre
 
 # Discord Selfbot
 
-Has various commands and utilities, keyword logger/notifier, and adding custom commands. A few examples:
+Takes less than 5 minutes to set up. Has various commands and utilities, keyword logger/notifier, and adding custom commands. A few examples:
 
 ![main](https://cloud.githubusercontent.com/assets/14967932/24776520/22878bf0-1aef-11e7-8e28-fc7a01d3d188.gif)
 
@@ -79,7 +79,7 @@ Optionally, create a shortcut to the .bat file and [add it to startup](http://ww
 
 For Windows: The ``run.bat`` will prompt you when there's a new update on startup and will apply the update for you (it will save your settings). [You will need Git in order to do this.](https://git-scm.com/downloads)
 
-For Mac/Linux or if you want to update manually: Unless otherwise stated, all you need to do is save your ``settings`` folder and its contents, delete everything else, download the newest version, and then replace the ``settings`` folder with your ``settings`` folder. If you you know how to use git, that option exists as well.
+For Mac/Linux or if you want to update manually: Unless otherwise stated, all you need to do is save your ``settings`` folder and its contents, delete everything else, download the newest version, and then replace the ``settings`` folder with your ``settings`` folder. If you know how to use git properly, that option exists as well.
 
 
 ## All Commands:

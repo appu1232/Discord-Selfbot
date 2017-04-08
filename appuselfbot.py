@@ -23,7 +23,7 @@ bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbo
 # Startup
 @bot.event
 async def on_ready():
-    print('Logging in as')
+    print('Logged in as')
     try:
         print(bot.user.name)
     except:
