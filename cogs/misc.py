@@ -324,7 +324,7 @@ class Misc:
                     else:
                         avi_config['interval'] = int(interval.content)
                     if len(os.listdir('settings/avatars')) != 2:
-                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Changes games in order or randomly? Input ``o`` for order or ``r`` for random:')
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Change avatars in order or randomly? Input ``o`` for order or ``r`` for random:')
                         cycle_type = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
                         if not cycle_type:
                             return
