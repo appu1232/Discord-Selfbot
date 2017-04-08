@@ -71,6 +71,9 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. **When installing python, make sure you check "Add Python to PATH" in the install window.**
 
 **Windows:** Double click ``run.bat`` to start the bot. An anti-virus may warn you when you try to run it but let it pass. There is no malicious code here. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
+
+If you get errors, try holding ``Shift`` and right click in your bot folder. Select "Open command window here" and then in the window, type ``python -m pip install -r requirements.txt`` Try running ``run.bat`` now.
+
 Optionally, create a shortcut to the .bat file and [add it to startup](http://www.computerhope.com/issues/ch000322.htm) so you don't have to remember to run it every time.
 
 **Mac/Linux:** Navigate to the bot's folder in terminal/shell and run: ``pip install -r requirements.txt`` Once it's finished, run: ``python loopself.py`` to start the bot.
@@ -174,7 +177,11 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that. Deleted messages can be quoted.
 ![quote](https://cloud.githubusercontent.com/assets/14967932/24776240/f509e02a-1aed-11e7-95f5-6ecf30eb367a.gif)
 
-- ``>embed <words>`` - Make an embed out of the message.
+- ``>embed <words>`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax. Example:
+![img](https://i.imgur.com/0VBktGI.png)
+
+  + Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
+
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 
 ## Custom Commands:

@@ -40,7 +40,7 @@ class Misc:
         await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
         await self.bot.delete_message(ctx.message)
 
-    @commands.command(pass_context=True)
+    @commands.command(aliases=['status'], pass_context=True)
     async def stats(self, ctx):
         """Bot stats."""
         uptime = (datetime.datetime.now() - self.bot.uptime)
@@ -72,11 +72,73 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
+    # Embeds the message
     @commands.command(pass_context=True)
-    async def embed(self, ctx, *, msg):
+    async def embed(self, ctx):
+
         """Embed given text. Ex: >embed some stuff"""
-        em = discord.Embed(description=msg)
-        await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        if ctx.message.content[6:].strip():
+            msg = ctx.message.content[6:].strip()
+            title = description = image = thumbnail = color = footer = author = None
+            embed_values = msg.split('|')
+            for i in embed_values:
+                if i.strip().lower().startswith('title='):
+                    title = i.strip()[6:].strip()
+                elif i.strip().lower().startswith('description='):
+                    description = i.strip()[12:].strip()
+                elif i.strip().lower().startswith('desc='):
+                    description = i.strip()[5:].strip()
+                elif i.strip().lower().startswith('image='):
+                    image = i.strip()[6:].strip()
+                elif i.strip().lower().startswith('thumbnail='):
+                    thumbnail = i.strip()[10:].strip()
+                elif i.strip().lower().startswith('colour='):
+                    color = i.strip()[7:].strip()
+                elif i.strip().lower().startswith('color='):
+                    color = i.strip()[6:].strip()
+                elif i.strip().lower().startswith('footer='):
+                    footer = i.strip()[7:].strip()
+                elif i.strip().lower().startswith('author='):
+                    author = i.strip()[7:].strip()
+            if color:
+                if not color.startswith('0x'):
+                    color = '0x' + color
+            if color:
+                em = discord.Embed(title=title, description=description, color=int(color, 16))
+            else:
+                em = discord.Embed(title=title, description=description)
+            for i in embed_values:
+                if i.strip().lower().startswith('field='):
+                    field_inline = True
+                    field = i.strip().lstrip('field=')
+                    field_name, field_value = field.split('value=')
+                    if 'inline=' in field_value:
+                        field_value, field_inline = field_value.split('inline=')
+                        if 'false' in field_inline.lower() or 'no' in field_inline.lower():
+                            field_inline = False
+                    field_name = field_name.strip().lstrip('name=')
+                    em.add_field(name=field_name, value=field_value.strip(), inline=field_inline)
+            if author:
+                if 'icon=' in author:
+                    text, icon = author.split('icon=')
+                    em.set_author(name=text.strip()[5:], icon_url=icon)
+                else:
+                    em.set_author(name=author)
+
+            if image:
+                em.set_image(url=image)
+            if thumbnail:
+                em.set_thumbnail(url=thumbnail)
+            if footer:
+                if 'icon=' in footer:
+                    text, icon = footer.split('icon=')
+                    em.set_footer(text=text.strip()[5:], icon_url=icon)
+                else:
+                    em.set_footer(text=footer)
+            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        else:
+            msg = '**How to use the >embed command:**\n**Example:** >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\n**You do NOT need to specify every property, only the ones you want.**\n**All properties and the syntax:**\ntitle=words\ndescription=words\ncolor=hexvalue\nimage=url_to_image (must be https)\nthumbnail=url_to_image\nauthor=words **OR** author=name=words icon=url_to_image\nfooter=words **OR** footer=name=words icon=url_to_image\nfield=name=words value=words (you can add as many fields as you want)\n\n**NOTE:** After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.'
+            await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
     # Stats about current server

@@ -369,10 +369,9 @@ def remove_alllog(channel, server):
 # Set/cycle game
 async def game(bot):
     await bot.wait_until_ready()
-    await bot.wait_until_login()
     current_game = 0
     next_game = 0
-    while True:
+    while not bot.is_closed:
         if hasattr(bot, 'game_time') and hasattr(bot, 'game'):
             if bot.game:
                 if bot.game_interval:
@@ -407,10 +406,9 @@ async def game(bot):
 # Set/cycle avatar
 async def avatar(bot):
     await bot.wait_until_ready()
-    await bot.wait_until_login()
     current_avatar = 0
     next_avatar = 0
-    while True:
+    while not bot.is_closed:
         if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
             if bot.avatar:
                 if bot.avatar_interval:
