@@ -93,8 +93,11 @@ async def on_ready():
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r') as g:
             games = json.load(g)
-        bot.game_interval = games['interval']
-        bot.game = games['games'][0]
+        if type(games['games']) is list:
+            bot.game = games['games'][0]
+            bot.game_interval = games['interval']
+        else:
+            bot.game = games['games']
     if not os.path.exists('settings/avatars'):
         os.makedirs('settings/avatars')
     if not os.path.isfile('settings/avatars.json'):
