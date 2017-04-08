@@ -1,4 +1,6 @@
 @echo off
+SET root=%~dp0
+CD /D %root%
 SETLOCAL EnableDelayedExpansion
 type cogs\utils\credit.txt
 echo[
