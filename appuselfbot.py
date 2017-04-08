@@ -398,8 +398,9 @@ async def game(bot):
                     if game_time_check(bot, bot.game_time, 180):
                         with open('settings/games.json') as g:
                             games = json.load(g)
-                        bot.game = games['games'][0]
-                        await bot.change_presence(game=discord.Game(name=games['games'][0]))
+
+                        bot.game = games['games']
+                        await bot.change_presence(game=discord.Game(name=games['games']))
 
         await asyncio.sleep(5)
 
@@ -436,14 +437,6 @@ async def avatar(bot):
                             bot.avatar = all_avis[next_avatar]
                             with open('settings/avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
-
-
-                else:
-                    if game_time_check(bot, bot.game_time, 180):
-                        with open('settings/games.json') as g:
-                            games = json.load(g)
-                        bot.game = games['games'][0]
-                        await bot.change_presence(game=discord.Game(name=games['games'][0]))
 
         await asyncio.sleep(5)
 

@@ -4,7 +4,7 @@ type cogs\utils\credit.txt
 echo[
 echo[
 git init . >nul || goto :git
-git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul
+git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul 2>&1
 git remote show origin > tmp.txt
 set findfile="tmp.txt"
 set findtext="up"
