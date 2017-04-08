@@ -272,8 +272,8 @@ class Misc:
 
             # Set game if only one game is given.
             else:
-                self.bot.game = game
                 self.bot.game_interval = None
+                self.bot.game = game
                 games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none'}
                 with open('settings/games.json', 'w') as g:
                     json.dump(games, g, indent=4)
@@ -282,8 +282,8 @@ class Misc:
 
         # Remove game status.
         else:
-            self.bot.game = None
             self.bot.game_interval = None
+            self.bot.game = None
             await self.bot.change_presence(game=None)
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set playing status off')
             if os.path.isfile('settings/games.json'):
