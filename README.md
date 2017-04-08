@@ -164,6 +164,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 **Misc**
 
 - ``>about`` - link to this github project
+- ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
 - ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler Book He lives`` or ``>spoiler Some movie | He was his brother all along``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
@@ -172,12 +173,15 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
 ![img](http://i.imgur.com/n4mSRyD.png)
-- ``>ping`` - Responds with ``pong`` and also gives the response time.
+- ``>embed`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax. Example:
+
+![img](https://i.imgur.com/0VBktGI.png)
+  + Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that. Deleted messages can be quoted.
 ![quote](https://cloud.githubusercontent.com/assets/14967932/24776240/f509e02a-1aed-11e7-95f5-6ecf30eb367a.gif)
 
-- ``>embed <words>`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax. Example:
+- ``>embed`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax. Example:
 ![img](https://i.imgur.com/0VBktGI.png)
 
   + Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
