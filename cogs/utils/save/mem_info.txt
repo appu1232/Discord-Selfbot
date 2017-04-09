@@ -1,0 +1,1 @@
+'{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024**2)
