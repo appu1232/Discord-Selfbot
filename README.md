@@ -73,8 +73,6 @@ Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) a
 
 **Windows:** Double click ``run.bat`` to start the bot. An anti-virus may warn you when you try to run it but let it pass. There is no malicious code here. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
 
-If you get errors, try holding ``Shift`` and right click in your bot folder. Select "Open command window here" and then in the window, type ``python -m pip install -r requirements.txt`` Try running ``run.bat`` now.
-
 Optionally, create a shortcut to the .bat file and [add it to startup](http://www.computerhope.com/issues/ch000322.htm) so you don't have to remember to run it every time.
 
 **Mac/Linux:** Navigate to the bot's folder in terminal/shell and run: ``pip install -r requirements.txt`` Once it's finished, run: ``python loopself.py`` to start the bot.
@@ -314,7 +312,7 @@ Follow these steps to obtain them:
 
 ## Acknowledgements
 
-- Thanks to [adjnouobsref](https://github.com/adjnouobsref) for the spoiler tags.
+- Thanks to [adjnouobsref](https://github.com/adjnouobsref) for the spoiler tags and various other contributions.
 - Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards and the debugger.
 - Used [eye-sigil's](https://github.com/eye-sigil) code for the >repl command.
 - Thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
