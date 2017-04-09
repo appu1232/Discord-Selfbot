@@ -27,7 +27,6 @@ goto run
 	echo d | xcopy settings tmp /E >nul
 	ren settings settings2
 	del tmp.txt
-	git diff master...origin/master
 	git reset --hard FETCH_HEAD >nul
 	git pull origin master > tmp.txt
 	set findfile="tmp.txt"
