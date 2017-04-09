@@ -2,9 +2,6 @@
 SET root=%~dp0
 CD /D %root%
 SETLOCAL EnableDelayedExpansion
-type cogs\utils\credit.txt
-echo[
-echo[
 python -V >nul 2>&1 || goto :python
 git init . >nul || goto :git
 git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul 2>&1
@@ -30,7 +27,8 @@ goto run
 	echo d | xcopy settings tmp /E >nul
 	ren settings settings2
 	del tmp.txt
-	git reset --hard FETCH_HEAD
+	git diff master...origin/master
+	git reset --hard FETCH_HEAD >nul
 	git pull origin master > tmp.txt
 	set findfile="tmp.txt"
 	set findtext="Aborting"
@@ -45,14 +43,14 @@ goto run
 	TITLE Error!
 	echo Git not found, Download here: https://git-scm.com/downloads
 	echo Press any key to exit.
-	pause >nul 2>&1
+	pause >nul
 	CD /D "%root%"
 	goto :EOF
 :python
 	TITLE Error!
 	echo Python not added to PATH or not installed. Download Python 3.5.2 or above and make sure you add to PATH: https://i.imgur.com/KXgMcOK.png
 	echo Press any key to exit.
-	pause >nul 2>&1
+	pause >nul
 	CD /D "%root%"
 	goto :EOF
 :force
@@ -60,6 +58,9 @@ goto run
 	git reset --hard origin/master
 	echo Finished updating!
 :run
+	type cogs\utils\credit.txt
+	echo[
+	echo[
 	if exist settings2 (
 		if exist settings (
 			rmdir /s /q settings
@@ -71,6 +72,8 @@ goto run
 	)
 	FOR /f %%p in ('where python') do SET PYTHONPATH=%%p
 	echo Checking requirements...
+	chcp 65001
+	set PYTHONIOENCODING=utf-8
 	python -m pip install --upgrade pip >nul
 	python -m pip install -r requirements.txt >nul
 	echo Requirements satisifed.
