@@ -237,7 +237,7 @@ class Debugger:
             os.chdir('..')
 
     # Delete a saved cmd/script
-    @py.group(aliases=['del', 'rm'], pass_context=True)
+    @py.group(aliases=['rm'], pass_context=True)
     async def delete(self, ctx, *, msg: str):
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())

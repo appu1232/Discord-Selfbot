@@ -2,6 +2,8 @@ import spice_api as spice
 import requests
 import re
 import discord
+import asyncio
+import gc
 from discord.ext import commands
 from bs4 import BeautifulSoup
 from appuselfbot import bot_prefix
@@ -26,15 +28,16 @@ class Mal:
     # Anime search for Mal
     @mal.command(pass_context=True)
     async def anime(self, ctx, *, msg: str):
+        loop = asyncio.get_event_loop()
+        config = load_optional_config()
+        fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
         try:
             link = False
-            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
             try:
 
                 if msg.startswith('[link]'):
                     msg = msg[6:]
                     link = True
-                config = load_optional_config()
                 # Search google for the anime under site:myanimelist.net
                 searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net anime " + msg.strip() + "&start=" + '1' + "&key=" + \
                             config['google_api_key'] + "&cx=" + config[
@@ -43,18 +46,18 @@ class Mal:
                 response = r.content.decode('utf-8')
                 result = json.loads(response)
                 animeID = re.findall('/anime/(.*)/', str(result['items'][0]['link']))
-                results = spice.search_id(int(animeID[0]), spice.get_medium('anime'),
+                results = await loop.run_in_executor(None, spice.search_id, int(animeID[0]), spice.get_medium('anime'),
                                        spice.init_auth(config['mal_username'], config['mal_password']))
 
                 # If no results found or daily api limit exceeded, use spice's search
                 if not results:
-                    allresults = spice.search(msg.strip(), spice.get_medium('anime'),
+                    allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('anime'),
                                            spice.init_auth(config['mal_username'], config['mal_password']))
                     results = allresults[0]
 
             # On any exception, search spice instead
             except:
-                allresults = spice.search(msg.strip(), spice.get_medium('anime'),
+                allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('anime'),
                                        spice.init_auth(config['mal_username'], config['mal_password']))
                 results = allresults[0]
 
@@ -118,13 +121,17 @@ class Mal:
         except:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
             await self.bot.delete_message(fetch)
+        finally:
+            gc.collect()
 
     # Manga search for Mal
     @mal.command(pass_context=True)
     async def manga(self, ctx, *, msg: str):
+        loop = asyncio.get_event_loop()
+        config = load_optional_config()
+        fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
         try:
             link = False
-            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
             try:
 
                 if msg.startswith('[link]'):
@@ -139,17 +146,17 @@ class Mal:
                 response = r.content.decode('utf-8')
                 result = json.loads(response)
                 mangaID = re.findall('/manga/(.*)/', str(result['items'][0]['link']))
-                results = spice.search_id(int(mangaID[0]), spice.get_medium('manga'), spice.init_auth(config['mal_username'], config['mal_password']))
+                results = await loop.run_in_executor(None, spice.search_id, int(mangaID[0]), spice.get_medium('manga'), spice.init_auth(config['mal_username'], config['mal_password']))
 
                 # If no results found or daily api limit exceeded, use spice's search
                 if not results:
-                    allresults = spice.search(msg.strip(), spice.get_medium('manga'),
+                    allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('manga'),
                                            spice.init_auth(config['mal_username'], config['mal_password']))
                     results = allresults[0]
 
             # On any exception, search spice instead
             except:
-                allresults = spice.search(msg.strip(), spice.get_medium('manga'),
+                allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('manga'),
                                        spice.init_auth(config['mal_username'], config['mal_password']))
                 results = allresults[0]
 
@@ -212,6 +219,8 @@ class Mal:
         except:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
             await self.bot.delete_message(fetch)
+        finally:
+            gc.collect()
 
 
 def setup(bot):
