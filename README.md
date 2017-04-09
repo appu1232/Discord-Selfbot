@@ -9,7 +9,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 1. [Features](#features)
 2. [Setup](#setup)
 3. [Optional Setup](#optional-setup)
-4. [Running the Selfbot](#running-the-selfbot)
+4. [Running the selfbot](#running-the-selfbot)
 5. [All Commands](#all-commands)
 6. [Custom Commands](#custom-commands)
 7. [Keyword Notifier](#keyword-notifier)
@@ -39,7 +39,7 @@ Start off by setting up the ``config.json`` file in the ``settings`` folder:
 
 ```json
 {
-    "token" : "",
+    "token" : "your_token_here",
     "cmd_prefix": ">",
     "customcmd_prefix": ".",
     "bot_identifier": ":robot:"
@@ -68,7 +68,7 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 
 ## Running the selfbot
 
-Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. **When installing python, make sure you check "Add Python to PATH" in the install window.**
+Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. **When installing python, make sure you check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.**
 
 **Windows:** Double click ``run.bat`` to start the bot. An anti-virus may warn you when you try to run it but let it pass. There is no malicious code here. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
 

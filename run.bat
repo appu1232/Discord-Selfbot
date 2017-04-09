@@ -5,6 +5,7 @@ SETLOCAL EnableDelayedExpansion
 type cogs\utils\credit.txt
 echo[
 echo[
+python -V >nul 2>&1 || goto :python
 git init . >nul || goto :git
 git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul 2>&1
 git remote show origin > tmp.txt
@@ -47,19 +48,30 @@ goto run
 	pause >nul 2>&1
 	CD /D "%root%"
 	goto :EOF
+:python
+	TITLE Error!
+	echo Python not added to PATH or not installed. Download Python 3.5.2 or above and make sure you add to PATH: https://i.imgur.com/KXgMcOK.png
+	echo Press any key to exit.
+	pause >nul 2>&1
+	CD /D "%root%"
+	goto :EOF
 :force
 	git fetch --all
 	git reset --hard origin/master
+	echo Finished updating!
 :run
 	if exist settings2 (
-		rmdir /s /q settings
-		ren settings2 settings
+		if exist settings (
+			rmdir /s /q settings
+			ren settings2 settings
+		)
 	)
 	if exist tmp.txt (
 		del tmp.txt
 	)
 	FOR /f %%p in ('where python') do SET PYTHONPATH=%%p
 	echo Checking requirements...
+	python -m pip install --upgrade pip
 	python -m pip install -r requirements.txt >nul
 	echo Requirements satisifed.
 	echo Starting the bot (this may take a minute or two)...

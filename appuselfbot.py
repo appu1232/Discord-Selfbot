@@ -13,9 +13,9 @@ from cogs.webhook import *
 
 config = load_config()
 
-bot_prefix = config['bot_identifier'] + ' '
-if bot_prefix == ' ':
-    bot_prefix = ''
+bot_prefix = config['bot_identifier']
+if bot_prefix != '':
+    bot_prefix += ' '
 
 bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
 
