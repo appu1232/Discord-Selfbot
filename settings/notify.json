@@ -1,5 +1,5 @@
 {
-    "type": "msg",
+    "type": "none",
     "channel": "",
     "bot_token": "",
     "notify": "off",
