@@ -24,6 +24,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Set your game to anything or set up multiple and cycle through them.
 - Cycle through avatars automatically (minimum 5 minute interval).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
+- Custom embeds.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
@@ -302,11 +303,11 @@ Follow these steps to obtain them:
 
 1. Visit the [Google API Console](https://console.developers.google.com/). Once you are in the Console, create a new project.
 2. Go to ``Library`` and search ``Custom Search API``. Click it and enable it.
-3. Go to ``Credentials`` and click ``create credentials`` and choose ``API Key`` (no need to restrict the key). The value under "Key" is your api key. Paste this into the config.json under ``google_api_key``.
+3. Go to ``Credentials`` and click ``create credentials`` and choose ``API Key`` (no need to restrict the key). The value under "Key" is your api key. Paste this into the optional_config.json under ``google_api_key``.
 4. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
 5. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
 6. Make sure the ``Image search`` option is enabled and make sure to click the ``Update`` button at the bottom when you are done with the changes!
-6. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the config.json.
+6. Go to ``Details`` section and click ``Search Engine ID`` to grab the ID. Copy this and add it for ``custom_search_engine`` in the optional_config.json.
 
 **Note:** Google may take a little while to properly register your key so the search feature may not work right away. If it's still not working after a few hours, then you may have messed up somewhere.
 
