@@ -71,7 +71,7 @@ goto run
 	)
 	FOR /f %%p in ('where python') do SET PYTHONPATH=%%p
 	echo Checking requirements...
-	python -m pip install --upgrade pip
+	python -m pip install --upgrade pip >nul
 	python -m pip install -r requirements.txt >nul
 	echo Requirements satisifed.
 	echo Starting the bot (this may take a minute or two)...
