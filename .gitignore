@@ -3,3 +3,5 @@ discord.log
 commands.json
 config.json
 .idea/
+*~
+*__pycache__*
