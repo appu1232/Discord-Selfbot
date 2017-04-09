@@ -4,7 +4,7 @@ Come join the dedicated server for this bot: https://discord.gg/TBQE72k Feel fre
 
 Takes less than 5 minutes to set up. Has various commands and utilities, keyword logger/notifier, and adding custom commands. A few examples:
 
-![main](https://cloud.githubusercontent.com/assets/14967932/24776520/22878bf0-1aef-11e7-8e28-fc7a01d3d188.gif)
+![](http://i.imgur.com/3H9zpop.gif)
 
 1. [Features](#features)
 2. [Setup](#setup)
