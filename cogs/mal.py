@@ -48,17 +48,20 @@ class Mal:
                 animeID = re.findall('/anime/(.*)/', str(result['items'][0]['link']))
                 results = await loop.run_in_executor(None, spice.search_id, int(animeID[0]), spice.get_medium('anime'),
                                        spice.init_auth(config['mal_username'], config['mal_password']))
+                gc.collect()
 
                 # If no results found or daily api limit exceeded, use spice's search
                 if not results:
                     allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('anime'),
                                            spice.init_auth(config['mal_username'], config['mal_password']))
+                    gc.collect()
                     results = allresults[0]
 
             # On any exception, search spice instead
             except:
                 allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('anime'),
                                        spice.init_auth(config['mal_username'], config['mal_password']))
+                gc.collect()
                 results = allresults[0]
 
             # No results found for specified tags
@@ -121,8 +124,6 @@ class Mal:
         except:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
             await self.bot.delete_message(fetch)
-        finally:
-            gc.collect()
 
     # Manga search for Mal
     @mal.command(pass_context=True)
@@ -147,17 +148,20 @@ class Mal:
                 result = json.loads(response)
                 mangaID = re.findall('/manga/(.*)/', str(result['items'][0]['link']))
                 results = await loop.run_in_executor(None, spice.search_id, int(mangaID[0]), spice.get_medium('manga'), spice.init_auth(config['mal_username'], config['mal_password']))
+                gc.collect()
 
                 # If no results found or daily api limit exceeded, use spice's search
                 if not results:
                     allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('manga'),
                                            spice.init_auth(config['mal_username'], config['mal_password']))
+                    gc.collect()
                     results = allresults[0]
 
             # On any exception, search spice instead
             except:
                 allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('manga'),
                                        spice.init_auth(config['mal_username'], config['mal_password']))
+                gc.collect()
                 results = allresults[0]
 
             # No results found for specified tags
@@ -219,8 +223,6 @@ class Mal:
         except:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
             await self.bot.delete_message(fetch)
-        finally:
-            gc.collect()
 
 
 def setup(bot):
