@@ -175,17 +175,14 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 
 ![img](http://i.imgur.com/n4mSRyD.png)
 - ``>embed`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax. Example:
+	+ Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
 
 ![img](https://i.imgur.com/0VBktGI.png)
   + Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
+
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that. Deleted messages can be quoted.
-![quote](https://cloud.githubusercontent.com/assets/14967932/24776240/f509e02a-1aed-11e7-95f5-6ecf30eb367a.gif)
-
-- ``>embed`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax. Example:
-![img](https://i.imgur.com/0VBktGI.png)
-
-  + Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
+![quote](https://cloud.githubusercontent.com/assets/14967932/24776240/f509e02a-1aed-11e7-95f5-6ecf30eb367a.gif)  
 
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 
