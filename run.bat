@@ -9,11 +9,15 @@ git remote show origin > tmp.txt
 set findfile="tmp.txt"
 set findtext="up"
 findstr %findtext% %findfile% >nul 2>&1
-if errorlevel 1 goto prompt
-del tmp.txt
+if errorlevel 1 goto forward
 goto run
 
-
+:forward
+	set findfile="tmp.txt"
+	set forwardable="fast-forwardable"
+	findstr %forwardable% %findfile% >nul 2>&1
+	if errorlevel 1 goto prompt
+	goto run
 :prompt
 	choice /t 10 /c yn /d n /m "There is an update for the bot. Download now?"
 	if errorlevel 2 goto :run
@@ -27,14 +31,13 @@ goto run
 	echo d | xcopy settings tmp /E >nul
 	echo Backing up your settings...
 	ren settings settings2
-	del tmp.txt
 	echo Latest update:
 	git --no-pager log --pretty=oneline -n1 origin/master ^master
 	git pull origin master
 	if errorlevel 1 goto force
 	echo Finished updating
 	ping 127.0.0.1 -n 2 >nul
-	rmdir /s /q settings
+	rmdir /s /q settings >nul 2>&1
 	ren settings2 settings
 	echo Starting up...
 	ping 127.0.0.1 -n 4 >nul
@@ -64,6 +67,7 @@ goto run
 	echo Starting up...
 	ping 127.0.0.1 -n 4 >nul
 :run
+	if exist tmp.txt del tmp.txt
 	type cogs\utils\credit.txt
 	echo[
 	echo[
