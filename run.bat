@@ -25,19 +25,21 @@ goto run
 		del cogs\afk.py
 	)
 	echo d | xcopy settings tmp /E >nul
+	echo Backing up your settings...
 	ren settings settings2
 	del tmp.txt
-	git reset --hard FETCH_HEAD >nul
-	git pull origin master > tmp.txt
-	set findfile="tmp.txt"
-	set findtext="Aborting"
-	findstr %findtext% %findfile% >nul 2>&1
-	if errorlevel 0 goto force
+	echo Latest update:
+	git --no-pager log --pretty=oneline -n1 origin/master ^master
+	git pull origin master
+	if errorlevel 1 goto force
+	echo Finished updating
+	ping 127.0.0.1 -n 2 >nul
 	rmdir /s /q settings
 	ren settings2 settings
-	echo Finished updating!
-	pause
+	echo Starting up...
+	ping 127.0.0.1 -n 4 >nul
 	goto run
+	
 :git
 	TITLE Error!
 	echo Git not found, Download here: https://git-scm.com/downloads
@@ -55,20 +57,16 @@ goto run
 :force
 	git fetch --all
 	git reset --hard origin/master
-	echo Finished updating!
+	echo Finished updating
+	ping 127.0.0.1 -n 2 >nul
+	rmdir /s /q settings
+	ren settings2 settings
+	echo Starting up...
+	ping 127.0.0.1 -n 4 >nul
 :run
 	type cogs\utils\credit.txt
 	echo[
 	echo[
-	if exist settings2 (
-		if exist settings (
-			rmdir /s /q settings
-			ren settings2 settings
-		)
-	)
-	if exist tmp.txt (
-		del tmp.txt
-	)
 	FOR /f %%p in ('where python') do SET PYTHONPATH=%%p
 	echo Checking requirements...
 	chcp 65001 >nul
