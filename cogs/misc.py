@@ -52,10 +52,8 @@ class Misc:
         else:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
         try:
-            game = str(ctx.message.author.game)
+            game = self.bot.game
         except:
-            await self.bot.change_presence(game=None)
-            self.bot.game = None
             game = 'None'
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
