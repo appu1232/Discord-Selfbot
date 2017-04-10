@@ -8,7 +8,9 @@ import random
 import glob
 from datetime import timezone
 from cogs.utils.allmsgs import *
-from cogs.webhook import *
+from discord_webhooks import *
+from cogs.utils.checks import *
+from discord.ext import commands
 
 
 config = load_config()
@@ -307,11 +309,9 @@ async def on_message(message):
                         except:
                             pass
                         if notify['type'] == 'msg':
-                            bot.keyword_found = ['embed', em]
-                            await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
+                            await webhook(em, 'embed')
                         elif notify['type'] == 'ping':
-                            bot.keyword_found = ['embed msg', em]
-                            await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
+                            await webhook(em, 'embed ping')
                         else:
                             await bot.send_message(server.get_channel(location[0]), embed=em)
                     else:
@@ -326,20 +326,16 @@ async def on_message(message):
                         for b,i in enumerate(all_words):
                             if b == 0:
                                 if notify['type'] == 'msg':
-                                    bot.keyword_found = ['message', bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i)]
-                                    await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
+                                    await webhook(bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i), 'message')
                                 elif notify['type'] == 'ping':
-                                    bot.keyword_found = ['message msg', bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i)]
-                                    await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
+                                    await webhook(bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i), 'message ping')
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i))
                             else:
                                 if notify['type'] == 'msg':
-                                    bot.keyword_found = ['message', '```%s```' % i]
-                                    await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
+                                    await webhook('```%s```' % i, 'message')
                                 elif notify['type'] == 'ping':
-                                    bot.keyword_found = ['message msg', '```%s```' % i]
-                                    await bot.send_message(server.get_channel(location[0]), content='%sfound_key' % config['cmd_prefix'])
+                                    await webhook('```%s```' % i, 'message ping')
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), '```%s```' % i)
                     bot.keyword_log += 1
@@ -348,7 +344,6 @@ async def on_message(message):
             pass
 
     await bot.process_commands(message)
-
 
 def add_alllog(channel, server, message):
     if not hasattr(bot, 'all_log'):
@@ -365,6 +360,24 @@ def add_alllog(channel, server, message):
 def remove_alllog(channel, server):
     del bot.all_log[channel + ' ' + server]
 
+
+# Webhook for keyword notifications
+async def webhook(keyword_content, send_type):
+    temp = bot.log_conf['webhook_url'].split('/')
+    channel = temp[len(temp) - 2]
+    token = temp[len(temp) - 1]
+    webhook_class = Webhook(bot)
+    request_webhook = webhook_class.request_webhook
+    if send_type.startswith('embed'):
+        if 'ping' in send_type:
+            await request_webhook('/{}/{}'.format(channel, token), embeds=[keyword_content.to_dict()], content=bot.user.mention)
+        else:
+            await request_webhook('/{}/{}'.format(channel, token), embeds=[keyword_content.to_dict()], content=None)
+    else:
+        if 'ping' in send_type:
+            await request_webhook('/{}/{}'.format(channel, token), content=keyword_content + '\n' + bot.user.mention, embeds=None)
+        else:
+            await request_webhook('/{}/{}'.format(channel, token), content=keyword_content, embeds=None)
 
 # Set/cycle game
 async def game(bot):
