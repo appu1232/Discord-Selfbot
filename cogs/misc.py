@@ -6,6 +6,7 @@ import prettytable
 import strawpy
 import random
 import requests
+from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -17,22 +18,6 @@ class Misc:
 
     def __init__(self, bot):
         self.bot = bot
-
-    # Posts code to hastebin and retrieves link.
-    async def post_to_hastebin(self, string):
-        '''Posts a string to hastebin.'''
-        data = str(string).encode('utf-8')
-
-        url = 'https://hastebin.com/documents'
-        try:
-            response = requests.post(url, data=data)
-        except requests.exceptions.RequestException as e:
-            return 'Error'
-
-        try:
-            return 'https://hastebin.com/{}'.format(response.json()['key'])
-        except Exception as e:
-            return 'Error'
 
     @commands.command(pass_context=True)
     async def about(self, ctx):
@@ -162,6 +147,11 @@ class Misc:
             for i in server.members:
                 if str(i.status) == 'online':
                     online += 1
+            all_users = []
+            for user in ctx.message.server.members:
+                all_users.append('{}#{}'.format(user.name, user.discriminator))
+            all_users.sort()
+            all = '\n'.join(all_users)
             if embed_perms(ctx.message):
                 em = discord.Embed(color=0xea7938)
                 em.add_field(name='Name', value=server.name)
@@ -170,8 +160,10 @@ class Misc:
                 em.add_field(name='Currently Online', value=online)
                 em.add_field(name='Region', value=server.region)
                 em.add_field(name='Verification Level', value=str(server.verification_level))
-                em.add_field(name='Highest role:', value=server.role_hierarchy[0])
+                em.add_field(name='Highest role', value=server.role_hierarchy[0])
                 em.add_field(name='Default Channel', value=server.default_channel)
+                url = PythonGists.Gist(description='All Users in: %s' % server.name, content=str(all), name='server.txt')
+                em.add_field(name='All users', value=url)
                 em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=server.icon_url)
                 em.set_author(name='Server Info', icon_url='https://i.imgur.com/RHagTDg.png')
@@ -234,8 +226,8 @@ class Misc:
                 em.add_field(name='Mentionable', value=role.mentionable)
                 if len(all_users) > 10:
                     all = all.replace(', ', '\n')
-                    url = await self.post_to_hastebin(all)
-                    em.add_field(name='All Users', value='Long list, posted to hastebin:\n %s' % url, inline=False)
+                    url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, ctx.message.server.name), content=str(all), name='role.txt')
+                    em.add_field(name='All users', value='Long list, posted to Gist:\n %s' % url, inline=False)
                 else:
                     em.add_field(name='All Users', value=all, inline=False)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))

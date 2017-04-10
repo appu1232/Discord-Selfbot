@@ -6,11 +6,12 @@ import shutil
 import appuselfbot
 import glob
 import math
-import requests
+from PythonGists import PythonGists
 from discord.ext import commands
 from io import StringIO
 
 # Common imports that can be used by the debugger.
+import requests
 import json
 import gc
 import datetime
@@ -46,22 +47,6 @@ class Debugger:
     def __init__(self, bot):
         self.bot = bot
 
-    # Posts code to hastebin and retrieves link.
-    async def post_to_hastebin(self, string):
-        '''Posts a string to hastebin.'''
-        data = str(string).encode('utf-8')
-
-        url = 'https://hastebin.com/documents'
-        try:
-            response = requests.post(url, data=data)
-        except requests.exceptions.RequestException as e:
-            return 'Error'
-
-        try:
-            return 'https://hastebin.com/{}'.format(response.json()['key'])
-        except Exception as e:
-            return 'Error'
-
     # Executes/evaluates code. Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
     async def interpreter(self, env, code):
         if code.startswith('[m]'):
@@ -96,8 +81,8 @@ class Debugger:
             return appuselfbot.bot_prefix + '```{}```'.format(type(e).__name__ + ': ' + str(e))
 
         if len(str(result)) > 1950:
-            url = await self.post_to_hastebin(result)
-            return appuselfbot.bot_prefix + 'Large output. Posted to hastebin: %s' % url
+            url = PythonGists.Gist(description='Py output', content=str(result), name='output.txt')
+            return appuselfbot.bot_prefix + 'Large output. Posted to Gist: %s' % url
         else:
             if code_block:
                 return appuselfbot.bot_prefix + '```py\n{}\n```'.format(result)

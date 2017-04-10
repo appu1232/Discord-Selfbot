@@ -5,7 +5,7 @@ import aiohttp
 import inspect
 import traceback
 from contextlib import redirect_stdout
-import requests
+from PythonGists import PythonGists
 import io
 
 '''Module for an embeded python interpreter. More or less the same as the debugger module but with embeds.'''
@@ -31,21 +31,6 @@ class EmbedShell():
             err,
             '^',
             type(err).__name__)
-
-    async def post_to_hastebin(self, string):
-        '''Posts a string to hastebin.'''
-        data = string.encode('utf-8')
-
-        url = 'https://hastebin.com/documents'
-        try:
-            response = requests.post(url, data=data)
-        except requests.exceptions.RequestException as e:
-            return 'Error'
-
-        try:
-            return 'https://hastebin.com/{}'.format(response.json()['key'])
-        except Exception as e:
-            return 'Error'
 
     @commands.group(name='shell',
                     aliases=['ipython', 'repl',
@@ -150,10 +135,10 @@ class EmbedShell():
                         item,
                         history[item])
 
-                haste_url = await self.post_to_hastebin(history_string)
+                gist_url = PythonGists.Gist(description='Py output', content=str(history_string), name='output.txt')
                 return_msg = "[`Leaving shell session. " \
-                             "History hosted on hastebin.`]({})".format(
-                    haste_url)
+                             "History hosted on Gist.`]({})".format(
+                    gist_url)
 
                 self.repl_embeds[shell].add_field(
                     name="`>>> {}`".format(cleaned),
@@ -194,10 +179,10 @@ class EmbedShell():
                     if len(cleaned) > 800:
                         cleaned = "<Too big to be printed>"
                     if len(return_msg) > 800:
-                        haste_url = await self.post_to_hastebin(return_msg)
+                        gist_url = PythonGists.Gist(description='Py output', content=str(return_msg), name='output.txt')
                         return_msg = "[`SyntaxError too big to be printed. " \
-                                     "Hosted on hastebin.`]({})".format(
-                            haste_url)
+                                     "Hosted on Gist.`]({})".format(
+                            gist_url)
 
                     self.repl_embeds[shell].add_field(
                         name="`>>> {}`".format(cleaned),
@@ -250,12 +235,12 @@ class EmbedShell():
             try:
                 if fmt is not None:
                     if len(fmt) >= 800:
-                        haste_url = await self.post_to_hastebin(fmt)
+                        gist_url = PythonGists.Gist(description='Py output', content=str(fmt), name='output.txt')
                         self.repl_embeds[shell].add_field(
                             name="`>>> {}`".format(cleaned),
                             value="[`Content too big to be printed. "
-                                  "Hosted on hastebin.`]({})".format(
-                                haste_url),
+                                  "Hosted on Gist.`]({})".format(
+                                gist_url),
                             inline=False)
 
                         await self.bot.edit_message(

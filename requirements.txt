@@ -7,3 +7,4 @@ strawpy==1.1
 lxml
 discord.webhooks==0.0.3
 psutil==5.2.1
+PythonGists==1.1.3
