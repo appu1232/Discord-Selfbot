@@ -11,7 +11,7 @@ if hash git 2>/dev/null; then
 		cp -r settings tmp
 		mv settings settings2
 	fi
-	news=$(git remote show origin)
+	new=$(git remote show origin)
 	if [[ "${new}" =~ "up" ]] || [[ "${new}" =~ "fast-forwardable" ]] ; then
 		echo "The bot is up to date."
 		sleep 1
