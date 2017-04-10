@@ -5,7 +5,6 @@ import os
 import prettytable
 import strawpy
 import random
-import requests
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
@@ -617,6 +616,28 @@ class Misc:
             + '`\n' + bot_prefix + 'Use http://rot13.com to decode')
         except:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not encrypt spoiler.')
+
+    # Create gist of msg
+    @commands.group(pass_context=True)
+    async def gist(self, ctx):
+        """Posts to gist"""
+        if ctx.invoked_subcommand is None:
+            url = PythonGists.Gist(description='Created in channel: {} in server: {}'.format(ctx.message.channel, ctx.message.server), content=ctx.message.content[6:], name='Output')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Gist output: ' + url)
+            await self.bot.delete_message(ctx.message)
+
+    # Create gist of file
+    @gist.command(pass_context=True)
+    async def file(self, ctx, *, msg):
+        try:
+            with open(msg) as fp:
+                output = fp.read()
+                url = PythonGists.Gist(description='Created in channel: {} in server: {}'.format(ctx.message.channel, ctx.message.server), content=output, name=msg.replace('/', '.'))
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Gist output: ' + url)
+        except:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'File not found.')
+        finally:
+            await self.bot.delete_message(ctx.message)
 
 
 def setup(bot):

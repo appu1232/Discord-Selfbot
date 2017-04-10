@@ -1,5 +1,6 @@
 import math
 import re
+from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -36,18 +37,28 @@ class Customcmds:
                 else:
                     part += check
             msgs.append(part)
-            if len(msgs) == 1:
-                await self.bot.send_message(ctx.message.channel, '```css\n[List of Custom Commands]\n%s ```' % msgs[0].rstrip())
+            if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
+                msgs = '\n'.join(msgs)
+                url = PythonGists.Gist(description='Custom Commands', content=str(msgs), name='commands.txt')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'List of Custom Commands: %s' % url)
             else:
-                for b, i in enumerate(msgs):
-                    await self.bot.send_message(ctx.message.channel, '```css\n[List of Custom Commands %s/%s]\n%s ```' % (b + 1, len(msgs), i.rstrip()))
+                if len(msgs) == 1:
+                    await self.bot.send_message(ctx.message.channel, '```css\n[List of Custom Commands]\n%s ```' % msgs[0].rstrip())
+                else:
+                    for b, i in enumerate(msgs):
+                        await self.bot.send_message(ctx.message.channel, '```css\n[List of Custom Commands %s/%s]\n%s ```' % (b + 1, len(msgs), i.rstrip()))
         await self.bot.delete_message(ctx.message)
 
     @customcmds.command(pass_context=True)
     async def long(self, ctx):
         """Lists detailed version of customcmds."""
-        with open('settings/commands.json', 'r') as commands:
-            cmds = json.load(commands)
+        with open('settings/commands.json') as commands:
+            if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
+                cmds = commands.read()
+                link = PythonGists.Gist(description='a sample gist', content=cmds, name='test')
+                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Full commands.json: %s' % link)
+            else:
+                cmds = json.load(commands)
         msg = ''
         sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
         for cmd in sortedcmds:
