@@ -26,11 +26,10 @@ def custom(message):
         with open('settings/commands.json', 'r') as f:
             commands = json.load(f)
         for i in commands:
-            if message[1:].startswith(i.lower()):
+            if message[1:].lower().startswith(i.lower()):
 
                 # If the commands resulting reply is a list instead of a str
                 if type(commands[i]) is list:
-                    index = 0
                     try:
                         # If index from list is specified, get that result.
                         if message[len(i) + 1:].isdigit():
@@ -38,7 +37,7 @@ def custom(message):
                         else:
                             title = message[len(i) + 1:]
                             for b, j in enumerate(commands[i]):
-                                if j[0] == title.strip():
+                                if j[0].lower() == title.lower().strip():
                                     index = int(b)
                                     break
                         mimetype, encoding = mimetypes.guess_type(commands[i][index][1])
