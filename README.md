@@ -71,18 +71,23 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 
 Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. **When installing python, make sure you check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.**
 
-**Windows:** Double click ``run.bat`` to start the bot. An anti-virus may warn you when you try to run it but let it pass. There is no malicious code here. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
+**Windows:**
+
+Double click ``run.bat`` to start the bot. An anti-virus may warn you when you try to run it but let it pass. There is no malicious code here. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
 
 Optionally, create a shortcut to the .bat file and [add it to startup](http://www.computerhope.com/issues/ch000322.htm) so you don't have to remember to run it every time.
 
-**Mac/Linux:** Navigate to the bot's folder in terminal/shell and run: ``pip install -r requirements.txt`` Once it's finished, run: ``python loopself.py`` to start the bot.
+**Mac/Linux:**
+
+Navigate to the bot's folder in terminal/shell and run: ``bash run_linuxmac.sh`` If it doesn't work, do ``sudo bash run_linuxmac.sh``
+
+Alternatively if the bash script isn't working for you, do ``pip install -r requirements.txt`` (only need to do it the first time). Once it's finished, run: ``python loopself.py`` (or pip3 and python3 on some linux machines) to start the bot.
 
 **Updating the bot:**
 
-For Windows: The ``run.bat`` will prompt you when there's a new update on startup and will apply the update for you (it will save your settings). [You will need Git in order to do this.](https://git-scm.com/downloads)
+The respective script (``run.bat`` for Windows and ``run_linuxmac.sh`` for Mac/Linux) will prompt you when there's a new update on startup and will apply the update for you (it will save your settings). [You will need Git in order to do this.](https://git-scm.com/downloads)
 
-For Mac/Linux or if you want to update manually: Unless otherwise stated, all you need to do is save your ``settings`` folder and its contents, delete everything else, download the newest version, and then replace the ``settings`` folder with your ``settings`` folder. If you know how to use git properly, that option exists as well.
-
+Manual update: Unless otherwise stated, all you need to do is save your ``settings`` folder and its contents somewhere, delete everything else, download the newest version, and then replace the ``settings`` folder with your ``settings`` folder. If you know how to use git properly, that option exists as well.
 
 ## All Commands:
 - ``>restart`` - restart the bot.
