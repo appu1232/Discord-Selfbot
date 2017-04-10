@@ -30,7 +30,6 @@ def custom(message):
 
                 # If the commands resulting reply is a list instead of a str
                 if type(commands[i]) is list:
-                    index = 0
                     try:
                         # If index from list is specified, get that result.
                         if message[len(i) + 1:].isdigit():
