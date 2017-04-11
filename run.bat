@@ -28,15 +28,14 @@ goto run
 	if exist cogs\afk.py (
 		del cogs\afk.py
 	)
-	echo d | xcopy settings tmp /E >nul
 	echo Backing up your settings...
+	echo d | xcopy settings tmp /E >nul
 	ren settings settings2
 	echo Latest update:
 	git --no-pager log --pretty=oneline -n1 origin/master ^master
 	git pull origin master
 	if errorlevel 1 goto force
 	echo Finished updating
-	ping 127.0.0.1 -n 2 >nul
 	rmdir /s /q settings >nul 2>&1
 	ren settings2 settings
 	echo Starting up...
@@ -61,11 +60,11 @@ goto run
 	git fetch --all
 	git reset --hard origin/master
 	echo Finished updating
-	ping 127.0.0.1 -n 2 >nul
-	rmdir /s /q settings
+	rmdir /s /q settings >nul 2>&1
 	ren settings2 settings
 	echo Starting up...
 	ping 127.0.0.1 -n 4 >nul
+	goto run
 :run
 	if exist tmp.txt del tmp.txt
 	type cogs\utils\credit.txt
