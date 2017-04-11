@@ -20,7 +20,7 @@ bot_prefix = config['bot_identifier']
 if bot_prefix != '':
     bot_prefix += ' '
 
-bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''')
+bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
 
 
 # Startup
@@ -504,5 +504,4 @@ if __name__ == '__main__':
 
     bot.loop.create_task(game(bot))
     bot.loop.create_task(avatar(bot))
-    #bot.run(config['token'], bot=False)
-    bot.run('MjYwNjUxNDYxMTgzMTQzOTM4.C7nOmw.2ETuBQiEaL3nO2pQTTe3Z9b3WCQ')
+    bot.run(config['token'], bot=False)
