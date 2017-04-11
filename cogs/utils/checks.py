@@ -67,7 +67,7 @@ def update_bot(message):
         em = discord.Embed(color=0x24292E, title='Latest changes for the selfbot:')
         for i in range(int(version)-1):
             title = g.execute(["git", "log", "--format=%ar", "-n", "1", "%s" % commits[i]])
-            field = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "%s" % commits[i], "^%s" % commits[i+1]])
+            field = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--shortstat", "%s" % commits[i], "^%s" % commits[i+1]])
             field = field[8:].strip()
             link = 'https://github.com/appu1232/Discord-Selfbot/commit/%s' % commits[i]
             em.add_field(name=title, value='%s\n[Code changes](%s)' % (field, link), inline=False)
