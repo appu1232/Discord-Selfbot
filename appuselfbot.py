@@ -154,7 +154,6 @@ async def restart(ctx):
 async def update(ctx):
     """Update the bot if there is an update available."""
     if ctx.message.content:
-        print(ctx.message.content[7:].strip())
         if ctx.message.content[7:].strip() == 'show':
             latest = update_bot(False)
         else:
@@ -163,7 +162,8 @@ async def update(ctx):
         latest = update_bot(True)
     if latest:
         if not ctx.message.content[7:].strip() == 'show':
-            await bot.send_message(ctx.message.channel, content=None, embed=latest)
+            if embed_perms(ctx.message):
+                await bot.send_message(ctx.message.channel, content=None, embed=latest)
             await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
         else:
             await bot.send_message(ctx.message.channel, content=None, embed=latest)
