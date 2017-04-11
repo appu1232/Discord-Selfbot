@@ -24,7 +24,6 @@ goto run
 	if errorlevel 1 goto :update
 :update
 	echo Starting update...
-	pause
 	if exist tmp del /F /Q tmp
 	if exist cogs\afk.py (
 		del cogs\afk.py
