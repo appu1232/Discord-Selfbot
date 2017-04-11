@@ -143,12 +143,20 @@ async def restart(ctx):
         reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
         if not reply or reply.content.lower().strip() == 'n':
             with open('restart.txt', 'w') as re:
+                print('Restarting...')
                 re.write(str(ctx.message.channel.id))
             await bot.send_message(ctx.message.channel, bot_prefix + 'Restarting...')
         else:
             with open('quit.txt', 'w') as q:
                 q.write('update')
+            print('Downloading update and restarting...')
             await bot.send_message(ctx.message.channel, bot_prefix + 'Downloading update and restarting (check your console to see the progress)...')
+
+    else:
+        print('Restarting...')
+        with open('restart.txt', 'w') as re:
+            re.write(str(ctx.message.channel.id))
+        await bot.send_message(ctx.message.channel, bot_prefix + 'Restarting...')
 
     if bot.subpro:
         bot.subpro.kill()
