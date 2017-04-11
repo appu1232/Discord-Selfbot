@@ -5,6 +5,7 @@ import subprocess
 import asyncio
 import random
 import glob
+import gc
 from datetime import timezone
 from cogs.utils.allmsgs import *
 from discord_webhooks import *
@@ -48,6 +49,8 @@ async def on_ready():
         bot.keyword_log = 0
     if not hasattr(bot, 'refresh_time'):
         bot.refresh_time = time.time()
+    if not hasattr(bot, 'gc_time'):
+        bot.gc_time = time.time()
     if not hasattr(bot, 'game'):
         bot.game = None
     if not hasattr(bot, 'game_interval'):
@@ -219,14 +222,6 @@ async def on_message(message):
     await bot.wait_until_login()
     if hasattr(bot, 'message_count'):
         bot.message_count += 1
-
-    # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
-    if hasattr(bot, 'refresh_time'):
-        if has_passed(bot, bot.refresh_time):
-            if bot.game:
-                await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
-            else:
-                await bot.change_presence(status='invisible', afk=True)
 
     # If the message was sent by me
     if message.author.id == bot.user.id:
@@ -451,6 +446,18 @@ async def game(bot):
 
                         bot.game = games['games']
                         await bot.change_presence(game=discord.Game(name=games['games']))
+
+        # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
+        if hasattr(bot, 'refresh_time'):
+            if has_passed(bot, bot.refresh_time):
+                if bot.game:
+                    await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
+                else:
+                    await bot.change_presence(status='invisible', afk=True)
+
+        if hasattr(bot, 'gc_time'):
+            if gc_clear(bot, bot.gc_time):
+                gc.collect()
 
         await asyncio.sleep(5)
 

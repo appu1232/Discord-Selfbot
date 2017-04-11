@@ -26,6 +26,13 @@ def has_passed(bot, oldtime):
     return True
 
 
+def gc_clear(bot, gc_time):
+    if time.time() - 1800 < gc_time:
+        return False
+    bot.gc_time = time.time()
+    return True
+
+
 def game_time_check(bot, oldtime, interval):
     if time.time() - float(interval) < oldtime:
         return False
