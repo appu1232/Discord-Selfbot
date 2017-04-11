@@ -1,7 +1,6 @@
 import collections
 import datetime
 import math
-import os
 import subprocess
 import asyncio
 import random
@@ -11,6 +10,7 @@ from cogs.utils.allmsgs import *
 from discord_webhooks import *
 from cogs.utils.checks import *
 from discord.ext import commands
+
 
 
 config = load_config()
@@ -132,13 +132,43 @@ async def on_ready():
 @bot.command(pass_context=True, aliases=['reboot'])
 async def restart(ctx):
     """Restarts the bot."""
-    print('Restarting...')
-    await bot.edit_message(ctx.message, bot_prefix + 'Restarting...')
+    def check(msg):
+        if msg:
+            return msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n'
+        else:
+            return False
+
+    if update_bot():
+        await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
+        reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
+        if not reply or reply.content.lower().strip() == 'n':
+            with open('restart.txt', 'w') as re:
+                re.write(str(ctx.message.channel.id))
+            await bot.send_message(ctx.message.channel, bot_prefix + 'Restarting...')
+        else:
+            with open('quit.txt', 'w') as q:
+                q.write('update')
+            await bot.send_message(ctx.message.channel, bot_prefix + 'Downloading update and restarting (check your console to see the progress)...')
+
     if bot.subpro:
         bot.subpro.kill()
-    with open('restart.txt', 'w') as re:
-        re.write(str(ctx.message.channel.id))
     os._exit(0)
+
+
+@bot.command(pass_context=True, aliases=['upgrade'])
+async def update(ctx):
+    """Update the bot if there is an update available."""
+    if update_bot():
+        await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
+        with open('quit.txt', 'w') as q:
+            q.write('update')
+        with open('restart.txt', 'w') as re:
+            re.write(str(ctx.message.channel.id))
+        if bot.subpro:
+            bot.subpro.kill()
+        os._exit(0)
+    else:
+        await bot.send_message(ctx.message.channel, bot_prefix + 'The bot is up to date.')
 
 
 @bot.command(pass_context=True, aliases=['exit'])

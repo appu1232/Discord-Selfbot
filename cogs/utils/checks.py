@@ -1,5 +1,7 @@
 import json
 import time
+import git
+import os
 
 
 def load_config():
@@ -36,6 +38,15 @@ def avatar_time_check(bot, oldtime, interval):
         return False
     bot.avatar_time = time.time()
     return True
+
+
+def update_bot():
+    g = git.cmd.Git(working_dir=os.getcwd())
+    update = g.execute(["git", "remote", "show", "origin"])
+    if 'up to date' in update or 'fast-forwarding' in update:
+        return False
+    else:
+        return True
 
 
 def embed_perms(message):

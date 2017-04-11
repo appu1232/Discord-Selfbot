@@ -24,6 +24,7 @@ goto run
 	if errorlevel 1 goto :update
 :update
 	echo Starting update...
+	pause
 	if exist tmp del /F /Q tmp
 	if exist cogs\afk.py (
 		del cogs\afk.py
@@ -80,3 +81,4 @@ goto run
 	echo Requirements satisifed.
 	echo Starting the bot (this may take a minute or two)...
 	python loopself.py
+	if %ERRORLEVEL% == 15 goto update

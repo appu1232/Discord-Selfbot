@@ -1,7 +1,7 @@
 import discord
 import datetime
 import asyncio
-import os
+import git
 import prettytable
 import strawpy
 import random
@@ -24,7 +24,7 @@ class Misc:
         await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
         await self.bot.delete_message(ctx.message)
 
-    @commands.command(aliases=['status'], pass_context=True)
+    @commands.group(aliases=['status'], pass_context=True)
     async def stats(self, ctx):
         """Bot stats."""
         uptime = (datetime.datetime.now() - self.bot.uptime)
@@ -48,6 +48,20 @@ class Misc:
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
             em.add_field(name=u'\U0001F3AE Game', value=game)
+            try:
+                g = git.cmd.Git(working_dir=os.getcwd())
+                version = g.execute(["git", "rev-list", "--count", "master...origin/master"])
+                if version == '0':
+                    status = 'Up to date.'
+                elif version == '1':
+                    status = 'Behind by 1 release.'
+                else:
+                    status = '%s releases behind.' % version
+                em.add_field(name=u'\U0001f4bb Update status:', value=status)
+            except:
+                pass
+            mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024**2)
+            em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
             msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), game)
