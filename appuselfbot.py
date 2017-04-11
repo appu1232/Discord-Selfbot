@@ -20,7 +20,7 @@ bot_prefix = config['bot_identifier']
 if bot_prefix != '':
     bot_prefix += ' '
 
-bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
+bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''')
 
 
 # Startup
@@ -31,44 +31,26 @@ async def on_ready():
         print(bot.user.name)
     except:
         print(bot.user.name.encode("utf-8"))
-    print('User id:' + bot.user.id)
+    print('User id:' + str(bot.user.id))
     print('------')
-    if not hasattr(bot, 'uptime'):
-        bot.uptime = datetime.datetime.now()
-    if not hasattr(bot, 'icount'):
-        bot.icount = 0
-    if not hasattr(bot, 'message_count'):
-        bot.message_count = 0
-    if not hasattr(bot, 'mention_count'):
-        bot.mention_count = 0
-    if not hasattr(bot, 'self_log'):
-        bot.self_log = {}
-    if not hasattr(bot, 'all_log'):
-        bot.all_log = {}
-    if not hasattr(bot, 'keyword_log'):
-        bot.keyword_log = 0
-    if not hasattr(bot, 'refresh_time'):
-        bot.refresh_time = time.time()
-    if not hasattr(bot, 'gc_time'):
-        bot.gc_time = time.time()
-    if not hasattr(bot, 'game'):
-        bot.game = None
-    if not hasattr(bot, 'game_interval'):
-        bot.game_interval = None
-    if not hasattr(bot, 'avatar'):
-        bot.avatar = None
-    if not hasattr(bot, 'avatar_interval'):
-        bot.avatar_interval = None
-    if not hasattr(bot, 'game_time'):
-        bot.game_time = time.time()
-    if not hasattr(bot, 'avatar_time'):
-        bot.avatar_time = time.time()
-    if not hasattr(bot, 'subpro'):
-        bot.subpro = None
-    if not hasattr(bot, 'keyword_found'):
-        bot.keyword_found = None
-    if not hasattr(bot, 'log_conf'):
-        bot.log_conf = None
+    bot.uptime = datetime.datetime.now()
+    bot.icount = 0
+    bot.message_count = 0
+    bot.mention_count = 0
+    bot.self_log = {}
+    bot.all_log = {}
+    bot.keyword_log = 0
+    bot.refresh_time = time.time()
+    bot.gc_time = time.time()
+    bot.game = None
+    bot.game_interval = None
+    bot.avatar = None
+    bot.avatar_interval = None
+    bot.game_time = time.time()
+    bot.avatar_time = time.time()
+    bot.subpro = None
+    bot.keyword_found = None
+
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
@@ -141,7 +123,8 @@ async def restart(ctx):
         else:
             return False
 
-    if update_bot():
+    latest = update_bot(True)
+    if latest:
         await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
         reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
         if not reply or reply.content.lower().strip() == 'n':
@@ -150,6 +133,7 @@ async def restart(ctx):
                 re.write(str(ctx.message.channel.id))
             await bot.send_message(ctx.message.channel, bot_prefix + 'Restarting...')
         else:
+            await bot.send_message(ctx.message.channel, content=None, embed=latest)
             with open('quit.txt', 'w') as q:
                 q.write('update')
             print('Downloading update and restarting...')
@@ -169,8 +153,21 @@ async def restart(ctx):
 @bot.command(pass_context=True, aliases=['upgrade'])
 async def update(ctx):
     """Update the bot if there is an update available."""
-    if update_bot():
-        await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
+    if ctx.message.content:
+        print(ctx.message.content[7:].strip())
+        if ctx.message.content[7:].strip() == 'show':
+            latest = update_bot(False)
+        else:
+            latest = update_bot(True)
+    else:
+        latest = update_bot(True)
+    if latest:
+        if not ctx.message.content[7:].strip() == 'show':
+            await bot.send_message(ctx.message.channel, content=None, embed=latest)
+            await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
+        else:
+            await bot.send_message(ctx.message.channel, content=None, embed=latest)
+            return
         with open('quit.txt', 'w') as q:
             q.write('update')
         with open('restart.txt', 'w') as re:
@@ -507,4 +504,5 @@ if __name__ == '__main__':
 
     bot.loop.create_task(game(bot))
     bot.loop.create_task(avatar(bot))
-    bot.run(config['token'], bot=False)
+    #bot.run(config['token'], bot=False)
+    bot.run('MjYwNjUxNDYxMTgzMTQzOTM4.C7nOmw.2ETuBQiEaL3nO2pQTTe3Z9b3WCQ')

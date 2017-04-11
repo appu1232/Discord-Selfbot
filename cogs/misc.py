@@ -48,21 +48,24 @@ class Misc:
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
             em.add_field(name=u'\U0001F3AE Game', value=game)
+            mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024**2)
+            em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
                 g.execute(["git", "fetch", "origin", "master"])
                 version = g.execute(["git", "rev-list", "--count", "master...origin/master"])
+                if version != '0':
+                    latest = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version])
+                    gist_latest = PythonGists.Gist(description='Py output', content=latest, name='output.txt')
                 if version == '0':
                     status = 'Up to date.'
                 elif version == '1':
-                    status = 'Behind by 1 release.'
+                    status = 'Behind by 1 release. [Pending update.](%s)' % gist_latest
                 else:
-                    status = '%s releases behind.' % version
+                    status = '%s releases behind. [Pending updates.](%s)' % (version, gist_latest)
                 em.add_field(name=u'\U0001f4bb Update status:', value=status)
             except:
-                pass
-            mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024**2)
-            em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
+                raise
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
             msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), game)
