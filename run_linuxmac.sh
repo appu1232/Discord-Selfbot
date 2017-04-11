@@ -8,7 +8,7 @@ updater () {
 		echo "Fetching origin"
 		git init >/dev/null 2>&1
 		git remote add origin https://github.com/appu1232/Discord-Selfbot.git >/dev/null 2>&1
-		git fetch origin
+		git fetch origin master
 		if [ -d "settings" ]; then
 			cp -r settings tmp
 			mv settings settings2
