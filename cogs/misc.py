@@ -50,6 +50,7 @@ class Misc:
             em.add_field(name=u'\U0001F3AE Game', value=game)
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
+                g.execute(["git", "fetch", "origin", "master"])
                 version = g.execute(["git", "rev-list", "--count", "master...origin/master"])
                 if version == '0':
                     status = 'Up to date.'
