@@ -55,7 +55,7 @@ class Customcmds:
         with open('settings/commands.json') as commands:
             if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
                 cmds = commands.read()
-                link = PythonGists.Gist(description='a sample gist', content=cmds, name='test')
+                link = PythonGists.Gist(description='Full commands.json', content=cmds, name='commands.json')
                 return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Full commands.json: %s' % link)
             else:
                 cmds = json.load(commands)
