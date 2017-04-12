@@ -106,15 +106,12 @@ async def on_ready():
     with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['type'] == 'dm':
-        if not os.path.isfile('notifs.txt'):
-            with open('notifs.txt', 'w') as f:
-                f.write('.')
-            try:
-                bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
-            except (SyntaxError, FileNotFoundError):
-                bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
-            except:
-                pass
+        try:
+            bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+        except (SyntaxError, FileNotFoundError):
+            bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+        except:
+            pass
 
 
 @bot.command(pass_context=True, aliases=['reboot'])
@@ -225,28 +222,29 @@ async def on_message(message):
 
     # If the message was sent by me
     if message.author.id == bot.user.id:
-        if message.channel.id not in bot.self_log:
-            bot.self_log[message.channel.id] = collections.deque(maxlen=100)
-        bot.self_log[message.channel.id].append(message)
-        bot.icount += 1
-        if message.content.startswith(config['customcmd_prefix'][0]):
-            response = custom(message.content.lower().strip())
-            if response is None:
-                pass
-            else:
-                if response[0] == 'embed' and embed_perms(message):
-                    try:
-                        await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
-                    except:
-                        await bot.send_message(message.channel, response[1])
+        if hasattr(bot, 'self_log'):
+            if message.channel.id not in bot.self_log:
+                bot.self_log[message.channel.id] = collections.deque(maxlen=100)
+            bot.self_log[message.channel.id].append(message)
+            bot.icount += 1
+            if message.content.startswith(config['customcmd_prefix'][0]):
+                response = custom(message.content.lower().strip())
+                if response is None:
+                    pass
                 else:
-                    await bot.send_message(message.channel, response[1])
-                await bot.delete_message(message)
-        else:
-            response = quickcmds(message.content.lower().strip())
-            if response:
-                await bot.delete_message(message)
-                await bot.send_message(message.channel, response)
+                    if response[0] == 'embed' and embed_perms(message):
+                        try:
+                            await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
+                        except:
+                            await bot.send_message(message.channel, response[1])
+                    else:
+                        await bot.send_message(message.channel, response[1])
+                    await bot.delete_message(message)
+            else:
+                response = quickcmds(message.content.lower().strip())
+                if response:
+                    await bot.delete_message(message)
+                    await bot.send_message(message.channel, response)
 
     notified = message.mentions
     if notified:

@@ -50,8 +50,4 @@ async def on_message(message):
 async def on_ready():
     pass
 
-
-if not os.path.isfile('notifs.txt'):
-    with open('notifs.txt', 'w') as f:
-        f.write('.')
-    bot.run(notif["bot_token"])
+bot.run(notif["bot_token"])
