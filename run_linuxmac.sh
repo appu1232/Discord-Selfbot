@@ -47,8 +47,39 @@ updater () {
 		echo "You do not have git installed. Auto-update is not currently supported" # TODO HTTP update
 		echo "Git is almost certainly available from your package manager. Install with:"
 		echo "sudo apt-get install git-all"
+	fi	
+}
+
+min_updater() {
+	if hash git 2>/dev/null; then
+		if [ -d "settings" ]; then
+			cp -r settings tmp
+			mv settings settings2
+		fi
+		git fetch origin master
+		echo ""
+		echo "Installing update"
+		echo "Updating to latest stable build."
+		if git pull origin master ; then 
+			echo "Update succeeded"
+			sleep 2
+		else
+			echo "Pull failed, attempting to hard reset to origin master (settings are still saved)"
+			git fetch --all
+			git reset --hard origin/master
+			echo "Update succeeded"
+			sleep 2
+		fi
+		sleep 1
+		if [ -d "settings2" ]; then
+				mv settings2 settings
+		
+		fi
+	else
+		echo "You do not have git installed. Auto-update is not currently supported" # TODO HTTP update
+		echo "Git is almost certainly available from your package manager. Install with:"
+		echo "sudo apt-get install git-all"
 	fi
-	
 }
 
 run_bot() {
@@ -61,13 +92,11 @@ run_bot() {
 				python3 loopself.py
 				ret=$?
 				if [ $ret == "15" ]; then
-					updater
+					min_updater
 					run_bot
 				else
 					echo "Shutting down"
 				fi
-				updater
-				run_bot
 			else
 				echo "Requirements installation failed"
 				exit 254
@@ -82,13 +111,11 @@ run_bot() {
 					python3 loopself.py
 					ret=$?
 					if [ $ret == "15" ]; then
-						updater
+						min_updater
 						run_bot
 					else
 						echo "Shutting down"
 					fi
-					updater
-					run_bot
 				else
 					echo "Requirements installation failed"
 					exit 254
@@ -117,7 +144,7 @@ run_bot() {
 				python loopself.py
 				ret=$?
 				if [ $ret == "15" ]; then
-					updater
+					min_updater
 					run_bot
 				else
 					echo "Shutting down"
@@ -137,7 +164,7 @@ run_bot() {
 					python loopself.py
 					ret=$?
 					if [ $ret == "15" ]; then
-						updater
+						min_updater
 						run_bot
 					else
 						echo "Shutting down"
