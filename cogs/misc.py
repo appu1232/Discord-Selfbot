@@ -54,15 +54,15 @@ class Misc:
                 g = git.cmd.Git(working_dir=os.getcwd())
                 g.execute(["git", "fetch", "origin", "master"])
                 version = g.execute(["git", "rev-list", "--count", "master...origin/master"])
-                if version != '0':
-                    latest = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version])
-                    gist_latest = PythonGists.Gist(description='Py output', content=latest, name='output.txt')
                 if version == '0':
                     status = 'Up to date.'
-                elif version == '1':
-                    status = 'Behind by 1 release. [Pending update.](%s)' % gist_latest
                 else:
-                    status = '%s releases behind. [Pending updates.](%s)' % (version, gist_latest)
+                    latest = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version])
+                    gist_latest = PythonGists.Gist(description='Latest changes for the selfbot.', content=latest, name='latest.txt')
+                    if version == '1':
+                        status = 'Behind by 1 release. [Latest update.](%s)' % gist_latest
+                    else:
+                        status = '%s releases behind. [Latest updates.](%s)' % (version, gist_latest)
                 em.add_field(name=u'\U0001f4bb Update status:', value=status)
             except:
                 raise
