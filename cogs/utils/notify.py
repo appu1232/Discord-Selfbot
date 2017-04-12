@@ -1,5 +1,6 @@
 import discord
 import json
+import os
 
 with open('settings/notify.json', 'r') as f:
     notif = json.load(f)
@@ -49,4 +50,8 @@ async def on_message(message):
 async def on_ready():
     pass
 
-bot.run(notif["bot_token"])
+
+if not os.path.isfile('notifs.txt'):
+    with open('notifs.txt', 'w') as f:
+        f.write('.')
+    bot.run(notif["bot_token"])

@@ -442,6 +442,8 @@ class KeywordLogger:
     # Set notifications to ping
     @notify.command(pass_context=True)
     async def ping(self, ctx):
+        if os.path.isfile('notifs.txt'):
+            os.remove('notifs.txt')
         with open('settings/log.json', 'r+') as log:
             location = json.load(log)['log_location']
         if location == '':
@@ -459,6 +461,8 @@ class KeywordLogger:
     # Set notifications to msg
     @notify.command(aliases=['message'], pass_context=True)
     async def msg(self, ctx):
+        if os.path.isfile('notifs.txt'):
+            os.remove('notifs.txt')
         with open('settings/log.json') as l:
             location = json.load(l)['log_location']
         if location == '':
@@ -500,17 +504,21 @@ class KeywordLogger:
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``direct messages``. The proxy bot will direct message you.')
         if self.bot.subpro:
             self.bot.subpro.kill()
-        await asyncio.sleep(1)
-        try:
-            self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
-        except (SyntaxError, FileNotFoundError):
-            self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
-        except:
-            pass
+        if not os.path.isfile('notifs.txt'):
+            with open('notifs.txt', 'w') as f:
+                f.write('.')
+            try:
+                self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+            except (SyntaxError, FileNotFoundError):
+                self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+            except:
+                pass
 
     # Set notifications to ping
     @notify.command(aliases=['none'], pass_context=True)
     async def off(self, ctx):
+        if os.path.isfile('notifs.txt'):
+            os.remove('notifs.txt')
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             notify['type'] = 'off'

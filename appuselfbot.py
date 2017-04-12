@@ -106,12 +106,15 @@ async def on_ready():
     with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['type'] == 'dm':
-        try:
-            bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
-        except (SyntaxError, FileNotFoundError):
-            bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
-        except:
-            pass
+        if not os.path.isfile('notifs.txt'):
+            with open('notifs.txt', 'w') as f:
+                f.write('.')
+            try:
+                bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
+            except (SyntaxError, FileNotFoundError):
+                bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
+            except:
+                pass
 
 
 @bot.command(pass_context=True, aliases=['reboot'])
