@@ -399,28 +399,29 @@ class Misc:
                             pass
                         if urls:
                             for i in urls:
-                                image_url = i.split('/')
-                                image_name = image_url[len(image_url) - 1]
-                                if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                                    image_name = '1_' + image_name
-                                    duplicate = 2
-                                    dup = True
-                                    while dup:
-                                        image_name = str(duplicate) + image_name[1:]
-                                        if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                                            duplicate += 1
-                                        else:
-                                            dup = False
-                                try:
-                                    with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
-                                        await loop.run_in_executor(None, img.write, requests.get(i).content)
+                                if i.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
+                                    image_url = i.split('/')
+                                    image_name = image_url[len(image_url) - 1]
+                                    if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
+                                        image_name = '1_' + image_name
+                                        duplicate = 2
+                                        dup = True
+                                        while dup:
+                                            image_name = str(duplicate) + image_name[1:]
+                                            if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
+                                                duplicate += 1
+                                            else:
+                                                dup = False
+                                    try:
+                                        with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
+                                            await loop.run_in_executor(None, img.write, requests.get(i).content)
 
-                                    if 'cdn.discord' in i:
-                                        await asyncio.sleep(float(opt['image_dump_delay']))
-                                    total += 1
-                                except:
-                                    print('Failed to save image: ``%s``\nContinuing...' % i)
-                                    failures += 1
+                                        if 'cdn.discord' in i:
+                                            await asyncio.sleep(float(opt['image_dump_delay']))
+                                        total += 1
+                                    except:
+                                        print('Failed to save image: ``%s``\nContinuing...' % i)
+                                        failures += 1
                         if message.attachments:
                             for i in message.attachments:
                                 if i['url'] != '':
