@@ -4,6 +4,7 @@ import strawpy
 import random
 import requests
 import re
+import sys
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
@@ -376,7 +377,7 @@ class Misc:
                     with open('settings/optional_config.json', 'r+') as fp:
                         opt = json.load(fp)
                         if 'image_dump_delay' not in opt:
-                            opt['image_dump_delay'] = ".5"
+                            opt['image_dump_delay'] = "0"
                         fp.seek(0)
                         fp.truncate()
                         json.dump(opt, fp, indent=4)
@@ -386,71 +387,66 @@ class Misc:
                         path = opt['image_dump_location']
                     if not os.path.exists('{}image_dump'.format(path)):
                         os.makedirs('{}image_dump'.format(path))
-                    new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + ctx.message.channel.name + '_' + ctx.message.server.name
+                    try:
+                        new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + ctx.message.channel.name + '_' + ctx.message.server.name
+                    except:
+                        new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_")
+                    new_dump = "".join([x if x.isalnum() else "_" for x in new_dump])
+                    new_dump.replace('/', '_')
                     os.makedirs('{}image_dump/{}'.format(path, new_dump))
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images from the last {} messages in this channel...\nSaving to ``image_dump/{}``'.format(msg, new_dump))
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages in this channel...\nSaving to ``image_dump/{}`` Check console for progress.'.format(msg, new_dump))
                     start = time.time()
                     total = failures = 0
+                    messages = []
+                    print('Fetching last %s messages...' % msg)
                     async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)):
-                        urls = None
+                        urls = []
                         try:
                             urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
                         except:
                             pass
-                        if urls:
-                            for i in urls:
-                                if i.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
-                                    image_url = i.split('/')
-                                    image_name = image_url[len(image_url) - 1]
-                                    if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                                        image_name = '1_' + image_name
-                                        duplicate = 2
-                                        dup = True
-                                        while dup:
-                                            image_name = str(duplicate) + image_name[1:]
-                                            if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                                                duplicate += 1
-                                            else:
-                                                dup = False
-                                    try:
-                                        with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
-                                            await loop.run_in_executor(None, img.write, requests.get(i).content)
-
-                                        if 'cdn.discord' in i:
-                                            await asyncio.sleep(float(opt['image_dump_delay']))
-                                        total += 1
-                                    except:
-                                        print('Failed to save image: ``%s``\nContinuing...' % i)
-                                        failures += 1
+                        if urls is []:
+                            for url in urls:
+                                if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
+                                    messages.append(url)
                         if message.attachments:
-                            for i in message.attachments:
-                                if i['url'] != '':
-                                    image_url = i['url'].split('/')
-                                    image_name = image_url[len(image_url)-1]
-                                    if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                                        image_name = '1_' + image_name
-                                        duplicate = 2
-                                        dup = True
-                                        while dup:
-                                            image_name = str(duplicate) + image_name[-50:]
-                                            if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                                                duplicate += 1
-                                            else:
-                                                dup = False
-                                    try:
-                                        with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
-                                            await loop.run_in_executor(None, img.write, requests.get(i['url']).content)
+                            for item in message.attachments:
+                                if item['url'] != '':
+                                    messages.append(item['url'])
 
-                                        await asyncio.sleep(float(opt['image_dump_delay']))
-                                        total += 1
-                                    except:
-                                        print('Failed to save image: ``%s``\nContinuing...' % i['url'])
-                                        failures += 1
+                    print('Downloading images...')
+                    for i, image in enumerate(messages):
+                        sys.stdout.write("\r{0}%".format(int((i / len(messages)) * 100)))
+                        sys.stdout.flush()
+                        image_url = image.split('/')
+                        image_name = image_url[len(image_url) - 1]
+                        if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
+                            image_name = '1_' + image_name
+                            duplicate = 2
+                            dup = True
+                            while dup:
+                                image_name = str(duplicate) + image_name[1:]
+                                if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
+                                    duplicate += 1
+                                else:
+                                    dup = False
+                        try:
+                            with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
+                                await loop.run_in_executor(None, img.write, requests.get(image).content)
+
+                            if 'cdn.discord' in image:
+                                await asyncio.sleep(float(opt['image_dump_delay']))
+                            total += 1
+                        except:
+                            print('Failed to save image: ``%s``\nContinuing...' % image)
+                            failures += 1
                     stop = time.time()
+                    sys.stdout.write('\r100% Done!')
+                    sys.stdout.flush()
                     if failures:
-                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} images downloaded. However, {} images failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
                     else:
-                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} images downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
                 else:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
             else:
