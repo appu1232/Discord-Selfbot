@@ -25,7 +25,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Cycle through avatars automatically (minimum 5 minute interval).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Custom embeds.
-- Save image/gif dumps in channels quickly to your computer. (urls and uploads)
+- Save image/gif/webm dumps in channels quickly to your computer. (urls and uploads)
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
@@ -171,9 +171,8 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 
 - ``>about`` - link to this github project
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
-- ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel and downloads all the images/gifs found (uploads and links) to the ``image_dump`` folder.
+- ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel or direct message and downloads all the images/gifs/webms found (uploads and links) to the ``image_dump`` folder.
   + ``>imagedump dir path/to/directory/`` - if you want to change where the images/gifs are automatically saved to.
-  + **Note:** in order to not abuse the Discord API, there is a default delay of .5 seconds between downloading uploaded images. After using ``>imagedump`` once, this value can be seen in the ``optional_config.json`` as ``image_dump_delay``. You can higher or lower this delay but I suggest not lowering it below .5 seconds.
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
 - ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler Book He lives`` or ``>spoiler Some movie | He was his brother all along``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
