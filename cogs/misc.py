@@ -370,7 +370,12 @@ class Misc:
     async def imagedump(self, ctx):
         if ctx.invoked_subcommand is None:
             if ctx.message.content[11:].strip():
-                msg = ctx.message.content[11:].strip()
+                if ctx.message.content[11] == 's':
+                    silent = True
+                    msg = ctx.message.content[13:].strip()
+                else:
+                    silent = False
+                    msg = ctx.message.content[11:].strip()
                 if msg.isdigit():
                     loop = asyncio.get_event_loop()
                     await self.bot.delete_message(ctx.message)
@@ -394,7 +399,8 @@ class Misc:
                     new_dump = "".join([x if x.isalnum() else "_" for x in new_dump])
                     new_dump.replace('/', '_')
                     os.makedirs('{}image_dump/{}'.format(path, new_dump))
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages in this channel...\nSaving to ``image_dump/{}`` Check console for progress.'.format(msg, new_dump))
+                    if not silent:
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages in this channel...\nSaving to ``image_dump/{}`` Check console for progress.'.format(msg, new_dump))
                     start = time.time()
                     total = failures = 0
                     messages = []
@@ -444,9 +450,15 @@ class Misc:
                     sys.stdout.write('\r100% Done!')
                     sys.stdout.flush()
                     if failures:
-                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
+                        if not silent:
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
+                        else:
+                            print(' {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
                     else:
-                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
+                        if not silent:
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
+                        else:
+                            print(' {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
                 else:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
             else:
