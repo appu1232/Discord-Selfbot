@@ -373,20 +373,24 @@ class Misc:
                 if msg.isdigit():
                     loop = asyncio.get_event_loop()
                     await self.bot.delete_message(ctx.message)
-                    with open('settings/optional_config.json') as fp:
+                    with open('settings/optional_config.json', 'r+') as fp:
                         opt = json.load(fp)
+                        if 'image_dump_delay' not in opt:
+                            opt['image_dump_delay'] = ".5"
+                        fp.seek(0)
+                        fp.truncate()
+                        json.dump(opt, fp, indent=4)
                     if 'image_dump_location' not in opt:
                         path = ''
                     else:
                         path = opt['image_dump_location']
                     if not os.path.exists('{}image_dump'.format(path)):
                         os.makedirs('{}image_dump'.format(path))
-                    new_dump = time.strftime("%d-%m-%Y-%H-%M-%S")
+                    new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + ctx.message.channel.name + '_' + ctx.message.server.name
                     os.makedirs('{}image_dump/{}'.format(path, new_dump))
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images from the last {} messages in this channel...\nSaving to ``image_dump/{}``'.format(msg, new_dump))
                     start = time.time()
-                    total = 0
-                    failures = 0
+                    total = failures = 0
                     async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)):
                         urls = None
                         try:
@@ -402,7 +406,7 @@ class Misc:
                                     duplicate = 2
                                     dup = True
                                     while dup:
-                                        image_name = str(duplicate) + image_name[-50:]
+                                        image_name = str(duplicate) + image_name[1:]
                                         if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
                                             duplicate += 1
                                         else:
@@ -411,6 +415,8 @@ class Misc:
                                     with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
                                         await loop.run_in_executor(None, img.write, requests.get(i).content)
 
+                                    if 'cdn.discord' in i:
+                                        await asyncio.sleep(float(opt['image_dump_delay']))
                                     total += 1
                                 except:
                                     print('Failed to save image: ``%s``\nContinuing...' % i)
@@ -434,6 +440,7 @@ class Misc:
                                         with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
                                             await loop.run_in_executor(None, img.write, requests.get(i['url']).content)
 
+                                        await asyncio.sleep(float(opt['image_dump_delay']))
                                         total += 1
                                     except:
                                         print('Failed to save image: ``%s``\nContinuing...' % i['url'])
