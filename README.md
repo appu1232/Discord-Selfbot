@@ -25,6 +25,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Cycle through avatars automatically (minimum 5 minute interval).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Custom embeds.
+- Save image dumps in channels quickly to your computer.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
@@ -36,7 +37,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 
 ## Setup
 
-Start off by setting up the ``config.json`` file in the ``settings`` folder:
+Download the zip and extract it. Inside this folder, go into the ``settings`` folder and edit the file ``config.json``. If you can't edit it, you may need to download something like [Notepad++.](https://notepad-plus-plus.org/download/v7.3.3.html)
 
 ```json
 {
@@ -47,7 +48,7 @@ Start off by setting up the ``config.json`` file in the ``settings`` folder:
 }
 ```
 
-- ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) Don't give this out to anyone!
+- ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) [For Mac.](https://i.imgur.com/otvxoYL.png) Don't give this out to anyone!
 - ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as in in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
 
@@ -79,9 +80,9 @@ Optionally, create a shortcut to the .bat file and [add it to startup](http://ww
 
 **Mac/Linux:**
 
-Navigate to the bot's folder in terminal/shell and run: ``bash run_linuxmac.sh`` If it doesn't work, do ``sudo bash run_linuxmac.sh``
+Navigate to the bot's folder in terminal/shell and run: ``sudo bash run_linuxmac.sh``
 
-Alternatively if the bash script isn't working for you, do ``pip install -r requirements.txt`` (only need to do it the first time). Once it's finished, run: ``python loopself.py`` (or pip3 and python3 on some linux machines) to start the bot.
+Alternatively if the bash script isn't working for you, do ``sudo -H pip install -r requirements.txt`` (only need to do it the first time). Once it's finished, run: ``sudo python loopself.py`` (or pip3 and python3 on some linux machines) to start the bot.
 
 **Updating the bot:**
 
@@ -91,6 +92,7 @@ Manual update: Unless otherwise stated, all you need to do is save your ``settin
 
 ## All Commands:
 - ``>restart`` - restart the bot. If there is an update available it will prompt you if you want to update as well.
+- ``>quit`` - quits the bot.
 - ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. **The game won't show for yourself but other people can see it.** The bot sets the game status on startup as well if you set it up once. Do ``>game`` with nothing else to turn off your game.
 - ``>avatar`` - sets your avatar by cycling through the images you have under ``settings/avatars`` (.jpg, .jpeg, and .png only). It will prompt you with your desired interval and whether to change randomly or in order.
   + On first use, this command will require your discord password. This is just a limitation of the API. In no way is your password being distributed. It is just stored locally and called on internally to change your avatar. Just make sure you input the password in a private channel so no one sees it.
@@ -169,6 +171,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 
 - ``>about`` - link to this github project
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
+- ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel and downloads all the images found to the ``image_dump`` folder.
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
 - ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler Book He lives`` or ``>spoiler Some movie | He was his brother all along``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
@@ -188,6 +191,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 ![quote](https://cloud.githubusercontent.com/assets/14967932/24776240/f509e02a-1aed-11e7-95f5-6ecf30eb367a.gif)  
 
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
+- ``>gist <text>`` - posts the given text to Gist. Also can do ``>gist file /path/to/file`` to post the file if the file is in the bot folder.
 
 ## Custom Commands:
 ![custom](https://cloud.githubusercontent.com/assets/14967932/24776178/bb6bb5f0-1aed-11e7-94e4-567b993b4ba6.gif)
