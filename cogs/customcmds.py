@@ -177,6 +177,12 @@ class Customcmds:
 
             # If there are quotes in the message (meaning multiple words for each param)
             success = False
+
+            def check(msg):
+                if msg:
+                    return msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n'
+                else:
+                    return False
             if '"' in words:
                 entry = re.findall('"([^"]+)"', words)
 
@@ -206,9 +212,12 @@ class Customcmds:
                 else:
                     if entry[0] in cmds:
                         if type(cmds[entry[0]]) is list:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'This will delete all responses for this list command. Enter ``y`` to proceed.')
-                            reply = await self.bot.wait_for_message(author=ctx.message.author)
-                            if reply.content.lower().strip() != 'y':
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'This will delete all responses for this list command. Are you sure you want to do this? (y/n).')
+                            reply = await self.bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
+                            if reply:
+                                if reply.content.lower().strip() == 'n':
+                                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
+                            else:
                                 return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
                         oldValue = cmds[entry[0]]
                         del cmds[entry[0]]
@@ -244,9 +253,12 @@ class Customcmds:
                     entry = words.split(' ', 1)
                     if entry[0] in cmds:
                         if type(cmds[entry[0]]) is list:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'This will delete all responses for this list command. Enter ``y`` to proceed.')
-                            reply = await self.bot.wait_for_message(author=ctx.message.author)
-                            if reply.content.lower().strip() != 'y':
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'This will delete all responses for this list command. Are you sure you want to do this? (y/n).')
+                            reply = await self.bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
+                            if reply:
+                                if reply.content.lower().strip() == 'n':
+                                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
+                            else:
                                 return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
                         oldValue = cmds[entry[0]]
                         del cmds[entry[0]]

@@ -6,6 +6,7 @@ import asyncio
 import random
 import glob
 import gc
+import psutil
 from datetime import timezone
 from cogs.utils.allmsgs import *
 from discord_webhooks import *
@@ -30,7 +31,7 @@ async def on_ready():
     try:
         print(bot.user.name)
     except:
-        print(bot.user.name.encode("utf-8"))
+        pass
     print('User id:' + str(bot.user.id))
     print('------')
     bot.uptime = datetime.datetime.now()
@@ -85,16 +86,16 @@ async def on_ready():
             bot.game_interval = games['interval']
         else:
             bot.game = games['games']
-    if not os.path.exists('settings/avatars'):
-        os.makedirs('settings/avatars')
+    if not os.path.exists('avatars'):
+        os.makedirs('avatars')
     if not os.path.isfile('settings/avatars.json'):
         with open('settings/avatars.json', 'w') as avis:
             json.dump({'password': '', 'interval': '0', 'type': 'random'}, avis, indent=4)
     with open('settings/avatars.json', 'r') as g:
         avatars = json.load(g)
     bot.avatar_interval = avatars['interval']
-    if os.listdir('settings/avatars') and avatars['interval'] != '0':
-        all_avis = os.listdir('settings/avatars')
+    if os.listdir('avatars') and avatars['interval'] != '0':
+        all_avis = os.listdir('avatars')
         all_avis.sort()
         avi = random.choice(all_avis)
         bot.avatar = avi
@@ -106,12 +107,22 @@ async def on_ready():
     with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['type'] == 'dm':
+        if os.path.exists('notifier.txt'):
+            pid = open('notifier.txt', 'r').read()
+            try:
+                p = psutil.Process(int(pid))
+                p.kill()
+            except:
+                pass
+            os.remove('notifier.txt')
         try:
             bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
             bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
         except:
             pass
+        with open('notifier.txt', 'w') as fp:
+            fp.write(str(bot.subpro.pid))
 
 
 @bot.command(pass_context=True, aliases=['reboot'])
@@ -179,7 +190,7 @@ async def update(ctx):
         await bot.send_message(ctx.message.channel, bot_prefix + 'The bot is up to date.')
 
 
-@bot.command(pass_context=True, aliases=['exit'])
+@bot.command(pass_context=True, aliases=['stop'])
 async def quit(ctx):
     """Quits the bot."""
     print('Bot exiting...')
@@ -471,17 +482,17 @@ async def avatar(bot):
                     if avatar_time_check(bot, bot.avatar_time, bot.avatar_interval):
                         with open('settings/avatars.json') as g:
                             avi_config = json.load(g)
-                        all_avis = glob.glob('settings/avatars/*.jpg')
-                        all_avis.extend(glob.glob('settings/avatars/*.jpeg'))
-                        all_avis.extend(glob.glob('settings/avatars/*.png'))
-                        all_avis = os.listdir('settings/avatars')
+                        all_avis = glob.glob('avatars/*.jpg')
+                        all_avis.extend(glob.glob('avatars/*.jpeg'))
+                        all_avis.extend(glob.glob('avatars/*.png'))
+                        all_avis = os.listdir('avatars')
                         all_avis.sort()
                         if avi_config['type'] == 'random':
                             while next_avatar == current_avatar:
                                 next_avatar = random.randint(0, len(all_avis) - 1)
                             current_avatar = next_avatar
                             bot.avatar = all_avis[next_avatar]
-                            with open('settings/avatars/%s' % bot.avatar, 'rb') as fp:
+                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
                         else:
                             if next_avatar+1 == len(all_avis):
@@ -489,7 +500,7 @@ async def avatar(bot):
                             else:
                                 next_avatar += 1
                             bot.avatar = all_avis[next_avatar]
-                            with open('settings/avatars/%s' % bot.avatar, 'rb') as fp:
+                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
 
         await asyncio.sleep(5)

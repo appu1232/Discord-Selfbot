@@ -5,6 +5,7 @@ import math
 import os
 import re
 import subprocess
+import psutil
 import asyncio
 from datetime import timezone
 
@@ -99,11 +100,19 @@ class KeywordLogger:
             else:
                 save = False
                 skip = 2
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Are you sure you want to output all the messages here? ``y/n``.')
-                reply = await self.bot.wait_for_message(author=ctx.message.author)
-                if reply.content.lower().strip() != 'y':
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
-                    return
+
+                def check(msg):
+                    if msg:
+                        return msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n'
+                    else:
+                        return False
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Are you sure you want to output all the messages here? ``(y/n)``.')
+                reply = await self.bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
+                if reply:
+                    if reply.content.lower().strip() == 'n':
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
+                else:
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
                 fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Fetching messages...')
                 size = ctx.message.content.strip()[12:]
             if size.isdigit:
@@ -455,6 +464,8 @@ class KeywordLogger:
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``ping``. The webhook will ping you.')
         if self.bot.subpro:
             self.bot.subpro.kill()
+        if os.path.exists('notifier.txt'):
+            os.remove('notifier.txt')
 
     # Set notifications to msg
     @notify.command(aliases=['message'], pass_context=True)
@@ -472,6 +483,8 @@ class KeywordLogger:
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``. The webhook will send notifications to your log location channel. Make sure you have notifications enabled for all messages in that channel.')
         if self.bot.subpro:
             self.bot.subpro.kill()
+        if os.path.exists('notifier.txt'):
+            os.remove('notifier.txt')
 
     # Set notifications to dm
     @notify.command(aliases=['pm', 'pms', 'direct message', 'direct messages', 'dms'], pass_context=True)
@@ -500,12 +513,22 @@ class KeywordLogger:
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``direct messages``. The proxy bot will direct message you.')
         if self.bot.subpro:
             self.bot.subpro.kill()
+        if os.path.exists('notifier.txt'):
+            pid = open('notifier.txt', 'r').read()
+            try:
+                p = psutil.Process(int(pid))
+                p.kill()
+            except:
+                pass
+            os.remove('notifier.txt')
         try:
             self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
         except (SyntaxError, FileNotFoundError):
             self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
         except:
             pass
+        with open('notifier.txt', 'w') as fp:
+            fp.write(str(self.bot.subpro.pid))
 
     # Set notifications to ping
     @notify.command(aliases=['none'], pass_context=True)
@@ -519,6 +542,8 @@ class KeywordLogger:
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off notifications.')
         if self.bot.subpro:
             self.bot.subpro.kill()
+        if os.path.exists('notifier.txt'):
+            os.remove('notifier.txt')
 
     # Set bot token
     @notify.command(pass_context=True)
