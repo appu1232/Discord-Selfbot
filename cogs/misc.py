@@ -1,16 +1,14 @@
-import discord
 import datetime
 import asyncio
-import git
-import prettytable
 import strawpy
 import random
+import requests
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
-'''Module for miscellaneous commands including game set, server commands, and more.'''
+'''Module for miscellaneous commands'''
 
 
 class Misc:
@@ -53,7 +51,7 @@ class Misc:
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
                 g.execute(["git", "fetch", "origin", "master"])
-                version = g.execute(["git", "rev-list", "--count", "master...origin/master"])
+                version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
                 if version == '0':
                     status = 'Up to date.'
                 else:
@@ -75,216 +73,73 @@ class Misc:
     # Embeds the message
     @commands.command(pass_context=True)
     async def embed(self, ctx):
-
-        """Embed given text. Ex: >embed some stuff"""
+        """Embed given text. Ex: Do >embed for more help"""
         if ctx.message.content[6:].strip():
-            msg = ctx.message.content[6:].strip()
-            title = description = image = thumbnail = color = footer = author = None
-            embed_values = msg.split('|')
-            for i in embed_values:
-                if i.strip().lower().startswith('title='):
-                    title = i.strip()[6:].strip()
-                elif i.strip().lower().startswith('description='):
-                    description = i.strip()[12:].strip()
-                elif i.strip().lower().startswith('desc='):
-                    description = i.strip()[5:].strip()
-                elif i.strip().lower().startswith('image='):
-                    image = i.strip()[6:].strip()
-                elif i.strip().lower().startswith('thumbnail='):
-                    thumbnail = i.strip()[10:].strip()
-                elif i.strip().lower().startswith('colour='):
-                    color = i.strip()[7:].strip()
-                elif i.strip().lower().startswith('color='):
-                    color = i.strip()[6:].strip()
-                elif i.strip().lower().startswith('footer='):
-                    footer = i.strip()[7:].strip()
-                elif i.strip().lower().startswith('author='):
-                    author = i.strip()[7:].strip()
-            if color:
-                if not color.startswith('0x'):
-                    color = '0x' + color
-            if color:
-                em = discord.Embed(title=title, description=description, color=int(color, 16))
-            else:
-                em = discord.Embed(title=title, description=description)
-            for i in embed_values:
-                if i.strip().lower().startswith('field='):
-                    field_inline = True
-                    field = i.strip().lstrip('field=')
-                    field_name, field_value = field.split('value=')
-                    if 'inline=' in field_value:
-                        field_value, field_inline = field_value.split('inline=')
-                        if 'false' in field_inline.lower() or 'no' in field_inline.lower():
-                            field_inline = False
-                    field_name = field_name.strip().lstrip('name=')
-                    em.add_field(name=field_name, value=field_value.strip(), inline=field_inline)
-            if author:
-                if 'icon=' in author:
-                    text, icon = author.split('icon=')
-                    em.set_author(name=text.strip()[5:], icon_url=icon)
+            if embed_perms(ctx.message):
+                msg = ctx.message.content[6:].strip()
+                title = description = image = thumbnail = color = footer = author = None
+                embed_values = msg.split('|')
+                for i in embed_values:
+                    if i.strip().lower().startswith('title='):
+                        title = i.strip()[6:].strip()
+                    elif i.strip().lower().startswith('description='):
+                        description = i.strip()[12:].strip()
+                    elif i.strip().lower().startswith('desc='):
+                        description = i.strip()[5:].strip()
+                    elif i.strip().lower().startswith('image='):
+                        image = i.strip()[6:].strip()
+                    elif i.strip().lower().startswith('thumbnail='):
+                        thumbnail = i.strip()[10:].strip()
+                    elif i.strip().lower().startswith('colour='):
+                        color = i.strip()[7:].strip()
+                    elif i.strip().lower().startswith('color='):
+                        color = i.strip()[6:].strip()
+                    elif i.strip().lower().startswith('footer='):
+                        footer = i.strip()[7:].strip()
+                    elif i.strip().lower().startswith('author='):
+                        author = i.strip()[7:].strip()
+                if color:
+                    if not color.startswith('0x'):
+                        color = '0x' + color
+                if color:
+                    em = discord.Embed(title=title, description=description, color=int(color, 16))
                 else:
-                    em.set_author(name=author)
+                    em = discord.Embed(title=title, description=description)
+                for i in embed_values:
+                    if i.strip().lower().startswith('field='):
+                        field_inline = True
+                        field = i.strip().lstrip('field=')
+                        field_name, field_value = field.split('value=')
+                        if 'inline=' in field_value:
+                            field_value, field_inline = field_value.split('inline=')
+                            if 'false' in field_inline.lower() or 'no' in field_inline.lower():
+                                field_inline = False
+                        field_name = field_name.strip().lstrip('name=')
+                        em.add_field(name=field_name, value=field_value.strip(), inline=field_inline)
+                if author:
+                    if 'icon=' in author:
+                        text, icon = author.split('icon=')
+                        em.set_author(name=text.strip()[5:], icon_url=icon)
+                    else:
+                        em.set_author(name=author)
 
-            if image:
-                em.set_image(url=image)
-            if thumbnail:
-                em.set_thumbnail(url=thumbnail)
-            if footer:
-                if 'icon=' in footer:
-                    text, icon = footer.split('icon=')
-                    em.set_footer(text=text.strip()[5:], icon_url=icon)
-                else:
-                    em.set_footer(text=footer)
-            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+                if image:
+                    em.set_image(url=image)
+                if thumbnail:
+                    em.set_thumbnail(url=thumbnail)
+                if footer:
+                    if 'icon=' in footer:
+                        text, icon = footer.split('icon=')
+                        em.set_footer(text=text.strip()[5:], icon_url=icon)
+                    else:
+                        em.set_footer(text=footer)
+                await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+            else:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'No embed permissions in this channel.')
         else:
             msg = '**How to use the >embed command:**\n**Example:** >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\n**You do NOT need to specify every property, only the ones you want.**\n**All properties and the syntax:**\ntitle=words\ndescription=words\ncolor=hexvalue\nimage=url_to_image (must be https)\nthumbnail=url_to_image\nauthor=words **OR** author=name=words icon=url_to_image\nfooter=words **OR** footer=name=words icon=url_to_image\nfield=name=words value=words (you can add as many fields as you want)\n\n**NOTE:** After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.'
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
-
-    # Stats about current server
-    @commands.group(pass_context=True)
-    async def server(self, ctx):
-        """Various info about the server. See the README for more info."""
-        if ctx.invoked_subcommand is None:
-            if ctx.message.content[7:]:
-                server = None
-                for i in self.bot.servers:
-                    if i.name.lower() == ctx.message.content[7:].lower().strip():
-                        server = i
-                        break
-                if not server:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
-                    return
-            else:
-                server = ctx.message.server
-
-            online = 0
-            for i in server.members:
-                if str(i.status) == 'online':
-                    online += 1
-            all_users = []
-            for user in ctx.message.server.members:
-                all_users.append('{}#{}'.format(user.name, user.discriminator))
-            all_users.sort()
-            all = '\n'.join(all_users)
-            if embed_perms(ctx.message):
-                em = discord.Embed(color=0xea7938)
-                em.add_field(name='Name', value=server.name)
-                em.add_field(name='Owner', value=server.owner, inline=False)
-                em.add_field(name='Members', value=server.member_count)
-                em.add_field(name='Currently Online', value=online)
-                em.add_field(name='Region', value=server.region)
-                em.add_field(name='Verification Level', value=str(server.verification_level))
-                em.add_field(name='Highest role', value=server.role_hierarchy[0])
-                em.add_field(name='Default Channel', value=server.default_channel)
-                url = PythonGists.Gist(description='All Users in: %s' % server.name, content=str(all), name='server.txt')
-                em.add_field(name='All users', value=url)
-                em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-                em.set_thumbnail(url=server.icon_url)
-                em.set_author(name='Server Info', icon_url='https://i.imgur.com/RHagTDg.png')
-                await self.bot.send_message(ctx.message.channel, embed=em)
-            else:
-                msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (server.name, server.owner, server.member_count, online, server.region, str(server.verification_level), server.role_hierarchy[0], server.default_channel, server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
-            await self.bot.delete_message(ctx.message)
-
-    @server.group(pass_context=True)
-    async def emojis(self, ctx):
-        """List all emojis in this server."""
-        msg = ''
-        for i in ctx.message.server.emojis:
-            msg += str(i)
-        await self.bot.send_message(ctx.message.channel, msg)
-        await self.bot.delete_message(ctx.message)
-
-    @server.group(pass_context=True)
-    async def avi(self, ctx):
-        """Get server avatar image link."""
-        if ctx.message.content[11:]:
-            server = None
-            for i in self.bot.servers:
-                if i.name.lower() == ctx.message.content[11:].lower().strip():
-                    server = i
-                    break
-            if not server:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
-                return
-        else:
-            server = ctx.message.server
-        if embed_perms(ctx.message):
-            em = discord.Embed()
-            em.set_image(url=server.icon_url)
-            await self.bot.send_message(ctx.message.channel, embed=em)
-        else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + server.icon_url)
-        await self.bot.delete_message(ctx.message)
-
-    @server.group(pass_context=True)
-    async def role(self, ctx, *, msg):
-        await self.bot.delete_message(ctx.message)
-        for role in ctx.message.server.roles:
-            if msg == role.name:
-                role_count = 0
-                all_users = []
-                for user in ctx.message.server.members:
-                    if role in user.roles:
-                        all_users.append('{}#{}'.format(user.name, user.discriminator))
-                        role_count += 1
-                all_users.sort()
-                all = ', '.join(all_users)
-                em = discord.Embed(title='Role Info', color=role.color)
-                em.add_field(name='Name', value=role.name)
-                em.add_field(name='ID', value=role.id, inline=False)
-                em.add_field(name='Users in this role', value=role_count)
-                em.add_field(name='Role color hex value', value=str(role.color))
-                em.add_field(name='Role color rgb value', value=role.color.to_tuple())
-                em.add_field(name='Mentionable', value=role.mentionable)
-                if len(all_users) > 10:
-                    all = all.replace(', ', '\n')
-                    url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, ctx.message.server.name), content=str(all), name='role.txt')
-                    em.add_field(name='All users', value='Long list, posted to Gist:\n %s' % url, inline=False)
-                else:
-                    em.add_field(name='All Users', value=all, inline=False)
-                em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
-                return await self.bot.send_message(ctx.message.channel, content=None, embed=em)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find role ``%s``' % msg)
-
-    @server.group(pass_context=True)
-    async def members(self, ctx):
-        """List of members in the server."""
-        msg = prettytable.PrettyTable(['User', 'Nickname', 'Join Date', 'Account Created', 'Color', 'Top Role', 'Is bot', 'Avatar url', 'All Roles'])
-        for i in ctx.message.server.members:
-            roles = ''
-            for j in i.roles:
-                if j.name != '@everyone':
-                    roles += j.name + ', '
-            if i.avatar_url[60:].startswith('a_'):
-                avi = 'https://images.discordapp.net/avatars/' + i.avatar_url[33:][:18] + i.avatar_url[59:-3] + 'gif'
-            else:
-                avi = i.avatar_url
-            try:
-                join = i.joined_at.__format__('%x at %X')
-            except:
-                join = 'N/A'
-            try:
-                create = i.created_at.__format__('%x at %X')
-            except:
-                create = 'N/A'
-            msg.add_row([str(i.name), i.nick, join, create, i.color, i.top_role, str(i.bot), avi, roles[:-2]])
-        name = ctx.message.server.name
-        keep_characters = (' ', '.', '_')
-        name = ''.join(c for c in name if c.isalnum() or c in keep_characters).rstrip()
-        name = name.replace(' ', '_')
-        save_file = '%s_members.txt' % name
-        try:
-            msg = msg.get_string(sortby='User')
-        except:
-            pass
-        with open(save_file, 'w') as file:
-            file.write(str(msg))
-        with open(save_file, 'rb') as file:
-            await self.bot.send_file(ctx.message.channel, file)
-        os.remove(save_file)
 
     @commands.command(pass_context=True)
     async def game(self, ctx):
@@ -375,7 +230,7 @@ class Misc:
                     json.dump(avi_config, avi, indent=4)
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'Disabled cycling of avatars.')
             else:
-                if os.listdir('settings/avatars'):
+                if os.listdir('avatars'):
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Enabled cycling of avatars. Input interval in seconds to wait before changing avatars (``n`` to cancel):')
 
                     def check(msg):
@@ -392,7 +247,7 @@ class Misc:
                         return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled. Interval is too short. Must be at least 300 seconds (5 minutes).')
                     else:
                         avi_config['interval'] = int(interval.content)
-                    if len(os.listdir('settings/avatars')) != 2:
+                    if len(os.listdir('avatars')) != 2:
                         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Change avatars in order or randomly? Input ``o`` for order or ``r`` for random:')
                         cycle_type = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
                         if not cycle_type:
@@ -414,10 +269,10 @@ class Misc:
                         avi.truncate()
                         json.dump(avi_config, avi, indent=4)
                     self.bot.avatar_interval = interval.content
-                    self.bot.avatar = random.choice(os.listdir('settings/avatars'))
+                    self.bot.avatar = random.choice(os.listdir('avatars'))
 
                 else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'No images found under ``settings/avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'No images found under ``avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')
 
     @avatar.command(aliases=['pass', 'pw'], pass_context=True)
     async def password(self, ctx, *, msg):
@@ -508,6 +363,52 @@ class Misc:
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No quote found.')
         await self.bot.delete_message(ctx.message)
+
+    @commands.command(pass_context=True)
+    async def imagedump(self, ctx, *, msg):
+        if msg.strip().isdigit():
+            loop = asyncio.get_event_loop()
+            await self.bot.delete_message(ctx.message)
+            msg = msg.strip()
+            if not os.path.exists('image_dump'):
+                os.makedirs('image_dump')
+            new_dump = time.strftime("%d-%m-%Y-%H-%M-%S")
+            os.makedirs('image_dump/%s' % new_dump)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images from the last {} messages in this channel...\nSaving to ``image_dump/{}``'.format(msg, new_dump))
+            start = time.time()
+            total = 0
+            failures = 0
+            async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)):
+                if message.attachments:
+                    for i in message.attachments:
+                        if i['url'] != '':
+                            image_url = i['url'].split('/')
+                            image_name = image_url[len(image_url)-1]
+                            if os.path.exists('image_dump/{}/{}'.format(new_dump, image_name)):
+                                image_name = '1_' + image_name
+                                duplicate = 2
+                                dup = True
+                                while dup:
+                                    image_name = str(duplicate) + image_name[-50:]
+                                    if os.path.exists('image_dump/{}/{}'.format(new_dump, image_name)):
+                                        duplicate += 1
+                                    else:
+                                        dup = False
+                            try:
+                                with open('image_dump/{}/{}'.format(new_dump, image_name), 'wb') as img:
+                                    await loop.run_in_executor(None, img.write, requests.get(i['url']).content)
+
+                                total += 1
+                            except:
+                                print('Failed to save image: ``%s``\nContinuing...' % i['url'])
+                                failures += 1
+            stop = time.time()
+            if failures:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} images downloaded. However, {} images failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
+            else:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} images downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. Ex: ``>imagedump 100``')
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):
