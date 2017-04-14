@@ -30,9 +30,9 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
-- Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro``
 - Purge the last n messages you sent in a channel.
 - Simple calculator.
+- Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro`` Also, meme commands like spacing text or converting it to regional indicator emojis.
 - Various other misc commands like spoiler tagging text (encrypts the text), creating strawpolls, embeding text, server/user info commands, and more.
 
 ## Setup
@@ -49,7 +49,7 @@ Download the zip and extract it. Inside this folder, go into the ``settings`` fo
 ```
 
 - ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) [For Mac.](https://i.imgur.com/otvxoYL.png) Don't give this out to anyone!
-- ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as in in-built.
+- ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as an in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
 
 ## Optional Setup
@@ -181,11 +181,10 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - ``>info`` or ``>info <user>`` - See various discord info about yourself or a specified user. Also, ``>info avi`` or ``>info avi <user>`` to see a bigger verion of the users profile picture.
 
 ![img](http://i.imgur.com/n4mSRyD.png)
-- ``>embed`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax. Example:
+- ``>embed`` - Make an embed out of the message. You can customize all attributes of the embed. Do ``>embed`` to see more specific instructions and the syntax.
 	+ Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
 
 ![img](https://i.imgur.com/0VBktGI.png)
-  + Pro tip: save custom embeds by adding the entire command as a custom command. Ex: ``>add "customembed" ">embed title=hello world | description=this is a test | color=3AB35E"``
 
 - ``>emoji <emoji>`` - Gets the image url for the specified emoji.
 - ``>quote`` or ``>quote <words>`` - Quotes the last message in the channel if no words are given or finds the message (if it wasn't too long ago) with the given words and quotes that. Deleted messages can be quoted.
@@ -193,6 +192,8 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 
 - ``>l2g <tags>`` - Gives a https://googleitfor.me link with the specified tags for when you want to be a smartass.
 - ``>gist <text>`` - posts the given text to Gist. Also can do ``>gist file /path/to/file`` to post the file if the file is in the bot folder.
+- ``>regional <text>`` - send each letter in this message as regional indicator emojis.
+- ``>space <text>`` or ``>space <n> <text>`` - put a space between each letter in the message. Optionally, specify how many spaces to put between each letter with ``<n>``
 
 ## Custom Commands:
 ![custom](https://cloud.githubusercontent.com/assets/14967932/24776178/bb6bb5f0-1aed-11e7-94e4-567b993b4ba6.gif)
@@ -260,7 +261,10 @@ So, here's how you get started with setting up the notifier:
   + ``>log addblacklist [user] <user>`` - blacklists the user from the keyword notifier. ``<user>`` can be their name + discriminator, a mention, or their user id.
   + ``>log addblacklist [word] <word>`` - blacklists this word from the keyword notifier.
   + ``>log addblacklist [server]`` - blacklists the current server from the keyword notifier.
-  + ``>log removeblacklist [user] <user>`` or ``>log removeblacklist [word] <word>`` or ``>log removeblacklist [server]`` - self-explanatory.
+  + ``>log addblacklist [word] [server] <word>`` - blacklists the current word for only this server (the one you are typing in).
+    - Ex: ``overwatch`` is a keyword but you don't want notifs from the Overwatch server. Go to the server and in any channel, type ``>log addblacklist [word] [server] overwatch``.
+  + ``>log addblacklist [word] [channel] <word>`` - blacklists the current word for only this channel (the one you are typing in).
+  + ``>log removeblacklist [user] <user>`` or ``>log removeblacklist [word] <word>`` etc. - self-explanatory.
   
 - **Set how you want to receive notifications:**
   + ``>notify msg`` - posts in the keyword notifier channel using the webhook. (default)
@@ -270,8 +274,8 @@ So, here's how you get started with setting up the notifier:
 	
 **Things to note:**
 
-1. You can blacklist a word only for a certain server by doing ``>log addblacklist [word] [here] <word>``. For example, if you have ``overwatch`` as a keyword but you don't want to log it if it was said in the Overwatch Discord server, you go to the Overwatch server and in any channel, type ``>log addblacklist [word] [here] overwatch``. Removing is the same: ``>log removeblacklist [word] [here] overwatch``.
-2. Only other people can trigger the log message. You yourself saying a keyword won't log the message. The channel the keyword notifier is logging in is exempt from the keyword search as well.
+1. Only other people can trigger the log message. You yourself saying a keyword won't log the message.
+2. The channel the keyword notifier is logging in (your ``>log location``) is exempt from the keyword search.
 3. Bots do not trigger the keyword notifier. Only user accounts can.
 4. If the logged message + context is too long, the log message will be split up into multiple messages. These mutiple messages don't use embeds so it won't look as neat, sadly. This shouldn't happen often though.
 
