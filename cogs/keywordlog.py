@@ -335,9 +335,18 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted user ``%s`` from the keyword logger.' % name)
             elif msg.startswith('[word]'):
                 msg = msg[6:].strip()
-                if msg.startswith('[here] '):
-                    msg = msg[6:].strip()
+                if msg.startswith('[here] ') or msg.startswith('[server] '):
+                    if msg.startswith('[here] '):
+                        msg = msg[6:].strip()
+                    else:
+                        msg = msg[8:].strip()
                     msg += ' [server]' + ctx.message.server.id
+                if msg.startswith('[chere] ') or msg.startswith('[channel] '):
+                    if msg.startswith('[chere] '):
+                        msg = msg[7:].strip()
+                    else:
+                        msg = msg[9:].strip()
+                    msg += ' [channel]' + ctx.message.channel.id
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg in settings['blacklisted_words']:
@@ -349,6 +358,9 @@ class KeywordLogger:
                 if ' [server]' in msg:
                     await self.bot.send_message(ctx.message.channel,
                                                 bot_prefix + 'Blacklisted the word ``%s`` for this server from the keyword logger.' % msg.split(' [server]')[0])
+                elif ' [channel]' in msg:
+                    await self.bot.send_message(ctx.message.channel,
+                                                bot_prefix + 'Blacklisted the word ``%s`` for this channel from the keyword logger.' % msg.split(' [channel]')[0])
                 else:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted the word ``%s`` from the keyword logger.' % msg)
             elif msg.startswith('[server]'):
@@ -395,9 +407,18 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed ``%s`` from the blacklist for the keyword logger.' % name)
             elif msg.startswith('[word]'):
                 msg = msg[6:].strip()
-                if msg.startswith('[here] '):
-                    msg = msg[6:].strip()
+                if msg.startswith('[here] ') or msg.startswith('[server] '):
+                    if msg.startswith('[here] '):
+                        msg = msg[6:].strip()
+                    else:
+                        msg = msg[8:].strip()
                     msg += ' [server]' + ctx.message.server.id
+                if msg.startswith('[chere] ') or msg.startswith('[channel] '):
+                    if msg.startswith('[chere] '):
+                        msg = msg[7:].strip()
+                    else:
+                        msg = msg[9:].strip()
+                    msg += ' [channel]' + ctx.message.channel.id
                 if 'blacklisted_words' not in settings:
                     settings['blacklisted_words'] = []
                 if msg not in settings['blacklisted_words']:
@@ -409,6 +430,9 @@ class KeywordLogger:
                 if ' [server]' in msg:
                     await self.bot.send_message(ctx.message.channel,
                                                 bot_prefix + '``%s`` removed from the blacklist for this server.' % msg.split(' [server]')[0])
+                elif ' [channel]' in msg:
+                    await self.bot.send_message(ctx.message.channel,
+                                                bot_prefix + '``%s`` removed from the blacklist for this channel.' % msg.split(' [channel]')[0])
                 else:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + '``%s`` removed from the blacklist.' % msg)
             elif msg.startswith('[server]'):

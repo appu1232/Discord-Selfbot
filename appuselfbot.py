@@ -289,6 +289,11 @@ async def on_message(message):
                                 if bword.strip().lower() in message.content.lower() and message.server.id == id:
                                     word_found = False
                                     break
+                            if '[channel]' in x:
+                                bword, id = x.split('[channel]')
+                                if bword.strip().lower() in message.content.lower() and message.channel.id == id:
+                                    word_found = False
+                                    break
                             if x.lower() in message.content.lower():
                                 word_found = False
                                 break
