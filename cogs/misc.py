@@ -406,13 +406,13 @@ class Misc:
                     total = failures = 0
                     messages = []
                     print('Fetching last %s messages...' % msg)
-                    async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)):
+                    async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)+1):
 
                         if message.embeds:
                             for data in message.embeds:
                                 try:
                                     url = data['thumbnail']['url']
-                                    if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in messages:
+                                    if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in messages:
                                         messages.append(url)
                                 except:
                                     pass
@@ -438,7 +438,9 @@ class Misc:
                         sys.stdout.write("\r{}%".format(int((i / len(messages)) * 100)))
                         sys.stdout.flush()
                         image_url = image.split('/')
-                        image_name = image_url[-1]
+                        image_name = image_url[-1][-25:]
+                        if not image_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
+                            image_name += '.jpg'
                         if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
                             duplicate = 1
                             dup = True
