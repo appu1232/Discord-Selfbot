@@ -438,7 +438,7 @@ class Misc:
                         sys.stdout.write("\r{}%".format(int((i / len(messages)) * 100)))
                         sys.stdout.flush()
                         image_url = image.split('/')
-                        image_name = image_url[-1][-25:]
+                        image_name = "".join([x if x.isalnum() else "_" for x in image_url[-1]])[-25:]
                         if not image_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
                             image_name += '.jpg'
                         if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
@@ -458,23 +458,32 @@ class Misc:
                                 await asyncio.sleep(float(opt['image_dump_delay']))
                             total += 1
                         except:
-                            print('Failed to save: ``%s``\nContinuing...' % image)
+                            print('\nFailed to save: %s\nContinuing...' % image)
                             failures += 1
                             try:
                                 os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
                             except:
                                 pass
                     stop = time.time()
-                    sys.stdout.write('\r100% Done!')
+                    folder_size = 0
+                    for (path, dirs, files) in os.walk('{}image_dump/{}'.format(path, new_dump)):
+                        for file in files:
+                            filename = os.path.join(path, file)
+                            folder_size += os.path.getsize(filename)
+                    if folder_size/(1024*1024.0) > 1024:
+                        size = "%0.1f GB" % (folder_size/(1024 * 1024 * 1024.0))
+                    else:
+                        size = "%0.1f MB" % (folder_size / (1024 * 1024.0))
+                    sys.stdout.write('\r100% Done! Downloaded {} items. {}\n'.format(total, size))
                     sys.stdout.flush()
                     if failures:
                         if not silent:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` However, ``{}`` items failed to download. Check your console for more info on which ones were missed. Finished in: ``{} seconds.``'.format(str(total), size, str(failures), str(round(stop - start, 2))))
                         else:
                             print(' {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
                     else:
                         if not silent:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` Finished in: ``{} seconds.``'.format(str(total), size, str(round(stop-start, 2))))
                         else:
                             print(' {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
                 else:
@@ -622,7 +631,6 @@ class Misc:
         except:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not encrypt spoiler.')
 
-    # Create gist of msg
     @commands.group(pass_context=True)
     async def gist(self, ctx):
         """Posts to gist"""
@@ -631,9 +639,9 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Gist output: ' + url)
             await self.bot.delete_message(ctx.message)
 
-    # Create gist of file
     @gist.command(pass_context=True)
     async def file(self, ctx, *, msg):
+        """Create gist of file"""
         try:
             with open(msg) as fp:
                 output = fp.read()
@@ -643,6 +651,47 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'File not found.')
         finally:
             await self.bot.delete_message(ctx.message)
+
+    @commands.command(pass_context=True)
+    async def regional(self, ctx, *, msg):
+        """Replace letters with regional indicator emojis"""
+        await self.bot.delete_message(ctx.message)
+        msg = list(msg)
+        regional_list = [':regional_indicator_{}:'.format(x.lower()) if x.isalpha() else x for x in msg]
+        regional_output = ' '.join(regional_list)
+        await self.bot.send_message(ctx.message.channel, regional_output)
+
+    @commands.command(pass_context=True)
+    async def space(self, ctx, *, msg):
+        """Add n spaces between each letter. Ex: >space 2 thicc"""
+        await self.bot.delete_message(ctx.message)
+        if msg.split(' ', 1)[0].isdigit():
+            spaces = int(msg.split(' ', 1)[0]) * ' '
+            msg = msg.split(' ', 1)[1].strip()
+        else:
+            spaces = ' '
+        msg = list(msg)
+        spaced_message = '{}'.format(spaces).join(msg)
+        await self.bot.send_message(ctx.message.channel, spaced_message)
+
+    @commands.command(pass_context=True)
+    async def react(self, ctx, *, msg):
+        """Add letter(s) as reaction to previous message. Ex: >react hot"""
+        messages = []
+        async for message in self.bot.logs_from(ctx.message.channel, limit=2):
+            messages.append(message)
+        data = {'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}', 'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}', 'c': '\N{REGIONAL INDICATOR SYMBOL LETTER C}', 'd': '\N{REGIONAL INDICATOR SYMBOL LETTER D}',
+                'e': '\N{REGIONAL INDICATOR SYMBOL LETTER E}', 'f': '\N{REGIONAL INDICATOR SYMBOL LETTER F}', 'g': '\N{REGIONAL INDICATOR SYMBOL LETTER G}', 'h': '\N{REGIONAL INDICATOR SYMBOL LETTER H}',
+                'i': '\N{REGIONAL INDICATOR SYMBOL LETTER I}', 'j': '\N{REGIONAL INDICATOR SYMBOL LETTER J}', 'k': '\N{REGIONAL INDICATOR SYMBOL LETTER K}', 'l': '\N{REGIONAL INDICATOR SYMBOL LETTER L}',
+                'm': '\N{REGIONAL INDICATOR SYMBOL LETTER M}', 'n': '\N{REGIONAL INDICATOR SYMBOL LETTER N}', 'o': '\N{REGIONAL INDICATOR SYMBOL LETTER O}', 'p': '\N{REGIONAL INDICATOR SYMBOL LETTER P}',
+                'q': '\N{REGIONAL INDICATOR SYMBOL LETTER Q}', 'r': '\N{REGIONAL INDICATOR SYMBOL LETTER R}', 's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}',
+                'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}', 'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
+                'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}'}
+
+        await self.bot.delete_message(ctx.message)
+        for i in list(msg):
+            if i.isalpha():
+                await self.bot.add_reaction(messages[1], data[i.lower()])
 
 
 def setup(bot):
