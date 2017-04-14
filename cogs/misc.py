@@ -54,10 +54,11 @@ class Misc:
                 g = git.cmd.Git(working_dir=os.getcwd())
                 g.execute(["git", "fetch", "origin", "master"])
                 version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
+                commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])
                 if version == '0':
                     status = 'Up to date.'
                 else:
-                    latest = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version])
+                    latest = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version, "origin/master"])
                     gist_latest = PythonGists.Gist(description='Latest changes for the selfbot.', content=latest, name='latest.txt')
                     if version == '1':
                         status = 'Behind by 1 release. [Latest update.](%s)' % gist_latest
@@ -406,46 +407,61 @@ class Misc:
                     messages = []
                     print('Fetching last %s messages...' % msg)
                     async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)):
+
+                        if message.embeds:
+                            for data in message.embeds:
+                                try:
+                                    url = data['thumbnail']['url']
+                                    if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in messages:
+                                        messages.append(url)
+                                except:
+                                    pass
+
                         urls = []
                         try:
                             urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
                         except:
                             pass
+
                         if urls is not []:
                             for url in urls:
-                                if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
+                                if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in messages:
                                     messages.append(url)
+
                         if message.attachments:
                             for item in message.attachments:
-                                if item['url'] != '':
+                                if item['url'] != '' and item['url'] not in messages:
                                     messages.append(item['url'])
 
-                    print('Downloading images...')
+                    print('Found {} items. Downloading...'.format(len(messages)))
                     for i, image in enumerate(messages):
-                        sys.stdout.write("\r{0}%".format(int((i / len(messages)) * 100)))
+                        sys.stdout.write("\r{}%".format(int((i / len(messages)) * 100)))
                         sys.stdout.flush()
                         image_url = image.split('/')
-                        image_name = image_url[len(image_url) - 1]
+                        image_name = image_url[-1]
                         if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                            image_name = '1_' + image_name
-                            duplicate = 2
+                            duplicate = 1
                             dup = True
                             while dup:
-                                image_name = str(duplicate) + image_name[1:]
-                                if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
+                                if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, '{}_{}'.format(str(duplicate), image_name))):
                                     duplicate += 1
                                 else:
                                     dup = False
+                            image_name = '{}_{}'.format(str(duplicate), image_name)
                         try:
                             with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
-                                await loop.run_in_executor(None, img.write, requests.get(image).content)
+                                await loop.run_in_executor(None, img.write, requests.get(image, stream=True).content)
 
                             if 'cdn.discord' in image:
                                 await asyncio.sleep(float(opt['image_dump_delay']))
                             total += 1
                         except:
-                            print('Failed to save image: ``%s``\nContinuing...' % image)
+                            print('Failed to save: ``%s``\nContinuing...' % image)
                             failures += 1
+                            try:
+                                os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
+                            except:
+                                pass
                     stop = time.time()
                     sys.stdout.write('\r100% Done!')
                     sys.stdout.flush()
