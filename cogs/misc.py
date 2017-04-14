@@ -486,7 +486,7 @@ class Misc:
     async def dir(self, ctx, *, msg):
         msg = msg.strip() if msg.strip().endswith('/') else msg.strip() + '/'
         if os.path.exists(msg):
-            if not os.path.exists('{}image_dump'):
+            if not os.path.exists('{}image_dump'.format(msg)):
                 os.makedirs('{}image_dump'.format(msg))
             with open('settings/optional_config.json', 'r+') as fp:
                 opt = json.load(fp)
