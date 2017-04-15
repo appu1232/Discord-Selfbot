@@ -60,7 +60,6 @@ class Server:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
             await self.bot.delete_message(ctx.message)
 
-
     @server.group(pass_context=True)
     async def emojis(self, ctx):
         """List all emojis in this server."""
@@ -69,7 +68,6 @@ class Server:
             msg += str(i)
         await self.bot.send_message(ctx.message.channel, msg)
         await self.bot.delete_message(ctx.message)
-
 
     @server.group(pass_context=True)
     async def avi(self, ctx):
@@ -92,7 +90,6 @@ class Server:
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + server.icon_url)
         await self.bot.delete_message(ctx.message)
-
 
     @server.group(pass_context=True)
     async def role(self, ctx, *, msg):
@@ -121,9 +118,9 @@ class Server:
                 else:
                     em.add_field(name='All Users', value=all, inline=False)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
+                em.set_thumbnail(url='http://www.colorhexa.com/%s.png' % str(role.color).strip("#"))
                 return await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find role ``%s``' % msg)
-
 
     @server.group(pass_context=True)
     async def members(self, ctx):

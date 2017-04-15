@@ -5,6 +5,7 @@ import random
 import requests
 import re
 import sys
+import subprocess
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
@@ -17,6 +18,16 @@ class Misc:
 
     def __init__(self, bot):
         self.bot = bot
+
+    @staticmethod
+    def regional_indicators(self):
+        return {'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}', 'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}', 'c': '\N{REGIONAL INDICATOR SYMBOL LETTER C}', 'd': '\N{REGIONAL INDICATOR SYMBOL LETTER D}',
+                'e': '\N{REGIONAL INDICATOR SYMBOL LETTER E}', 'f': '\N{REGIONAL INDICATOR SYMBOL LETTER F}', 'g': '\N{REGIONAL INDICATOR SYMBOL LETTER G}', 'h': '\N{REGIONAL INDICATOR SYMBOL LETTER H}',
+                'i': '\N{REGIONAL INDICATOR SYMBOL LETTER I}', 'j': '\N{REGIONAL INDICATOR SYMBOL LETTER J}', 'k': '\N{REGIONAL INDICATOR SYMBOL LETTER K}', 'l': '\N{REGIONAL INDICATOR SYMBOL LETTER L}',
+                'm': '\N{REGIONAL INDICATOR SYMBOL LETTER M}', 'n': '\N{REGIONAL INDICATOR SYMBOL LETTER N}', 'o': '\N{REGIONAL INDICATOR SYMBOL LETTER O}', 'p': '\N{REGIONAL INDICATOR SYMBOL LETTER P}',
+                'q': '\N{REGIONAL INDICATOR SYMBOL LETTER Q}', 'r': '\N{REGIONAL INDICATOR SYMBOL LETTER R}', 's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}',
+                'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}', 'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
+                'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}'}
 
     @commands.command(pass_context=True)
     async def about(self, ctx):
@@ -403,93 +414,73 @@ class Misc:
                     if not silent:
                         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages in this channel...\nSaving to ``image_dump/{}`` Check console for progress.'.format(msg, new_dump))
                     start = time.time()
-                    total = failures = 0
-                    messages = []
+                    images = []
                     print('Fetching last %s messages...' % msg)
                     async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)+1):
 
-                        if message.embeds:
+                        if message.attachments:
+                            for item in message.attachments:
+                                if item['url'] != '' and item['url'] not in images:
+                                    images.append(item['url'])
+
+                        elif message.embeds:
                             for data in message.embeds:
                                 try:
                                     url = data['thumbnail']['url']
-                                    if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in messages:
-                                        messages.append(url)
+                                    if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in images:
+                                        images.append(url)
                                 except:
                                     pass
 
-                        urls = []
-                        try:
-                            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
-                        except:
-                            pass
-
-                        if urls is not []:
-                            for url in urls:
-                                if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in messages:
-                                    messages.append(url)
-
-                        if message.attachments:
-                            for item in message.attachments:
-                                if item['url'] != '' and item['url'] not in messages:
-                                    messages.append(item['url'])
-
-                    print('Found {} items. Downloading...'.format(len(messages)))
-                    for i, image in enumerate(messages):
-                        sys.stdout.write("\r{}%".format(int((i / len(messages)) * 100)))
-                        sys.stdout.flush()
-                        image_url = image.split('/')
-                        image_name = "".join([x if x.isalnum() else "_" for x in image_url[-1]])[-25:]
-                        if not image_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
-                            image_name += '.jpg'
-                        if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, image_name)):
-                            duplicate = 1
-                            dup = True
-                            while dup:
-                                if os.path.exists('{}image_dump/{}/{}'.format(path, new_dump, '{}_{}'.format(str(duplicate), image_name))):
-                                    duplicate += 1
-                                else:
-                                    dup = False
-                            image_name = '{}_{}'.format(str(duplicate), image_name)
-                        try:
-                            with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
-                                await loop.run_in_executor(None, img.write, requests.get(image, stream=True).content)
-
-                            if 'cdn.discord' in image:
-                                await asyncio.sleep(float(opt['image_dump_delay']))
-                            total += 1
-                        except:
-                            print('\nFailed to save: %s\nContinuing...' % image)
-                            failures += 1
+                        else:
+                            urls = []
                             try:
-                                os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
+                                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
                             except:
                                 pass
-                    stop = time.time()
-                    folder_size = 0
-                    for (path, dirs, files) in os.walk('{}image_dump/{}'.format(path, new_dump)):
-                        for file in files:
-                            filename = os.path.join(path, file)
-                            folder_size += os.path.getsize(filename)
-                    if folder_size/(1024*1024.0) > 1024:
-                        size = "%0.1f GB" % (folder_size/(1024 * 1024 * 1024.0))
-                    else:
-                        size = "%0.1f MB" % (folder_size / (1024 * 1024.0))
-                    sys.stdout.write('\r100% Done! Downloaded {} items. {}\n'.format(total, size))
-                    sys.stdout.flush()
-                    if failures:
+
+                            if urls is not []:
+                                for url in urls:
+                                    if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images:
+                                        images.append(url)
+
+                    with open('cogs/utils/urls.txt', 'w') as fp:
+                        for url in images:
+                            fp.write(url + '\n')
+
+                    args = [sys.executable, 'cogs/utils/image_dump.py', path, new_dump, opt['image_dump_delay']]
+                    p = subprocess.Popen(args)
+
+                    while p.poll() is None:
+                        await asyncio.sleep(1)
+
+                    try:
+                        with open('cogs/utils/finished.txt', 'r') as fp:
+                            stop = float(fp.readline())
+                            total = fp.readline()
+                            failures = fp.readline()
+                            size = fp.readline()
+                        os.remove('cogs/utils/finished.txt')
+                    except:
+                        return print('Something went wrong when saving items and the download was stopped. Error posted above.')
+                    if int(failures) != 0:
                         if not silent:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` However, ``{}`` items failed to download. Check your console for more info on which ones were missed. Finished in: ``{} seconds.``'.format(str(total), size, str(failures), str(round(stop - start, 2))))
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` However, ``{}`` items failed to download. Check your console for more info on which ones were missed. '
+                                                                                          'Finished in: ``{} seconds.``'.format(str(total), size, str(failures), str(round(stop - start, 2))))
                         else:
-                            print(' {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
+                            print(' {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. '
+                                  'Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
                     else:
                         if not silent:
                             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` Finished in: ``{} seconds.``'.format(str(total), size, str(round(stop-start, 2))))
                         else:
                             print(' {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
                 else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
+                                                                                  'Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
+                                                                              'Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
 
     @imagedump.command(pass_context=True)
     async def dir(self, ctx, *, msg):
@@ -656,8 +647,9 @@ class Misc:
     async def regional(self, ctx, *, msg):
         """Replace letters with regional indicator emojis"""
         await self.bot.delete_message(ctx.message)
+        data = self.regional_indicators(self)
         msg = list(msg)
-        regional_list = [':regional_indicator_{}:'.format(x.lower()) if x.isalpha() else x for x in msg]
+        regional_list = [data[x.lower()] if x.isalpha() else x for x in msg]
         regional_output = ' '.join(regional_list)
         await self.bot.send_message(ctx.message.channel, regional_output)
 
@@ -680,14 +672,7 @@ class Misc:
         messages = []
         async for message in self.bot.logs_from(ctx.message.channel, limit=2):
             messages.append(message)
-        data = {'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}', 'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}', 'c': '\N{REGIONAL INDICATOR SYMBOL LETTER C}', 'd': '\N{REGIONAL INDICATOR SYMBOL LETTER D}',
-                'e': '\N{REGIONAL INDICATOR SYMBOL LETTER E}', 'f': '\N{REGIONAL INDICATOR SYMBOL LETTER F}', 'g': '\N{REGIONAL INDICATOR SYMBOL LETTER G}', 'h': '\N{REGIONAL INDICATOR SYMBOL LETTER H}',
-                'i': '\N{REGIONAL INDICATOR SYMBOL LETTER I}', 'j': '\N{REGIONAL INDICATOR SYMBOL LETTER J}', 'k': '\N{REGIONAL INDICATOR SYMBOL LETTER K}', 'l': '\N{REGIONAL INDICATOR SYMBOL LETTER L}',
-                'm': '\N{REGIONAL INDICATOR SYMBOL LETTER M}', 'n': '\N{REGIONAL INDICATOR SYMBOL LETTER N}', 'o': '\N{REGIONAL INDICATOR SYMBOL LETTER O}', 'p': '\N{REGIONAL INDICATOR SYMBOL LETTER P}',
-                'q': '\N{REGIONAL INDICATOR SYMBOL LETTER Q}', 'r': '\N{REGIONAL INDICATOR SYMBOL LETTER R}', 's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}',
-                'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}', 'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
-                'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}'}
-
+        data = self.regional_indicators(self)
         await self.bot.delete_message(ctx.message)
         for i in list(msg):
             if i.isalpha():
