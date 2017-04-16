@@ -71,7 +71,9 @@ async def on_ready():
         if int(loginfo['log_size']) > 25:
             loginfo['log_size'] = "25"
         if 'keyusers' not in loginfo:
-            loginfo['keyusers'] = []
+            loginfo['keyusers'] = {}
+        if loginfo['keyusers'] is []:
+            loginfo['keyusers'] = {}
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
