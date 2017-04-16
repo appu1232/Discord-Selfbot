@@ -83,7 +83,6 @@ class KeywordLogger:
                     try:
                         member = None
                         if ' all' in user:
-                            print(user[:-4])
                             for server in self.bot.servers:
                                 member = server.get_member(user[:-4])
                                 if member:
