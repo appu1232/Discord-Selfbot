@@ -6,11 +6,11 @@ import requests
 path, new_dump, delay = sys.argv[1], sys.argv[2], sys.argv[3]
 images = []
 total = failures = 0
-with open('cogs/utils/urls.txt', 'r') as fp:
+with open('cogs/utils/urls{}.txt'.format(new_dump), 'r') as fp:
     for lines in fp:
         images.append(lines.strip())
 
-os.remove('cogs/utils/urls.txt')
+os.remove('cogs/utils/urls{}.txt'.format(new_dump))
 
 print('Found {} items. Downloading...'.format(len(images)))
 for i, image in enumerate(images):
@@ -58,5 +58,5 @@ else:
 sys.stdout.write('\r100% Done! Downloaded {} items. {}\n'.format(total, size))
 sys.stdout.flush()
 
-with open('cogs/utils/finished.txt', 'w') as fp:
+with open('cogs/utils/finished{}.txt'.format(new_dump), 'w') as fp:
     fp.write('{}\n{}\n{}\n{}'.format(str(stop), str(total), str(failures), size))
