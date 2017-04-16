@@ -299,13 +299,13 @@ To switch back to the webhook method of posting notifications in channels, just 
 
 ## Follow Users:
 
-**You must set up the [Keyword notifier](#keyword-notifier) (steps 1-8 at the start of the section) in order to use this feature.**
+**Note:** You must set up the [Keyword Notifier](#keyword-notifier) (steps 1-8 at the start of the section) in order to use this feature.
 
 **Set up people to follow and get notified when they post a message:**
 
 - [Enable developer mode](https://i.imgur.com/AmOZHzL.png) in your user settings to copy [user](https://i.imgur.com/7694JCl.png) and [server](https://i.imgur.com/sc74gxG.png) ids.
 - ``>log adduser <user_id> | <n>`` - get notified when this user sends a message across any of your servers. The ``<n>`` is the cooldown in minutes before that user posting will notify you again. See below for a more thorough explanation.
-    + Ex: ``>log adduser 124910128582361092 | 10`` - I will get notified when user with id ``124910128582361092`` (enable developer mode in your Discord settings under )
+    + Ex: ``>log adduser 124910128582361092 | 10`` - I will get notified when user with id ``124910128582361092`` posts a message anywhere with a cooldown of 10 minutes.
 - ``>log adduser <user_id> | <server_id> | <n>`` - get notified when this user sends a message in the given server. ``<n>`` is the same as above.
 - ``>log removeuser <user_id>`` and ``>log removeuser <user_id> | <server_id>`` - remove the user from all servers or that one server respectively.
 - ``>log refresh`` or ``>log refresh <user_id>`` - refresh the notifier for all users or this specific user if ``<user_id>`` is given. Basically allows you to get notified on the very next message from your users. Aka "I need to know where they are posting right now".
