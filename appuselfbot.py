@@ -60,24 +60,24 @@ async def on_ready():
         os.remove('restart.txt')
     with open('settings/log.json', 'r+') as log:
         loginfo = json.load(log)
-        try:
-            if 'blacklisted_words' not in loginfo:
-                loginfo['blacklisted_words'] = []
-            if 'blacklisted_servers' not in loginfo:
-                loginfo['blacklisted_servers'] = []
-            if 'keyword_logging' not in loginfo:
-                loginfo['keyword_logging'] = 'on'
-            if 'webhook_url' not in loginfo:
-                loginfo['webhook_url'] = ''
-            if int(loginfo['log_size']) > 25:
-                loginfo['log_size'] = "25"
-        except:
-            pass
+        if 'blacklisted_words' not in loginfo:
+            loginfo['blacklisted_words'] = []
+        if 'blacklisted_servers' not in loginfo:
+            loginfo['blacklisted_servers'] = []
+        if 'keyword_logging' not in loginfo:
+            loginfo['keyword_logging'] = 'on'
+        if 'webhook_url' not in loginfo:
+            loginfo['webhook_url'] = ''
+        if int(loginfo['log_size']) > 25:
+            loginfo['log_size'] = "25"
+        if 'keyusers' not in loginfo:
+            loginfo['keyusers'] = []
         log.seek(0)
         log.truncate()
         json.dump(loginfo, log, indent=4)
     with open('settings/log.json', 'r') as log:
         bot.log_conf = json.load(log)
+        bot.key_users = bot.log_conf['keyusers']
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r') as g:
             games = json.load(g)
@@ -321,7 +321,16 @@ async def on_message(message):
                                     break
                             break
 
-            if word_found is True:
+            user_found = False
+            if '{} {}'.format(str(message.author.id), str(message.server.id)) in bot.log_conf['keyusers']:
+                if user_post(bot, '{} {}'.format(str(message.author.id), str(message.server.id))):
+                    user_found = message.author.name
+
+            elif '{} all'.format(str(message.author.id)) in bot.log_conf['keyusers']:
+                if user_post(bot, '{} all'.format(str(message.author.id))):
+                    user_found = message.author.name
+
+            if word_found is True or user_found:
                 location = bot.log_conf['log_location'].split()
                 server = bot.get_server(location[1])
                 if message.channel.id != location[0]:
@@ -344,8 +353,12 @@ async def on_message(message):
 
                     part = int(math.ceil(len(msg) / 1950))
                     notify = load_notify_config()
+                    if user_found:
+                        title = '%s posted' % user_found
+                    else:
+                        title = '%s mentioned: %s' % (message.author.name, word)
                     if part == 1 and success is True:
-                        em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title='%s mentioned: %s' % (message.author.name, word), description='Server: ``%s``\nChannel: ``%s``\n\n**Context:**' % (str(message.server), str(message.channel)))
+                        em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: ``%s``\n\n**Context:**' % (str(message.server), str(message.channel)))
                         for i in range(0, int(bot.log_conf['context_len'])):
                             temp = context.pop()
                             if temp[0].clean_content:
@@ -370,14 +383,18 @@ async def on_message(message):
                                 split_msg += b + '\n'
                             all_words.append(split_msg)
                             split_msg = ''
-                        for b,i in enumerate(all_words):
+                        if user_found:
+                            logged_msg = '``%s`` posted' % user_found
+                        else:
+                            logged_msg = '``%s`` mentioned' % word
+                        for b, i in enumerate(all_words):
                             if b == 0:
                                 if notify['type'] == 'msg':
-                                    await webhook(bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i), 'message')
+                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message')
                                 elif notify['type'] == 'ping':
-                                    await webhook(bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i), 'message ping')
+                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message ping')
                                 else:
-                                    await bot.send_message(server.get_channel(location[0]), bot_prefix + 'Keyword ``%s`` mentioned in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (word, str(message.server), str(message.channel), i))
+                                    await bot.send_message(server.get_channel(location[0]), bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i))
                             else:
                                 if notify['type'] == 'msg':
                                     await webhook('```%s```' % i, 'message')
@@ -391,6 +408,7 @@ async def on_message(message):
             pass
 
     await bot.process_commands(message)
+
 
 def add_alllog(channel, server, message):
     if not hasattr(bot, 'all_log'):
@@ -427,11 +445,12 @@ async def webhook(keyword_content, send_type):
             await request_webhook('/{}/{}'.format(channel, token), content=keyword_content, embeds=None)
 
 # Set/cycle game
-async def game(bot):
+async def game_and_avatar(bot):
     await bot.wait_until_ready()
-    current_game = 0
-    next_game = 0
+    current_game = next_game = current_avatar = next_avatar = 0
     while not bot.is_closed:
+
+        # Cycles game if game cycling is enabled.
         if hasattr(bot, 'game_time') and hasattr(bot, 'game'):
             if bot.game:
                 if bot.game_interval:
@@ -461,26 +480,7 @@ async def game(bot):
                         bot.game = games['games']
                         await bot.change_presence(game=discord.Game(name=games['games']))
 
-        # Sets status to idle when I go offline (won't trigger while I'm online so this prevents me from appearing online all the time)
-        if hasattr(bot, 'refresh_time'):
-            if has_passed(bot, bot.refresh_time):
-                if bot.game:
-                    await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
-                else:
-                    await bot.change_presence(status='invisible', afk=True)
-
-        if hasattr(bot, 'gc_time'):
-            if gc_clear(bot, bot.gc_time):
-                gc.collect()
-
-        await asyncio.sleep(5)
-
-# Set/cycle avatar
-async def avatar(bot):
-    await bot.wait_until_ready()
-    current_avatar = 0
-    next_avatar = 0
-    while not bot.is_closed:
+        # Cycles avatar if avatar cycling is enabled.
         if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
             if bot.avatar:
                 if bot.avatar_interval:
@@ -500,13 +500,25 @@ async def avatar(bot):
                             with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
                         else:
-                            if next_avatar+1 == len(all_avis):
+                            if next_avatar + 1 == len(all_avis):
                                 next_avatar = 0
                             else:
                                 next_avatar += 1
                             bot.avatar = all_avis[next_avatar]
                             with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
+
+        # Sets status to invisible when user goes offline (won't trigger while user is online because client takes priority)
+        if hasattr(bot, 'refresh_time'):
+            if has_passed(bot, bot.refresh_time):
+                if bot.game:
+                    await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
+                else:
+                    await bot.change_presence(status='invisible', afk=True)
+
+        if hasattr(bot, 'gc_time'):
+            if gc_clear(bot, bot.gc_time):
+                gc.collect()
 
         await asyncio.sleep(5)
 
@@ -519,6 +531,5 @@ if __name__ == '__main__':
             except Exception as e:
                 print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
-    bot.loop.create_task(game(bot))
-    bot.loop.create_task(avatar(bot))
+    bot.loop.create_task(game_and_avatar(bot))
     bot.run(config['token'], bot=False)

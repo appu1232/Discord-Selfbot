@@ -2,7 +2,6 @@ import datetime
 import asyncio
 import strawpy
 import random
-import requests
 import re
 import sys
 import subprocess
@@ -11,6 +10,14 @@ from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
+data = {'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}', 'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}', 'c': '\N{REGIONAL INDICATOR SYMBOL LETTER C}', 'd': '\N{REGIONAL INDICATOR SYMBOL LETTER D}',
+        'e': '\N{REGIONAL INDICATOR SYMBOL LETTER E}', 'f': '\N{REGIONAL INDICATOR SYMBOL LETTER F}', 'g': '\N{REGIONAL INDICATOR SYMBOL LETTER G}', 'h': '\N{REGIONAL INDICATOR SYMBOL LETTER H}',
+        'i': '\N{REGIONAL INDICATOR SYMBOL LETTER I}', 'j': '\N{REGIONAL INDICATOR SYMBOL LETTER J}', 'k': '\N{REGIONAL INDICATOR SYMBOL LETTER K}', 'l': '\N{REGIONAL INDICATOR SYMBOL LETTER L}',
+        'm': '\N{REGIONAL INDICATOR SYMBOL LETTER M}', 'n': '\N{REGIONAL INDICATOR SYMBOL LETTER N}', 'o': '\N{REGIONAL INDICATOR SYMBOL LETTER O}', 'p': '\N{REGIONAL INDICATOR SYMBOL LETTER P}',
+        'q': '\N{REGIONAL INDICATOR SYMBOL LETTER Q}', 'r': '\N{REGIONAL INDICATOR SYMBOL LETTER R}', 's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}',
+        'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}', 'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
+        'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}'}
+
 '''Module for miscellaneous commands'''
 
 
@@ -18,16 +25,6 @@ class Misc:
 
     def __init__(self, bot):
         self.bot = bot
-
-    @staticmethod
-    def regional_indicators(self):
-        return {'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}', 'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}', 'c': '\N{REGIONAL INDICATOR SYMBOL LETTER C}', 'd': '\N{REGIONAL INDICATOR SYMBOL LETTER D}',
-                'e': '\N{REGIONAL INDICATOR SYMBOL LETTER E}', 'f': '\N{REGIONAL INDICATOR SYMBOL LETTER F}', 'g': '\N{REGIONAL INDICATOR SYMBOL LETTER G}', 'h': '\N{REGIONAL INDICATOR SYMBOL LETTER H}',
-                'i': '\N{REGIONAL INDICATOR SYMBOL LETTER I}', 'j': '\N{REGIONAL INDICATOR SYMBOL LETTER J}', 'k': '\N{REGIONAL INDICATOR SYMBOL LETTER K}', 'l': '\N{REGIONAL INDICATOR SYMBOL LETTER L}',
-                'm': '\N{REGIONAL INDICATOR SYMBOL LETTER M}', 'n': '\N{REGIONAL INDICATOR SYMBOL LETTER N}', 'o': '\N{REGIONAL INDICATOR SYMBOL LETTER O}', 'p': '\N{REGIONAL INDICATOR SYMBOL LETTER P}',
-                'q': '\N{REGIONAL INDICATOR SYMBOL LETTER Q}', 'r': '\N{REGIONAL INDICATOR SYMBOL LETTER R}', 's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}',
-                'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}', 'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
-                'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}'}
 
     @commands.command(pass_context=True)
     async def about(self, ctx):
@@ -444,7 +441,7 @@ class Misc:
                                     if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images:
                                         images.append(url)
 
-                    with open('cogs/utils/urls.txt', 'w') as fp:
+                    with open('cogs/utils/urls{}.txt'.format(new_dump), 'w') as fp:
                         for url in images:
                             fp.write(url + '\n')
 
@@ -455,12 +452,12 @@ class Misc:
                         await asyncio.sleep(1)
 
                     try:
-                        with open('cogs/utils/finished.txt', 'r') as fp:
+                        with open('cogs/utils/finished{}.txt'.format(new_dump), 'r') as fp:
                             stop = float(fp.readline())
                             total = fp.readline()
                             failures = fp.readline()
                             size = fp.readline()
-                        os.remove('cogs/utils/finished.txt')
+                        os.remove('cogs/utils/finished{}.txt'.format(new_dump))
                     except:
                         return print('Something went wrong when saving items and the download was stopped. Error posted above.')
                     if int(failures) != 0:
@@ -468,13 +465,13 @@ class Misc:
                             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` However, ``{}`` items failed to download. Check your console for more info on which ones were missed. '
                                                                                           'Finished in: ``{} seconds.``'.format(str(total), size, str(failures), str(round(stop - start, 2))))
                         else:
-                            print(' {} items downloaded. However, {} items failed to download. Check your console for more info on which ones were missed. '
-                                  'Finished in: {} seconds.'.format(str(total), str(failures), str(round(stop - start, 2))))
+                            print('{} items failed to download. See above for missed links. '
+                                  'Finished in: {} seconds.'.format(str(failures), str(round(stop - start, 2))))
                     else:
                         if not silent:
                             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` Finished in: ``{} seconds.``'.format(str(total), size, str(round(stop-start, 2))))
                         else:
-                            print(' {} items downloaded. Finished in: {} seconds'.format(str(total), str(round(stop-start, 2))))
+                            print('Finished in: {} seconds'.format(str(round(stop-start, 2))))
                 else:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
                                                                                   'Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
@@ -647,10 +644,9 @@ class Misc:
     async def regional(self, ctx, *, msg):
         """Replace letters with regional indicator emojis"""
         await self.bot.delete_message(ctx.message)
-        data = self.regional_indicators(self)
         msg = list(msg)
         regional_list = [data[x.lower()] if x.isalpha() else x for x in msg]
-        regional_output = ' '.join(regional_list)
+        regional_output = '  '.join(regional_list)
         await self.bot.send_message(ctx.message.channel, regional_output)
 
     @commands.command(pass_context=True)
@@ -670,13 +666,25 @@ class Misc:
     async def react(self, ctx, *, msg):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
         messages = []
-        async for message in self.bot.logs_from(ctx.message.channel, limit=2):
+        try:
+            id = msg.split(' ', 1)[0]
+            int(id)
+            limit = 25
+        except:
+            id = None
+            limit = 2
+        async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
             messages.append(message)
-        data = self.regional_indicators(self)
         await self.bot.delete_message(ctx.message)
         for i in list(msg):
             if i.isalpha():
-                await self.bot.add_reaction(messages[1], data[i.lower()])
+                if id:
+                    for j in messages:
+                        if id == j.id:
+                            await self.bot.add_reaction(j, data[i.lower()])
+
+                else:
+                    await self.bot.add_reaction(messages[1], data[i.lower()])
 
 
 def setup(bot):

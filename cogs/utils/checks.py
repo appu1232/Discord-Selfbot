@@ -27,6 +27,21 @@ def has_passed(bot, oldtime):
     return True
 
 
+def user_post(bot, user):
+    if time.time() - float(bot.key_users[user][0]) < float(bot.key_users[user][1]):
+        bot.key_users[user] = [time.time(), bot.key_users[user][1]]
+        return False
+    with open('settings/log.json', 'r+') as log:
+        settings = json.load(log)
+        now = time.time()
+        settings['keyusers'][user] = [now, bot.key_users[user][1]]
+        log.seek(0)
+        log.truncate()
+        json.dump(settings, log, indent=4)
+    bot.key_users[user] = [now, bot.key_users[user][1]]
+    return True
+
+
 def gc_clear(bot, gc_time):
     if time.time() - 1800 < gc_time:
         return False

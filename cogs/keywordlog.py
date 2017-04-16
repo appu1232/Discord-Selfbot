@@ -78,7 +78,29 @@ class KeywordLogger:
                         pass
                     msg += str(server) + ', '
                 msg = msg.rstrip(', ')
-                msg += '\n\nContext length: %s messages```' % settings['context_len']
+                msg += '\n\nContext length: %s messages\n\nUser follows: ' % settings['context_len']
+                for user in settings['keyusers']:
+                    try:
+                        member = None
+                        if ' all' in user:
+                            print(user[:-4])
+                            for server in self.bot.servers:
+                                member = server.get_member(user[:-4])
+                                if member:
+                                    msg += '{} CD: {} mins, '.format(str(member.name), str(settings['keyusers'][user][1] / 60.0))
+                                    break
+                            if not member:
+                                continue
+                        else:
+                            try:
+                                server = self.bot.get_server(user.split(' ')[1])
+                                member = server.get_member(user.split(' ')[0])
+                                msg += '{} in server: {} CD: {} mins, '.format(str(member.name), str(server.name), str(settings['keyusers'][user][1] / 60.0))
+                            except:
+                                continue
+                    except:
+                        pass
+                msg = msg.rstrip(', ') + '```'
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
 
     @log.command(pass_context=True)
@@ -227,6 +249,28 @@ class KeywordLogger:
             self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
+    async def refresh(self, ctx):
+        with open('settings/log.json', 'r+') as log:
+            settings = json.load(log)
+            if ctx.message.content[13:].strip():
+                user = ctx.message.content[13:].strip()
+                for key in settings['keyusers']:
+                    if user in key:
+                        settings['keyusers'][key] = [0.0, settings['keyusers'][key][1]]
+            else:
+
+                for user in settings['keyusers']:
+                    settings['keyusers'][user] = [0.0, settings['keyusers'][user][1]]
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Refreshed notification cooldown for this user.')
+            log.seek(0)
+            log.truncate()
+            json.dump(settings, log, indent=4)
+        await self.bot.delete_message(ctx.message)
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+            self.bot.key_users = self.bot.log_conf['keyusers']
+
+    @log.command(pass_context=True)
     async def context(self, ctx):
         if ctx.message.content[12:].strip():
             if ctx.message.content[12:].strip().isdigit():
@@ -308,6 +352,75 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'This keyword ``%s`` is not in the logger.' % msg)
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
+
+    @log.command(pass_context=True)
+    async def adduser(self, ctx, *, msg: str):
+        if ' | ' in msg.strip():
+            data = msg.strip().split(' | ')
+            if len(data) == 2:
+                id = data[0]
+                stalk_servers = True
+                interval = data[1]
+            else:
+                id = data[0]
+                stalk_servers = self.bot.get_server(data[1])
+                if not stalk_servers:
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Server not found. Are you using the command right?\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
+                interval = data[2]
+            try:
+                interval = float(interval)
+            except:
+                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid interval. Enter a number.\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
+            user = None
+            for server in self.bot.servers:
+                user = server.get_member(id)
+                if user:
+                    break
+            if not user:
+                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find specified user. Are you using the command right?\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
+
+            if stalk_servers is True:
+                key = id + ' all'
+            else:
+                key = id + ' ' + stalk_servers.id
+
+            with open('settings/log.json', 'r+') as log:
+                settings = json.load(log)
+                if msg not in settings['keywords'] and msg is not None:
+                    settings['keyusers'][key] = [0.0, float(interval) * 60.0]
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+            if stalk_servers is True:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Now ~~stalking~~ following ``{}``.'.format(user.name))
+            else:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Now ~~stalking~~ following ``{}`` in server ``{}``.'.format(user.name, self.bot.get_server(stalk_servers.id).name))
+            with open('settings/log.json', 'r') as log:
+                self.bot.log_conf = json.load(log)
+                self.bot.key_users = self.bot.log_conf['keyusers']
+
+        else:
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Proper use: ``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60'.format(self.bot.user.id))
+
+    @log.command(pass_context=True)
+    async def removeuser(self, ctx, *, msg: str):
+        if ' | ' in msg.strip():
+            user = msg.strip().replace(' | ', ' ')
+        else:
+            user = msg.strip() + ' all'
+        with open('settings/log.json', 'r+') as log:
+            settings = json.load(log)
+            if user in settings['keyusers']:
+                del settings['keyusers'][user]
+                log.seek(0)
+                log.truncate()
+                json.dump(settings, log, indent=4)
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Stopped following this user.')
+            else:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+            self.bot.key_users = self.bot.log_conf['keyusers']
 
     @log.command(pass_context=True)
     async def addblacklist(self, ctx, *, msg: str):
