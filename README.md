@@ -13,14 +13,15 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 5. [All Commands](#all-commands)
 6. [Custom Commands](#custom-commands)
 7. [Keyword Notifier](#keyword-notifier)
-8. [Save Chat Messages](#save-chat-messages)
-9. [Google API](#google-api)
-10. [Other Things to Note](#other-things-to-note)
+8. [User Following](#follow-users)
+9. [Save Chat Messages](#save-chat-messages)
+10. [Google API](#google-api)
+11. [Other Things to Note](#other-things-to-note)
 
 ## Features
 
 - Google web and image search.
-- Keyword/mention logger and notifier. Log messages and get notified when keywords you specified are said in any of your servers. Useful to track if someone mentioned your name or your favorite show/book/whatever else keywords and you want to stalk— I mean, talk to them about it.
+- Keyword/user logger and notifier. Get notified when keywords you specified are said in any of your server or follow users and get notified when they send a message (with a cooldown). Useful to track someone or see if someone mentioned your name or your favorite show/book/whatever else keywords and you want to stalk— I mean, talk to them about it.
 - Set your game to anything or set up multiple and cycle through them.
 - Cycle through avatars automatically (minimum 5 minute interval).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
@@ -94,7 +95,7 @@ Manual update: Unless otherwise stated, all you need to do is save your ``settin
 - ``>restart`` - restart the bot. If there is an update available it will prompt you if you want to update as well.
 - ``>quit`` - quits the bot.
 - ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. **The game won't show for yourself but other people can see it.** The bot sets the game status on startup as well if you set it up once. Do ``>game`` with nothing else to turn off your game.
-- ``>avatar`` - sets your avatar by cycling through the images you have under ``settings/avatars`` (.jpg, .jpeg, and .png only). It will prompt you with your desired interval and whether to change randomly or in order.
+- ``>avatar`` - sets your avatar by cycling through the images you have under the ``avatars`` folder (.jpg, .jpeg, and .png only). It will prompt you with your desired interval and whether to change randomly or in order.
   + On first use, this command will require your discord password. This is just a limitation of the API. In no way is your password being distributed. It is just stored locally and called on internally to change your avatar. Just make sure you input the password in a private channel so no one sees it.
 - ``>stats`` - Bot stats and some user info. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
 
@@ -194,6 +195,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - ``>gist <text>`` - posts the given text to Gist. Also can do ``>gist file /path/to/file`` to post the file if the file is in the bot folder.
 - ``>regional <text>`` - send each letter in this message as regional indicator emojis.
 - ``>space <text>`` or ``>space <n> <text>`` - put a space between each letter in the message. Optionally, specify how many spaces to put between each letter with ``<n>``
+- ``>react <text>`` or ``>react <id> <text>`` - react to the above message with the given text. If the message id is given, it will react to that message instead.
 
 ## Custom Commands:
 ![custom](https://cloud.githubusercontent.com/assets/14967932/24776178/bb6bb5f0-1aed-11e7-94e4-567b993b4ba6.gif)
@@ -264,14 +266,14 @@ So, here's how you get started with setting up the notifier:
   + ``>log addblacklist [word] [server] <word>`` - blacklists the current word for only this server (the one you are typing in).
     - Ex: ``overwatch`` is a keyword but you don't want notifs from the Overwatch server. Go to the server and in any channel, type ``>log addblacklist [word] [server] overwatch``.
   + ``>log addblacklist [word] [channel] <word>`` - blacklists the current word for only this channel (the one you are typing in).
-  + ``>log removeblacklist [user] <user>`` or ``>log removeblacklist [word] <word>`` etc. - self-explanatory.
-  
+  + ``>log removeblacklist [user] <user>`` or ``>log removeblacklist [word] <word>`` etc. - self-explanatory.  
+
 - **Set how you want to receive notifications:**
   + ``>notify msg`` - posts in the keyword notifier channel using the webhook. (default)
   + ``>notify ping`` - posts in the keyword notifier channel but also get pinged when it does so (helpful if you want to see your logs in the recent mentions tab).
   + ``>notify dm`` - recieve via direct message. **This requires the proxy bot to be set up. See below**
   + ``>notify off`` - don't recieve any notifications (keywords will still be logged if keyword logging is on but no notifications will be sent)
-	
+ 
 **Things to note:**
 
 1. Only other people can trigger the log message. You yourself saying a keyword won't log the message.
@@ -294,6 +296,24 @@ This is possible, but you'll need a **proxy bot** for this. Here's how you can s
 5. Enable the proxy bot and set it to send via direct messages with ``>notify dm``. ``>notify off`` will turn off the proxy bot.
 
 To switch back to the webhook method of posting notifications in channels, just do ``>notify msg`` or ``>notify ping`` again.
+
+## Follow Users:
+
+**Set up people to follow and get notified when they post a message:**
+
+- [Enable developer mode](https://i.imgur.com/AmOZHzL.png) in your user settings to copy [user](https://i.imgur.com/7694JCl.png) and [server](https://i.imgur.com/sc74gxG.png) ids.
+- ``>log adduser <user_id> | <n>`` - get notified when this user sends a message across any of your servers. The ``<n>`` is the cooldown in minutes before that user posting will notify you again. See below for a more thorough explanation.
+    + Ex: ``>log adduser 124910128582361092 | 10`` - I will get notified when user with id ``124910128582361092`` (enable developer mode in your Discord settings under )
+- ``>log adduser <user_id> | <server_id> | <n>`` - get notified when this user sends a message in the given server. ``<n>`` is the same as above.
+- ``>log removeuser <user_id>`` and ``>log removeuser <user_id> | <server_id>`` - remove the user from all servers or that one server respectively.
+- ``>log refresh`` or ``>log refresh <user_id>`` - refresh the notifier for all users or this specific user if ``<user_id>`` is given. Basically allows you to get notified on the very next message from your users. Aka "I need to know where they are posting right now".
+- ``>log`` - will show who you are ~~stalking~~ following (keyword settings are at the top and user settings are at the bottom)
+
+**More important information about user following:**
+
+- The cooldown is in minutes but you can go lower than 1, although I wouldn't advise it unless you want to get spam pinged.
+- The cooldown is basically a timer that counts down but resets if the user posts again within the count down. Basically, a user must go ``<n>`` time without posting and then the next post will trigger the notification.
+- ``adduser`` and ``removeuser`` are directly linked so you can't do something like add a user for all servers and then try to remove them from one server. If you add a user for all, you must remove for all. If you added for one server, you must remove for that server.
 
 ## Save Chat Messages
 
