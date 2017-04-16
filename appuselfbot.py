@@ -72,7 +72,7 @@ async def on_ready():
             loginfo['log_size'] = "25"
         if 'keyusers' not in loginfo:
             loginfo['keyusers'] = {}
-        if loginfo['keyusers'] is []:
+        if loginfo['keyusers'] == []:
             loginfo['keyusers'] = {}
         log.seek(0)
         log.truncate()
