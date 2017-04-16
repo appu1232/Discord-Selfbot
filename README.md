@@ -94,6 +94,7 @@ Manual update: Unless otherwise stated, all you need to do is save your ``settin
 ## All Commands:
 - ``>restart`` - restart the bot. If there is an update available it will prompt you if you want to update as well.
 - ``>quit`` - quits the bot.
+- ``>update`` - updates the bot to the latest version.
 - ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. **The game won't show for yourself but other people can see it.** The bot sets the game status on startup as well if you set it up once. Do ``>game`` with nothing else to turn off your game.
 - ``>avatar`` - sets your avatar by cycling through the images you have under the ``avatars`` folder (.jpg, .jpeg, and .png only). It will prompt you with your desired interval and whether to change randomly or in order.
   + On first use, this command will require your discord password. This is just a limitation of the API. In no way is your password being distributed. It is just stored locally and called on internally to change your avatar. Just make sure you input the password in a private channel so no one sees it.
