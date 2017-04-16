@@ -7,6 +7,7 @@ import random
 import glob
 import gc
 import psutil
+import sys
 from datetime import timezone
 from cogs.utils.allmsgs import *
 from discord_webhooks import *
@@ -117,12 +118,7 @@ async def on_ready():
             except:
                 pass
             os.remove('notifier.txt')
-        try:
-            bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
-        except (SyntaxError, FileNotFoundError):
-            bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
-        except:
-            pass
+        bot.subpro = subprocess.Popen([sys.executable, 'cogs/utils/notify.py'])
         with open('notifier.txt', 'w') as fp:
             fp.write(str(bot.subpro.pid))
 

@@ -6,7 +6,7 @@ import os
 import re
 import subprocess
 import psutil
-import asyncio
+import sys
 from datetime import timezone
 
 keywords = []
@@ -657,12 +657,7 @@ class KeywordLogger:
             except:
                 pass
             os.remove('notifier.txt')
-        try:
-            self.bot.subpro = subprocess.Popen(['python3', 'cogs/utils/notify.py'])
-        except (SyntaxError, FileNotFoundError):
-            self.bot.subpro = subprocess.Popen(['python', 'cogs/utils/notify.py'])
-        except:
-            pass
+        self.bot.subpro = subprocess.Popen([sys.executable, 'cogs/utils/notify.py'])
         with open('notifier.txt', 'w') as fp:
             fp.write(str(self.bot.subpro.pid))
 

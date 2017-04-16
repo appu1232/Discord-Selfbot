@@ -19,13 +19,20 @@ class Server:
         if ctx.invoked_subcommand is None:
             if ctx.message.content[7:]:
                 server = None
-                for i in self.bot.servers:
-                    if i.name.lower() == ctx.message.content[7:].lower().strip():
-                        server = i
-                        break
-                if not server:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
-                    return
+                try:
+                    float(ctx.message.content[7:].strip())
+                    server = self.bot.get_server(ctx.message.content[7:].strip())
+                    if not server:
+                        return await self.bot.send_message(ctx.message.channel,
+                                                           bot_prefix + 'Server not found.')
+                except:
+                    for i in self.bot.servers:
+                        if i.name.lower() == ctx.message.content[7:].lower().strip():
+                            server = i
+                            break
+                    if not server:
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
+                        return
             else:
                 server = ctx.message.server
 
