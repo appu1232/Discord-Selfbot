@@ -23,7 +23,7 @@ updater () {
 				echo ""
 				echo "Installing update"
 				echo "Updating to latest stable build."
-				if git pull origin master ; then 
+				if git pull origin master ; then
 					echo "Update succeeded"
 					sleep 2
 				else
@@ -40,14 +40,15 @@ updater () {
 		fi
 		sleep 1
 		if [ -d "settings2" ]; then
+				rm -f settings >/dev/null 2>&1
 				mv settings2 settings
-		
+
 		fi
 	else
 		echo "You do not have git installed. Auto-update is not currently supported" # TODO HTTP update
 		echo "Git is almost certainly available from your package manager. Install with:"
 		echo "sudo apt-get install git-all"
-	fi	
+	fi
 }
 
 min_updater() {
@@ -60,7 +61,7 @@ min_updater() {
 		echo ""
 		echo "Installing update"
 		echo "Updating to latest stable build."
-		if git pull origin master ; then 
+		if git pull origin master ; then
 			echo "Update succeeded"
 			sleep 2
 		else
@@ -72,8 +73,9 @@ min_updater() {
 		fi
 		sleep 1
 		if [ -d "settings2" ]; then
+				rm -f settings >/dev/null 2>&1
 				mv settings2 settings
-		
+
 		fi
 	else
 		echo "You do not have git installed. Auto-update is not currently supported" # TODO HTTP update
@@ -125,7 +127,7 @@ run_bot() {
 				exit 253
 			fi
 		fi
-		
+
 	elif hash python 2>/dev/null; then # TODO abstracify all this which mirrors above an also look up boolean operators in sh
 		case "$(python --version 2>&1)" in
 			*" 3."*)
@@ -149,7 +151,7 @@ run_bot() {
 				else
 					echo "Shutting down"
 				fi
-				
+
 			else
 				echo "Requirements installation failed"
 				exit 254
