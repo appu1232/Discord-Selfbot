@@ -299,6 +299,8 @@ To switch back to the webhook method of posting notifications in channels, just 
 
 ## Follow Users:
 
+**You must set up the [Keyword notifier](#keyword-notifier) (steps 1-8 at the start of the section) in order to use this feature.**
+
 **Set up people to follow and get notified when they post a message:**
 
 - [Enable developer mode](https://i.imgur.com/AmOZHzL.png) in your user settings to copy [user](https://i.imgur.com/7694JCl.png) and [server](https://i.imgur.com/sc74gxG.png) ids.
