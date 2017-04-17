@@ -23,19 +23,34 @@ class Customcmds:
             sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
             msgs = []
             part = ''
-            for cmd in sortedcmds:
-                if type(cmds[cmd]) is list:
-                    check = cmd + ': '
-                    for i in cmds[cmd]:
-                        check += str(i[0]) + ' | '
-                    check = check.rstrip(' | ') + '\n\n'
-                else:
-                    check = cmd + '\n\n'
-                if len(part + check) > 1900:
-                    msgs.append(part)
-                    part = check
-                else:
-                    part += check
+            if ctx.message.content[12:] and ctx.message.content[12:] != 'gist':
+                one_cmd = True
+                list_cmd = ctx.message.content.strip().split(' ')[1]
+                for cmd in sortedcmds:
+                    if one_cmd and list_cmd == cmd:
+                        if type(cmds[cmd]) is list:
+                            part = cmd + ': '
+                            for i in cmds[cmd]:
+                                part += str(i[0]) + ' | '
+                            part = part.rstrip(' | ')
+                            break
+                        else:
+                            part = cmd
+
+            else:
+                for cmd in sortedcmds:
+                    if type(cmds[cmd]) is list:
+                        check = cmd + ': '
+                        for i in cmds[cmd]:
+                            check += str(i[0]) + ' | '
+                        check = check.rstrip(' | ') + '\n\n'
+                    else:
+                        check = cmd + '\n\n'
+                    if len(part + check) > 1900:
+                        msgs.append(part)
+                        part = check
+                    else:
+                        part += check
             msgs.append(part)
             if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
                 msgs = '\n'.join(msgs)
@@ -61,14 +76,28 @@ class Customcmds:
                 cmds = json.load(commands)
         msg = ''
         sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
-        for cmd in sortedcmds:
-            msg += '"' + cmd + '" : "'
-            if type(cmds[cmd]) == list:
-                for i in cmds[cmd]:
-                    msg += str(i) + ', '
-                msg = msg[:-2] + '",\n\n'
-            else:
-                msg += str(cmds[cmd]) + '",\n\n'
+        if ctx.message.content[17:] and ctx.message.content[17:] != 'gist':
+            one_cmd = True
+            list_cmd = ctx.message.content.strip().split('long')[1].strip()
+            for cmd in sortedcmds:
+                if one_cmd and list_cmd == cmd:
+                    msg += '"' + cmd + '" : "'
+                    if type(cmds[cmd]) == list:
+                        for i in cmds[cmd]:
+                            msg += str(i) + ', '
+                        msg = msg[:-2] + '",\n\n'
+                    else:
+                        msg += str(cmds[cmd]) + '",\n\n'
+
+        else:
+            for cmd in sortedcmds:
+                msg += '"' + cmd + '" : "'
+                if type(cmds[cmd]) == list:
+                    for i in cmds[cmd]:
+                        msg += str(i) + ', '
+                    msg = msg[:-2] + '",\n\n'
+                else:
+                    msg += str(cmds[cmd]) + '",\n\n'
         msg = msg[:-3]
         msg += '}```'
         part = int(math.ceil(len(msg) / 1900))

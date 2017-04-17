@@ -49,7 +49,7 @@ Download the zip and extract it. Inside this folder, go into the ``settings`` fo
 }
 ```
 
-- ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Shift + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) [For Mac.](https://i.imgur.com/otvxoYL.png) Don't give this out to anyone!
+- ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Option + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) [For Mac.](https://i.imgur.com/otvxoYL.png) Don't give this out to anyone!
 - ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as an in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
 
@@ -214,6 +214,16 @@ However, **you may want to add multiple responses to the same command.** So the 
 Example: ``>add kaguya present http://i.imgur.com/7Px7EZx.png`` then you can add another to the ``.kaguya`` command: ``>add kaguya yes http://i.imgur.com/y0yAp1j.png``.
 
 Invoke a specific response with ``.<command> <response_name>`` or get a random response for that command with ``.<command>``
+
+**Ways to view your customcmds:**
+
+- ``>customcmds`` - small view, just shows the command and response names.
+  + ``>customcmds <command>`` - view just this command and its response names.
+  + ``>customcmds gist`` - posts to Gist and gets the link to it rather than posting it in the chat (useful if your list is really long)
+- ``>customcmds long`` - large view, shows you everything including the responses.
+  + ``>customcmds long <command>`` - view just this command and it's response names and responses.
+  + ``>customcmds long gist`` - posts it to Gist and retrieves the link like with customcmds gist.
+  
 
 
 **Removing commands:**
