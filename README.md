@@ -71,7 +71,7 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 
 ## Running the selfbot
 
-Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed (don't change any settings). **When installing python, make sure you check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.**
+Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. Make sure [this is selected](https://i.imgur.com/ZXEpGtH.png) when installing Git. **When installing Python, check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.**
 
 **Windows:**
 
