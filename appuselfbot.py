@@ -472,14 +472,14 @@ async def game_and_avatar(bot):
                                 next_game = random.randint(0, len(games['games']) - 1)
                             current_game = next_game
                             bot.game = games['games'][next_game]
-                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.invisible, afk=True)
+                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.idle, afk=True)
                         else:
                             if next_game+1 == len(games['games']):
                                 next_game = 0
                             else:
                                 next_game += 1
                             bot.game = games['games'][next_game]
-                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.invisible, afk=True)
+                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.idle, afk=True)
 
 
                 else:
@@ -488,7 +488,7 @@ async def game_and_avatar(bot):
                             games = json.load(g)
 
                         bot.game = games['games']
-                        await bot.change_presence(game=discord.Game(name=games['games']), status=discord.Status.invisible, afk=True)
+                        await bot.change_presence(game=discord.Game(name=games['games']), status=discord.Status.idle, afk=True)
 
         # Cycles avatar if avatar cycling is enabled.
         if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
@@ -518,13 +518,13 @@ async def game_and_avatar(bot):
                             with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
 
-        # Sets status to invisible when user goes offline (won't trigger while user is online because client takes priority)
+        # Sets status to idle when user goes offline (won't trigger while user is online because client takes priority)
         if hasattr(bot, 'refresh_time'):
             if has_passed(bot, bot.refresh_time):
                 if bot.game:
-                    await bot.change_presence(game=discord.Game(name=bot.game), status=discord.Status.invisible, afk=True)
+                    await bot.change_presence(game=discord.Game(name=bot.game), status=discord.Status.idle, afk=True)
                 else:
-                    await bot.change_presence(status=discord.Status.invisible, afk=True)
+                    await bot.change_presence(status=discord.Status.idle, afk=True)
 
         if hasattr(bot, 'gc_time'):
             if gc_clear(bot, bot.gc_time):
