@@ -69,6 +69,10 @@ async def on_ready():
             loginfo['keyword_logging'] = 'on'
         if 'webhook_url' not in loginfo:
             loginfo['webhook_url'] = ''
+        if 'webhook_url2' not in loginfo:
+            loginfo['webhook_url2'] = ''
+        if 'user_location' not in loginfo:
+            loginfo['user_location'] = ''
         if int(loginfo['log_size']) > 25:
             loginfo['log_size'] = "25"
         if 'keyusers' not in loginfo:
@@ -329,7 +333,12 @@ async def on_message(message):
                     user_found = message.author.name
 
             if word_found is True or user_found:
-                location = bot.log_conf['log_location'].split()
+                if bot.log_conf['user_location'] != bot.log_conf['log_location'] and bot.log_conf['user_location'] != '' and not word_found:
+                    location = bot.log_conf['user_location'].split()
+                    is_separate = True
+                else:
+                    location = bot.log_conf['log_location'].split()
+                    is_separate = False
                 server = bot.get_server(location[1])
                 if message.channel.id != location[0]:
                     msg = message.clean_content.replace('`', '')
@@ -351,7 +360,7 @@ async def on_message(message):
 
                     part = int(math.ceil(len(msg) / 1950))
                     notify = load_notify_config()
-                    if user_found:
+                    if user_found and is_separate:
                         title = '%s posted' % user_found
                     else:
                         title = '%s mentioned: %s' % (message.author.name, word)
@@ -367,9 +376,9 @@ async def on_message(message):
                         except:
                             pass
                         if notify['type'] == 'msg':
-                            await webhook(em, 'embed')
+                            await webhook(em, 'embed', is_separate)
                         elif notify['type'] == 'ping':
-                            await webhook(em, 'embed ping')
+                            await webhook(em, 'embed ping', is_separate)
                         else:
                             await bot.send_message(server.get_channel(location[0]), embed=em)
                     else:
@@ -381,23 +390,23 @@ async def on_message(message):
                                 split_msg += b + '\n'
                             all_words.append(split_msg)
                             split_msg = ''
-                        if user_found:
+                        if user_found and is_separate:
                             logged_msg = '``%s`` posted' % user_found
                         else:
                             logged_msg = '``%s`` mentioned' % word
                         for b, i in enumerate(all_words):
                             if b == 0:
                                 if notify['type'] == 'msg':
-                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message')
+                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message', is_separate)
                                 elif notify['type'] == 'ping':
-                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message ping')
+                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message ping', is_separate)
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i))
                             else:
                                 if notify['type'] == 'msg':
-                                    await webhook('```%s```' % i, 'message')
+                                    await webhook('```%s```' % i, 'message', is_separate)
                                 elif notify['type'] == 'ping':
-                                    await webhook('```%s```' % i, 'message ping')
+                                    await webhook('```%s```' % i, 'message ping', is_separate)
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), '```%s```' % i)
                     bot.keyword_log += 1
@@ -425,8 +434,11 @@ def remove_alllog(channel, server):
 
 
 # Webhook for keyword notifications
-async def webhook(keyword_content, send_type):
-    temp = bot.log_conf['webhook_url'].split('/')
+async def webhook(keyword_content, send_type, is_separate):
+    if not is_separate:
+        temp = bot.log_conf['webhook_url'].split('/')
+    else:
+        temp = bot.log_conf['webhook_url2'].split('/')
     channel = temp[len(temp) - 2]
     token = temp[len(temp) - 1]
     webhook_class = Webhook(bot)
@@ -460,14 +472,14 @@ async def game_and_avatar(bot):
                                 next_game = random.randint(0, len(games['games']) - 1)
                             current_game = next_game
                             bot.game = games['games'][next_game]
-                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
+                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.invisible, afk=True)
                         else:
                             if next_game+1 == len(games['games']):
                                 next_game = 0
                             else:
                                 next_game += 1
                             bot.game = games['games'][next_game]
-                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]))
+                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.invisible, afk=True)
 
 
                 else:
@@ -476,7 +488,7 @@ async def game_and_avatar(bot):
                             games = json.load(g)
 
                         bot.game = games['games']
-                        await bot.change_presence(game=discord.Game(name=games['games']))
+                        await bot.change_presence(game=discord.Game(name=games['games']), status=discord.Status.invisible, afk=True)
 
         # Cycles avatar if avatar cycling is enabled.
         if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
@@ -510,9 +522,9 @@ async def game_and_avatar(bot):
         if hasattr(bot, 'refresh_time'):
             if has_passed(bot, bot.refresh_time):
                 if bot.game:
-                    await bot.change_presence(game=discord.Game(name=bot.game), status='invisible', afk=True)
+                    await bot.change_presence(game=discord.Game(name=bot.game), status=discord.Status.invisible, afk=True)
                 else:
-                    await bot.change_presence(status='invisible', afk=True)
+                    await bot.change_presence(status=discord.Status.invisible, afk=True)
 
         if hasattr(bot, 'gc_time'):
             if gc_clear(bot, bot.gc_time):

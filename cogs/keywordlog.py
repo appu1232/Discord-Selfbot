@@ -55,6 +55,10 @@ class KeywordLogger:
                         word, id = i.split('[server]')
                         name = self.bot.get_server(id)
                         msg += word + '(for server: %s)' % str(name) + ', '
+                    elif '[channel]' in i:
+                        word, id = i.split('[channel]')
+                        name = self.bot.get_channel(id)
+                        msg += word + '(for server: %s)' % str(name) + ', '
                     else:
                         msg += i + ', '
                 msg = msg.rstrip(', ')
@@ -203,6 +207,25 @@ class KeywordLogger:
             log.truncate()
             json.dump(settings, log, indent=4)
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set log location to this channel.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+
+    @log.command(pass_context=True)
+    async def location2(self, ctx):
+        with open('settings/log.json', 'r+') as log:
+            settings = json.load(log)
+            settings['user_location'] = ctx.message.channel.id + ' ' + ctx.message.server.id
+            log.seek(0)
+            log.truncate()
+            json.dump(settings, log, indent=4)
+        if settings['user_location'] == settings['log_location']:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'User follows and keywords will both log in this channel.')
+        else:
+            if settings['webhook_url2'] == "":
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'User follows will now log in this channel, however, you will need to set up a separate webhook for this. '
+                                                                              'Follow the instructions on how to set up a webhook found in the keyword logger section and add it for the user follows with ``>webhook2 <webhook_url>``')
+            else:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'User follows will now log in this channel instead of the keyword logger channel.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -562,7 +585,6 @@ class KeywordLogger:
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
-
     @commands.command(pass_context=True)
     async def webhook(self, ctx, *, msg):
         with open('settings/log.json', 'r+') as l:
@@ -577,6 +599,19 @@ class KeywordLogger:
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
+    @commands.command(pass_context=True)
+    async def webhook2(self, ctx, *, msg):
+        with open('settings/log.json', 'r+') as l:
+            log = json.load(l)
+            if 'webhook_url' not in log:
+                log['webhook_url2'] = ''
+            log['webhook_url2'] = msg.lstrip('<').rstrip('>').strip('"')
+            l.seek(0)
+            l.truncate()
+            json.dump(log, l, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set up webhook for user follow notifications!')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
 
     @commands.group(pass_context=True)
     async def notify(self, ctx):
