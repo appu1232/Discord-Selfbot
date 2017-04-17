@@ -327,6 +327,7 @@ To switch back to the webhook method of posting notifications in channels, just 
 - The cooldown is in minutes but you can go lower than 1, although I wouldn't advise it unless you want to get spam pinged.
 - The cooldown is basically a timer that counts down but resets if the user posts again within the count down. Basically, a user must go ``<n>`` time without posting and then the next post will trigger the notification.
 - ``adduser`` and ``removeuser`` are directly linked so you can't do something like add a user for all servers and then try to remove them from one server. If you add a user for all, you must remove for all. If you added for one server, you must remove for that server.
+- If you are using a channel to recieve notifications (no proxy bot) and want to recieve notifications in a different channel for user follows rather than the same one as the keyword logger, you can do this by setting a second log location ``>log location2`` in this second channel. You will also need a second webhook so create a second webhook for this new channel using the same instructions as in the Keyword Notifier section and then do ``>webhook2 <webhook_url>`` and you should be all set.
 
 ## Save Chat Messages
 
