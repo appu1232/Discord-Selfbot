@@ -196,7 +196,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - ``>gist <text>`` - posts the given text to Gist. Also can do ``>gist file /path/to/file`` to post the file if the file is in the bot folder.
 - ``>regional <text>`` - send each letter in this message as regional indicator emojis.
 - ``>space <text>`` or ``>space <n> <text>`` - put a space between each letter in the message. Optionally, specify how many spaces to put between each letter with ``<n>``
-- ``>react <text>`` or ``>react <id> <text>`` - react to the above message with the given text. If the message id is given, it will react to that message instead.
+- ``>react <text>`` or ``>react <text> <id>`` - react to the above message with the given text. If the message id is given, it will react to that message instead.
 
 ## Custom Commands:
 ![custom](https://cloud.githubusercontent.com/assets/14967932/24776178/bb6bb5f0-1aed-11e7-94e4-567b993b4ba6.gif)
