@@ -274,6 +274,7 @@ So, here's how you get started with setting up the notifier:
   + ``>log addblacklist [user] <user>`` - blacklists the user from the keyword notifier. ``<user>`` can be their name + discriminator, a mention, or their user id.
   + ``>log addblacklist [word] <word>`` - blacklists this word from the keyword notifier.
   + ``>log addblacklist [server]`` - blacklists the current server from the keyword notifier.
+  + ``>log addblacklist [channel]`` - blacklists the current channel from the keyword notifier.
   + ``>log addblacklist [word] [server] <word>`` - blacklists the current word for only this server (the one you are typing in).
     - Ex: ``overwatch`` is a keyword but you don't want notifs from the Overwatch server. Go to the server and in any channel, type ``>log addblacklist [word] [server] overwatch``.
   + ``>log addblacklist [word] [channel] <word>`` - blacklists the current word for only this channel (the one you are typing in).
