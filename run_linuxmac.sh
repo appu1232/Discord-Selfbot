@@ -40,7 +40,7 @@ updater () {
 		fi
 		sleep 1
 		if [ -d "settings2" ]; then
-				rm -f settings >/dev/null 2>&1
+				rm -d -r settings >/dev/null 2>&1
 				mv settings2 settings
 
 		fi
@@ -73,7 +73,7 @@ min_updater() {
 		fi
 		sleep 1
 		if [ -d "settings2" ]; then
-				rm -f settings >/dev/null 2>&1
+				rm -d -r settings >/dev/null 2>&1
 				mv settings2 settings
 
 		fi
