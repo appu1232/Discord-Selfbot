@@ -10,14 +10,6 @@ from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
-data = {'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}', 'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}', 'c': '\N{REGIONAL INDICATOR SYMBOL LETTER C}', 'd': '\N{REGIONAL INDICATOR SYMBOL LETTER D}',
-        'e': '\N{REGIONAL INDICATOR SYMBOL LETTER E}', 'f': '\N{REGIONAL INDICATOR SYMBOL LETTER F}', 'g': '\N{REGIONAL INDICATOR SYMBOL LETTER G}', 'h': '\N{REGIONAL INDICATOR SYMBOL LETTER H}',
-        'i': '\N{REGIONAL INDICATOR SYMBOL LETTER I}', 'j': '\N{REGIONAL INDICATOR SYMBOL LETTER J}', 'k': '\N{REGIONAL INDICATOR SYMBOL LETTER K}', 'l': '\N{REGIONAL INDICATOR SYMBOL LETTER L}',
-        'm': '\N{REGIONAL INDICATOR SYMBOL LETTER M}', 'n': '\N{REGIONAL INDICATOR SYMBOL LETTER N}', 'o': '\N{REGIONAL INDICATOR SYMBOL LETTER O}', 'p': '\N{REGIONAL INDICATOR SYMBOL LETTER P}',
-        'q': '\N{REGIONAL INDICATOR SYMBOL LETTER Q}', 'r': '\N{REGIONAL INDICATOR SYMBOL LETTER R}', 's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}',
-        'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}', 'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
-        'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}'}
-
 '''Module for miscellaneous commands'''
 
 
@@ -25,6 +17,16 @@ class Misc:
 
     def __init__(self, bot):
         self.bot = bot
+        self.regionals = {'a': '\N{REGIONAL INDICATOR SYMBOL LETTER A}', 'b': '\N{REGIONAL INDICATOR SYMBOL LETTER B}', 'c': '\N{REGIONAL INDICATOR SYMBOL LETTER C}',
+                          'd': '\N{REGIONAL INDICATOR SYMBOL LETTER D}', 'e': '\N{REGIONAL INDICATOR SYMBOL LETTER E}', 'f': '\N{REGIONAL INDICATOR SYMBOL LETTER F}',
+                          'g': '\N{REGIONAL INDICATOR SYMBOL LETTER G}', 'h': '\N{REGIONAL INDICATOR SYMBOL LETTER H}', 'i': '\N{REGIONAL INDICATOR SYMBOL LETTER I}',
+                          'j': '\N{REGIONAL INDICATOR SYMBOL LETTER J}', 'k': '\N{REGIONAL INDICATOR SYMBOL LETTER K}', 'l': '\N{REGIONAL INDICATOR SYMBOL LETTER L}',
+                          'm': '\N{REGIONAL INDICATOR SYMBOL LETTER M}', 'n': '\N{REGIONAL INDICATOR SYMBOL LETTER N}', 'o': '\N{REGIONAL INDICATOR SYMBOL LETTER O}',
+                          'p': '\N{REGIONAL INDICATOR SYMBOL LETTER P}', 'q': '\N{REGIONAL INDICATOR SYMBOL LETTER Q}', 'r': '\N{REGIONAL INDICATOR SYMBOL LETTER R}',
+                          's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}', 'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}',
+                          'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
+                          'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}', '0': '0⃣', '1': '1⃣', '2': '2⃣', '3': '3⃣',
+                          '4': '4⃣', '5': '5⃣', '6': '6⃣', '7': '7⃣', '8': '8⃣', '9': '9⃣'}
 
     @commands.command(pass_context=True)
     async def about(self, ctx):
@@ -645,7 +647,7 @@ class Misc:
         """Replace letters with regional indicator emojis"""
         await self.bot.delete_message(ctx.message)
         msg = list(msg)
-        regional_list = [data[x.lower()] if x.isalpha() else x for x in msg]
+        regional_list = [self.regionals[x.lower()] if x.isalnum() else x for x in msg]
         regional_output = '  '.join(regional_list)
         await self.bot.send_message(ctx.message.channel, regional_output)
 
@@ -663,28 +665,23 @@ class Misc:
         await self.bot.send_message(ctx.message.channel, spaced_message)
 
     @commands.command(pass_context=True)
-    async def react(self, ctx, *, msg):
+    async def react(self, ctx, msg: str, id: int = None):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
-        messages = []
-        try:
-            id = msg.split(' ', 1)[0]
-            int(id)
-            limit = 25
-        except:
-            id = None
-            limit = 2
-        async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
-            messages.append(message)
         await self.bot.delete_message(ctx.message)
-        for i in list(msg):
-            if i.isalpha():
-                if id:
-                    for j in messages:
-                        if id == j.id:
-                            await self.bot.add_reaction(j, data[i.lower()])
-
-                else:
-                    await self.bot.add_reaction(messages[1], data[i.lower()])
+        reactions = []
+        if id:
+            limit = 25
+        else:
+            limit = 1
+        for i in msg:
+            if i.isalnum():
+                reactions.append(self.regionals[i.lower()])
+            else:
+                reactions.append(i)
+        async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
+            if (not id and message.id != ctx.message.id) or (str(id) == message.id):
+                for i in reactions:
+                    await self.bot.add_reaction(message, i)
 
 
 def setup(bot):

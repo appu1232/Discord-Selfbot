@@ -12,6 +12,24 @@ class Server:
     def __init__(self, bot):
         self.bot = bot
 
+    def find_server(self, msg):
+        server = None
+        if msg:
+            try:
+                float(msg)
+                server = self.bot.get_server(msg)
+                if not server:
+                    return bot_prefix + 'Server not found.', False
+            except:
+                for i in self.bot.servers:
+                    if i.name.lower() == msg.lower().strip():
+                        server = i
+                        break
+                if not server:
+                    return bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.', False
+
+        return server, True
+
     # Stats about server
     @commands.group(pass_context=True)
     async def server(self, ctx):
@@ -55,7 +73,8 @@ class Server:
                 em.add_field(name='Highest role', value=server.role_hierarchy[0])
                 em.add_field(name='Default Channel', value=server.default_channel)
                 url = PythonGists.Gist(description='All Users in: %s' % server.name, content=str(all), name='server.txt')
-                em.add_field(name='All users', value=url)
+                gist_of_users = '[List of all {} users in this server]({})'.format(server.member_count, url)
+                em.add_field(name='Users', value=gist_of_users)
                 em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=server.icon_url)
                 em.set_author(name='Server Info', icon_url='https://i.imgur.com/RHagTDg.png')
@@ -67,43 +86,23 @@ class Server:
             await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
-    async def emojis(self, ctx):
+    async def emojis(self, ctx, msg: str = None):
         """List all emojis in this server."""
-        if ctx.message.content[15:]:
-            server = None
-            try:
-                float(ctx.message.content[15:].strip())
-                server = self.bot.get_server(ctx.message.content[15:].strip())
-                if not server:
-                    return await self.bot.send_message(ctx.message.channel,
-                                                       bot_prefix + 'Server not found.')
-            except:
-                for i in self.bot.servers:
-                    if i.name.lower() == ctx.message.content[7:].lower().strip():
-                        server = i
-                        break
-                if not server:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
+        if msg:
+            server, found = self.find_server(msg)
         else:
             server = ctx.message.server
-        msg = ''
+        emojis = ''
         for i in server.emojis:
-            msg += str(i)
-        await self.bot.send_message(ctx.message.channel, msg)
+            emojis += str(i)
+        await self.bot.send_message(ctx.message.channel, emojis)
         await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
-    async def avi(self, ctx):
+    async def avi(self, ctx, msg: str = None):
         """Get server avatar image link."""
-        if ctx.message.content[11:]:
-            server = None
-            for i in self.bot.servers:
-                if i.name.lower() == ctx.message.content[11:].lower().strip():
-                    server = i
-                    break
-            if not server:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
-                return
+        if msg:
+            server, found = self.find_server(msg)
         else:
             server = ctx.message.server
         if embed_perms(ctx.message):
@@ -116,7 +115,6 @@ class Server:
 
     @server.group(pass_context=True)
     async def role(self, ctx, *, msg):
-        await self.bot.delete_message(ctx.message)
         for role in ctx.message.server.roles:
             if msg == role.name:
                 role_count = 0
@@ -144,12 +142,17 @@ class Server:
                 em.set_thumbnail(url='http://www.colorhexa.com/%s.png' % str(role.color).strip("#"))
                 return await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find role ``%s``' % msg)
+        await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
-    async def members(self, ctx):
+    async def members(self, ctx, msg: str = None):
         """List of members in the server."""
+        if msg:
+            server, found = self.find_server(msg)
+        else:
+            server = ctx.message.server
         msg = prettytable.PrettyTable(['User', 'Nickname', 'Join Date', 'Account Created', 'Color', 'Top Role', 'Is bot', 'Avatar url', 'All Roles'])
-        for i in ctx.message.server.members:
+        for i in server.members:
             roles = ''
             for j in i.roles:
                 if j.name != '@everyone':
@@ -167,7 +170,7 @@ class Server:
             except:
                 create = 'N/A'
             msg.add_row([str(i.name), i.nick, join, create, i.color, i.top_role, str(i.bot), avi, roles[:-2]])
-        name = ctx.message.server.name
+        name = server.name
         keep_characters = (' ', '.', '_')
         name = ''.join(c for c in name if c.isalnum() or c in keep_characters).rstrip()
         name = name.replace(' ', '_')
@@ -181,6 +184,7 @@ class Server:
         with open(save_file, 'rb') as file:
             await self.bot.send_file(ctx.message.channel, file)
         os.remove(save_file)
+        await self.bot.delete_message(ctx.message)
 
 
 def setup(bot):
