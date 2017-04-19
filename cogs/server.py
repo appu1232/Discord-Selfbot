@@ -58,7 +58,7 @@ class Server:
                 if str(i.status) == 'online':
                     online += 1
             all_users = []
-            for user in ctx.message.server.members:
+            for user in server.members:
                 all_users.append('{}#{}'.format(user.name, user.discriminator))
             all_users.sort()
             all = '\n'.join(all_users)
