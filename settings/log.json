@@ -8,6 +8,7 @@
     "blacklisted_words": [],
 	"blacklisted_users": [],
     "blacklisted_servers": [],
+	"blacklisted_channels": {},
     "log_size": "25",
     "context_len": "4",
     "keyusers": {},
