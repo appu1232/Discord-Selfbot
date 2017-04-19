@@ -81,7 +81,7 @@ Optionally, create a shortcut to the .bat file and [add it to startup](http://ww
 
 **Mac/Linux:**
 
-Navigate to the bot's folder in terminal/shell and run: ``sudo bash run_linuxmac.sh``
+Navigate to the bot's folder in terminal/shell and run: ``bash run_linuxmac.sh``
 
 Alternatively if the bash script isn't working for you, do ``sudo -H pip install -r requirements.txt`` (only need to do it the first time). Once it's finished, run: ``sudo python loopself.py`` (or pip3 and python3 on some linux machines) to start the bot.
 

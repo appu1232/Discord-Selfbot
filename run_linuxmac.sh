@@ -89,7 +89,7 @@ run_bot() {
 	if hash python3 2>/dev/null; then # TODO abstracify all this which mirrors above an also look up boolean operators in sh
 		if hash pip3 2>/dev/null; then
 			echo "Using global pip3 executable"
-			if sudo pip3 install -r requirements.txt >/dev/null; then
+			if pip3 install --user -r requirements.txt >/dev/null; then
 				echo "Starting bot..."
 				python3 loopself.py
 				ret=$?
@@ -141,7 +141,7 @@ run_bot() {
 		esac
 		if hash pip 2>/dev/null; then
 			echo "Using global pip executable"
-			if sudo pip install -r requirements.txt >/dev/null; then
+			if pip install --user -r requirements.txt >/dev/null; then
 				echo "Starting bot..."
 				python loopself.py
 				ret=$?
