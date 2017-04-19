@@ -1,5 +1,6 @@
 {
     "keyword_logging": "on",
+	"user_logging": "on",
 	"log_location": "",
 	"user_location": "",
     "allservers": "True",

@@ -69,6 +69,8 @@ async def on_ready():
             loginfo['blacklisted_channels'] = {}
         if 'keyword_logging' not in loginfo:
             loginfo['keyword_logging'] = 'on'
+        if 'user_logging' not in loginfo:
+            loginfo['user_logging'] = 'on'
         if 'webhook_url' not in loginfo:
             loginfo['webhook_url'] = ''
         if 'webhook_url2' not in loginfo:
@@ -326,13 +328,14 @@ async def on_message(message):
                             break
 
             user_found = False
-            if '{} {}'.format(str(message.author.id), str(message.server.id)) in bot.log_conf['keyusers']:
-                if user_post(bot, '{} {}'.format(str(message.author.id), str(message.server.id))):
-                    user_found = message.author.name
+            if bot.log_conf['user_logging'] == 'on':
+                if '{} {}'.format(str(message.author.id), str(message.server.id)) in bot.log_conf['keyusers']:
+                    if user_post(bot, '{} {}'.format(str(message.author.id), str(message.server.id))):
+                        user_found = message.author.name
 
-            elif '{} all'.format(str(message.author.id)) in bot.log_conf['keyusers']:
-                if user_post(bot, '{} all'.format(str(message.author.id))):
-                    user_found = message.author.name
+                elif '{} all'.format(str(message.author.id)) in bot.log_conf['keyusers']:
+                    if user_post(bot, '{} all'.format(str(message.author.id))):
+                        user_found = message.author.name
 
             if word_found is True or user_found:
                 if bot.log_conf['user_location'] != bot.log_conf['log_location'] and bot.log_conf['user_location'] != '' and not word_found:

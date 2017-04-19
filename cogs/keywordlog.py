@@ -286,6 +286,30 @@ class KeywordLogger:
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
+    @log.command(aliases=['useron'], pass_context=True)
+    async def userstart(self, ctx):
+        with open('settings/log.json', 'r+') as log:
+            settings = json.load(log)
+            settings['user_logging'] = 'on'
+            log.seek(0)
+            log.truncate()
+            json.dump(settings, log, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned on the user logger.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+
+    @log.command(aliases=['useroff'], pass_context=True)
+    async def userstop(self, ctx):
+        with open('settings/log.json', 'r+') as log:
+            settings = json.load(log)
+            settings['user_logging'] = 'off'
+            log.seek(0)
+            log.truncate()
+            json.dump(settings, log, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off the user logger.')
+        with open('settings/log.json', 'r') as log:
+            self.bot.log_conf = json.load(log)
+
     @log.command(pass_context=True)
     async def refresh(self, ctx):
         with open('settings/log.json', 'r+') as log:
