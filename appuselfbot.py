@@ -65,6 +65,8 @@ async def on_ready():
             loginfo['blacklisted_words'] = []
         if 'blacklisted_servers' not in loginfo:
             loginfo['blacklisted_servers'] = []
+        if 'blacklisted_channels' not in loginfo:
+            loginfo['blacklisted_channels'] = {}
         if 'keyword_logging' not in loginfo:
             loginfo['keyword_logging'] = 'on'
         if 'webhook_url' not in loginfo:
@@ -274,7 +276,7 @@ async def on_message(message):
 
         try:
             word_found = False
-            if bot.log_conf['allservers'] == 'True' and message.server.id not in bot.log_conf['blacklisted_servers']:
+            if bot.log_conf['allservers'] == 'True' and message.server.id not in bot.log_conf['blacklisted_servers'] and message.channel.id not in bot.log_conf['blacklisted_channels']:
                 add_alllog(message.channel.id, message.server.id, message)
                 for word in bot.log_conf['keywords']:
                     if word.lower() in message.content.lower() and message.author.id != bot.user.id:
@@ -301,7 +303,7 @@ async def on_message(message):
                                 break
                         break
             else:
-                if str(message.server.id) in bot.log_conf['servers']:
+                if str(message.server.id) in bot.log_conf['servers'] and message.channel.id not in bot.log_conf['blacklisted_channels']:
                     add_alllog(message.channel.id, message.server.id, message)
                     for word in bot.log_conf['keywords']:
                         if word.lower() in message.content.lower() and message.author.id != bot.user.id:

@@ -7,6 +7,7 @@ import re
 import subprocess
 import psutil
 import sys
+from PythonGists import PythonGists
 from datetime import timezone
 
 keywords = []
@@ -82,6 +83,16 @@ class KeywordLogger:
                         pass
                     msg += str(server) + ', '
                 msg = msg.rstrip(', ')
+                channel = ''
+                msg += '\n\nBlacklisted Channels: '
+                for i in settings['blacklisted_channels']:
+                    try:
+                        channel = self.bot.get_channel(i)
+                        server = self.bot.get_server(settings['blacklisted_channels'][i])
+                    except:
+                        pass
+                    msg += '{} in server: {}, '.format(str(channel), str(server))
+                msg = msg.rstrip(', ')
                 msg += '\n\nContext length: %s messages\n\nUser follows: ' % settings['context_len']
                 for user in settings['keyusers']:
                     try:
@@ -104,7 +115,12 @@ class KeywordLogger:
                     except:
                         pass
                 msg = msg.rstrip(', ') + '```'
-            await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+
+            if len(msg) > 1950 or 'gist' in ctx.message.content:
+                gist_log = PythonGists.Gist(description='Logging info.', content=msg, name='log.txt')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + gist_log)
+            else:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
 
     @log.command(pass_context=True)
     async def history(self, ctx):
@@ -445,145 +461,173 @@ class KeywordLogger:
             self.bot.key_users = self.bot.log_conf['keyusers']
 
     @log.command(pass_context=True)
-    async def addblacklist(self, ctx, *, msg: str):
-        with open('settings/log.json', 'r+') as log:
-            settings = json.load(log)
-            if msg.startswith('[user]'):
-                msg = msg[6:].strip()
-                try:
-                    name = ctx.message.mentions[0].id
-                except:
-                    name = ctx.message.server.get_member_named(msg)
+    async def addblacklist(self, ctx, *, msg: str = None):
+        if msg:
+            with open('settings/log.json', 'r+') as log:
+                settings = json.load(log)
+                if msg.startswith('[user]'):
+                    msg = msg[6:].strip()
+                    try:
+                        name = ctx.message.mentions[0].id
+                    except:
+                        name = ctx.message.server.get_member_named(msg)
+                        if not name:
+                            name = ctx.message.server.get_member(msg)
+                        if name:
+                            name = name.id
                     if not name:
-                        name = ctx.message.server.get_member(msg)
-                    if name:
-                        name = name.id
-                if not name:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user. They must be in the server you are currently using this command in.')
-                if name in settings['blacklisted_users']:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'User is already blacklisted from the keyword logger.')
-                settings['blacklisted_users'].append(name)
-                log.seek(0)
-                log.truncate()
-                json.dump(settings, log, indent=4)
-                name = ctx.message.server.get_member(name)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted user ``%s`` from the keyword logger.' % name)
-            elif msg.startswith('[word]'):
-                msg = msg[6:].strip()
-                if msg.startswith('[here] ') or msg.startswith('[server] '):
-                    if msg.startswith('[here] '):
-                        msg = msg[6:].strip()
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user. They must be in the server you are currently using this command in.')
+                    if name in settings['blacklisted_users']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'User is already blacklisted from the keyword logger.')
+                    settings['blacklisted_users'].append(name)
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    name = ctx.message.server.get_member(name)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted user ``%s`` from the keyword logger.' % name)
+                elif msg.startswith('[word]'):
+                    msg = msg[6:].strip()
+                    if msg.startswith('[here] ') or msg.startswith('[server] '):
+                        if msg.startswith('[here] '):
+                            msg = msg[6:].strip()
+                        else:
+                            msg = msg[8:].strip()
+                        msg += ' [server]' + ctx.message.server.id
+                    if msg.startswith('[chere] ') or msg.startswith('[channel] '):
+                        if msg.startswith('[chere] '):
+                            msg = msg[7:].strip()
+                        else:
+                            msg = msg[9:].strip()
+                        msg += ' [channel]' + ctx.message.channel.id
+                    if 'blacklisted_words' not in settings:
+                        settings['blacklisted_words'] = []
+                    if msg in settings['blacklisted_words']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This word is already blacklisted.')
+                    settings['blacklisted_words'].append(msg)
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    if ' [server]' in msg:
+                        await self.bot.send_message(ctx.message.channel,
+                                                    bot_prefix + 'Blacklisted the word ``%s`` for this server from the keyword logger.' % msg.split(' [server]')[0])
+                    elif ' [channel]' in msg:
+                        await self.bot.send_message(ctx.message.channel,
+                                                    bot_prefix + 'Blacklisted the word ``%s`` for this channel from the keyword logger.' % msg.split(' [channel]')[0])
                     else:
-                        msg = msg[8:].strip()
-                    msg += ' [server]' + ctx.message.server.id
-                if msg.startswith('[chere] ') or msg.startswith('[channel] '):
-                    if msg.startswith('[chere] '):
-                        msg = msg[7:].strip()
-                    else:
-                        msg = msg[9:].strip()
-                    msg += ' [channel]' + ctx.message.channel.id
-                if 'blacklisted_words' not in settings:
-                    settings['blacklisted_words'] = []
-                if msg in settings['blacklisted_words']:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This word is already blacklisted.')
-                settings['blacklisted_words'].append(msg)
-                log.seek(0)
-                log.truncate()
-                json.dump(settings, log, indent=4)
-                if ' [server]' in msg:
-                    await self.bot.send_message(ctx.message.channel,
-                                                bot_prefix + 'Blacklisted the word ``%s`` for this server from the keyword logger.' % msg.split(' [server]')[0])
-                elif ' [channel]' in msg:
-                    await self.bot.send_message(ctx.message.channel,
-                                                bot_prefix + 'Blacklisted the word ``%s`` for this channel from the keyword logger.' % msg.split(' [channel]')[0])
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted the word ``%s`` from the keyword logger.' % msg)
+                elif msg.startswith('[server]'):
+                    if 'blacklisted_servers' not in settings:
+                        settings['blacklisted_servers'] = []
+                    if ctx.message.server.id in settings['blacklisted_servers']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is already blacklisted.')
+                    if ctx.message.server.id in settings['servers']:
+                        settings['servers'].remove(ctx.message.server.id)
+                    settings['blacklisted_servers'].append(ctx.message.server.id)
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Server ``%s`` has been blacklisted from the keyword logger.' % ctx.message.server.name)
+                elif msg.startswith('[channel]'):
+                    if 'blacklisted_channels' not in settings:
+                        settings['blacklisted_channels'] = []
+                    if ctx.message.channel.id in settings['blacklisted_channels']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This channel is already blacklisted.')
+                    settings['blacklisted_channels'][ctx.message.channel.id] = ctx.message.server.id
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Channel ``{}`` in server ``{}`` has been blacklisted from the keyword logger.'.format(ctx.message.channel.name, ctx.message.server.name))
                 else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Blacklisted the word ``%s`` from the keyword logger.' % msg)
-            elif msg.startswith('[server]'):
-                if 'blacklisted_servers' not in settings:
-                    settings['blacklisted_servers'] = []
-                if ctx.message.server.id in settings['blacklisted_servers']:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is already blacklisted.')
-                if ctx.message.server.id in settings['servers']:
-                    settings['servers'].remove(ctx.message.server.id)
-                settings['blacklisted_servers'].append(ctx.message.server.id)
-                log.seek(0)
-                log.truncate()
-                json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Server ``%s`` has been blacklisted from the keyword logger.' % ctx.message.server.name)
-            else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Usage: ``>log addblacklist [user] someone#2341`` or ``>log addblacklist [word] word`` or ``>log addblacklist [server]``')
-        with open('settings/log.json', 'r') as log:
-            self.bot.log_conf = json.load(log)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Usage: ``>log addblacklist [user] someone#2341`` - this user won\'t notify you when they say a keyword.\n``>log addblacklist [word] word`` - if this word is in the message, it won\'t notify you.\n``>log addblacklist [server]`` - if the message is from this server, it won\'t notify you.\n``>log addblacklist [channel]`` - if the message is from this channel, it won\'t notify you.\n``>log addblacklist [word] [server]`` - if this word is said in this server, it won\'t notify you.\n``>log addblacklist [word] [channel]`` - if this word is said in this channel, it won\'t notify you.')
+            with open('settings/log.json', 'r') as log:
+                self.bot.log_conf = json.load(log)
+        else:
+            await self.bot.send_message(ctx.message.channel,
+                                        bot_prefix + 'Usage: ``>log addblacklist [user] someone#2341`` - this user won\'t notify you when they say a keyword.\n``>log addblacklist [word] word`` - if this word is in the message, it won\'t notify you.\n``>log addblacklist [server]`` - if the message is from this server, it won\'t notify you.\n``>log addblacklist [channel]`` - if the message is from this channel, it won\'t notify you.\n``>log addblacklist [word] [server]`` - if this word is said in this server, it won\'t notify you.\n``>log addblacklist [word] [channel]`` - if this word is said in this channel, it won\'t notify you.')
 
     @log.command(pass_context=True)
-    async def removeblacklist(self, ctx, *, msg: str):
-        with open('settings/log.json', 'r+') as log:
-            settings = json.load(log)
-            if msg.startswith('[user]'):
-                msg = msg[6:].strip()
-                try:
-                    name = ctx.message.mentions[0].id
-                except:
-                    name = ctx.message.server.get_member_named(msg)
+    async def removeblacklist(self, ctx, *, msg: str = None):
+        if msg:
+            with open('settings/log.json', 'r+') as log:
+                settings = json.load(log)
+                if msg.startswith('[user]'):
+                    msg = msg[6:].strip()
+                    try:
+                        name = ctx.message.mentions[0].id
+                    except:
+                        name = ctx.message.server.get_member_named(msg)
+                        if not name:
+                            name = ctx.message.server.get_member(msg)
+                        if name:
+                            name = name.id
                     if not name:
-                        name = ctx.message.server.get_member(msg)
-                    if name:
-                        name = name.id
-                if not name:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user. They must be in the server you are currently using this command in.')
-                    return
-                if name not in settings['blacklisted_users']:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'User is not in the blacklist for the keyword logger.')
-                settings['blacklisted_users'].remove(name)
-                log.seek(0)
-                log.truncate()
-                json.dump(settings, log, indent=4)
-                name = ctx.message.server.get_member(name)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed ``%s`` from the blacklist for the keyword logger.' % name)
-            elif msg.startswith('[word]'):
-                msg = msg[6:].strip()
-                if msg.startswith('[here] ') or msg.startswith('[server] '):
-                    if msg.startswith('[here] '):
-                        msg = msg[6:].strip()
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user. They must be in the server you are currently using this command in.')
+                        return
+                    if name not in settings['blacklisted_users']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'User is not in the blacklist for the keyword logger.')
+                    settings['blacklisted_users'].remove(name)
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    name = ctx.message.server.get_member(name)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed ``%s`` from the blacklist for the keyword logger.' % name)
+                elif msg.startswith('[word]'):
+                    msg = msg[6:].strip()
+                    if msg.startswith('[here] ') or msg.startswith('[server] '):
+                        if msg.startswith('[here] '):
+                            msg = msg[6:].strip()
+                        else:
+                            msg = msg[8:].strip()
+                        msg += ' [server]' + ctx.message.server.id
+                    if msg.startswith('[chere] ') or msg.startswith('[channel] '):
+                        if msg.startswith('[chere] '):
+                            msg = msg[7:].strip()
+                        else:
+                            msg = msg[9:].strip()
+                        msg += ' [channel]' + ctx.message.channel.id
+                    if 'blacklisted_words' not in settings:
+                        settings['blacklisted_words'] = []
+                    if msg not in settings['blacklisted_words']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This word is not blacklisted.')
+                    settings['blacklisted_words'].remove(msg)
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    if ' [server]' in msg:
+                        await self.bot.send_message(ctx.message.channel,
+                                                    bot_prefix + '``%s`` removed from the blacklist for this server.' % msg.split(' [server]')[0])
+                    elif ' [channel]' in msg:
+                        await self.bot.send_message(ctx.message.channel,
+                                                    bot_prefix + '``%s`` removed from the blacklist for this channel.' % msg.split(' [channel]')[0])
                     else:
-                        msg = msg[8:].strip()
-                    msg += ' [server]' + ctx.message.server.id
-                if msg.startswith('[chere] ') or msg.startswith('[channel] '):
-                    if msg.startswith('[chere] '):
-                        msg = msg[7:].strip()
-                    else:
-                        msg = msg[9:].strip()
-                    msg += ' [channel]' + ctx.message.channel.id
-                if 'blacklisted_words' not in settings:
-                    settings['blacklisted_words'] = []
-                if msg not in settings['blacklisted_words']:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This word is not blacklisted.')
-                settings['blacklisted_words'].remove(msg)
-                log.seek(0)
-                log.truncate()
-                json.dump(settings, log, indent=4)
-                if ' [server]' in msg:
-                    await self.bot.send_message(ctx.message.channel,
-                                                bot_prefix + '``%s`` removed from the blacklist for this server.' % msg.split(' [server]')[0])
-                elif ' [channel]' in msg:
-                    await self.bot.send_message(ctx.message.channel,
-                                                bot_prefix + '``%s`` removed from the blacklist for this channel.' % msg.split(' [channel]')[0])
+                        await self.bot.send_message(ctx.message.channel, bot_prefix + '``%s`` removed from the blacklist.' % msg)
+                elif msg.startswith('[server]'):
+                    if 'blacklisted_servers' not in settings:
+                        settings['blacklisted_servers'] = []
+                    if ctx.message.server.id not in settings['blacklisted_servers']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is not blacklisted.')
+                    settings['blacklisted_servers'].remove(ctx.message.server.id)
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed server ``%s`` from the blacklist.' % ctx.message.server.name)
+                elif msg.startswith('[channel]'):
+                    if 'blacklisted_channels' not in settings:
+                        settings['blacklisted_channels'] = []
+                    if ctx.message.channel.id not in settings['blacklisted_channels']:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This channel is not blacklisted.')
+                    del settings['blacklisted_channels'][ctx.message.channel.id]
+                    log.seek(0)
+                    log.truncate()
+                    json.dump(settings, log, indent=4)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed channel ``{}`` in server ``{}`` from the blacklist.'.format(ctx.message.channel.name, ctx.message.server.name))
                 else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + '``%s`` removed from the blacklist.' % msg)
-            elif msg.startswith('[server]'):
-                if 'blacklisted_servers' not in settings:
-                    settings['blacklisted_servers'] = []
-                if ctx.message.server.id not in settings['blacklisted_servers']:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is not blacklisted.')
-                settings['blacklisted_servers'].remove(ctx.message.server.id)
-                log.seek(0)
-                log.truncate()
-                json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed server ``%s`` from the blacklist.' % ctx.message.server.name)
-            else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Usage: ``>log removeblacklist [user] someone#2341`` or ``>log removeblacklist [word] word`` or ``>log removeblacklist [server]``')
-        with open('settings/log.json', 'r') as log:
-            self.bot.log_conf = json.load(log)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Usage:\n``>log removeblacklist [user] someone#2341``\n``>log removeblacklist [word] word``\n``>log removeblacklist [server]``\n``>log removeblacklist [word] [server] word``\n``>log removeblacklist [word] [channel] word``')
+            with open('settings/log.json', 'r') as log:
+                self.bot.log_conf = json.load(log)
+        else:
+            await self.bot.send_message(ctx.message.channel,
+                                        bot_prefix + 'Usage:\n``>log removeblacklist [user] someone#2341``\n``>log removeblacklist [word] word``\n``>log removeblacklist [server]``\n``>log removeblacklist [word] [server] word``\n``>log removeblacklist [word] [channel] word``')
 
     @commands.command(pass_context=True)
     async def webhook(self, ctx, *, msg):
