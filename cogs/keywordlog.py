@@ -311,19 +311,18 @@ class KeywordLogger:
             self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True)
-    async def refresh(self, ctx):
+    async def refresh(self, ctx, *, user: str = None):
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
-            if ctx.message.content[13:].strip():
-                user = ctx.message.content[13:].strip()
+            if user:
                 for key in settings['keyusers']:
                     if user in key:
                         settings['keyusers'][key] = [0.0, settings['keyusers'][key][1]]
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Refreshed notification cooldown for this user.')
             else:
-
                 for user in settings['keyusers']:
                     settings['keyusers'][user] = [0.0, settings['keyusers'][user][1]]
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Refreshed notification cooldown for this user.')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Refreshed notification cooldown.')
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
@@ -333,19 +332,19 @@ class KeywordLogger:
             self.bot.key_users = self.bot.log_conf['keyusers']
 
     @log.command(pass_context=True)
-    async def context(self, ctx):
-        if ctx.message.content[12:].strip():
-            if ctx.message.content[12:].strip().isdigit():
-                if 0 < int(ctx.message.content[12:].strip()) < 21:
+    async def context(self, ctx, *, msg: str = None):
+        if msg:
+            if msg.isdigit():
+                if 0 < int(msg) < 21:
                     with open('settings/log.json', 'r+') as log:
                         settings = json.load(log)
-                        settings['context_len'] = ctx.message.content[12:].strip()
+                        settings['context_len'] = msg
                         log.seek(0)
                         log.truncate()
                         json.dump(settings, log, indent=4)
                     with open('settings/log.json', 'r') as log:
                         self.bot.log_conf = json.load(log)
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set context length to ``%s``.' % ctx.message.content[12:])
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set context length to ``%s``.' % msg)
                 else:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid context length.')
             else:
