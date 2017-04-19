@@ -53,6 +53,8 @@ Download the zip and extract it. Inside this folder, go into the ``settings`` fo
 - ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as an in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
 
+**Note:** On Mac, you may need to [disable smartquotes.](http://www.iclarified.com/38772/how-to-disable-curly-quotes-in-mac-os-x-mavericks) Quotes in the json should look like this: ``"`` or else the bot may throw errors when logging in.
+
 ## Optional Setup
 
 This is the ``optional_config.json`` file in the ``settings`` folder. These are additional parts that are not required to get the bot running but do provide some nice features.
@@ -71,7 +73,7 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 
 ## Running the selfbot
 
-Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. Make sure [this is selected](https://i.imgur.com/ZXEpGtH.png) when installing Git. **When installing Python, check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.** Some Mac users have reported problems with Python 3.6 so if you are a Mac user, try to go for Python 3.5.
+Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. Make sure [this is selected](https://i.imgur.com/ZXEpGtH.png) when installing Git on Windows. **When installing Python, check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.** Some Mac users have reported problems with Python 3.6 so if you are a Mac user, try to go for Python 3.5.
 
 **Windows:**
 
@@ -81,9 +83,9 @@ Optionally, create a shortcut to the .bat file and [add it to startup](http://ww
 
 **Mac/Linux:**
 
-Navigate to the bot's folder in terminal/shell and run: ``bash run_linuxmac.sh``
+Navigate to the bot's folder in terminal/shell and run: ``sudo bash run_linuxmac.sh``
 
-Alternatively if the bash script isn't working for you, do ``sudo -H pip install -r requirements.txt`` (only need to do it the first time). Once it's finished, run: ``sudo python loopself.py`` (or pip3 and python3 on some linux machines) to start the bot.
+Alternatively if the bash script isn't working for you, do ``sudo -H pip install -r requirements.txt`` (only need to do it the first time). Once it's finished, run: ``python loopself.py`` (or pip3 and python3 on some linux machines) to start the bot.
 
 **Updating the bot:**
 
