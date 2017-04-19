@@ -360,7 +360,7 @@ async def on_message(message):
 
                     part = int(math.ceil(len(msg) / 1950))
                     notify = load_notify_config()
-                    if user_found and is_separate:
+                    if user_found:
                         title = '%s posted' % user_found
                     else:
                         title = '%s mentioned: %s' % (message.author.name, word)
@@ -390,7 +390,7 @@ async def on_message(message):
                                 split_msg += b + '\n'
                             all_words.append(split_msg)
                             split_msg = ''
-                        if user_found and is_separate:
+                        if user_found:
                             logged_msg = '``%s`` posted' % user_found
                         else:
                             logged_msg = '``%s`` mentioned' % word
