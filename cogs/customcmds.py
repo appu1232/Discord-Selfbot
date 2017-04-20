@@ -117,6 +117,26 @@ class Customcmds:
             for i in allWords:
                 await self.bot.send_message(ctx.message.channel, '```%s```' % i)
 
+    # Change customcmd embed color
+    @customcmds.command(pass_context=True, aliases=['colour'])
+    async def color(self, ctx, *, msg: str = None):
+        if msg:
+            try:
+                msg = msg.lstrip('#')
+                int(msg, 16)
+            except:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for customcmd embeds.')
+        else:
+            msg = ''
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed embed color for customcmd embeds.')
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            opt['customcmd_color'] = msg
+            fp.seek(0)
+            fp.truncate()
+            json.dump(opt, fp, indent=4)
+
     # Add a custom command
     @commands.command(pass_context=True)
     async def add(self, ctx, *, msg: str):

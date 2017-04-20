@@ -7,7 +7,6 @@ quick = [('shrug', '¯\_(ツ)_/¯'), ('flip', '(╯°□°）╯︵ ┻━┻'),
 
 # Quick cmds for da memes
 def quickcmds(message):
-
     for i in quick:
         if message == i[0]:
             return i[1]
@@ -16,7 +15,6 @@ def quickcmds(message):
 
 # Searches commands.json for the inputted command. If exists, return the response associated with the command.
 def custom(message):
-
     success = False
 
     with open('settings/config.json') as f:

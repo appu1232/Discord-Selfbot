@@ -251,7 +251,16 @@ async def on_message(message):
                 else:
                     if response[0] == 'embed' and embed_perms(message):
                         try:
-                            await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
+                            with open('settings/optional_config.json', 'r') as fp:
+                                opt = json.load(fp)
+                            if 'customcmd_color' in opt:
+                                if opt['customcmd_color'] != '':
+                                    color = int('0x' + opt['customcmd_color'], 16)
+                                    await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=color).set_image(url=response[1]))
+                                else:
+                                    await bot.send_message(message.channel, content=None, embed=discord.Embed().set_image(url=response[1]))
+                            else:
+                                await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
                         except:
                             await bot.send_message(message.channel, response[1])
                     else:
