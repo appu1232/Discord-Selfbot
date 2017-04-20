@@ -216,6 +216,7 @@ However, **you may want to add multiple responses to the same command.** So the 
 Example: ``>add kaguya present http://i.imgur.com/7Px7EZx.png`` then you can add another to the ``.kaguya`` command: ``>add kaguya yes http://i.imgur.com/y0yAp1j.png``.
 
 Invoke a specific response with ``.<command> <response_name>`` or get a random response for that command with ``.<command>``
+Change the customcmd default embed color with ``>customcmds color <hex_value>`` or set it to have no color with just ``>customcmds color``
 
 **Ways to view your customcmds:**
 
