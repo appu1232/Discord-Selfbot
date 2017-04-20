@@ -115,6 +115,15 @@ async def on_ready():
         o_conf = {'google_api_key': conf['google_api_key'], 'custom_search_engine': conf['custom_search_engine'], 'mal_username': conf['mal_username'], 'mal_password': conf['mal_password']}
         with open('settings/optional_config.json', 'w') as oc:
             json.dump(o_conf, oc, indent=4)
+    with open('settings/optional_config.json', 'r+') as fp:
+        opt = json.load(fp)
+        if 'customcmd_color' not in opt:
+            opt['customcmd_color'] = '27007A'
+        if 'rich_embed' not in opt:
+            opt['rich_embed'] = 'on'
+        fp.seek(0)
+        fp.truncate()
+        json.dump(opt, fp, indent=4)
     with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['type'] == 'dm':
@@ -249,19 +258,19 @@ async def on_message(message):
                 if response is None:
                     pass
                 else:
-                    if response[0] == 'embed' and embed_perms(message):
-                        try:
-                            with open('settings/optional_config.json', 'r') as fp:
-                                opt = json.load(fp)
-                            if 'customcmd_color' in opt:
+                    with open('settings/optional_config.json', 'r') as fp:
+                        opt = json.load(fp)
+                    if opt['rich_embed'] == 'on':
+                        if response[0] == 'embed' and embed_perms(message):
+                            try:
                                 if opt['customcmd_color'] != '':
                                     color = int('0x' + opt['customcmd_color'], 16)
                                     await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=color).set_image(url=response[1]))
                                 else:
                                     await bot.send_message(message.channel, content=None, embed=discord.Embed().set_image(url=response[1]))
-                            else:
-                                await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=0x27007A).set_image(url=response[1]))
-                        except:
+                            except:
+                                await bot.send_message(message.channel, response[1])
+                        else:
                             await bot.send_message(message.channel, response[1])
                     else:
                         await bot.send_message(message.channel, response[1])

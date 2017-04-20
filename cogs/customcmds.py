@@ -137,6 +137,21 @@ class Customcmds:
             fp.truncate()
             json.dump(opt, fp, indent=4)
 
+    # Toggle auto-embed for images/gifs
+    @customcmds.command(pass_context=True)
+    async def embed(self, ctx):
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            if opt['rich_embed'] == 'on':
+                opt['rich_embed'] = 'off'
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off auto-embeding images/gifs for customcmds.')
+            else:
+                opt['rich_embed'] = 'on'
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned on auto-embeding images/gifs for customcmds.')
+            fp.seek(0)
+            fp.truncate()
+            json.dump(opt, fp, indent=4)
+
     # Add a custom command
     @commands.command(pass_context=True)
     async def add(self, ctx, *, msg: str):
