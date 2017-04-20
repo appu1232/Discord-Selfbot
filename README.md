@@ -217,6 +217,7 @@ Example: ``>add kaguya present http://i.imgur.com/7Px7EZx.png`` then you can add
 
 Invoke a specific response with ``.<command> <response_name>`` or get a random response for that command with ``.<command>``
 Change the customcmd default embed color with ``>customcmds color <hex_value>`` or set it to have no color with just ``>customcmds color``
+If for some reason, Discord isn't embedding images/gifs correctly (might just be Discord server issues sometimes), you can toggle auto-embedding with ``>customcmds embed``
 
 **Ways to view your customcmds:**
 
