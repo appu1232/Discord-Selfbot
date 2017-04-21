@@ -476,10 +476,10 @@ class Misc:
                             print('Finished in: {} seconds'.format(str(round(stop-start, 2))))
                 else:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
-                                                                                  'Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
+                                                                                  'Ex: ``>imagedump 100``\n``>imagedump dir path/to/directory`` if you want to change where images are saved.')
             else:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
-                                                                              'Ex: ``>imagedump 100``\n``>imagedump path/to/directory`` if you want to change where images are saved.')
+                                                                              'Ex: ``>imagedump 100``\n``>imagedump dir path/to/directory`` if you want to change where images are saved.')
 
     @imagedump.command(pass_context=True)
     async def dir(self, ctx, *, msg):
@@ -495,7 +495,7 @@ class Misc:
                 json.dump(opt, fp, indent=4)
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set path. Images will be saved to: ``{}image_dump/``'.format(msg))
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid path. Try again. Example: ``>imagedump dir C:/Users/Appu/Desktop``')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid path. Try again. Example: ``>imagedump dir C:/Users/Bill/Desktop``')
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):
