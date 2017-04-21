@@ -55,16 +55,17 @@ class KeywordLogger:
                     if '[server]' in i:
                         word, id = i.split('[server]')
                         name = self.bot.get_server(id)
-                        msg += word + '(for server: %s)' % str(name) + ', '
+                        if name:
+                            msg += word + '(for server: %s)' % str(name) + ', '
                     elif '[channel]' in i:
                         word, id = i.split('[channel]')
                         name = self.bot.get_channel(id)
-                        msg += word + '(for server: %s)' % str(name) + ', '
+                        if name:
+                            msg += word + '(for channel: %s)' % str(name) + ', '
                     else:
                         msg += i + ', '
                 msg = msg.rstrip(', ')
                 msg += '\n\nBlacklisted Users: '
-                name = None
                 names = []
                 for i in self.bot.servers:
                     for j in settings['blacklisted_users']:
@@ -81,7 +82,8 @@ class KeywordLogger:
                         server = self.bot.get_server(i)
                     except:
                         pass
-                    msg += str(server) + ', '
+                    if server:
+                        msg += str(server) + ', '
                 msg = msg.rstrip(', ')
                 channel = ''
                 msg += '\n\nBlacklisted Channels: '
@@ -91,7 +93,8 @@ class KeywordLogger:
                         server = self.bot.get_server(settings['blacklisted_channels'][i])
                     except:
                         pass
-                    msg += '{} in server: {}, '.format(str(channel), str(server))
+                    if channel:
+                        msg += '{} in server: {}, '.format(str(channel), str(server))
                 msg = msg.rstrip(', ')
                 msg += '\n\nContext length: %s messages\n\nUser follows: ' % settings['context_len']
                 for user in settings['keyusers']:
