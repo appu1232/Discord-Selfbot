@@ -177,6 +177,7 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel or direct message and downloads all the images/gifs/webms found (uploads and links) to the ``image_dump`` folder.
   + ``>imagedump dir path/to/directory/`` - if you want to change where the images/gifs are automatically saved to.
+  + ``>imagedump s <n>`` - downloads silently without sending a "Downloading..." message or a "Done" message at the end. Useful if you don't want to clog up the channel.
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
 - ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler Book He lives`` or ``>spoiler Some movie | He was his brother all along``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
