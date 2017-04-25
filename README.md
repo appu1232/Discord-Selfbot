@@ -83,9 +83,9 @@ Optionally, create a shortcut to the .bat file and [add it to startup](http://ww
 
 **Mac/Linux:**
 
-Navigate to the bot's folder in terminal/shell and run: ``sudo bash run_linuxmac.sh``
+Navigate to the bot's folder in terminal/shell and run: ``bash run_linuxmac.sh``
 
-Alternatively if the bash script isn't working for you, do ``sudo -H pip install -r requirements.txt`` (only need to do it the first time). Once it's finished, run: ``python loopself.py`` (or pip3 and python3 on some linux machines) to start the bot.
+Alternatively if the bash script isn't working for you, try ``sudo -H pip install -r requirements.txt`` (only need to do it the first time) and then try running the bash script again.
 
 **Updating the bot:**
 
@@ -94,6 +94,7 @@ The respective script (``run.bat`` for Windows and ``run_linuxmac.sh`` for Mac/L
 Manual update: Unless otherwise stated, all you need to do is save your ``settings`` folder and its contents somewhere, delete everything else, download the newest version, and then replace the ``settings`` folder with your ``settings`` folder. If you know how to use git properly, that option exists as well.
 
 ## All Commands:
+- ``>about`` - link to this github project and some more info.
 - ``>restart`` - restart the bot. If there is an update available it will prompt you if you want to update as well.
 - ``>quit`` - quits the bot.
 - ``>update`` - updates the bot to the latest version.
@@ -125,14 +126,6 @@ See the [Custom Commands](#custom-commands) section for more info on how to invo
 
 ![img](http://i.imgur.com/neisYXe.png)
 
-**Logging commands**
-
-- ``>log`` - See what, where, and how you are logging/tracking. See the [Keyword Notifier](#keyword-notifier) section below for more commands used for keyword logging. A logged message:
-
-![img](http://i.imgur.com/4I8B2IW.png)
-- ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See [Save Chat Messages](#save-chat-messages) section for more details.
-
-
 **MyAnimeList commands**
 
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
@@ -152,28 +145,8 @@ A MAL search result:
 - ``>server avi`` or ``>server avi <name of server>`` - Gets the server image.
 - ``>server emojis`` - Lists all the custom emojis for the current server.
 
-**Python Interpreter**
-
-- ``>py <code>`` - python interpreter. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load <module>`` ``>unload <module>`` and ``>reload`` cmds to load, unload, and reload modules.
-
-Example usage of the python interpreter:
-
-![img](http://i.imgur.com/MpAtJ7W.png)
-
-- ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
-![pyscripts](https://cloud.githubusercontent.com/assets/14967932/24776287/1b93ec36-1aee-11e7-8418-14d91105e5f5.gif)
-
-Alternatively, there is also the ``>repl`` command which uses an embed shell like so:
-![img](https://i.imgur.com/jg2dmAq.png)
-
-- Input by putting the code in \` like this: \`print('test')\`
-- Make the shell jump to the most recent message with ``>repl jump`` and clear the current shell with ``>repl clear``
-- Quit the shell with \`quit\`
-- Based entirely off of eye-sigil's repl shell. Kind of unnecessarily huge and fancy but hey, it looks nice.
-
 **Misc**
 
-- ``>about`` - link to this github project
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
 - ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel or direct message and downloads all the images/gifs/webms found (uploads and links) to the ``image_dump`` folder.
   + ``>imagedump dir path/to/directory/`` - if you want to change where the images/gifs are automatically saved to.
@@ -200,6 +173,32 @@ Alternatively, there is also the ``>repl`` command which uses an embed shell lik
 - ``>regional <text>`` - send each letter in this message as regional indicator emojis.
 - ``>space <text>`` or ``>space <n> <text>`` - put a space between each letter in the message. Optionally, specify how many spaces to put between each letter with ``<n>``
 - ``>react <text>`` or ``>react <text> <id>`` - react to the above message with the given text. If the message id is given, it will react to that message instead.
+
+**Logging commands**
+
+- ``>log`` - See what, where, and how you are logging/tracking. See the [Keyword Notifier](#keyword-notifier) section below for more commands used for keyword logging. A logged message:
+
+![img](http://i.imgur.com/4I8B2IW.png)
+- ``>log history <n>`` or ``>log history save <n>`` - Output/save the last ``<n>`` number of messages from the chat you just used the command in, including deleted messages. See [Save Chat Messages](#save-chat-messages) section for more details.
+
+**Python Interpreter**
+
+- ``>py <code>`` - python interpreter. Similiar to RoboDanny's ?debug command. Works with exec and eval statements. Also has the ``>load <module>`` ``>unload <module>`` and ``>reload`` cmds to load, unload, and reload modules.
+
+Example usage of the python interpreter:
+
+![img](http://i.imgur.com/MpAtJ7W.png)
+
+- ``>py save <filename>`` ``>py run <filename>`` ``>py list`` ``>py view <filename>`` ``>py delete <filename>`` - Save/run/delete/view the contents of scripts. ``>py save <filename>`` saves the last ``>py <code>`` you did into a file. ``>py list`` or ``>py list <page_number>`` lets you see the list of scripts you have saved.
+![pyscripts](https://cloud.githubusercontent.com/assets/14967932/24776287/1b93ec36-1aee-11e7-8418-14d91105e5f5.gif)
+
+Alternatively, there is also the ``>repl`` command which uses an embed shell like so:
+![img](https://i.imgur.com/jg2dmAq.png)
+
+- Input by putting the code in \` like this: \`print('test')\`
+- Make the shell jump to the most recent message with ``>repl jump`` and clear the current shell with ``>repl clear``
+- Quit the shell with \`quit\`
+- Based entirely off of eye-sigil's repl shell. Kind of unnecessarily huge and fancy but hey, it looks nice.
 
 ## Custom Commands:
 ![custom](https://cloud.githubusercontent.com/assets/14967932/24776178/bb6bb5f0-1aed-11e7-94e4-567b993b4ba6.gif)
