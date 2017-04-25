@@ -31,7 +31,14 @@ class Misc:
     @commands.command(pass_context=True)
     async def about(self, ctx):
         """Links to the bot's github page."""
-        await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
+        if embed_perms(ctx.message) and ctx.message.content[7:] != 'short':
+            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot', description='**Features:**\n- Custom commands/reactions\n- Set/cycle your game status and your avatar\n- Save last x images in a channel to your computer\n- Google web and image search\n- Keyword notifier\n- MyAnimeList search\n- Spoiler tagging\n- Calculator\n- quoting, server info, creating polls, and much more')
+            em.add_field(name='\ud83d\udd17 Link to download', value='[Github link](https://github.com/appu1232/Discord-Selfbot/tree/master)')
+            em.add_field(name='\ud83c\udfa5Quick examples:', value='[Simple commands](http://i.imgur.com/3H9zpop.gif)')
+            em.set_footer(text='Made by appu1232#2569', icon_url='https://i.imgur.com/RHagTDg.png')
+            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        else:
+            await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
         await self.bot.delete_message(ctx.message)
 
     @commands.group(aliases=['status'], pass_context=True)
