@@ -32,7 +32,7 @@ class Misc:
     async def about(self, ctx):
         """Links to the bot's github page."""
         if embed_perms(ctx.message) and ctx.message.content[7:] != 'short':
-            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot', description='**Features:**\n- Custom commands/reactions\n- Set/cycle your game status and your avatar\n- Save last x images in a channel to your computer\n- Google web and image search\n- Keyword notifier\n- MyAnimeList search\n- Spoiler tagging\n- Calculator\n- quoting, server info, creating polls, and much more')
+            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot', description='**Features:**\n- Custom commands/reactions\n- Save last x images in a channel to your computer\n- Keyword notifier\n- Set/cycle your game status and your avatar\n- Google web and image search\n- MyAnimeList search\n- Spoiler tagging\n- Server info commands\n- quoting, calculator, creating polls, and much more')
             em.add_field(name='\ud83d\udd17 Link to download', value='[Github link](https://github.com/appu1232/Discord-Selfbot/tree/master)')
             em.add_field(name='\ud83c\udfa5Quick examples:', value='[Simple commands](http://i.imgur.com/3H9zpop.gif)')
             em.set_footer(text='Made by appu1232#2569', icon_url='https://i.imgur.com/RHagTDg.png')
@@ -67,6 +67,7 @@ class Misc:
             em.add_field(name=u'\U0001F3AE Game', value=game)
             mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024**2)
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
+            em.set_footer(text='Selfbot made by appu1232#2569')
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
                 g.execute(["git", "fetch", "origin", "master"])

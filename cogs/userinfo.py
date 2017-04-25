@@ -42,6 +42,7 @@ class Userinfo:
                 em.add_field(name='Join Date', value=name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=avi)
                 em.set_author(name=name, icon_url='https://i.imgur.com/RHagTDg.png')
+                em.set_footer(text='Selfbot made by appu1232#2569')
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (name.id, name.nick, name.status, name.voice_channel, name.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), name.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
