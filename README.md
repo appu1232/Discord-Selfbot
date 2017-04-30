@@ -26,7 +26,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Cycle through avatars automatically (minimum 5 minute interval).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Custom embeds.
-- Save image/gif/webm dumps in channels quickly to your computer. (urls and uploads)
+- Save image/gif/webm dumps (urls or attachments) in channels quickly to your computer (checks for duplicates as well).
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
@@ -148,9 +148,10 @@ A MAL search result:
 **Misc**
 
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
-- ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel or direct message and downloads all the images/gifs/webms found (uploads and links) to the ``image_dump`` folder.
+- ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel or direct message and downloads all the images/gifs/webms found (uploads and links) to the ``image_dump`` folder (duplicates are ignored).
   + ``>imagedump dir path/to/directory/`` - if you want to change where the images/gifs are automatically saved to.
   + ``>imagedump s <n>`` - downloads silently without sending a "Downloading..." message or a "Done" message at the end. Useful if you don't want to clog up the channel.
+  + ``>imagedump stop`` - stop any imagedump downloads occurring right now.
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
 - ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler Book He lives`` or ``>spoiler Some movie | He was his brother all along``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
@@ -216,6 +217,9 @@ However, **you may want to add multiple responses to the same command.** So the 
 Example: ``>add kaguya present http://i.imgur.com/7Px7EZx.png`` then you can add another to the ``.kaguya`` command: ``>add kaguya yes http://i.imgur.com/y0yAp1j.png``.
 
 Invoke a specific response with ``.<command> <response_name>`` or get a random response for that command with ``.<command>``
+
+Ex: ``.kaguya present`` would give you that specific link but ``.kaguya`` would give you one of the two you added to the kaguya command.
+
 Change the customcmd default embed color with ``>customcmds color <hex_value>`` or set it to have no color with just ``>customcmds color``
 If for some reason, Discord isn't embedding images/gifs correctly (might just be Discord server issues sometimes), you can toggle auto-embedding with ``>customcmds embed``
 
