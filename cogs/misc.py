@@ -264,8 +264,8 @@ class Misc:
                         return
                     if interval.content.lower().strip() == 'n':
                         return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
-                    elif int(interval.content) < 300:
-                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled. Interval is too short. Must be at least 300 seconds (5 minutes).')
+                    elif int(interval.content) < 1800:
+                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled. Interval is too short. Must be at least 1800 seconds (30 minutes).')
                     else:
                         avi_config['interval'] = int(interval.content)
                     if len(os.listdir('avatars')) != 2:
@@ -352,10 +352,10 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + '``Response Time: %s``' % str(ping))
 
     @commands.command(pass_context=True)
-    async def quote(self, ctx):
+    async def quote(self, ctx, *, msg: str = None):
         """Quote the last message sent in the channel."""
         result = None
-        if ctx.message.content[6:]:
+        if msg:
             length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
             if length < 201:
                 size = length
@@ -384,126 +384,6 @@ class Misc:
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No quote found.')
         await self.bot.delete_message(ctx.message)
-
-    @commands.group(pass_context=True)
-    async def imagedump(self, ctx):
-        if ctx.invoked_subcommand is None:
-            if ctx.message.content[11:].strip():
-                if ctx.message.content[11] == 's':
-                    silent = True
-                    msg = ctx.message.content[13:].strip()
-                else:
-                    silent = False
-                    msg = ctx.message.content[11:].strip()
-                if msg.isdigit():
-                    loop = asyncio.get_event_loop()
-                    await self.bot.delete_message(ctx.message)
-                    with open('settings/optional_config.json', 'r+') as fp:
-                        opt = json.load(fp)
-                        if 'image_dump_delay' not in opt:
-                            opt['image_dump_delay'] = "0"
-                        fp.seek(0)
-                        fp.truncate()
-                        json.dump(opt, fp, indent=4)
-                    if 'image_dump_location' not in opt:
-                        path = ''
-                    else:
-                        path = opt['image_dump_location']
-                    if not os.path.exists('{}image_dump'.format(path)):
-                        os.makedirs('{}image_dump'.format(path))
-                    try:
-                        new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + ctx.message.channel.name + '_' + ctx.message.server.name
-                    except:
-                        new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_")
-                    new_dump = "".join([x if x.isalnum() else "_" for x in new_dump])
-                    new_dump.replace('/', '_')
-                    os.makedirs('{}image_dump/{}'.format(path, new_dump))
-                    if not silent:
-                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages in this channel...\nSaving to ``image_dump/{}`` Check console for progress.'.format(msg, new_dump))
-                    start = time.time()
-                    images = []
-                    print('Fetching last %s messages...' % msg)
-                    async for message in self.bot.logs_from(ctx.message.channel, limit=int(msg)+1):
-
-                        if message.attachments:
-                            for item in message.attachments:
-                                if item['url'] != '' and item['url'] not in images:
-                                    images.append(item['url'])
-
-                        elif message.embeds:
-                            for data in message.embeds:
-                                try:
-                                    url = data['thumbnail']['url']
-                                    if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in images:
-                                        images.append(url)
-                                except:
-                                    pass
-
-                        else:
-                            urls = []
-                            try:
-                                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
-                            except:
-                                pass
-
-                            if urls is not []:
-                                for url in urls:
-                                    if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images:
-                                        images.append(url)
-
-                    with open('cogs/utils/urls{}.txt'.format(new_dump), 'w') as fp:
-                        for url in images:
-                            fp.write(url + '\n')
-
-                    args = [sys.executable, 'cogs/utils/image_dump.py', path, new_dump, opt['image_dump_delay']]
-                    p = subprocess.Popen(args)
-
-                    while p.poll() is None:
-                        await asyncio.sleep(1)
-
-                    try:
-                        with open('cogs/utils/finished{}.txt'.format(new_dump), 'r') as fp:
-                            stop = float(fp.readline())
-                            total = fp.readline()
-                            failures = fp.readline()
-                            size = fp.readline()
-                        os.remove('cogs/utils/finished{}.txt'.format(new_dump))
-                    except:
-                        return print('Something went wrong when saving items and the download was stopped. Error posted above.')
-                    if int(failures) != 0:
-                        if not silent:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` However, ``{}`` items failed to download. Check your console for more info on which ones were missed. '
-                                                                                          'Finished in: ``{} seconds.``'.format(str(total), size, str(failures), str(round(stop - start, 2))))
-                        else:
-                            print('{} items failed to download. See above for missed links. '
-                                  'Finished in: {} seconds.'.format(str(failures), str(round(stop - start, 2))))
-                    else:
-                        if not silent:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` Finished in: ``{} seconds.``'.format(str(total), size, str(round(stop-start, 2))))
-                        else:
-                            print('Finished in: {} seconds'.format(str(round(stop-start, 2))))
-                else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
-                                                                                  'Ex: ``>imagedump 100``\n``>imagedump dir path/to/directory`` if you want to change where images are saved.')
-            else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
-                                                                              'Ex: ``>imagedump 100``\n``>imagedump dir path/to/directory`` if you want to change where images are saved.')
-
-    @imagedump.command(pass_context=True)
-    async def dir(self, ctx, *, msg):
-        msg = msg.strip() if msg.strip().endswith('/') else msg.strip() + '/'
-        if os.path.exists(msg):
-            if not os.path.exists('{}image_dump'.format(msg)):
-                os.makedirs('{}image_dump'.format(msg))
-            with open('settings/optional_config.json', 'r+') as fp:
-                opt = json.load(fp)
-                opt['image_dump_location'] = msg
-                fp.seek(0)
-                fp.truncate()
-                json.dump(opt, fp, indent=4)
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set path. Images will be saved to: ``{}image_dump/``'.format(msg))
-        else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid path. Try again. Example: ``>imagedump dir C:/Users/Bill/Desktop``')
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):

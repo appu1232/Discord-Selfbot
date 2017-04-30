@@ -5,6 +5,7 @@ import requests
 
 path, new_dump, delay = sys.argv[1], sys.argv[2], sys.argv[3]
 images = []
+downloaded = []
 total = failures = 0
 with open('cogs/utils/urls{}.txt'.format(new_dump), 'r') as fp:
     for lines in fp:
@@ -30,6 +31,11 @@ for i, image in enumerate(images):
                 dup = False
         image_name = '{}_{}'.format(str(duplicate), image_name)
     try:
+        image_content = requests.get(image, stream=True).content
+        if image_content not in downloaded:
+            downloaded.append(image_content)
+        else:
+            continue
         with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
             img.write(requests.get(image, stream=True).content)
 

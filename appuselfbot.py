@@ -52,6 +52,7 @@ async def on_ready():
     bot.avatar_time = time.time()
     bot.subpro = None
     bot.keyword_found = None
+    bot.imagedumps = []
 
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
@@ -560,7 +561,7 @@ if __name__ == '__main__':
     for extension in os.listdir("cogs"):
         if extension.endswith('.py'):
             try:
-                bot.load_extension("cogs." + extension.rstrip(".py"))
+                bot.load_extension("cogs." + extension[:-3])
             except Exception as e:
                 print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
