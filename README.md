@@ -128,7 +128,7 @@ See the [Custom Commands](#custom-commands) section for more info on how to invo
 
 **Imagedump saver**
 
-This command goes through a ``n`` messages in a channel and downloads all the images/gifs/webms it finds (attachments and urls). It detects and ignores duplicate images. Also has many flags that can be specified which gives more options as to what images to download and where to look.
+This command goes through ``n`` messages in a channel and downloads all the images/gifs/webms it finds (attachments and urls). It detects and ignores duplicate images. Also has many flags that can be specified which gives more options as to what images to download and where to look.
 
 Simple:
 
@@ -138,7 +138,7 @@ More options:
 
 - ``>imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item>`` - add any one or more of these to the command to furthur specify your requirements to find images.
   + ``items=<m>`` - when checking the last ``<n>`` messages, only download ``<m>`` items max.
-  + ``before=YYYY-MM-DD`` - check ``<n>`` messages past this date. Ex: ``before=2017-02-16``
+  + ``before=YYYY-MM-DD`` - check ``<n>`` messages before this date. Ex: ``before=2017-02-16``
   + ``after=YYYY-MM-DD`` - check ``<n>`` messages after this date.
   + ``dim=WidthxHeight`` - only download items with these dimensions. Ex: ``dim=1920x1080`` Optionally, do ``dim>=WidthxHeight`` for images greater than or equal to these dimensions.
   + ``ratio=Width:Height`` - only download items with these ratios. Ex: ``ratio=16:9``
