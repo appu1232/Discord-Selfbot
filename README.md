@@ -126,6 +126,36 @@ See the [Custom Commands](#custom-commands) section for more info on how to invo
 
 ![img](http://i.imgur.com/neisYXe.png)
 
+**Imagedump saver**
+
+This command goes through a ``n`` messages in a channel and downloads all the images/gifs/webms it finds (attachments and urls). It detects and ignores duplicate images. Also has many flags that can be specified which gives more options as to what images to download and where to look.
+
+Simple:
+
+- ``>imagedump <n>`` - checks the last ``<n>`` messages in this chat and downloads all the images/gifs/webms found.
+
+More options:
+
+- ``>imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item>`` - add any one or more of these to the command to furthur specify your requirements to find images.
+  + ``items=<m>`` - when checking the last ``<n>`` messages, only download ``<m>`` items max.
+  + ``before=YYYY-MM-DD`` - check ``<n>`` messages past this date. Ex: ``before=2017-02-16``
+  + ``after=YYYY-MM-DD`` - check ``<n>`` messages after this date.
+  + ``dim=WidthxHeight`` - only download items with these dimensions. Ex: ``dim=1920x1080`` Optionally, do ``dim>=WidthxHeight`` for images greater than or equal to these dimensions.
+  + ``ratio=Width:Height`` - only download items with these ratios. Ex: ``ratio=16:9``
+  + ``type=<type_of_item>`` - only download these types of files. Ex: ``type=png`` or ``type=gif, webm`` All options: jpg, jpeg, png, gif (includes gifv), webm.
+  
+Example: I want a new wallpaper. I download 100 items with type .png that fit on my 16:9 monitor with dimensions 1920x1080 that was posted in this channel:
+
+- ``>imagedump 5000 | items=100 | type=png | ratio=16:9 | dim=1920x1080``
+  + Note that the number of messages to check is still needed here. You don't need any exact number, just specify a vague number of messages that you think will cover the amount.
+
+Other imagedump options:
+
+- ``>imagedump dir path/to/directory/`` - if you want to change where the images/gifs are automatically saved to.
+  + ``>imagedump dir`` - see the current path set to save images to.
+- ``>imagedump s <n>`` - downloads silently without sending a "Downloading..." message or a "Done" message at the end. Useful if you don't want to clog up the channel.
+- ``>imagedump stop`` - stop any imagedump downloads occurring right now.
+
 **MyAnimeList commands**
 
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
@@ -148,10 +178,6 @@ A MAL search result:
 **Misc**
 
 - ``>ping`` - Responds with ``pong`` and also gives the response time.
-- ``>imagedump <n>`` - checks the last ``<n>`` messages in a channel or direct message and downloads all the images/gifs/webms found (uploads and links) to the ``image_dump`` folder (duplicates are ignored).
-  + ``>imagedump dir path/to/directory/`` - if you want to change where the images/gifs are automatically saved to.
-  + ``>imagedump s <n>`` - downloads silently without sending a "Downloading..." message or a "Done" message at the end. Useful if you don't want to clog up the channel.
-  + ``>imagedump stop`` - stop any imagedump downloads occurring right now.
 - ``>poll <title> = <Option 1> | <Option 2> | ...`` - Create a strawpoll.
 - ``>spoiler <word> <some spoilers>`` or ``>spoiler <words> | <some spoiler>`` - Encrypt the spoiler and provides a link to decode it using ROT13. Basically spoiler tagging a message. Ex: ``>spoiler Book He lives`` or ``>spoiler Some movie | He was his brother all along``
 - ``>calc`` - calculator. Ex: ``>calc 44 * (45-15)``
