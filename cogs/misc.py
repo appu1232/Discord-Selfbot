@@ -32,7 +32,9 @@ class Misc:
     async def about(self, ctx):
         """Links to the bot's github page."""
         if embed_perms(ctx.message) and ctx.message.content[7:] != 'short':
-            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot', description='**Features:**\n- Custom commands/reactions\n- Save last x images in a channel to your computer\n- Keyword notifier\n- Set/cycle your game status and your avatar\n- Google web and image search\n- MyAnimeList search\n- Spoiler tagging\n- Server info commands\n- quoting, calculator, creating polls, and much more')
+            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot', description='**Features:**\n- Custom commands/reactions\n- Save last x images in a channel to your computer\n- Keyword notifier\n'
+                                                                                                         '- Set/cycle your game status and your avatar\n- Google web and image search\n- MyAnimeList search\n- Spoiler tagging\n'
+                                                                                                         '- Server info commands\n- Quoting, calculator, creating polls, and much more')
             em.add_field(name='\ud83d\udd17 Link to download', value='[Github link](https://github.com/appu1232/Discord-Selfbot/tree/master)')
             em.add_field(name='\ud83c\udfa5Quick examples:', value='[Simple commands](http://i.imgur.com/3H9zpop.gif)')
             em.set_footer(text='Made by appu1232#2569', icon_url='https://i.imgur.com/RHagTDg.png')

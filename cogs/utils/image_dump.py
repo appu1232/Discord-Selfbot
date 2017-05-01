@@ -35,7 +35,7 @@ for i, image in enumerate(images):
                 if width/int(dimx) != height/int(dimy):
                     continue
         except:
-            raise
+            continue
     image_url = image.split('/')
     image_name = "".join([x if x.isalnum() or x == '.' else "_" for x in image_url[-1]])[-25:]
     if not image_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
