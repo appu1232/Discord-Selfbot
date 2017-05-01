@@ -2,6 +2,8 @@ import sys
 import time
 import os
 import requests
+import traceback
+import hashlib
 from io import BytesIO
 from PIL import Image
 
@@ -19,9 +21,16 @@ print('Found {} items. Checking for matches and downloading...'.format(len(image
 for i, image in enumerate(images):
     sys.stdout.write("\r{}%".format(int((i / len(images)) * 100)))
     sys.stdout.flush()
+    try:
+        response = requests.get(image, stream=True)
+        data = response.content
+    except:
+        traceback.print_exc()
+        print('\nFailed to save: %s\nContinuing...' % image)
+        failures += 1
+        continue
     if (x != 'None' or dimx != 'None') and (image.endswith(('.jpg', '.jpeg', '.png'))):
         try:
-            data = requests.get(image).content
             im = Image.open(BytesIO(data))
             width, height = im.size
             if x != 'None':
@@ -38,6 +47,7 @@ for i, image in enumerate(images):
                 if width/int(dimx) != height/int(dimy):
                     continue
         except:
+            traceback.print_exc()
             continue
     image_url = image.split('/')
     image_name = "".join([x if x.isalnum() or x == '.' else "_" for x in image_url[-1]])[-25:]
@@ -53,20 +63,24 @@ for i, image in enumerate(images):
                 dup = False
         image_name = '{}_{}'.format(str(duplicate), image_name)
     try:
-        image_content = requests.get(image, stream=True).content
-        if image_content not in downloaded:
-            downloaded.append(image_content)
+        image_hash = hashlib.md5(data).hexdigest()
+        if image_hash not in downloaded:
+            downloaded.append(image_hash)
         else:
             continue
+
         with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
-            img.write(requests.get(image, stream=True).content)
+
+            for block in response.iter_content(1024):
+                if not block:
+                    break
+
+                img.write(block)
 
         if 'cdn.discord' in image:
             time.sleep(float(delay))
         total += 1
     except:
-        print('\nFailed to save: %s\nContinuing...' % image)
-        failures += 1
         try:
             os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
         except:
