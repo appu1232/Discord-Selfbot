@@ -212,7 +212,10 @@ class Imagedump:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages {}\nSaving to ``image_dump/{}`` Check console for progress.\n{}'.format(str(limit-1), which_channel, new_dump, params))
                 start = time.time()
                 images = []
-                print('Fetching last %s messages...' % str(limit-1))
+                if limit > 100000:
+                    print('Fetching last %s messages (this may take a few minutes)...' % str(limit - 1))
+                else:
+                    print('Fetching last %s messages...' % str(limit-1))
                 async for message in self.bot.logs_from(channel, limit=limit, before=before, after=after):
 
                     url = self.check_images(message, images, type_of_items)

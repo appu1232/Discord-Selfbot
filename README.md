@@ -157,6 +157,8 @@ Other imagedump options:
 - ``>imagedump s <n>`` - downloads silently without sending a "Downloading..." message or a "Done" message at the end. Useful if you don't want to clog up the channel.
 - ``>imagedump stop`` - stop any imagedump downloads occurring right now.
 
+Note: Large number of messages specified for ``<n>`` (> 100,000) will take a decent amount of time to just fetch, let alone download. The console may be stuck at fetching for a while and may say "Unclosed client session" but it's fine, it will just take some time.
+
 **MyAnimeList commands**
 
 - ``>mal anime <tags>`` or ``>mal manga <tags>`` - Searches MyAnimeList for specified entry. Use ``manga`` for light novels as well.
