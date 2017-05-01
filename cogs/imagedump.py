@@ -69,9 +69,10 @@ class Imagedump:
                 x = y = dimx = dimy = 'None'
                 fixed = 'no'
 
-                before_msg = after_msg = limit_images_msg = type_of_items_msg = dimensions_msg = ratio_msg = ''
+                before_msg = after_msg = limit_images_msg = type_of_items_msg = dimensions_msg = ratio_msg = channel_msg = ''
 
                 simple = True
+                channel = ctx.message.channel
                 if ' | ' not in msg:
                     if msg.isdigit():
                         limit = int(msg) + 1
@@ -113,8 +114,20 @@ class Imagedump:
                                 return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid Syntax. ``dim>=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim>=1920x1080``')
                             else:
                                 x, y = x.strip(), y.strip()
-                                fixed = 'no'
+                                fixed = 'more'
                                 dimensions_msg = 'Dimensions: {} or larger. '.format(dimensions)
+
+                        if i.strip().lower().startswith('dim<='):
+                            dimensions = i.strip()[5:].strip()
+                            if 'x' not in dimensions:
+                                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid Syntax. ``dim<=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim<=1920x1080``')
+                            x, y = dimensions.split('x')
+                            if not x.strip().isdigit() or not y.strip().isdigit():
+                                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid Syntax. ``dim<=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim<=1920x1080``')
+                            else:
+                                x, y = x.strip(), y.strip()
+                                fixed = 'less'
+                                dimensions_msg = 'Dimensions: {} or smaller. '.format(dimensions)
 
                         if i.strip().lower().startswith('ratio='):
                             ratio = i.strip()[6:].strip()
@@ -159,6 +172,14 @@ class Imagedump:
                                 type_of_items.append('.jpeg')
                             type_of_items_msg = 'Types: ' + type
 
+                        if i.strip().lower().startswith('channel='):
+                            channel = i.strip()[8:].strip()
+                            channel = self.bot.get_channel(channel)
+                            if not channel:
+                                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Channel not found. Are you using the right syntax? ``channel=`` should be the channel id. '
+                                                                                                     'Ex: ``>imagedump 500 | channel=299431230984683520``')
+                            channel_msg = 'Channel: {}'.format(channel.name)
+
                 await self.bot.delete_message(ctx.message)
                 with open('settings/optional_config.json', 'r+') as fp:
                     opt = json.load(fp)
@@ -181,15 +202,18 @@ class Imagedump:
                 new_dump.replace('/', '_')
                 os.makedirs('{}image_dump/{}'.format(path, new_dump))
                 if not silent:
+                    which_channel = 'in this channel...'
+                    if ctx.message.channel != channel:
+                        which_channel = 'in channel ``{}``'.format(channel.name)
                     if not simple:
-                        params = 'Parameters: ``{}{}{}{}{}{}``'.format(limit_images_msg, before_msg, after_msg, dimensions_msg, ratio_msg, type_of_items_msg)
+                        params = 'Parameters: ``{}{}{}{}{}{}{}``'.format(limit_images_msg, before_msg, after_msg, dimensions_msg, ratio_msg, type_of_items_msg, channel_msg)
                     else:
                         params = ''
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages in this channel...\nSaving to ``image_dump/{}`` Check console for progress.\n{}'.format(str(limit-1), new_dump, params))
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages {}\nSaving to ``image_dump/{}`` Check console for progress.\n{}'.format(str(limit-1), which_channel, new_dump, params))
                 start = time.time()
                 images = []
                 print('Fetching last %s messages...' % str(limit-1))
-                async for message in self.bot.logs_from(ctx.message.channel, limit=limit, before=before, after=after):
+                async for message in self.bot.logs_from(channel, limit=limit, before=before, after=after):
 
                     url = self.check_images(message, images, type_of_items)
 

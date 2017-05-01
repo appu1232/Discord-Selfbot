@@ -136,13 +136,14 @@ Simple:
 
 More options:
 
-- ``>imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item>`` - add any one or more of these to the command to furthur specify your requirements to find images.
+- ``>imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item> | channel=<id>`` - add any one or more of these to the command to furthur specify your requirements to find images.
   + ``items=<m>`` - when checking the last ``<n>`` messages, only download ``<m>`` items max.
   + ``before=YYYY-MM-DD`` - check ``<n>`` messages before this date. Ex: ``before=2017-02-16``
   + ``after=YYYY-MM-DD`` - check ``<n>`` messages after this date.
-  + ``dim=WidthxHeight`` - only download items with these dimensions. Ex: ``dim=1920x1080`` Optionally, do ``dim>=WidthxHeight`` for images greater than or equal to these dimensions.
+  + ``dim=WidthxHeight`` - only download items with these dimensions. Ex: ``dim=1920x1080`` Optionally, do ``dim>=WidthxHeight`` for images greater than or equal and ``dim<=WidthxHeight`` for less than or equal to these dimensions.
   + ``ratio=Width:Height`` - only download items with these ratios. Ex: ``ratio=16:9``
   + ``type=<type_of_item>`` - only download these types of files. Ex: ``type=png`` or ``type=gif, webm`` All options: jpg, png, gif (includes gifv), webm.
+  + ``channel=<id>`` - download from a different channel (can be a from a different server). Useful if you can't send messages in that channel. [Enable developer mode,](https://i.imgur.com/AmOZHzL.png) right click on the channel name, and hit ``copy id`` to get the id. Ex: ``channel=299293492645986307``
   
 Example: I want a new wallpaper. I download 100 items with type .png that fit on my 16:9 monitor with dimensions 1920x1080 that was posted in this channel:
 

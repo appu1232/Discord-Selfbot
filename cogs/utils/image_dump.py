@@ -28,8 +28,11 @@ for i, image in enumerate(images):
                 if fixed == 'yes':
                     if width != int(x) or height != int(y):
                         continue
-                else:
+                elif fixed == 'more':
                     if width < int(x) or height < int(y):
+                        continue
+                else:
+                    if width > int(x) or height > int(y):
                         continue
             if dimx != 'None':
                 if width/int(dimx) != height/int(dimy):
