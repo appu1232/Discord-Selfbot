@@ -378,11 +378,11 @@ class Misc:
         if result:
             await self.bot.delete_message(ctx.message)
             if embed_perms(ctx.message) and result[0].content:
-                em = discord.Embed(description=result[0].clean_content, timestamp=result[2], color=0xbc0b0b)
+                em = discord.Embed(description=result[0].content, timestamp=result[2], color=0xbc0b0b)
                 em.set_author(name=result[1].name, icon_url=result[1].avatar_url)
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
-                await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result[1].name, result[2], result[0].clean_content))
+                await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result[1].name, result[2], result[0].content))
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No quote found.')
         await self.bot.delete_message(ctx.message)
