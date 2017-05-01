@@ -142,7 +142,7 @@ More options:
   + ``after=YYYY-MM-DD`` - check ``<n>`` messages after this date.
   + ``dim=WidthxHeight`` - only download items with these dimensions. Ex: ``dim=1920x1080`` Optionally, do ``dim>=WidthxHeight`` for images greater than or equal to these dimensions.
   + ``ratio=Width:Height`` - only download items with these ratios. Ex: ``ratio=16:9``
-  + ``type=<type_of_item>`` - only download these types of files. Ex: ``type=png`` or ``type=gif, webm`` All options: jpg, jpeg, png, gif (includes gifv), webm.
+  + ``type=<type_of_item>`` - only download these types of files. Ex: ``type=png`` or ``type=gif, webm`` All options: jpg, png, gif (includes gifv), webm.
   
 Example: I want a new wallpaper. I download 100 items with type .png that fit on my 16:9 monitor with dimensions 1920x1080 that was posted in this channel:
 
