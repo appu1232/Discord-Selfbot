@@ -65,7 +65,7 @@ class Imagedump:
                 before = None
                 after = None
                 limit_images = None
-                type_of_items = ['.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm']
+                type_of_items = ['jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm']
                 x = y = dimx = dimy = 'None'
                 fixed = 'no'
 
@@ -150,11 +150,13 @@ class Imagedump:
                             else:
                                 type_of_items = [type]
                             for i in type_of_items:
-                                if 'png' in i or 'jpg' in i or 'jpeg' in i or 'gif' in i or 'webm' in i:
+                                if 'png' in i or 'jpg' in i or 'gif' in i or 'webm' in i:
                                     pass
                                 else:
                                     return await self.bot.send_message(ctx.message.channel,
                                                                        bot_prefix + 'Invalid Syntax. ``type=`` should be tye type(s) of items to download. Ex: ``>imagedump 500 | type=png`` or ``>imagedump 500 | type=png, gif``')
+                            if 'jpg' in type_of_items or '.jpg' in type_of_items:
+                                type_of_items.append('.jpeg')
                             type_of_items_msg = 'Types: ' + type
 
                 await self.bot.delete_message(ctx.message)
