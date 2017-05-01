@@ -195,7 +195,7 @@ class Imagedump:
                 if not os.path.exists('{}image_dump'.format(path)):
                     os.makedirs('{}image_dump'.format(path))
                 try:
-                    new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + ctx.message.channel.name + '_' + ctx.message.server.name
+                    new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + channel.name + '_' + channel.server.name
                 except:
                     new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_")
                 new_dump = "".join([x if x.isalnum() else "_" for x in new_dump])
