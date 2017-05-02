@@ -53,23 +53,56 @@ class Imagedump:
 
     @commands.group(pass_context=True)
     async def imagedump(self, ctx):
+        """Mass downloads images from a channel. >help imagedump for info.
+        ----Simple----
+        >imagedump <n> - checks the last <n> messages in this chat and downloads all the images/gifs/webms found.
+        
+        ----More options----
+        >imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item> | channel=<id> | user=<id> - add any one or more of these to the command to furthur specify your requirements to find items.
+        
+        - items=<m> - when checking the last <n> messages, only download <m> items max.
+        
+        - before=YYYY-MM-DD - check <n> messages before this date. Ex: before=2017-02-16
+        
+        - after=YYYY-MM-DD - check <n> messages after this date.
+        
+        - dim=WidthxHeight - only download items with these dimensions. Ex: dim=1920x1080 Optionally, do dim>=WidthxHeight for images greater than or equal and dim<=WidthxHeight for less than or equal to these dimensions.
+        
+        - ratio=Width:Height - only download items with these ratios. Ex: ratio=16:9
+        
+        - type=<type_of_item> - only download these types of files. Ex: type=png or type=gif, webm All options: jpg, png, gif (includes gifv), webm.
+        
+        - channel=<id> - download from a different channel (can be a from a different server). Enable developer mode, right click on the channel name, and hit copy id to get the id. Ex: channel=299293492645986307
+        
+        - user=<id> - download only items posted by this user. Enable developer mode, right click on user, copy id to get their id. Ex: user=124910128582361092
+        
+        
+        Example: I want a new wallpaper. I download 100 items with type .png that fit on my 16:9 monitor with dimensions 1920x1080 that was posted in this channel:
+
+        >imagedump 5000 | items=100 | type=png | ratio=16:9 | dim=1920x1080"""
+
         if ctx.invoked_subcommand is None:
             error = 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. Ex: ``>imagedump 100``\n``>imagedump dir path/to/directory`` if you want to change where images are saved.'
             if ctx.message.content[11:].strip():
+                finished_dls = os.listdir('cogs/utils/')
+                finished = []
+                for i in finished_dls:
+                    if i.startswith('finished'):
+                        finished.append(i)
+                for i in finished:
+                    os.remove('cogs/utils/{}'.format(i))
                 if ctx.message.content[11] == 's':
                     silent = True
                     msg = ctx.message.content[13:].strip()
                 else:
                     silent = False
                     msg = ctx.message.content[11:].strip()
-                before = None
-                after = None
-                limit_images = None
+                before = after = limit_images = user = None
                 type_of_items = ['jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm']
                 x = y = dimx = dimy = 'None'
                 fixed = 'no'
 
-                before_msg = after_msg = limit_images_msg = type_of_items_msg = dimensions_msg = ratio_msg = channel_msg = ''
+                before_msg = after_msg = limit_images_msg = type_of_items_msg = dimensions_msg = ratio_msg = channel_msg = user_msg = ''
 
                 simple = True
                 channel = ctx.message.channel
@@ -170,7 +203,7 @@ class Imagedump:
                                                                        bot_prefix + 'Invalid Syntax. ``type=`` should be tye type(s) of items to download. Ex: ``>imagedump 500 | type=png`` or ``>imagedump 500 | type=png, gif``')
                             if 'jpg' in type_of_items or '.jpg' in type_of_items:
                                 type_of_items.append('.jpeg')
-                            type_of_items_msg = 'Types: ' + type
+                            type_of_items_msg = 'Types: {} '.format(type)
 
                         if i.strip().lower().startswith('channel='):
                             channel = i.strip()[8:].strip()
@@ -178,7 +211,20 @@ class Imagedump:
                             if not channel:
                                 return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Channel not found. Are you using the right syntax? ``channel=`` should be the channel id. '
                                                                                                      'Ex: ``>imagedump 500 | channel=299431230984683520``')
-                            channel_msg = 'Channel: {}'.format(channel.name)
+                            channel_msg = 'Channel: {} '.format(channel.name)
+
+                        if i.strip().lower().startswith('user='):
+                            user_id = i.strip()[5:].strip()
+                            print(user_id)
+                            for j in self.bot.servers:
+                                user = j.get_member(user_id)
+                                print(user)
+                                if user:
+                                    break
+                            if not user:
+                                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'User not found. Are you using the right syntax? ``user=`` should be the user\'s id. '
+                                                                                                     'Ex: ``>imagedump 500 | user=124910128582361092``')
+                            user_msg = 'User: {}'.format(channel.name)
 
                 await self.bot.delete_message(ctx.message)
                 with open('settings/optional_config.json', 'r+') as fp:
@@ -206,7 +252,7 @@ class Imagedump:
                     if ctx.message.channel != channel:
                         which_channel = 'in channel ``{}``'.format(channel.name)
                     if not simple:
-                        params = 'Parameters: ``{}{}{}{}{}{}{}``'.format(limit_images_msg, before_msg, after_msg, dimensions_msg, ratio_msg, type_of_items_msg, channel_msg)
+                        params = 'Parameters: ``{}{}{}{}{}{}{}{}``'.format(limit_images_msg, before_msg, after_msg, dimensions_msg, ratio_msg, type_of_items_msg, channel_msg, user_msg)
                     else:
                         params = ''
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Downloading all images/gifs/webms from the last {} messages {}\nSaving to ``image_dump/{}`` Check console for progress.\n{}'.format(str(limit-1), which_channel, new_dump, params))
@@ -217,14 +263,14 @@ class Imagedump:
                 else:
                     print('Fetching last %s messages...' % str(limit-1))
                 async for message in self.bot.logs_from(channel, limit=limit, before=before, after=after):
+                    if message.author == user or not user:
+                        url = self.check_images(message, images, type_of_items)
 
-                    url = self.check_images(message, images, type_of_items)
+                        if url:
+                            images.append(url)
 
-                    if url:
-                        images.append(url)
-
-                    if len(images) == limit_images:
-                        break
+                        if len(images) == limit_images:
+                            break
 
                 with open('cogs/utils/urls{}.txt'.format(new_dump), 'w') as fp:
                     for url in images:
@@ -236,6 +282,9 @@ class Imagedump:
 
                 while p.poll() is None:
                     await asyncio.sleep(1)
+
+                if os.path.exists('cogs/utils/paused{}.txt'.format(new_dump)):
+                    return
 
                 try:
                     with open('cogs/utils/finished{}.txt'.format(new_dump), 'r') as fp:
@@ -267,6 +316,7 @@ class Imagedump:
 
     @imagedump.command(pass_context=True)
     async def dir(self, ctx, *, msg: str = None):
+        """Set directory to save to. Ex: >imagedump dir C:/Users/Bill/Desktop"""
         if msg:
             msg = msg.strip() if msg.strip().endswith('/') else msg.strip() + '/'
             if os.path.exists(msg):
@@ -292,10 +342,63 @@ class Imagedump:
 
     @imagedump.command(pass_context=True, aliases=['stop'])
     async def cancel(self, ctx):
+        """Cancel ongoing imagedump downloads."""
         for i in self.bot.imagedumps:
             i.kill()
+        self.bot.imagedumps = []
+        if os.path.exists('pause.txt'):
+            os.remove('pause.txt')
+            paused_dls = os.listdir('cogs/utils/')
+            for i in paused_dls:
+                if i.startswith('paused') or i.startswith('urls'):
+                    os.remove('cogs/utils/{}'.format(i))
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled all imagedump processes currently running.')
-        print('Imagedump forcibily cancelled.')
+        print('\nImagedump forcibily cancelled.')
+
+    @imagedump.command(pass_context=True)
+    async def pause(self, ctx):
+        """Pause ongoing imagedump downloads."""
+        for i in self.bot.imagedumps:
+            if i.poll() is not None:
+                pass
+            else:
+                open('pause.txt', 'a').close()
+                self.bot.imagedumps = []
+                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Paused download. ``>imagedump resume`` to resume. Imagedumps can be resumed even after a restart.')
+        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'No imagedumps processes are running currently.')
+
+    @imagedump.command(pass_context=True, aliases=['unpause'])
+    async def resume(self, ctx):
+        """Resume paused imagedump downloads. (you can resume even after restart)"""
+        if os.path.exists('pause.txt'):
+            os.remove('pause.txt')
+            paused_dls = os.listdir('cogs/utils/')
+            proc = []
+            for i in paused_dls:
+                if i.startswith('paused'):
+                    proc.append(i)
+            for i in proc:
+                with open('cogs/utils/{}'.format(i), 'r') as fp:
+                    fp.readline()
+                    path = fp.readline().strip()
+                    new_dump = fp.readline().strip()
+                    delay = fp.readline().strip()
+                    x = fp.readline().strip()
+                    y = fp.readline().strip()
+                    dimx = fp.readline().strip()
+                    dimy = fp.readline().strip()
+                    fixed = fp.readline().strip()
+                os.remove('cogs/utils/{}'.format(i))
+
+                args = [sys.executable, 'cogs/utils/image_dump.py', path, new_dump, delay, x, y, dimx, dimy, fixed]
+                print('\nResuming...')
+                p = subprocess.Popen(args)
+                self.bot.imagedumps.append(p)
+
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Resumed imagedump. Check console for progress.')
+
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'No imagedump processes are paused.')
 
 
 def setup(bot):

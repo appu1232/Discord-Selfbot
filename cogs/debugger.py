@@ -117,6 +117,7 @@ class Debugger:
     # Save last >py cmd/script.
     @py.command(pass_context=True)
     async def save(self, ctx, *, msg):
+        """Save the code you last ran. Ex: >py save stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir(os.getcwd())
         if not os.path.exists('%s/cogs/utils/temp.txt' % os.getcwd()):
@@ -140,6 +141,7 @@ class Debugger:
     # Load a cmd/script saved with the >save cmd
     @py.command(aliases=['start'], pass_context=True)
     async def run(self, ctx, *, msg):
+        """Run code that you saved with the save commmand. Ex: >py run stuff"""
         save_file = msg[:-4].strip() if msg.endswith('.txt') else msg.strip()
         if not os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)):
             return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'Could not find file ``%s.txt``' % save_file)
@@ -163,6 +165,7 @@ class Debugger:
     # List saved cmd/scripts
     @py.command(aliases=['ls'], pass_context=True)
     async def list(self, ctx):
+        """List all saved scripts. Ex: >py list or >py ls"""
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         if 'list' in ctx.message.content:
             l = 8
@@ -205,6 +208,7 @@ class Debugger:
     # View a saved cmd/script
     @py.group(aliases=['vi', 'vim'], pass_context=True)
     async def view(self, ctx, *, msg: str):
+        """View a saved script's contents. Ex: >py view stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
@@ -224,6 +228,7 @@ class Debugger:
     # Delete a saved cmd/script
     @py.group(aliases=['rm'], pass_context=True)
     async def delete(self, ctx, *, msg: str):
+        """Delete a saved script. Ex: >py delete stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:

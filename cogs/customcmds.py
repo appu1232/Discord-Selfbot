@@ -16,7 +16,11 @@ class Customcmds:
     # List all custom commands
     @commands.group(pass_context=True)
     async def customcmds(self, ctx):
-        """Lists all customcmds."""
+        """Lists all customcmds. >help customcmds for more info
+        
+        >customcmds - normal output with all the customcmds and subcommands (response names).
+        >customcmds <command_name> - output only this specific command.
+        >customcmds gist - normal output but posted to Gist to avoid cluttering the chat."""
         if ctx.invoked_subcommand is None:
             with open('settings/commands.json', 'r') as c:
                 cmds = json.load(c)
@@ -66,7 +70,7 @@ class Customcmds:
 
     @customcmds.command(pass_context=True)
     async def long(self, ctx):
-        """Lists detailed version of customcmds."""
+        """Lists detailed version of customcmds. Ex: >customcmd long"""
         with open('settings/commands.json') as commands:
             if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
                 cmds = commands.read()
@@ -120,6 +124,7 @@ class Customcmds:
     # Change customcmd embed color
     @customcmds.command(pass_context=True, aliases=['colour'])
     async def color(self, ctx, *, msg: str = None):
+        '''Set color (hex) of a custom command image. Ex: >customcmd color 000000'''
         if msg:
             try:
                 msg = msg.lstrip('#')
@@ -140,6 +145,7 @@ class Customcmds:
     # Toggle auto-embed for images/gifs
     @customcmds.command(pass_context=True)
     async def embed(self, ctx):
+        """Toggle auto embeding of images for custom commands."""
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
             if opt['rich_embed'] == 'on':
@@ -155,7 +161,27 @@ class Customcmds:
     # Add a custom command
     @commands.command(pass_context=True)
     async def add(self, ctx, *, msg: str):
-        """Add a new customcmd. See the README for more info."""
+        """Add a new customcmd. >help add for more info
+        
+        There are two ways to add custom commands. The first way:
+        ----Simple----
+        >add <command> <response> Now, if you do .<command> you will receive <response>.
+        Example: >add nervous http://i.imgur.com/K9gMjWo.gifv
+        Then, doing .nervous will output this imgur link (images and gifs will auto embed) Assuming that your customcmd_prefix is set to "." 
+
+        ---Multiple responses to the same command----
+        >add <command> <response_name> <response>. This way, you can add multiple responses to the same command.
+        Example:
+        >add cry k-on http://i.imgur.com/tWtXttk.gif 
+        
+        Then you can add another to the .cry command:
+        >add cry nichijou https://media.giphy.com/media/3fmRTfVIKMRiM/giphy.gif
+        
+        Note: If anything you are adding/removing is more than one word, you MUST put each part in quotes.
+        Example: >add "cry" "mugi why" "http://i.imgur.com/tWtXttk.gif" or >add "copypasta" "I identify as an attack helicopter."
+        
+        Then invoke a specific response with .<command> <response_name> or get a random response for that command with .<command>
+        So: .cry k-on would give you that specific link but .cry would give you one of the two you added to the cry command."""
         words = msg.strip()
 
         with open('settings/commands.json', 'r') as commands:
@@ -230,7 +256,12 @@ class Customcmds:
     # Remove a custom command
     @commands.command(pass_context=True)
     async def remove(self, ctx, *, msg: str):
-        """Remove a customcmd. See the README for more info."""
+        """Remove a customcmd. >help remove for more info.
+        
+        >remove <command> or >remove <command> <response_name> if you want to remove a specific response for a command.
+        
+        Just like with the add cmd, note that if anything you are adding/removing is more than one word, you must put each part in quotes.
+        Example: If "cry" is the command and "mugi why" is the name for one of the links, removing that link would be: >remove "cry" "mugi why" """
         words = msg.strip()
 
         with open('settings/commands.json', 'r') as commands:

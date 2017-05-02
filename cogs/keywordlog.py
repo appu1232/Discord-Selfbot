@@ -127,6 +127,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def history(self, ctx):
+        """View the last n messages in this channel. Ex: >log history 20"""
         if ctx.message.content.strip()[12:]:
             if ctx.message.content[12:].strip().startswith('save'):
                 if ctx.message.content[17:].strip():
@@ -219,6 +220,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def location(self, ctx):
+        """Set log location for keyword logging. See README for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['log_location'] = ctx.message.channel.id + ' ' + ctx.message.server.id
@@ -231,6 +233,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def location2(self, ctx):
+        """Set optional seperate location for user follows. See README for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['user_location'] = ctx.message.channel.id + ' ' + ctx.message.server.id
@@ -250,6 +253,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def toggle(self, ctx):
+        """Toggle logging of all servers or only added servers."""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if settings['allservers'] == 'False':
@@ -267,6 +271,7 @@ class KeywordLogger:
 
     @log.command(aliases=['on'], pass_context=True)
     async def start(self, ctx):
+        """Turn on keyword logging (on by default)."""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['keyword_logging'] = 'on'
@@ -279,6 +284,7 @@ class KeywordLogger:
 
     @log.command(aliases=['off'], pass_context=True)
     async def stop(self, ctx):
+        """Turn off keyword logging"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['keyword_logging'] = 'off'
@@ -291,6 +297,7 @@ class KeywordLogger:
 
     @log.command(aliases=['useron'], pass_context=True)
     async def userstart(self, ctx):
+        """Start user follows if off."""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['user_logging'] = 'on'
@@ -303,6 +310,7 @@ class KeywordLogger:
 
     @log.command(aliases=['useroff'], pass_context=True)
     async def userstop(self, ctx):
+        """Stop user follows."""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['user_logging'] = 'off'
@@ -315,6 +323,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def refresh(self, ctx, *, user: str = None):
+        """Refresh cooldown for user follows."""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if user:
@@ -336,6 +345,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def context(self, ctx, *, msg: str = None):
+        """Set context length for keywords logged. See README for more info"""
         if msg:
             if msg.isdigit():
                 if 0 < int(msg) < 21:
@@ -357,6 +367,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def add(self, ctx):
+        """Add a server to log from. See README for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if ctx.message.server.id not in settings['servers']:
@@ -372,6 +383,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def remove(self, ctx):
+        """Remove a server that is being logged. See README for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if ctx.message.server.id in settings['servers']:
@@ -387,6 +399,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def addkey(self, ctx, *, msg: str):
+        """Add a keyword to the keyword logger. See README for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if msg not in settings['keywords'] and msg is not None:
@@ -404,6 +417,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def removekey(self, ctx, *, msg: str):
+        """Remove a keyword from the keyword logger. See README for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if msg in settings['keywords']:
@@ -419,6 +433,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def adduser(self, ctx, *, msg: str):
+        """Add a user to follow. See README for more info"""
         if ' | ' in msg.strip():
             data = msg.strip().split(' | ')
             if len(data) == 2:
@@ -468,6 +483,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def removeuser(self, ctx, *, msg: str):
+        """Remove a user that is being followed. See README for more info"""
         if ' | ' in msg.strip():
             user = msg.strip().replace(' | ', ' ')
         else:
@@ -488,6 +504,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def addblacklist(self, ctx, *, msg: str = None):
+        """Blacklist servers/users/words from keyword logging. See README for more info"""
         if msg:
             with open('settings/log.json', 'r+') as log:
                 settings = json.load(log)
@@ -573,6 +590,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def removeblacklist(self, ctx, *, msg: str = None):
+        """Remove a blacklisted item from keyword logging. See README for more info"""
         if msg:
             with open('settings/log.json', 'r+') as log:
                 settings = json.load(log)
@@ -657,6 +675,7 @@ class KeywordLogger:
 
     @commands.command(pass_context=True)
     async def webhook(self, ctx, *, msg):
+        """Set up a webhook for keyword logging. See README for more info"""
         with open('settings/log.json', 'r+') as l:
             log = json.load(l)
             if 'webhook_url' not in log:
@@ -671,6 +690,7 @@ class KeywordLogger:
 
     @commands.command(pass_context=True)
     async def webhook2(self, ctx, *, msg):
+        """Set up optional second webhook for user follows. See README for more info"""
         with open('settings/log.json', 'r+') as l:
             log = json.load(l)
             if 'webhook_url' not in log:
@@ -685,13 +705,14 @@ class KeywordLogger:
 
     @commands.group(pass_context=True)
     async def notify(self, ctx):
-        """Manage notifier bot. See the README for more info."""
+        """Manage notifier bot. See README for more info."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the proxy bot.\n``>notify msg`` - sends message to your keyword logger channel through webhook. (get notification if you have notification settings set to all messages in that server).\n``>notify ping`` - recieve notifications via mention in your keyword logger channel through webhook.\n``>notify dm`` - recieve notifications via direct message through proxy bot.\n``>notify off`` - Turn off all notifications.')
 
     # Set notifications to ping
     @notify.command(pass_context=True)
     async def ping(self, ctx):
+        """Set to ping you when a keyword gets logged. See README for more info"""
         with open('settings/log.json', 'r+') as log:
             location = json.load(log)['log_location']
         if location == '':
@@ -711,6 +732,7 @@ class KeywordLogger:
     # Set notifications to msg
     @notify.command(aliases=['message'], pass_context=True)
     async def msg(self, ctx):
+        """Set to just send msg when keyword gets logged. See README for more info"""
         with open('settings/log.json') as l:
             location = json.load(l)['log_location']
         if location == '':
@@ -730,6 +752,7 @@ class KeywordLogger:
     # Set notifications to dm
     @notify.command(aliases=['pm', 'pms', 'direct message', 'direct messages', 'dms'], pass_context=True)
     async def dm(self, ctx):
+        """Set to direct message you when keyword gets logged. See README for more info"""
         with open('settings/log.json') as l:
             location = json.load(l)['log_location']
         if location == '':
@@ -769,6 +792,7 @@ class KeywordLogger:
     # Set notifications to ping
     @notify.command(aliases=['none'], pass_context=True)
     async def off(self, ctx):
+        """Turn off notifier for keyword logging. See README for more info"""
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             notify['type'] = 'off'
@@ -784,6 +808,7 @@ class KeywordLogger:
     # Set bot token
     @notify.command(pass_context=True)
     async def token(self, ctx, *, msg):
+        """Set token for direct message bot. See README for more info"""
         msg = msg.strip('<').strip('>')
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)

@@ -88,7 +88,7 @@ class Server:
 
     @server.group(pass_context=True)
     async def emojis(self, ctx, msg: str = None):
-        """List all emojis in this server."""
+        """List all emojis in this server. Ex: >server emojis"""
         if msg:
             server, found = self.find_server(msg)
         else:
@@ -116,6 +116,7 @@ class Server:
 
     @server.group(pass_context=True)
     async def role(self, ctx, *, msg):
+        """Get more info about a specific role. Ex: >server role Admins"""
         for role in ctx.message.server.roles:
             if msg == role.name:
                 role_count = 0

@@ -19,14 +19,14 @@ class EmbedShell():
         self.aioclient = aiohttp.ClientSession()
 
     def cleanup_code(self, content):
-        '''Automatically removes code blocks from the code.'''
+        """Automatically removes code blocks from the code."""
         if content.startswith('```') and content.endswith('```'):
             return '\n'.join(content.split('\n')[1:-1])
 
         return content.strip('` \n')
 
     def get_syntax_error(self, err):
-        '''Returns SyntaxError formatted for repl reply.'''
+        """Returns SyntaxError formatted for repl reply."""
         return '```py\n{0.text}{1:>{0.offset}}\n{2}: {0}```'.format(
             err,
             '^',
@@ -38,7 +38,7 @@ class EmbedShell():
                     pass_context=True,
                     invoke_without_command=True)
     async def repl(self, ctx, *, name: str = None):
-        '''Head on impact with an interactive python shell.'''
+        """Head on impact with an interactive python shell."""
         # TODO Minimize local variables
         # TODO Minimize branches
 
@@ -281,7 +281,7 @@ class EmbedShell():
                   aliases=['hop', 'pull', 'recenter', 'whereditgo'],
                   pass_context=True)
     async def _repljump(self, ctx):
-        '''Brings the shell back down so you can see it again.'''
+        """Brings the shell back down so you can see it again."""
 
         session = ctx.message.channel.id
 
@@ -318,7 +318,7 @@ class EmbedShell():
                            'ohfuckme', 'deletthis'],
                   pass_context=True)
     async def _replclear(self, ctx):
-        '''Clears the fields of the shell and resets the color.'''
+        """Clears the fields of the shell and resets the color."""
 
         session = ctx.message.channel.id
 

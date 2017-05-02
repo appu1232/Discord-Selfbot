@@ -20,7 +20,10 @@ class Mal:
     # Mal search (chained with either anime or manga)
     @commands.group(pass_context=True)
     async def mal(self, ctx):
-        """Search MyAnimeList for an anime/manga. Ex: >mal anime Steins;Gate"""
+        """Search MyAnimeList for an anime/manga. Ex: >mal anime Steins;Gate
+        
+        Optionally, put [link] after the anime/manga part to just get the link instead of the full info.
+        Ex: >mal anime [link] Steins;Gate"""
         if ctx.invoked_subcommand is None:
             await self.bot.send_message(ctx.message.channel,
                                        bot_prefix + 'Invalid Syntax. Example use: ``>mal anime steins;gate`` or ``>mal manga boku no hero academia``')
@@ -28,6 +31,7 @@ class Mal:
     # Anime search for Mal
     @mal.command(pass_context=True)
     async def anime(self, ctx, *, msg: str):
+        """Search the anime database. Ex: >mal anime Steins;Gate"""
         loop = asyncio.get_event_loop()
         config = load_optional_config()
         fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
@@ -128,6 +132,7 @@ class Mal:
     # Manga search for Mal
     @mal.command(pass_context=True)
     async def manga(self, ctx, *, msg: str):
+        """Search the manga database. Ex: >mal manga Boku no Hero Academia"""
         loop = asyncio.get_event_loop()
         config = load_optional_config()
         fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')

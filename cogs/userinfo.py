@@ -52,6 +52,7 @@ class Userinfo:
 
     @info.command(pass_context=True)
     async def avi(self, ctx):
+        """View bigger version of user's avatar. Ex: >info avi @user"""
         name = ctx.message.content[9:].strip()
         if name:
             try:

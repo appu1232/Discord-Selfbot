@@ -166,7 +166,13 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def game(self, ctx):
-        """Set playing status. Ex: >game napping"""
+        """Set playing status. Ex: >game napping >help game for more info
+        
+        Your game status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
+        
+        To set a rotating game status, do >game game1 | game2 | game3 | etc.
+        It will then prompt you with an interval in seconds to wait before changing the game and after that the order in which to change (in order or random)
+        Ex: >game with matches | sleeping | watching anime"""
         if ctx.message.content[6:]:
             game = str(ctx.message.clean_content[6:])
 
@@ -238,7 +244,7 @@ class Misc:
 
     @commands.group(aliases=['avatars'], pass_context=True)
     async def avatar(self, ctx):
-        """Rotate avatars."""
+        """Rotate avatars. See README for more info."""
 
         if ctx.invoked_subcommand is None:
             with open('settings/avatars.json', 'r+') as a:
@@ -299,6 +305,7 @@ class Misc:
 
     @avatar.command(aliases=['pass', 'pw'], pass_context=True)
     async def password(self, ctx, *, msg):
+        """Set your discord acc password to rotate avatars. See README for more info."""
         with open('settings/avatars.json', 'r+') as a:
             avi_config = json.load(a)
             avi_config['password'] = msg.strip().strip('"').lstrip('<').rstrip('>')
@@ -355,7 +362,11 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
-        """Quote the last message sent in the channel."""
+        """Quote the last message sent in the channel. >help quote for more info.
+        
+        >quote - quotes the last message sent in the channel.
+        >quote <words> - tries to search for a message sent recently that contains the given words and quotes it.
+        >quote <message_id> - quotes the given message. (Enable developer mode to copy message ids)."""
         result = None
         if msg:
             length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
