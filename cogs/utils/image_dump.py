@@ -18,9 +18,25 @@ with open('cogs/utils/urls{}.txt'.format(new_dump), 'r') as fp:
 os.remove('cogs/utils/urls{}.txt'.format(new_dump))
 
 print('Found {} items. Checking for matches and downloading...'.format(len(images)))
+finished_status = images
 for i, image in enumerate(images):
-    sys.stdout.write("\r{}%".format(int((i / len(images)) * 100)))
+    if image[0] == '-':
+        continue
+    if image[0] == '+':
+        total += 1
+        continue
+    finished_status[i] = '-' + finished_status[i]
+    sys.stdout.write("\rStatus: {}% | Downloaded: {} | Checked: {}/{}".format(int((i / len(images)) * 100), total, i, len(images)))
     sys.stdout.flush()
+    if os.path.exists('pause.txt'):
+        with open('cogs/utils/urls{}.txt'.format(new_dump), 'w') as fp:
+            for links in finished_status:
+                fp.write(links + '\n')
+        with open('cogs/utils/paused{}.txt'.format(new_dump), 'w') as fp:
+            fp.write('{}%'.format(int((i / len(images)) * 100)))
+            fp.write('\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(path, new_dump, delay, x, y, dimx, dimy, fixed))
+        quit()
+        os._exit(0)
     try:
         response = requests.get(image, stream=True)
         data = response.content
@@ -80,11 +96,13 @@ for i, image in enumerate(images):
         if 'cdn.discord' in image:
             time.sleep(float(delay))
         total += 1
+        finished_status[i] = '+' + finished_status[i]
     except:
         try:
             os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
         except:
             pass
+
 stop = time.time()
 folder_size = 0
 for (path, dirs, files) in os.walk('{}image_dump/{}'.format(path, new_dump)):
@@ -97,7 +115,7 @@ elif folder_size/1024.0 > 1024:
     size = "%0.1f MB" % (folder_size / (1024 * 1024.0))
 else:
     size = "%0.1f KB" % (folder_size / 1024.0)
-sys.stdout.write('\r100% Done! Downloaded {} items. {}\n'.format(total, size))
+sys.stdout.write('\r100% Done! Downloaded {} items. {}                         \n'.format(total, size))
 sys.stdout.flush()
 
 with open('cogs/utils/finished{}.txt'.format(new_dump), 'w') as fp:
