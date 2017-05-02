@@ -2,7 +2,6 @@ import sys
 import time
 import os
 import requests
-import traceback
 import hashlib
 from io import BytesIO
 from PIL import Image
@@ -35,13 +34,11 @@ for i, image in enumerate(images):
         with open('cogs/utils/paused{}.txt'.format(new_dump), 'w') as fp:
             fp.write('{}%'.format(int((i / len(images)) * 100)))
             fp.write('\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(path, new_dump, delay, x, y, dimx, dimy, fixed))
-        quit()
         os._exit(0)
     try:
         response = requests.get(image, stream=True)
         data = response.content
     except:
-        traceback.print_exc()
         print('\nFailed to save: %s\nContinuing...' % image)
         failures += 1
         continue
@@ -63,7 +60,6 @@ for i, image in enumerate(images):
                 if width/int(dimx) != height/int(dimy):
                     continue
         except:
-            traceback.print_exc()
             continue
     image_url = image.split('/')
     image_name = "".join([x if x.isalnum() or x == '.' else "_" for x in image_url[-1]])[-25:]
