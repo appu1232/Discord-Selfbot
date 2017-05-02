@@ -8,6 +8,7 @@ import subprocess
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
+from discord import utils
 from cogs.utils.checks import *
 
 '''Module for miscellaneous commands'''
@@ -27,6 +28,7 @@ class Misc:
                           'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
                           'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}', '0': '0⃣', '1': '1⃣', '2': '2⃣', '3': '3⃣',
                           '4': '4⃣', '5': '5⃣', '6': '6⃣', '7': '7⃣', '8': '8⃣', '9': '9⃣'}
+        self.emoji_reg = re.compile(r'<:.+?:([0-9]{15,21})>')
 
     @commands.command(pass_context=True)
     async def about(self, ctx):
@@ -167,9 +169,9 @@ class Misc:
     @commands.command(pass_context=True)
     async def game(self, ctx):
         """Set playing status. Ex: >game napping >help game for more info
-        
+
         Your game status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
-        
+
         To set a rotating game status, do >game game1 | game2 | game3 | etc.
         It will then prompt you with an interval in seconds to wait before changing the game and after that the order in which to change (in order or random)
         Ex: >game with matches | sleeping | watching anime"""
@@ -363,7 +365,7 @@ class Misc:
     @commands.command(pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
         """Quote the last message sent in the channel. >help quote for more info.
-        
+
         >quote - quotes the last message sent in the channel.
         >quote <words> - tries to search for a message sent recently that contains the given words and quotes it.
         >quote <message_id> - quotes the given message. (Enable developer mode to copy message ids)."""
@@ -507,7 +509,7 @@ class Misc:
         else:
             await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
             await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
-    
+
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg : str):
         """Spoiler tag. Ex: >spoiler Some book | They get married."""
@@ -565,20 +567,23 @@ class Misc:
         spaced_message = '{}'.format(spaces).join(msg)
         await self.bot.send_message(ctx.message.channel, spaced_message)
 
+    def reactions(self, content):
+        emote_list = []
+        for i in content.split(" "):
+            if self.emoji_reg.findall(i):
+                emote_list.append(utils.get(self.bot.get_all_emojis(), id=str(self.emoji_reg.findall(i)[0])))
+            else:
+                for x in list(i):
+                    if x.isalnum():
+                        emote_list.append(self.regionals[x.lower()])
+        return emote_list
+
     @commands.command(pass_context=True)
     async def react(self, ctx, msg: str, id: int = None):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
         await self.bot.delete_message(ctx.message)
-        reactions = []
-        if id:
-            limit = 25
-        else:
-            limit = 1
-        for i in msg:
-            if i.isalnum():
-                reactions.append(self.regionals[i.lower()])
-            else:
-                reactions.append(i)
+        reactions = self.reactions(msg)
+        limit = 25 if id else 1
         async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
             if (not id and message.id != ctx.message.id) or (str(id) == message.id):
                 for i in reactions:
