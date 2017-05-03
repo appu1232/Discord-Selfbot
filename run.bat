@@ -76,7 +76,7 @@ goto run
 	set PYTHONIOENCODING=utf-8
 	python -m pip install --upgrade pip >nul
 	python -m pip install -r requirements.txt >nul
-	echo Requirements satisifed.
+	echo Requirements satisfied.
 	echo Starting the bot (this may take a minute or two)...
 	python loopself.py
 	if %ERRORLEVEL% == 15 goto update
