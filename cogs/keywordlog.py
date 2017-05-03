@@ -479,7 +479,7 @@ class KeywordLogger:
                 self.bot.key_users = self.bot.log_conf['keyusers']
 
         else:
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Proper use: ``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60'.format(self.bot.user.id))
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Proper use: ``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
 
     @log.command(pass_context=True)
     async def removeuser(self, ctx, *, msg: str):

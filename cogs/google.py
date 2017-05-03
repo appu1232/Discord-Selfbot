@@ -223,7 +223,6 @@ class Google:
                 await self.bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][item]['link']))
             else:
                 await self.bot.send_message(ctx.message.channel, result['items'][item]['link'])
-        await self.bot.delete_message(ctx.message)
 
 
 def setup(bot):
