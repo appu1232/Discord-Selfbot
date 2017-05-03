@@ -24,9 +24,9 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Keyword/user logger and notifier. Get notified when keywords you specified are said in any of your server or follow users and get notified when they send a message (with a cooldown). Useful to track someone or see if someone mentioned your name or your favorite show/book/whatever else keywords and you want to stalk— I mean, talk to them about it.
 - Set your game to anything or set up multiple and cycle through them.
 - Cycle through avatars automatically (minimum 5 minute interval).
+- Save image/gif/webm dumps (urls or attachments) in channels quickly to your computer (checks for duplicates as well).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Custom embeds.
-- Save image/gif/webm dumps (urls or attachments) in channels quickly to your computer (checks for duplicates as well).
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
@@ -77,7 +77,7 @@ Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) a
 
 **Windows:**
 
-Double click ``run.bat`` to start the bot. An anti-virus may warn you when you try to run it but let it pass. There is no malicious code here. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in.
+Double click ``run.bat`` to start the bot. An anti-virus may warn you when you try to run it but let it pass. There is no malicious code here. If everything in the config is setup properly you should login fine. If you have a weak internet connection, the bot could take several minutes to log in. If it refuses to recognize that Git is installed, try running as administrator.
 
 Optionally, create a shortcut to the .bat file and [add it to startup](http://www.computerhope.com/issues/ch000322.htm) so you don't have to remember to run it every time.
 
@@ -113,6 +113,7 @@ Manual update: Unless otherwise stated, all you need to do is save your ``settin
 ![img](http://i.imgur.com/gBoKnjQ.png)
 - ``>add <command> <response>`` or ``>add <command> <response_name> <response>`` - Add a custom command.
 - ``>remove <command>`` or ``>remove <command> <response_name>`` - Remove a custom command.
+- Invoke the custom command with ``.command`` or ``.command response_name`` for that specific response if multiple were given.
 
 See the [Custom Commands](#custom-commands) section for more info on how to invoke commands and set up multiple responses to the same command.
 
