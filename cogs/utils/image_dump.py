@@ -21,11 +21,13 @@ finished_status = images
 for i, image in enumerate(images):
     if image[0] == '-':
         continue
-    if image[0] == '+':
+    if image[0] == '+' and ' ' in image:
+        image_hash = image[1:].split(' ', 1)[0]
+        downloaded.append(image_hash)
         total += 1
         continue
     finished_status[i] = '-' + finished_status[i]
-    sys.stdout.write("\rStatus: {}% | Downloaded: {} | Checked: {}/{}".format(int((i / len(images)) * 100), total, i, len(images)))
+    sys.stdout.write('\rStatus: {}% | Downloaded: {} | Checked: {}/{}'.format(int((i / len(images)) * 100), total, i, len(images)))
     sys.stdout.flush()
     if os.path.exists('pause.txt'):
         with open('cogs/utils/urls{}.txt'.format(new_dump), 'w') as fp:
@@ -39,9 +41,12 @@ for i, image in enumerate(images):
         response = requests.get(image, stream=True)
         data = response.content
     except:
-        print('\nFailed to save: %s\nContinuing...' % image)
+        sys.stdout.write('\rFailed to save: %s                       ' % image)
+        sys.stdout.flush()
+        print('\nContinuing...')
         failures += 1
         continue
+
     if (x != 'None' or dimx != 'None') and (image.endswith(('.jpg', '.jpeg', '.png'))):
         try:
             im = Image.open(BytesIO(data))
@@ -61,6 +66,12 @@ for i, image in enumerate(images):
                     continue
         except:
             continue
+
+    image_hash = hashlib.md5(data).hexdigest()
+    if image_hash not in downloaded:
+        downloaded.append(image_hash)
+    else:
+        continue
     image_url = image.split('/')
     image_name = "".join([x if x.isalnum() or x == '.' else "_" for x in image_url[-1]])[-25:]
     if not image_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')):
@@ -75,11 +86,6 @@ for i, image in enumerate(images):
                 dup = False
         image_name = '{}_{}'.format(str(duplicate), image_name)
     try:
-        image_hash = hashlib.md5(data).hexdigest()
-        if image_hash not in downloaded:
-            downloaded.append(image_hash)
-        else:
-            continue
 
         with open('{}image_dump/{}/{}'.format(path, new_dump, image_name), 'wb') as img:
 
@@ -92,7 +98,7 @@ for i, image in enumerate(images):
         if 'cdn.discord' in image:
             time.sleep(float(delay))
         total += 1
-        finished_status[i] = '+' + finished_status[i]
+        finished_status[i] = '+{} {}'.format(image_hash, finished_status[i])
     except:
         try:
             os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
