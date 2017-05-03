@@ -126,7 +126,7 @@ class Server:
                         all_users.append('{}#{}'.format(user.name, user.discriminator))
                         role_count += 1
                 all_users.sort()
-                all = ', '.join(all_users)
+                all_users = ', '.join(all_users)
                 em = discord.Embed(title='Role Info', color=role.color)
                 em.add_field(name='Name', value=role.name)
                 em.add_field(name='ID', value=role.id, inline=False)
@@ -135,11 +135,11 @@ class Server:
                 em.add_field(name='Role color rgb value', value=role.color.to_tuple())
                 em.add_field(name='Mentionable', value=role.mentionable)
                 if len(all_users) > 10:
-                    all = all.replace(', ', '\n')
-                    url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, ctx.message.server.name), content=str(all), name='role.txt')
+                    all_users = all_users.replace(', ', '\n')
+                    url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, ctx.message.server.name), content=str(all_users), name='role.txt')
                     em.add_field(name='All users', value='Long list, posted to Gist:\n %s' % url, inline=False)
                 else:
-                    em.add_field(name='All Users', value=all, inline=False)
+                    em.add_field(name='All Users', value=all_users, inline=False)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
                 em.set_thumbnail(url='http://www.colorhexa.com/%s.png' % str(role.color).strip("#"))
                 return await self.bot.send_message(ctx.message.channel, content=None, embed=em)

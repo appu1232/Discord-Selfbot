@@ -15,7 +15,6 @@ from cogs.utils.checks import *
 from discord.ext import commands
 
 
-
 config = load_config()
 
 bot_prefix = config['bot_identifier']
@@ -36,23 +35,11 @@ async def on_ready():
     print('User id:' + str(bot.user.id))
     print('------')
     bot.uptime = datetime.datetime.now()
-    bot.icount = 0
-    bot.message_count = 0
-    bot.mention_count = 0
-    bot.self_log = {}
-    bot.all_log = {}
-    bot.keyword_log = 0
-    bot.refresh_time = time.time()
-    bot.gc_time = time.time()
-    bot.game = None
-    bot.game_interval = None
-    bot.avatar = None
-    bot.avatar_interval = None
-    bot.game_time = time.time()
-    bot.avatar_time = time.time()
-    bot.subpro = None
-    bot.keyword_found = None
+    bot.icount = bot.message_count = bot.mention_count = bot.keyword_log = 0
+    bot.self_log = bot.all_log = {}
     bot.imagedumps = []
+    bot.game = bot.game_interval = bot.avatar = bot.avatar_interval = bot.subpro = bot.keyword_found = None
+    bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
 
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
@@ -60,33 +47,6 @@ async def on_ready():
             print('Bot has restarted.')
             await bot.send_message(channel, bot_prefix + 'Bot has restarted.')
         os.remove('restart.txt')
-    with open('settings/log.json', 'r+') as log:
-        loginfo = json.load(log)
-        if 'blacklisted_words' not in loginfo:
-            loginfo['blacklisted_words'] = []
-        if 'blacklisted_servers' not in loginfo:
-            loginfo['blacklisted_servers'] = []
-        if 'blacklisted_channels' not in loginfo:
-            loginfo['blacklisted_channels'] = {}
-        if 'keyword_logging' not in loginfo:
-            loginfo['keyword_logging'] = 'on'
-        if 'user_logging' not in loginfo:
-            loginfo['user_logging'] = 'on'
-        if 'webhook_url' not in loginfo:
-            loginfo['webhook_url'] = ''
-        if 'webhook_url2' not in loginfo:
-            loginfo['webhook_url2'] = ''
-        if 'user_location' not in loginfo:
-            loginfo['user_location'] = ''
-        if int(loginfo['log_size']) > 25:
-            loginfo['log_size'] = "25"
-        if 'keyusers' not in loginfo:
-            loginfo['keyusers'] = {}
-        if loginfo['keyusers'] == []:
-            loginfo['keyusers'] = {}
-        log.seek(0)
-        log.truncate()
-        json.dump(loginfo, log, indent=4)
     with open('settings/log.json', 'r') as log:
         bot.log_conf = json.load(log)
         bot.key_users = bot.log_conf['keyusers']
@@ -178,17 +138,14 @@ async def restart(ctx):
 
 
 @bot.command(pass_context=True, aliases=['upgrade'])
-async def update(ctx):
+async def update(ctx, msg:str = None):
     """Update the bot if there is an update available."""
-    if ctx.message.content:
-        if ctx.message.content[7:].strip() == 'show':
-            latest = update_bot(False)
-        else:
-            latest = update_bot(True)
+    if msg:
+        latest = update_bot(False) if msg == 'show' else update_bot(True)
     else:
         latest = update_bot(True)
     if latest:
-        if not ctx.message.content[7:].strip() == 'show':
+        if not msg == 'show':
             if embed_perms(ctx.message):
                 await bot.send_message(ctx.message.channel, content=None, embed=latest)
             await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
@@ -212,8 +169,7 @@ async def quit(ctx):
     print('Bot exiting...')
     if bot.subpro:
         bot.subpro.kill()
-    with open('quit.txt', 'w') as q:
-        q.write('.')
+    open('quit.txt', 'a').close()
     await bot.send_message(ctx.message.channel, bot_prefix + 'Bot shut down.')
     os._exit(0)
 
@@ -249,11 +205,11 @@ async def on_message(message):
 
     # If the message was sent by me
     if message.author.id == bot.user.id:
+        bot.icount += 1
         if hasattr(bot, 'self_log'):
             if message.channel.id not in bot.self_log:
                 bot.self_log[message.channel.id] = collections.deque(maxlen=100)
             bot.self_log[message.channel.id].append(message)
-            bot.icount += 1
             if message.content.startswith(config['customcmd_prefix'][0]):
                 response = custom(message.content.lower().strip())
                 if response is None:

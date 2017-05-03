@@ -3,8 +3,6 @@ import asyncio
 import strawpy
 import random
 import re
-import sys
-import subprocess
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
@@ -97,11 +95,10 @@ class Misc:
 
     # Embeds the message
     @commands.command(pass_context=True)
-    async def embed(self, ctx):
+    async def embed(self, ctx, *, msg: str = None):
         """Embed given text. Ex: Do >embed for more help"""
-        if ctx.message.content[6:].strip():
+        if msg:
             if embed_perms(ctx.message):
-                msg = ctx.message.content[6:].strip()
                 title = description = image = thumbnail = color = footer = author = None
                 embed_values = msg.split('|')
                 for i in embed_values:
@@ -162,12 +159,15 @@ class Misc:
             else:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'No embed permissions in this channel.')
         else:
-            msg = '**How to use the >embed command:**\n**Example:** >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\n**You do NOT need to specify every property, only the ones you want.**\n**All properties and the syntax:**\ntitle=words\ndescription=words\ncolor=hexvalue\nimage=url_to_image (must be https)\nthumbnail=url_to_image\nauthor=words **OR** author=name=words icon=url_to_image\nfooter=words **OR** footer=name=words icon=url_to_image\nfield=name=words value=words (you can add as many fields as you want)\n\n**NOTE:** After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.'
+            msg = '**How to use the >embed command:**\n**Example:** >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\n**You do NOT need to specify every property, only the ones you want.**' \
+                  '\n**All properties and the syntax:**\ntitle=words\ndescription=words\ncolor=hexvalue\nimage=url_to_image (must be https)\nthumbnail=url_to_image\nauthor=words **OR** author=name=words icon=url_to_image\nfooter=words ' \
+                  '**OR** footer=name=words icon=url_to_image\nfield=name=words value=words (you can add as many fields as you want)\n\n**NOTE:** After the command is sent, the bot will delete your message and replace it with the embed. ' \
+                  'Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.'
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
-    async def game(self, ctx):
+    async def game(self, ctx, *, game: str = None):
         """Set playing status. Ex: >game napping >help game for more info
 
         Your game status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
@@ -175,11 +175,10 @@ class Misc:
         To set a rotating game status, do >game game1 | game2 | game3 | etc.
         It will then prompt you with an interval in seconds to wait before changing the game and after that the order in which to change (in order or random)
         Ex: >game with matches | sleeping | watching anime"""
-        if ctx.message.content[6:]:
-            game = str(ctx.message.clean_content[6:])
+        if game:
 
             # Cycle games if more than one game is given.
-            if ' | ' in ctx.message.content[6:]:
+            if ' | ' in game:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'Input interval in seconds to wait before changing to the next game (``n`` to cancel):')
 
                 def check(msg):
@@ -233,7 +232,7 @@ class Misc:
                 with open('settings/games.json', 'w') as g:
                     json.dump(games, g, indent=4)
                 await self.bot.change_presence(game=discord.Game(name=game))
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Game set as: ``Playing %s``' % ctx.message.content[6:])
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Game set as: ``Playing %s``' % game)
 
         # Remove game status.
         else:
@@ -252,7 +251,8 @@ class Misc:
             with open('settings/avatars.json', 'r+') as a:
                 avi_config = json.load(a)
             if avi_config['password'] == '':
-                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cycling avatars requires you to input your password. Your password will not be sent anywhere and no one will have access to it. Enter your password with``>avatar password <password>`` Make sure you are in a private channel where no one can see!')
+                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cycling avatars requires you to input your password. Your password will not be sent anywhere and no one will have access to it. '
+                                                                                     'Enter your password with``>avatar password <password>`` Make sure you are in a private channel where no one can see!')
             if avi_config['interval'] != '0':
                 self.bot.avatar = None
                 self.bot.avatar_interval = None
@@ -317,14 +317,15 @@ class Misc:
         await self.bot.delete_message(ctx.message)
         return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Password set. Do ``>avatar`` to toggle cycling avatars.')
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['pick'])
     async def choose(self, ctx, *, choices: str):
         """Choose randomly from the options you give. >choose this | that"""
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
-        """Get url of emoji (across any server). Ex: >emoji :smug:"""
+        """Embed a custom emoji (from any server). Ex: >emoji :smug:"""
+        msg = msg.strip(':')
         url = None
         exact_match = False
         for server in self.bot.servers:
@@ -446,14 +447,14 @@ class Misc:
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
-    async def d(self, ctx):
+    async def d(self, ctx, *, txt: str = None):
         """Deletes the last message sent or n messages sent. Ex: >d 5"""
 
         # If number of seconds/messages are specified
-        if len(ctx.message.content.lower().strip()) > 2:
-            if ctx.message.content[3] == '!':
+        if txt:
+            if txt[1] == '!':
                 killmsg = self.bot.self_log[ctx.message.channel.id][len(self.bot.self_log[ctx.message.channel.id]) - 2]
-                timer = int(ctx.message.content[4:].lower().strip())
+                timer = int(txt[1:].strip())
 
                 # Animated countdown because screw rate limit amirite
                 destroy = await self.bot.edit_message(ctx.message, bot_prefix + 'The above message will self-destruct in:')
@@ -499,7 +500,7 @@ class Misc:
                 await self.bot.delete_message(killmsg)
             else:
                 await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
-                for i in range(0, int(ctx.message.content[3:])):
+                for i in range(0, int(txt)):
                     try:
                         await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
                     except:
@@ -511,7 +512,7 @@ class Misc:
             await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
 
     @commands.command(pass_context=True)
-    async def spoiler(self, ctx, *, msg : str):
+    async def spoiler(self, ctx, *, msg: str):
         """Spoiler tag. Ex: >spoiler Some book | They get married."""
         try:
             if " | " in msg:
@@ -563,8 +564,7 @@ class Misc:
             msg = msg.split(' ', 1)[1].strip()
         else:
             spaces = ' '
-        msg = list(msg)
-        spaced_message = '{}'.format(spaces).join(msg)
+        spaced_message = '{}'.format(spaces).join(list(msg))
         await self.bot.send_message(ctx.message.channel, spaced_message)
 
     def reactions(self, content):
@@ -579,13 +579,13 @@ class Misc:
         return emote_list
 
     @commands.command(pass_context=True)
-    async def react(self, ctx, msg: str, id: int = None):
+    async def react(self, ctx, msg: str, msg_id: int = None):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
         await self.bot.delete_message(ctx.message)
         reactions = self.reactions(msg)
-        limit = 25 if id else 1
+        limit = 25 if msg_id else 1
         async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
-            if (not id and message.id != ctx.message.id) or (str(id) == message.id):
+            if (not msg_id and message.id != ctx.message.id) or (str(id) == message.id):
                 for i in reactions:
                     await self.bot.add_reaction(message, i)
 
