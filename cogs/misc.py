@@ -393,36 +393,50 @@ class Misc:
         >quote - quotes the last message sent in the channel.
         >quote <words> - tries to search for a message sent recently that contains the given words and quotes it.
         >quote <message_id> - quotes the given message. (Enable developer mode to copy message ids)."""
-        result = None
+        result = channel = None
+        await self.bot.delete_message(ctx.message)
         if msg:
             length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
             if length < 201:
                 size = length
             else:
                 size = 200
-
-            for i in range(length-2, length-size, -1):
-                search = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id][i]
-                if ctx.message.clean_content[6:].lower().strip() in search[0].clean_content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote '):
-                    result = [search[0], search[0].author, search[0].timestamp]
-                    break
-                if ctx.message.clean_content[6:].strip() == search[0].id:
-                    result = [search[0], search[0].author, search[0].timestamp]
-                    break
+            for channel in ctx.message.server.channels:
+                if str(channel.type) == 'text':
+                    if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
+                        for i in range(length - 2, length - size, -1):
+                            try:
+                                search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
+                            except:
+                                continue
+                            if (ctx.message.clean_content[6:].lower().strip() in search[0].clean_content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.clean_content[6:].strip() == search[0].id):
+                                result = search[0]
+                                break
+                        if result:
+                            break
+            if not result:
+                for channel in ctx.message.server.channels:
+                    async for sent_message in self.bot.logs_from(channel, limit=500):
+                        if (msg.lower().strip() in sent_message.clean_content and (sent_message.author != ctx.message.author or sent_message.clean_content[:7] != '>quote ')) or (msg.strip() == sent_message.id):
+                            result = sent_message
+                            break
+                    if result:
+                        break
         else:
+            channel = ctx.message.channel
             search = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id][-2]
-            result = [search[0], search[0].author, search[0].timestamp]
+            result = search[0]
         if result:
-            await self.bot.delete_message(ctx.message)
-            if embed_perms(ctx.message) and result[0].content:
-                em = discord.Embed(description=result[0].content, timestamp=result[2], color=0xbc0b0b)
-                em.set_author(name=result[1].name, icon_url=result[1].avatar_url)
+            if embed_perms(ctx.message) and result.content:
+                em = discord.Embed(description=result.content, timestamp=result.timestamp, color=0xbc0b0b)
+                em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
+                if channel != ctx.message.channel:
+                    em.set_footer(text='Sent in: {}'.format(channel.name))
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
-                await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result[1].name, result[2], result[0].content))
+                await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result.author.name, result.timestamp, result.content))
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No quote found.')
-        await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):
@@ -475,7 +489,7 @@ class Misc:
 
         # If number of seconds/messages are specified
         if txt:
-            if txt[1] == '!':
+            if txt[0] == '!':
                 killmsg = self.bot.self_log[ctx.message.channel.id][len(self.bot.self_log[ctx.message.channel.id]) - 2]
                 timer = int(txt[1:].strip())
 
@@ -523,11 +537,16 @@ class Misc:
                 await self.bot.delete_message(killmsg)
             else:
                 await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
-                for i in range(0, int(txt)):
-                    try:
-                        await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
-                    except:
-                        pass
+                deleted = 0
+                async for sent_message in self.bot.logs_from(ctx.message.channel, limit=200):
+                    if sent_message.author == ctx.message.author:
+                        try:
+                            await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
+                            deleted += 1
+                        except:
+                            pass
+                        if deleted == int(txt):
+                            break
 
         # If no number specified, delete message immediately
         else:
@@ -601,7 +620,7 @@ class Misc:
                         emote_list.append(self.regionals[x.lower()])
         return emote_list
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['r'])
     async def react(self, ctx, msg: str, msg_id: int = None):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
         await self.bot.delete_message(ctx.message)
