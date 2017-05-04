@@ -627,7 +627,7 @@ class Misc:
         reactions = self.reactions(msg)
         limit = 25 if msg_id else 1
         async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
-            if (not msg_id and message.id != ctx.message.id) or (str(id) == message.id):
+            if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                 for i in reactions:
                     await self.bot.add_reaction(message, i)
 
