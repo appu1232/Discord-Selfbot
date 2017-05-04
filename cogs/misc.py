@@ -110,6 +110,7 @@ class Misc:
             em.add_field(name='\u2753 Question', value=msg)
             em.add_field(name='\ud83c\udfb1 8ball', value=self.ball[answer], inline=False)
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+            await self.bot.delete_message(ctx.message)
         else:
             await self.bot.send_message(ctx.message.channel, '\ud83c\udfb1 ``{}``'.format(random.choice(self.ball)))
 
