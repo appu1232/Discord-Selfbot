@@ -27,6 +27,8 @@ class Misc:
                           'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}', '0': '0⃣', '1': '1⃣', '2': '2⃣', '3': '3⃣',
                           '4': '4⃣', '5': '5⃣', '6': '6⃣', '7': '7⃣', '8': '8⃣', '9': '9⃣'}
         self.emoji_reg = re.compile(r'<:.+?:([0-9]{15,21})>')
+        self.ball = ['It is certain', 'It is decidedly so', 'Without a doubt', 'Yes definitely', 'You may rely on it', 'As I see it, yes', 'Most likely', 'Outlook good', 'Yes', 'Signs point to yes', 'Reply hazy try again',
+                     'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Concentrate and ask again', 'Don\'t count on it', 'My reply is no', 'My sources say no', 'Outlook not so good', 'Very doubtful']
 
     @commands.command(pass_context=True)
     async def about(self, ctx):
@@ -93,16 +95,36 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
+    # 8ball
+    @commands.command(pass_context=True, aliases=['8ball'])
+    async def ball8(self, ctx, *, msg: str):
+        answer = random.randint(0, 20)
+        if embed_perms(ctx.message):
+            if answer < 10:
+                color = 0x008000
+            elif 10 < answer < 15:
+                color = 0xFFD700
+            else:
+                color = 0xFF0000
+            em = discord.Embed(color=color)
+            em.add_field(name='\u2753 Question', value=msg)
+            em.add_field(name='\ud83c\udfb1 8ball', value=self.ball[answer], inline=False)
+            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        else:
+            await self.bot.send_message(ctx.message.channel, '\ud83c\udfb1 ``{}``'.format(random.choice(self.ball)))
+
     # Embeds the message
     @commands.command(pass_context=True)
     async def embed(self, ctx, *, msg: str = None):
         """Embed given text. Ex: Do >embed for more help"""
         if msg:
             if embed_perms(ctx.message):
-                title = description = image = thumbnail = color = footer = author = None
+                ptext = title = description = image = thumbnail = color = footer = author = None
                 embed_values = msg.split('|')
                 for i in embed_values:
-                    if i.strip().lower().startswith('title='):
+                    if i.strip().lower().startswith('ptext='):
+                        ptext = i.strip()[6:].strip()
+                    elif i.strip().lower().startswith('title='):
                         title = i.strip()[6:].strip()
                     elif i.strip().lower().startswith('description='):
                         description = i.strip()[12:].strip()
@@ -155,14 +177,14 @@ class Misc:
                         em.set_footer(text=text.strip()[5:], icon_url=icon)
                     else:
                         em.set_footer(text=footer)
-                await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+                await self.bot.send_message(ctx.message.channel, content=ptext, embed=em)
             else:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'No embed permissions in this channel.')
         else:
             msg = '**How to use the >embed command:**\n**Example:** >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\n**You do NOT need to specify every property, only the ones you want.**' \
                   '\n**All properties and the syntax:**\ntitle=words\ndescription=words\ncolor=hexvalue\nimage=url_to_image (must be https)\nthumbnail=url_to_image\nauthor=words **OR** author=name=words icon=url_to_image\nfooter=words ' \
-                  '**OR** footer=name=words icon=url_to_image\nfield=name=words value=words (you can add as many fields as you want)\n\n**NOTE:** After the command is sent, the bot will delete your message and replace it with the embed. ' \
-                  'Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.'
+                  '**OR** footer=name=words icon=url_to_image\nfield=name=words value=words (you can add as many fields as you want)\nptext=words\n\n**NOTE:** After the command is sent, the bot will delete your message and replace it with ' \
+                  'the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.'
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
