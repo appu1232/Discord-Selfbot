@@ -98,11 +98,11 @@ class Misc:
     # 8ball
     @commands.command(pass_context=True, aliases=['8ball'])
     async def ball8(self, ctx, *, msg: str):
-        answer = random.randint(0, 20)
+        answer = random.randint(0, 19)
         if embed_perms(ctx.message):
             if answer < 10:
                 color = 0x008000
-            elif 10 < answer < 15:
+            elif 10 <= answer < 15:
                 color = 0xFFD700
             else:
                 color = 0xFF0000
