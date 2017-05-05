@@ -71,7 +71,6 @@ class Misc:
             em.add_field(name=u'\U0001F3AE Game', value=game)
             mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024**2)
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
-            em.set_footer(text='Selfbot made by appu1232#2569')
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
                 g.execute(["git", "fetch", "origin", "master"])

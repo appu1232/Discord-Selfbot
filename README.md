@@ -83,9 +83,9 @@ Optionally, create a shortcut to the .bat file and [add it to startup](http://ww
 
 **Mac/Linux:**
 
-Navigate to the bot's folder in terminal/shell and run: ``bash run_linuxmac.sh``
+You should be able to double click ``run_linuxmac.sh`` to start the bot on Mac. Alternatively, navigate to the bot's folder in terminal/shell and run: ``bash run_linuxmac.sh``
 
-Alternatively if the bash script isn't working for you, try ``sudo -H pip install -r requirements.txt`` (only need to do it the first time) and then try running the bash script again.
+If the bash script isn't working for you, try ``sudo -H pip install -r requirements.txt`` (only need to do it the first time) and then try running the bash script again.
 
 **Updating the bot:**
 

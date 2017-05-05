@@ -78,7 +78,6 @@ class Server:
                 em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=server.icon_url)
                 em.set_author(name='Server Info', icon_url='https://i.imgur.com/RHagTDg.png')
-                em.set_footer(text='Selfbot made by appu1232#2569')
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (
