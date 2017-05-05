@@ -98,6 +98,7 @@ class Misc:
     # 8ball
     @commands.command(pass_context=True, aliases=['8ball'])
     async def ball8(self, ctx, *, msg: str):
+        """Let the 8ball decide your fate. Ex: >8ball Will I get good?"""
         answer = random.randint(0, 19)
         if embed_perms(ctx.message):
             if answer < 10:
@@ -388,11 +389,11 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
-        """Quote the last message sent in the channel. >help quote for more info.
+        """Quote a message. >help quote for more info.
 
         >quote - quotes the last message sent in the channel.
-        >quote <words> - tries to search for a message sent recently that contains the given words and quotes it.
-        >quote <message_id> - quotes the given message. (Enable developer mode to copy message ids)."""
+        >quote <words> - tries to search for a message in the server that contains the given words and quotes it.
+        >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids)."""
         result = channel = None
         await self.bot.delete_message(ctx.message)
         if msg:

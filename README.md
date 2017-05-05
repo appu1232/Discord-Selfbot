@@ -23,7 +23,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Google web and image search.
 - Keyword/user logger and notifier. Get notified when keywords you specified are said in any of your server or follow users and get notified when they send a message (with a cooldown). Useful to track someone or see if someone mentioned your name or your favorite show/book/whatever else keywords and you want to stalk— I mean, talk to them about it.
 - Set your game to anything or set up multiple and cycle through them.
-- Cycle through avatars automatically (minimum 5 minute interval).
+- Cycle through avatars automatically.
 - Save image/gif/webm dumps (urls or attachments) in channels quickly to your computer (checks for duplicates as well).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Custom embeds.
@@ -73,7 +73,7 @@ This is the ``optional_config.json`` file in the ``settings`` folder. These are 
 
 ## Running the selfbot
 
-Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads) installed. Make sure [this is selected](https://i.imgur.com/ZXEpGtH.png) when installing Git on Windows. **When installing Python, check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.** Some Mac users have reported problems with Python 3.6 so if you are a Mac user, try to go for Python 3.5.
+Note: You must have [Python 3.5.2 or above](https://www.python.org/downloads/release/python-352/) (scroll to the bottom) and [Git](https://git-scm.com/downloads) installed. Make sure [this is selected](https://i.imgur.com/ZXEpGtH.png) when installing Git on Windows. **When installing Python, check ["Add Python to PATH"](https://i.imgur.com/KXgMcOK.png) in the install window.** Some Mac users have reported problems with Python 3.6 so if you are a Mac user, try to go for Python 3.5.
 
 **Windows:**
 
