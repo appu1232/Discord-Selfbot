@@ -719,10 +719,10 @@ class Misc:
         spaced_message = '{}'.format(spaces).join(list(msg))
         await self.bot.send_message(ctx.message.channel, spaced_message)
 
-    #print unicode converted :emoji: to the console.
+    #print unicode converted from :emoji:.
     @commands.command(pass_context=True)
-    async def uni(self, ctx):
-        print(self.bot.self_log[ctx.message.channel.id].pop().content)
+    async def uni(self, ctx, *, msg: str):
+        await self.bot.send_message(ctx.message.channel, "`"+msg.replace("`","")+"`")
 
     #given String reactMe, return a list of emojis that can construct the string with no duplicates (for the purpose of reacting)
     #TODO make it consider reactions already applied to the message
