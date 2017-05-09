@@ -11,7 +11,6 @@ from cogs.utils.checks import *
 
 '''Module for miscellaneous commands'''
 
-
 class Misc:
 
     def __init__(self, bot):
@@ -29,7 +28,118 @@ class Misc:
         self.emoji_reg = re.compile(r'<:.+?:([0-9]{15,21})>')
         self.ball = ['It is certain', 'It is decidedly so', 'Without a doubt', 'Yes definitely', 'You may rely on it', 'As I see it, yes', 'Most likely', 'Outlook good', 'Yes', 'Signs point to yes', 'Reply hazy try again',
                      'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Concentrate and ask again', 'Don\'t count on it', 'My reply is no', 'My sources say no', 'Outlook not so good', 'Very doubtful']
+    emojiDict = { #these arrays are in order of "most desirable". Put emojis that most convincingly correspond to their letter near the front of each array.
+                  'a' : ['🇦','🅰','🍙','🔼','4⃣'],
+                  'b' : ['🇧','🅱','8⃣'],
+                  'c' : ['🇨','©','🗜'],
+                  'd' : ['🇩','↩'],
+                  'e' : ['🇪','3⃣','📧','💶'],       
+                  'f' : ['🇫','🎏'],
+                  'g' : ['🇬','🗜','6⃣','9⃣','⛽'],
+                  'h' : ['🇭','♓'],
+                  'i' : ['🇮','ℹ','🚹','1⃣'],
+                  'j' : ['🇯','🗾'],
+                  'k' : ['🇰','🎋'],
+                  'l' : ['🇱','1⃣','🇮','👢','💷'],
+                  'm' : ['🇲','Ⓜ','📉'],
+                  'n' : ['🇳','♑','🎵'],
+                  'o' : ['🇴','🅾','0⃣','⭕','🔘','⏺','⚪','⚫','🔵','🔴','💫'],
+                  'p' : ['🇵','🅿'],
+                  'q' : ['🇶','♌'],
+                  'r' : ['🇷','®'],
+                  's' : ['🇸','💲','5⃣','⚡','💰','💵'],
+                  't' : ['🇹', '✝','➕','🎚','🌴','7⃣'],
+                  'u' : ['🇺','⛎','🐉'],
+                  'v' : ['🇻','♈','☑'],
+                  'w' : ['🇼','〰','📈'],
+                  'x' : ['🇽','❎','✖','❌','⚒'],
+                  'y' : ['🇾','✌','💴'],
+                  'z' : ['🇿','2⃣'],
+                  '0' : ['0⃣','🅾','0⃣','⭕','🔘','⏺','⚪','⚫','🔵','🔴','💫'],
+                  '1' : ['1⃣','🇮'],
+                  '2' : ['2⃣','🇿'],
+                  '3' : ['3⃣'],
+                  '4' : ['4⃣'],
+                  '5' : ['5⃣','🇸','💲','⚡'],
+                  '6' : ['6⃣'],
+                  '7' : ['7⃣'],
+                  '8' : ['8⃣','🎱','🇧','🅱'],
+                  '9' : ['9⃣'],
+                  '?' : ['❓'],
+                  '!' : ['❗','❕','⚠','❣'],
+                  
+                  #emojis that contain more than one letter can also help us react
+                  #letters that we are trying to replace go in front, emoji to use second
+                  #
+                  #if there is any overlap between characters that could be replaced,
+                  #e.g. 💯 vs 🔟, both could replace "10",
+                  #the longest ones & most desirable ones should go at the top
+                  #else you'll have "100" -> "🔟0" instead of "100" -> "💯".
+                  'combination' : [['cool','🆒'],
+                                   ['back','🔙'],
+                                   ['soon','🔜'],
+                                   ['free','🆓'],
+                                   ['end','🔚'],
+                                   ['top','🔝'],
+                                   ['abc','🔤'],
+                                   ['atm','🏧'],
+                                   ['new','🆕'],
+                                   ['sos','🆘'],
+                                   ['100','💯'],
+                                   ['loo','💯'],
+                                   ['zzz','💤'],
+                                   ['...','💬'],
+                                   ['ng','🆖'],
+                                   ['id','🆔'],
+                                   ['vs','🆚'],
+                                   ['wc','🚾'],
+                                   ['ab','🆎'],
+                                   ['cl','🆑'],
+                                   ['ok','🆗'],
+                                   ['up','🆙'],
+                                   ['10','🔟'],
+                                   ['11','⏸'],
+                                   ['ll','⏸'],
+                                   ['ii','⏸'],
+                                   ['tm','™'],
+                                   ['on','🔛'],
+                                   ['oo','🈁'],
+                                   ['!?','⁉'],
+                                   ['!!','‼'],
+                                   ['21','📅'],
+                                ]
+                 }
 
+    #used in >react, checks if it's possible to react with the duper string or not
+    def hasDupe(duper):
+        colectomyDuper = list(filter(lambda x : x != '<' and x != '⃣', duper)) #remove < because those are used to denote a written out emoji, and there might be more than one of those requested that are not necessarily the same one.  ⃣ appears twice in the number unicode thing, so that must be stripped too...
+        return len(set(colectomyDuper)) != len(colectomyDuper)
+    
+    #used in >react, replaces e.g. 'ng' with '🆖'
+    def replaceCombos(reactMe):
+        for combo in Misc.emojiDict['combination']:
+            if combo[0] in reactMe:
+                reactMe = reactMe.replace(combo[0],combo[1],1)
+        return reactMe
+        
+    #used in >react, replaces e.g. 'aaaa' with '🇦🅰🍙🔼'
+    def replaceLetters(reactMe):
+        for char in "abcdefghijklmnopqrstuvwxyz0123456789!?":
+            charCount = reactMe.count(char)
+            if charCount > 1: #there's a duplicate of this letter:
+                if len(Misc.emojiDict[char]) >= charCount: #if we have enough different ways to say the letter to complete the emoji chain
+                    i = 0
+                    while i < charCount: #moving goal post necessitates while loop instead of for
+                        if Misc.emojiDict[char][i] not in reactMe:
+                            reactMe = reactMe.replace(char, Misc.emojiDict[char][i],1)
+                        else:
+                            charCount+=1 #skip this one because it's already been used by another replacement (e.g. circle emoji used to replace O already, then want to replace 0)
+                        i+=1
+            else:
+                if charCount == 1:
+                    reactMe = reactMe.replace(char, Misc.emojiDict[char][0])
+        return reactMe
+    
     @commands.command(pass_context=True)
     async def about(self, ctx):
         """Links to the bot's github page."""
@@ -609,28 +719,93 @@ class Misc:
         spaced_message = '{}'.format(spaces).join(list(msg))
         await self.bot.send_message(ctx.message.channel, spaced_message)
 
-    def reactions(self, content):
-        emote_list = []
-        for i in content.split(" "):
-            if self.emoji_reg.findall(i):
-                emote_list.append(utils.get(self.bot.get_all_emojis(), id=str(self.emoji_reg.findall(i)[0])))
-            else:
-                for x in list(i):
-                    if x.isalnum():
-                        emote_list.append(self.regionals[x.lower()])
-        return emote_list
+    #print unicode converted :emoji: to the console.
+    @commands.command(pass_context=True)
+    async def uni(self, ctx):
+        print(self.bot.self_log[ctx.message.channel.id].pop().content)
 
+    #given String reactMe, return a list of emojis that can construct the string with no duplicates (for the purpose of reacting)
+    #TODO make it consider reactions already applied to the message
     @commands.command(pass_context=True, aliases=['r'])
-    async def react(self, ctx, msg: str, msg_id: int = None):
+    async def react(self, ctx, msg: str, msg_id = "last", preferCombine: bool = False):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
         await self.bot.delete_message(ctx.message)
-        reactions = self.reactions(msg)
-        limit = 25 if msg_id else 1
+        msg = msg.lower()
+        
+        if msg_id == "last" or msg_id == "0" or msg_id == "1":
+            msg_id = None
+        else:
+            msg_id = int(msg_id)
+        
+        if msg_id:
+            limit = 25
+        else:
+            limit = 1
+
+        reactions = []
+        nonUnicodeEmojiList = []
+        reactMe = "" #this is the string that will hold all our unicode converted characters from msg
+
+        #replace all custom server emoji <:emoji:123456789> with "<" and add emoji ids to nonUnicodeEmojiList
+        charIndex = 0
+        while charIndex < len(msg):
+            reactMe += msg[charIndex]
+            if msg[charIndex]=='<':
+                if (charIndex != len(msg) - 1) and msg[charIndex+1] == ":":
+                    nameEndColon = msg[charIndex+2:].index(':')+charIndex
+                    idEnd = msg[nameEndColon+2:].index('>')+nameEndColon
+                    nonUnicodeEmojiList.append(msg[nameEndColon+3:idEnd+2]) #we add the custom emoji to the list to replace '<' later
+                    charIndex = idEnd+2 #jump ahead in reactMe parse
+                else:
+                    raise Exception("Can't react with '<'")
+            charIndex += 1
+        if Misc.hasDupe(nonUnicodeEmojiList):
+            raise Exception("You requested that I react with at least two of the exact same specific emoji. I'll try to find alternatives for alphanumeric text, but if you specify a specific emoji must be used, I can't help.")
+
+        reactMeOriginal = reactMe #we'll go back to this version of reactMe if preferCombine is false but we can't make the reaction happen unless we combine anyway.
+
+        if Misc.hasDupe(reactMe): #there's a duplicate letter somewhere, so let's go ahead try to fix it.
+            if preferCombine: #we want a smaller reaction string, so we'll try to combine anything we can right away
+                reactMe = Misc.replaceCombos(reactMe)
+            reactMe = Misc.replaceLetters(reactMe)
+
+            if Misc.hasDupe(reactMe): #check if we were able to solve the dupe
+                if not preferCombine: #we wanted the most legible reaction string possible, even if it was longer, but unfortunately that's not possible, so we're going to combine first anyway
+                    reactMe = reactMeOriginal
+                    reactMe = Misc.replaceCombos(reactMe)
+                    reactMe = Misc.replaceLetters(reactMe)
+                    if Misc.hasDupe(reactMe): #this failed too, so there's really nothing we can do anymore.
+                        raise Exception("Tried a lot to get rid of the dupe, but couldn't. reactMe: "+reactMe)
+                else:
+                    raise Exception("Tried a lot to get rid of the dupe, but couldn't. reactMe: "+reactMe)
+
+            ltCount=0
+            for char in reactMe:
+                if char != "<":
+                    if char not in "0123456789": #these unicode characters are weird and actually more than one character.
+                        if char != '⃣': #</3
+                            reactions.append(char)
+                    else:
+                        reactions.append(self.emojiDict[char][0])
+                else:
+                    reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=nonUnicodeEmojiList[ltCount]))
+                    ltCount+=1
+        else: #probably doesn't matter, but by treating the case without dupes seperately, we can save some time
+            ltCount=0
+            for char in reactMe:
+                if char != "<":
+                    if char in "abcdefghijklmnopqrstuvwxyz0123456789!?":
+                        reactions.append(self.emojiDict[char][0])
+                    else:
+                        reactions.append(char)
+                else:
+                    reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=nonUnicodeEmojiList[ltCount]))
+                    ltCount+=1
+
         async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
             if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                 for i in reactions:
                     await self.bot.add_reaction(message, i)
-
 
 def setup(bot):
     bot.add_cog(Misc(bot))
