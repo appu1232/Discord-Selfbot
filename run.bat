@@ -5,19 +5,13 @@ SETLOCAL EnableDelayedExpansion
 python -V >nul 2>&1 || goto :python
 git init . >nul || goto :git
 git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul 2>&1
-git remote show origin > tmp.txt
-set findfile="tmp.txt"
-set findtext="up"
-findstr %findtext% %findfile% >nul 2>&1
-if errorlevel 1 goto forward
-goto run
-
-:forward
-	set findfile="tmp.txt"
-	set forwardable="fast-forwardable"
-	findstr %forwardable% %findfile% >nul 2>&1
-	if errorlevel 1 goto prompt
+get fetch origin master >nul 2>&1
+for /f "delims=" %%i in ('git rev-list --right-only --count master...origin/master') do set output=%%i
+if %output% == 0 (
 	goto run
+)
+goto prompt
+
 :prompt
 	choice /t 10 /c yn /d n /m "There is an update for the bot. Download now?"
 	if errorlevel 2 goto :run
@@ -41,7 +35,15 @@ goto run
 	echo Starting up...
 	ping 127.0.0.1 -n 4 >nul
 	goto run
-	
+:force
+	git fetch --all
+	git reset --hard origin/master
+	echo Finished updating
+	rmdir /s /q settings >nul 2>&1
+	ren settings2 settings
+	echo Starting up...
+	ping 127.0.0.1 -n 4 >nul
+	goto run
 :git
 	TITLE Error!
 	echo Git not found, Download here: https://git-scm.com/downloads
@@ -56,15 +58,6 @@ goto run
 	pause >nul
 	CD /D "%root%"
 	goto :EOF
-:force
-	git fetch --all
-	git reset --hard origin/master
-	echo Finished updating
-	rmdir /s /q settings >nul 2>&1
-	ren settings2 settings
-	echo Starting up...
-	ping 127.0.0.1 -n 4 >nul
-	goto run
 :run
 	if exist tmp.txt del tmp.txt
 	type cogs\utils\credit.txt
