@@ -82,8 +82,9 @@ class Imagedump:
         >imagedump 5000 | items=100 | type=png | ratio=16:9 | dim=1920x1080"""
 
         if ctx.invoked_subcommand is None:
+            pre = cmd_prefix_len()
             error = 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. Ex: ``>imagedump 100``\n``>imagedump dir path/to/directory`` if you want to change where images are saved.'
-            if ctx.message.content[11:].strip():
+            if ctx.message.content[9 + pre:].strip():
                 finished_dls = os.listdir('cogs/utils/')
                 finished = []
                 for i in finished_dls:
@@ -91,12 +92,12 @@ class Imagedump:
                         finished.append(i)
                 for i in finished:
                     os.remove('cogs/utils/{}'.format(i))
-                if ctx.message.content[11] == 's':
+                if ctx.message.content[pre + 10] == 's':
                     silent = True
-                    msg = ctx.message.content[13:].strip()
+                    msg = ctx.message.content[11 + pre:].strip()
                 else:
                     silent = False
-                    msg = ctx.message.content[11:].strip()
+                    msg = ctx.message.content[9 + pre:].strip()
                 before = after = limit_images = user = None
                 type_of_items = ['jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm']
                 x = y = dimx = dimy = 'None'

@@ -27,7 +27,8 @@ class Customcmds:
             sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
             msgs = []
             part = ''
-            if ctx.message.content[12:] and ctx.message.content[12:] != 'gist':
+            pre = cmd_prefix_len()
+            if ctx.message.content[10 + pre:].strip() and ctx.message.content[10 + pre:].strip() != 'gist':
                 one_cmd = True
                 list_cmd = ctx.message.content.strip().split(' ')[1]
                 for cmd in sortedcmds:

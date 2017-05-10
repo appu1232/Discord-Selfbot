@@ -126,12 +126,12 @@ class KeywordLogger:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
 
     @log.command(pass_context=True)
-    async def history(self, ctx):
+    async def history(self, ctx, txt: str = None):
         """View the last n messages in this channel. Ex: >log history 20"""
-        if ctx.message.content.strip()[12:]:
-            if ctx.message.content[12:].strip().startswith('save'):
-                if ctx.message.content[17:].strip():
-                    size = ctx.message.content[17:].strip()
+        if txt:
+            if txt.startswith('save'):
+                if txt[5:].strip():
+                    size = txt[5:].strip()
                     if size.isdigit():
                         save = True
                         skip = 0
@@ -159,7 +159,7 @@ class KeywordLogger:
                 else:
                     return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
                 fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Fetching messages...')
-                size = ctx.message.content.strip()[12:]
+                size = txt
             if size.isdigit:
                 size = int(size)
                 msg = ''
@@ -198,7 +198,7 @@ class KeywordLogger:
                     if part == 1:
                         await self.bot.send_message(ctx.message.channel,
                                                     bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (
-                                                    ctx.message.content.strip()[12:], msg))
+                                                    txt, msg))
                         await self.bot.delete_message(fetch)
                     else:
                         splitList = [msg[i:i + 1950] for i in range(0, len(msg), 1950)]
@@ -211,7 +211,7 @@ class KeywordLogger:
                             splitmsg = ''
                         for b, i in enumerate(allWords):
                             if b == 0:
-                                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (ctx.message.content.strip()[12:], i))
+                                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (txt, i))
                             else:
                                 await self.bot.send_message(ctx.message.channel, '```%s```' % i)
                         await self.bot.delete_message(fetch)

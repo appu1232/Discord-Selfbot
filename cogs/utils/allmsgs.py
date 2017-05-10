@@ -19,12 +19,13 @@ def custom(message):
 
     with open('settings/config.json') as f:
         config = json.load(f)
+    customcmd_prefix_len = len(config['customcmd_prefix'])
     if message.startswith(config['customcmd_prefix'][0]):
         with open('settings/commands.json', 'r') as f:
             commands = json.load(f)
         found_cmds = {}
         for i in commands:
-            if message[1:].lower().startswith(i.lower()):
+            if message[customcmd_prefix_len:].lower().startswith(i.lower()):
                 found_cmds[i] = len(i)
 
         if found_cmds != {}:
@@ -34,10 +35,10 @@ def custom(message):
             if type(commands[match]) is list:
                 try:
                     # If index from list is specified, get that result.
-                    if message[len(match) + 1:].isdigit():
-                        index = int(message.content[len(match) + 1:].strip())
+                    if message[len(match) + customcmd_prefix_len:].isdigit():
+                        index = int(message.content[len(match) + customcmd_prefix_len:].strip())
                     else:
-                        title = message[len(match) + 1:]
+                        title = message[len(match) + customcmd_prefix_len:]
                         for b, j in enumerate(commands[match]):
                             if j[0].lower() == title.lower().strip():
                                 index = int(b)

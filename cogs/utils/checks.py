@@ -91,6 +91,11 @@ def update_bot(message):
         return em
 
 
+def cmd_prefix_len():
+    config = load_config()
+    return len(config['cmd_prefix'])
+
+
 def embed_perms(message):
     try:
         check = message.author.permissions_in(message.channel).embed_links

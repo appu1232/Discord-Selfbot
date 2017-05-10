@@ -28,7 +28,7 @@ class Misc:
         self.emoji_reg = re.compile(r'<:.+?:([0-9]{15,21})>')
         self.ball = ['It is certain', 'It is decidedly so', 'Without a doubt', 'Yes definitely', 'You may rely on it', 'As I see it, yes', 'Most likely', 'Outlook good', 'Yes', 'Signs point to yes', 'Reply hazy try again',
                      'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Concentrate and ask again', 'Don\'t count on it', 'My reply is no', 'My sources say no', 'Outlook not so good', 'Very doubtful']
-    emojiDict = { #these arrays are in order of "most desirable". Put emojis that most convincingly correspond to their letter near the front of each array.
+    emoji_dict = {  # these arrays are in order of "most desirable". Put emojis that most convincingly correspond to their letter near the front of each array.
                   'a' : ['🇦','🅰','🍙','🔼','4⃣'],
                   'b' : ['🇧','🅱','8⃣'],
                   'c' : ['🇨','©','🗜'],
@@ -67,7 +67,7 @@ class Misc:
                   '9' : ['9⃣'],
                   '?' : ['❓'],
                   '!' : ['❗','❕','⚠','❣'],
-                  
+
                   #emojis that contain more than one letter can also help us react
                   #letters that we are trying to replace go in front, emoji to use second
                   #
@@ -110,40 +110,40 @@ class Misc:
                                 ]
                  }
 
-    #used in >react, checks if it's possible to react with the duper string or not
-    def hasDupe(duper):
-        colectomyDuper = list(filter(lambda x : x != '<' and x != '⃣', duper)) #remove < because those are used to denote a written out emoji, and there might be more than one of those requested that are not necessarily the same one.  ⃣ appears twice in the number unicode thing, so that must be stripped too...
-        return len(set(colectomyDuper)) != len(colectomyDuper)
+    # used in >react, checks if it's possible to react with the duper string or not
+    def has_dupe(duper):
+        collect_my_duper = list(filter(lambda x : x != '<' and x != '⃣', duper))  # remove < because those are used to denote a written out emoji, and there might be more than one of those requested that are not necessarily the same one.  ⃣ appears twice in the number unicode thing, so that must be stripped too...
+        return len(set(collect_my_duper)) != len(collect_my_duper)
     
-    #used in >react, replaces e.g. 'ng' with '🆖'
-    def replaceCombos(reactMe):
-        for combo in Misc.emojiDict['combination']:
-            if combo[0] in reactMe:
-                reactMe = reactMe.replace(combo[0],combo[1],1)
-        return reactMe
+    # used in >react, replaces e.g. 'ng' with '🆖'
+    def replace_combos(react_me):
+        for combo in Misc.emoji_dict['combination']:
+            if combo[0] in react_me:
+                react_me = react_me.replace(combo[0],combo[1],1)
+        return react_me
         
-    #used in >react, replaces e.g. 'aaaa' with '🇦🅰🍙🔼'
-    def replaceLetters(reactMe):
+    # used in >react, replaces e.g. 'aaaa' with '🇦🅰🍙🔼'
+    def replace_letters(react_me):
         for char in "abcdefghijklmnopqrstuvwxyz0123456789!?":
-            charCount = reactMe.count(char)
-            if charCount > 1: #there's a duplicate of this letter:
-                if len(Misc.emojiDict[char]) >= charCount: #if we have enough different ways to say the letter to complete the emoji chain
+            char_count = react_me.count(char)
+            if char_count > 1:  # there's a duplicate of this letter:
+                if len(Misc.emoji_dict[char]) >= char_count:  # if we have enough different ways to say the letter to complete the emoji chain
                     i = 0
-                    while i < charCount: #moving goal post necessitates while loop instead of for
-                        if Misc.emojiDict[char][i] not in reactMe:
-                            reactMe = reactMe.replace(char, Misc.emojiDict[char][i],1)
+                    while i < char_count:  # moving goal post necessitates while loop instead of for
+                        if Misc.emoji_dict[char][i] not in react_me:
+                            react_me = react_me.replace(char, Misc.emoji_dict[char][i],1)
                         else:
-                            charCount+=1 #skip this one because it's already been used by another replacement (e.g. circle emoji used to replace O already, then want to replace 0)
-                        i+=1
+                            char_count += 1  # skip this one because it's already been used by another replacement (e.g. circle emoji used to replace O already, then want to replace 0)
+                        i += 1
             else:
-                if charCount == 1:
-                    reactMe = reactMe.replace(char, Misc.emojiDict[char][0])
-        return reactMe
+                if char_count == 1:
+                    react_me = react_me.replace(char, Misc.emoji_dict[char][0])
+        return react_me
     
     @commands.command(pass_context=True)
-    async def about(self, ctx):
+    async def about(self, ctx, txt: str = None):
         """Links to the bot's github page."""
-        if embed_perms(ctx.message) and ctx.message.content[7:] != 'short':
+        if embed_perms(ctx.message) and txt != 'short':
             em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot', description='**Features:**\n- Custom commands/reactions\n- Save last x images in a channel to your computer\n- Keyword notifier\n'
                                                                                                          '- Set/cycle your game status and your avatar\n- Google web and image search\n- MyAnimeList search\n- Spoiler tagging\n'
                                                                                                          '- Server info commands\n- Quoting, calculator, creating polls, and much more')
@@ -197,7 +197,7 @@ class Misc:
                         status = '%s releases behind. [Latest updates.](%s)' % (version, gist_latest)
                 em.add_field(name=u'\U0001f4bb Update status:', value=status)
             except:
-                raise
+                pass
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
             msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count), str(len(self.bot.servers)), str(self.bot.keyword_log), game)
@@ -486,15 +486,15 @@ class Misc:
     async def ping(self, ctx):
         """Get response time."""
         msgtime = ctx.message.timestamp.now()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + ' pong')
+        await (await self.bot.ws.ping())
         now = datetime.datetime.now()
         ping = now - msgtime
         if embed_perms(ctx.message):
-            pong = discord.Embed(title='Response Time:', description=str(ping), color=0x7A0000)
+            pong = discord.Embed(title='Pong! Response Time:', description=str(ping.microseconds/1000.0) + ' ms', color=0x7A0000)
             pong.set_thumbnail(url='http://odysseedupixel.fr/wp-content/gallery/pong/pong.jpg')
             await self.bot.send_message(ctx.message.channel, content=None, embed=pong)
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + '``Response Time: %s``' % str(ping))
+            await self.bot.send_message(ctx.message.channel, bot_prefix + '``Response Time: %s ms``' % str(ping.microseconds/1000.0))
 
     @commands.command(pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
@@ -519,17 +519,20 @@ class Misc:
                                 search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
                             except:
                                 continue
-                            if (ctx.message.clean_content[6:].lower().strip() in search[0].clean_content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.clean_content[6:].strip() == search[0].id):
+                            if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.content[6:].strip() == search[0].id):
                                 result = search[0]
                                 break
                         if result:
                             break
             if not result:
                 for channel in ctx.message.server.channels:
-                    async for sent_message in self.bot.logs_from(channel, limit=500):
-                        if (msg.lower().strip() in sent_message.clean_content and (sent_message.author != ctx.message.author or sent_message.clean_content[:7] != '>quote ')) or (msg.strip() == sent_message.id):
-                            result = sent_message
-                            break
+                    try:
+                        async for sent_message in self.bot.logs_from(channel, limit=500):
+                            if (msg.lower().strip() in sent_message.content and (sent_message.author != ctx.message.author or sent_message.content[:7] != '>quote ')) or (msg.strip() == sent_message.id):
+                                result = sent_message
+                                break
+                    except:
+                        pass
                     if result:
                         break
         else:
@@ -587,10 +590,7 @@ class Misc:
     async def l2g(self, ctx, *, msg: str):
         """Creates a googleitfor.me link. Ex: >l2g how do i become cool."""
         lmgtfy = 'http://googleitfor.me/?q='
-        words = msg.lower().strip().split(' ')
-        for word in words:
-            lmgtfy += word + '+'
-        await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy[:-1])
+        await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy + msg.lower().strip().replace(' ', '+'))
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
@@ -681,7 +681,8 @@ class Misc:
     async def gist(self, ctx):
         """Posts to gist"""
         if ctx.invoked_subcommand is None:
-            url = PythonGists.Gist(description='Created in channel: {} in server: {}'.format(ctx.message.channel, ctx.message.server), content=ctx.message.content[6:], name='Output')
+            pre = cmd_prefix_len()
+            url = PythonGists.Gist(description='Created in channel: {} in server: {}'.format(ctx.message.channel, ctx.message.server), content=ctx.message.content[4 + pre:].strip(), name='Output')
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Gist output: ' + url)
             await self.bot.delete_message(ctx.message)
 
@@ -719,93 +720,88 @@ class Misc:
         spaced_message = '{}'.format(spaces).join(list(msg))
         await self.bot.send_message(ctx.message.channel, spaced_message)
 
-    #print unicode converted from :emoji:.
     @commands.command(pass_context=True)
     async def uni(self, ctx, *, msg: str):
-        await self.bot.send_message(ctx.message.channel, "`"+msg.replace("`","")+"`")
+        """Convert to unicode emoji if possilbe. Ex: >uni :eyes:"""
+        await self.bot.send_message(ctx.message.channel, "`"+msg.replace("`", "")+"`")
 
-    #given String reactMe, return a list of emojis that can construct the string with no duplicates (for the purpose of reacting)
-    #TODO make it consider reactions already applied to the message
+    # given String react_me, return a list of emojis that can construct the string with no duplicates (for the purpose of reacting)
+    # TODO make it consider reactions already applied to the message
     @commands.command(pass_context=True, aliases=['r'])
-    async def react(self, ctx, msg: str, msg_id = "last", preferCombine: bool = False):
+    async def react(self, ctx, msg: str, msg_id = "last", prefer_combine: bool = False):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
         await self.bot.delete_message(ctx.message)
         msg = msg.lower()
-        
-        if msg_id == "last" or msg_id == "0" or msg_id == "1":
-            msg_id = None
-        else:
-            msg_id = int(msg_id)
-        
-        if msg_id:
-            limit = 25
-        else:
-            limit = 1
+
+        msg_id = None if msg_id == "last" or msg_id == "0" or msg_id == "1" else int(msg_id)
+
+        limit = 25 if msg_id else 1
 
         reactions = []
-        nonUnicodeEmojiList = []
-        reactMe = "" #this is the string that will hold all our unicode converted characters from msg
+        non_unicode_emoji_list = []
+        react_me = ""  # this is the string that will hold all our unicode converted characters from msg
 
-        #replace all custom server emoji <:emoji:123456789> with "<" and add emoji ids to nonUnicodeEmojiList
-        charIndex = 0
-        while charIndex < len(msg):
-            reactMe += msg[charIndex]
-            if msg[charIndex]=='<':
-                if (charIndex != len(msg) - 1) and msg[charIndex+1] == ":":
-                    nameEndColon = msg[charIndex+2:].index(':')+charIndex
-                    idEnd = msg[nameEndColon+2:].index('>')+nameEndColon
-                    nonUnicodeEmojiList.append(msg[nameEndColon+3:idEnd+2]) #we add the custom emoji to the list to replace '<' later
-                    charIndex = idEnd+2 #jump ahead in reactMe parse
+        # replace all custom server emoji <:emoji:123456789> with "<" and add emoji ids to non_unicode_emoji_list
+        char_index = 0
+        while char_index < len(msg):
+            react_me += msg[char_index]
+            if msg[char_index] == '<':
+                if (char_index != len(msg) - 1) and msg[char_index+1] == ":":
+                    name_end_colon = msg[char_index+2:].index(':')+char_index
+                    id_end = msg[name_end_colon+2:].index('>')+name_end_colon
+                    non_unicode_emoji_list.append(msg[name_end_colon+3:id_end+2])  # we add the custom emoji to the list to replace '<' later
+                    char_index = id_end+2  # jump ahead in react_me parse
                 else:
                     raise Exception("Can't react with '<'")
-            charIndex += 1
-        if Misc.hasDupe(nonUnicodeEmojiList):
+            char_index += 1
+        if Misc.has_dupe(non_unicode_emoji_list):
             raise Exception("You requested that I react with at least two of the exact same specific emoji. I'll try to find alternatives for alphanumeric text, but if you specify a specific emoji must be used, I can't help.")
 
-        reactMeOriginal = reactMe #we'll go back to this version of reactMe if preferCombine is false but we can't make the reaction happen unless we combine anyway.
+        react_me_original = react_me  # we'll go back to this version of react_me if prefer_combine is false but we can't make the reaction happen unless we combine anyway.
 
-        if Misc.hasDupe(reactMe): #there's a duplicate letter somewhere, so let's go ahead try to fix it.
-            if preferCombine: #we want a smaller reaction string, so we'll try to combine anything we can right away
-                reactMe = Misc.replaceCombos(reactMe)
-            reactMe = Misc.replaceLetters(reactMe)
+        if Misc.has_dupe(react_me):  # there's a duplicate letter somewhere, so let's go ahead try to fix it.
+            if prefer_combine:  # we want a smaller reaction string, so we'll try to combine anything we can right away
+                react_me = Misc.replace_combos(react_me)
+            react_me = Misc.replace_letters(react_me)
 
-            if Misc.hasDupe(reactMe): #check if we were able to solve the dupe
-                if not preferCombine: #we wanted the most legible reaction string possible, even if it was longer, but unfortunately that's not possible, so we're going to combine first anyway
-                    reactMe = reactMeOriginal
-                    reactMe = Misc.replaceCombos(reactMe)
-                    reactMe = Misc.replaceLetters(reactMe)
-                    if Misc.hasDupe(reactMe): #this failed too, so there's really nothing we can do anymore.
-                        raise Exception("Tried a lot to get rid of the dupe, but couldn't. reactMe: "+reactMe)
+            if Misc.has_dupe(react_me):  # check if we were able to solve the dupe
+                if not prefer_combine:  # we wanted the most legible reaction string possible, even if it was longer, but unfortunately that's not possible, so we're going to combine first anyway
+                    react_me = react_me_original
+                    react_me = Misc.replace_combos(react_me)
+                    react_me = Misc.replace_letters(react_me)
+                    if Misc.has_dupe(react_me):  # this failed too, so there's really nothing we can do anymore.
+                        raise Exception("Tried a lot to get rid of the dupe, but couldn't. react_me: "+react_me)
                 else:
-                    raise Exception("Tried a lot to get rid of the dupe, but couldn't. reactMe: "+reactMe)
+                    raise Exception("Tried a lot to get rid of the dupe, but couldn't. react_me: "+react_me)
 
-            ltCount=0
-            for char in reactMe:
+            lt_count=0
+            for char in react_me:
                 if char != "<":
-                    if char not in "0123456789": #these unicode characters are weird and actually more than one character.
-                        if char != '⃣': #</3
+                    if char not in "0123456789":  # these unicode characters are weird and actually more than one character.
+                        if char != '⃣':  # </3
                             reactions.append(char)
                     else:
-                        reactions.append(self.emojiDict[char][0])
+                        reactions.append(self.emoji_dict[char][0])
                 else:
-                    reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=nonUnicodeEmojiList[ltCount]))
-                    ltCount+=1
-        else: #probably doesn't matter, but by treating the case without dupes seperately, we can save some time
-            ltCount=0
-            for char in reactMe:
+                    reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=non_unicode_emoji_list[lt_count]))
+                    lt_count += 1
+        else:  # probably doesn't matter, but by treating the case without dupes seperately, we can save some time
+            lt_count = 0
+            for char in react_me:
                 if char != "<":
                     if char in "abcdefghijklmnopqrstuvwxyz0123456789!?":
-                        reactions.append(self.emojiDict[char][0])
+                        reactions.append(self.emoji_dict[char][0])
                     else:
                         reactions.append(char)
                 else:
-                    reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=nonUnicodeEmojiList[ltCount]))
-                    ltCount+=1
+                    reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=non_unicode_emoji_list[lt_count]))
+                    lt_count += 1
 
         async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
             if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                 for i in reactions:
                     await self.bot.add_reaction(message, i)
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
