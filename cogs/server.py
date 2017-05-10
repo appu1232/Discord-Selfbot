@@ -35,17 +35,18 @@ class Server:
     async def server(self, ctx):
         """Various info about the server. See the README for more info."""
         if ctx.invoked_subcommand is None:
-            if ctx.message.content[7:]:
+            pre = cmd_prefix_len()
+            if ctx.message.content[6 + pre:].strip():
                 server = None
                 try:
-                    float(ctx.message.content[7:].strip())
-                    server = self.bot.get_server(ctx.message.content[7:].strip())
+                    float(ctx.message.content[6 + pre:].strip())
+                    server = self.bot.get_server(ctx.message.content[6 + pre:].strip())
                     if not server:
                         return await self.bot.send_message(ctx.message.channel,
                                                            bot_prefix + 'Server not found.')
                 except:
                     for i in self.bot.servers:
-                        if i.name.lower() == ctx.message.content[7:].lower().strip():
+                        if i.name.lower() == ctx.message.content[6 + pre:].lower().strip():
                             server = i
                             break
                     if not server:
@@ -133,10 +134,10 @@ class Server:
                 em.add_field(name='Role color hex value', value=str(role.color))
                 em.add_field(name='Role color rgb value', value=role.color.to_tuple())
                 em.add_field(name='Mentionable', value=role.mentionable)
-                if len(all_users) > 10:
+                if role_count > 10:
                     all_users = all_users.replace(', ', '\n')
                     url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, ctx.message.server.name), content=str(all_users), name='role.txt')
-                    em.add_field(name='All users', value='Long list, posted to Gist:\n %s' % url, inline=False)
+                    em.add_field(name='All users', value='{} users. [List of users posted to Gist.]({})'.format(role_count, url), inline=False)
                 else:
                     em.add_field(name='All Users', value=all_users, inline=False)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))

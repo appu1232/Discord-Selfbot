@@ -21,7 +21,7 @@ bot_prefix = config['bot_identifier']
 if bot_prefix != '':
     bot_prefix += ' '
 
-bot = commands.Bot(command_prefix=config['cmd_prefix'][0], description='''Selfbot by appu1232''', self_bot=True)
+bot = commands.Bot(command_prefix=config['cmd_prefix'], description='''Selfbot by appu1232''', self_bot=True)
 
 
 # Startup
@@ -212,9 +212,8 @@ async def on_message(message):
             bot.self_log[message.channel.id].append(message)
             if message.content.startswith(config['customcmd_prefix'][0]):
                 response = custom(message.content.lower().strip())
-                if response is None:
-                    pass
-                else:
+                if response:
+                    await bot.delete_message(message)
                     with open('settings/optional_config.json', 'r') as fp:
                         opt = json.load(fp)
                     if opt['rich_embed'] == 'on':
@@ -231,7 +230,6 @@ async def on_message(message):
                             await bot.send_message(message.channel, response[1])
                     else:
                         await bot.send_message(message.channel, response[1])
-                    await bot.delete_message(message)
             else:
                 response = quickcmds(message.content.lower().strip())
                 if response:

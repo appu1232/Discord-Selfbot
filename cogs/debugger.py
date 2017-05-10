@@ -9,6 +9,7 @@ import math
 from PythonGists import PythonGists
 from discord.ext import commands
 from io import StringIO
+from cogs.utils.checks import *
 
 # Common imports that can be used by the debugger.
 import requests
@@ -94,7 +95,8 @@ class Debugger:
         """Python interpreter. See the README for more info."""
 
         if ctx.invoked_subcommand is None:
-            code = ctx.message.content[4:].strip('` ')
+            pre = cmd_prefix_len()
+            code = ctx.message.content[2 + pre:].strip().strip('` ')
 
             env = {
                 'bot': self.bot,
@@ -110,7 +112,7 @@ class Debugger:
 
             os.chdir(os.getcwd())
             with open('%s/cogs/utils/temp.txt' % os.getcwd(), 'w') as temp:
-                temp.write(ctx.message.content[4:])
+                temp.write(ctx.message.content[2 + pre:].strip())
 
             await self.bot.send_message(ctx.message.channel, result)
 
@@ -164,16 +166,12 @@ class Debugger:
 
     # List saved cmd/scripts
     @py.command(aliases=['ls'], pass_context=True)
-    async def list(self, ctx):
+    async def list(self, ctx, txt: str = None):
         """List all saved scripts. Ex: >py list or >py ls"""
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
-        if 'list' in ctx.message.content:
-            l = 8
-        else:
-            l = 6
         try:
-            if ctx.message.content[l:]:
-                numb = ctx.message.content[l:].strip()
+            if txt:
+                numb = txt.strip()
                 if numb.isdigit():
                     numb = int(numb)
                 else:
@@ -185,7 +183,7 @@ class Debugger:
                 return await self.bot.send_message(ctx.message.channel, appuselfbot.bot_prefix + 'No saved cmd/scripts.')
             filelist.sort()
             msg = ''
-            pages = math.ceil(len(filelist) / 10)
+            pages = int(math.ceil(len(filelist) / 10))
             if numb < 1:
                 numb = 1
             elif numb > pages:

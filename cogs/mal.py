@@ -1,7 +1,6 @@
 import spice_api as spice
 import requests
 import re
-import discord
 import asyncio
 import gc
 from discord.ext import commands
