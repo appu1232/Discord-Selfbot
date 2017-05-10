@@ -28,12 +28,12 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Custom embeds.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
-- Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
 - Purge the last n messages you sent in a channel.
 - Simple calculator.
 - Quick commands so you can post pointless stuff as fast as possible like ``lenny``, ``shrug``, ``flip``, ``unflip``, and ``comeatmebro`` Also, meme commands like spacing text or converting it to regional indicator emojis.
+- Python interpreter. Modeled off of RoboDanny's ?debug command. Does both exec() and eval(). Ability to save and load scripts.
 - Various other misc commands like spoiler tagging text (encrypts the text), creating strawpolls, embeding text, server/user info commands, and more.
 
 ## Setup
@@ -50,7 +50,7 @@ Download the zip and extract it. Inside this folder, go into the ``settings`` fo
 ```
 
 - ``token`` - token obtained from ``localStorage.token`` On Discord do ``Ctrl + Shift + i`` for Windows or ``Cmd + Option + i`` on Mac and then [go here to get your token.](https://i.imgur.com/h3g9uf6.png) [For Mac.](https://i.imgur.com/otvxoYL.png) Don't give this out to anyone!
-- ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes longer than one character are not supported. You may set the same prefix for both but be careful not to make a custom cmd with the same name as an in-built.
+- ``cmd_prefix`` and ``customcmd_prefix`` - the prefix for in-built commands and custom commands respectively. Prefixes can be more than one character. You may set the same prefix for both but be careful not to make a custom cmd with the same name as an in-built.
 - ``bot_identifier`` - a word/message/emote the bot will add to the beginning of every message it sends (except embeds and replies to quick cmds). Make it empty if you don't want one.
 
 **Note:** On Mac, you may need to [disable smartquotes.](http://www.iclarified.com/38772/how-to-disable-curly-quotes-in-mac-os-x-mavericks) Quotes in the json should look like this: ``"`` or else the bot may throw errors when logging in.
@@ -209,6 +209,7 @@ A MAL search result:
 - ``>regional <text>`` - send each letter in this message as regional indicator emojis.
 - ``>space <text>`` or ``>space <n> <text>`` - put a space between each letter in the message. Optionally, specify how many spaces to put between each letter with ``<n>``
 - ``>react <text>`` or ``>react <text> <id>`` - react to the above message with the given text. If the message id is given, it will react to that message instead.
+- ``>uni <emoji>`` - convert the emoji to unicode emoji if possible.
 
 **Logging commands**
 
@@ -404,6 +405,7 @@ Follow these steps to obtain them:
 
 ## Acknowledgements
 
+- Thanks to [Hubcapp](https://github.com/Hubcapp) for the much improved >react command.
 - Thanks to [adjnouobsref](https://github.com/adjnouobsref) for the spoiler tags and various other contributions.
 - Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards and the debugger.
 - Used [eye-sigil's](https://github.com/eye-sigil) code for the >repl command.
