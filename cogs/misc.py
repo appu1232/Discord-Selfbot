@@ -798,7 +798,6 @@ class Misc:
                     lt_count += 1
 
         async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
-            print(message.content)
             if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                 for i in reactions:
                     await self.bot.add_reaction(message, i)
