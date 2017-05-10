@@ -13,8 +13,8 @@ updater () {
 			cp -r settings tmp
 			mv settings settings2
 		fi
-		new=$(git rev-list --right-only --count master...origin/master)
-		if [[ "${new}" == "0" ]] ; then
+		new=$(git remote show origin)
+		if [[ "${new}" =~ "up" ]] || [[ "${new}" =~ "fast-forwardable" ]] ; then
 			echo "The bot is up to date."
 			sleep 1
 		else

@@ -6,16 +6,23 @@ python -V >nul 2>&1 || goto :python
 git init . >nul || goto :git
 git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul 2>&1
 get fetch origin master >nul 2>&1
-for /f "delims=" %%i in ('git rev-list --right-only --count master...origin/master') do set output=%%i
-if %output% == 0 (
-	goto run
-)
-goto prompt
+git remote show origin > tmp.txt
+set findfile="tmp.txt"
+set findtext="up"
+findstr %findtext% %findfile% >nul 2>&1		
+if errorlevel 1 goto forward		
+goto run		
 
 :prompt
 	choice /t 10 /c yn /d n /m "There is an update for the bot. Download now?"
 	if errorlevel 2 goto :run
 	if errorlevel 1 goto :update
+:forward
+	set findfile="tmp.txt"		
+	set forwardable="fast-forwardable"		
+	findstr %forwardable% %findfile% >nul 2>&1		
+	if errorlevel 1 goto prompt
+	goto run
 :update
 	echo Starting update...
 	if exist tmp del /F /Q tmp
