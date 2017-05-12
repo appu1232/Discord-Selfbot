@@ -864,7 +864,7 @@ class KeywordLogger:
                                 await self.bot.delete_message(fourth)
                                 await self.bot.delete_message(reply)
                                 if reply.content.isdigit():
-                                    settings['keyusers']['{} all'.format(user.id)] = [0.0, int(reply.content)]
+                                    settings['keyusers']['{} all'.format(user.id)] = [0.0, int(reply.content)*60]
                                 else:
                                     return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Error, not a number.')
                                 with open('settings/log.json', 'r+') as log:
