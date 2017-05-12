@@ -841,7 +841,7 @@ class KeywordLogger:
                                         member = server.get_member(user[:-4])
                                         if member:
                                             msg += '{} CD: {} mins  {}. '.format(str(member.name),
-                                                                             str(settings['keyusers'][user][1] / 60.0), count)
+                                                                             str(settings['keyusers'][user][1] / 60.0), count+2)
                                             list_of_users.append(user)
                                             break
                                     if not member:
@@ -852,7 +852,7 @@ class KeywordLogger:
                                         member = server.get_member(user.split(' ')[0])
                                         msg += '{} in server: {} CD: {} mins  {}. '.format(str(member.name),
                                                                                        str(server.name), str(
-                                                settings['keyusers'][user][1] / 60.0), count)
+                                                settings['keyusers'][user][1] / 60.0), count+2)
                                         list_of_users.append(user)
                                     except:
                                         continue
@@ -861,9 +861,10 @@ class KeywordLogger:
 
                         msg = msg[:-(len(str(count + 2)) + 2)]
 
+                        val = count+2
                         await self.bot.edit_message(menu,
                                                             bot_prefix + '```\ud83c\udfc3 Enter the number to remove the user.\n\n{}```'.format(msg))
-                        reply = await self.bot.wait_for_message(author=ctx.message.author, check=not_block)
+                        reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
                         if reply and not reply.content.startswith(pre):
                             await self.bot.delete_message(reply)
                             index = int(reply.content) - 1
