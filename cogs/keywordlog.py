@@ -19,17 +19,6 @@ pre = ''
 '''Module for the keyword logger and chat history.'''
 
 
-def check(msg):
-    if msg.content.isdigit():
-        return 0 < int(msg.content) < val
-    elif msg.content.startswith(pre):
-        return True
-    return False
-
-
-def not_block(msg):
-    return '```' not in msg.content
-
 class KeywordLogger:
 
     def __init__(self, bot):
@@ -208,25 +197,23 @@ class KeywordLogger:
             def not_block(msg):
                 return '```' not in msg.content
 
-            with open('settings/log.json') as log:
-                settings = json.load(log)
-            log_loc = 'Set log location.' if settings['log_location'] == '' else 'Change log location.'
-            notifier = 'Set up notifier to ping you for keywords logged.' if settings['webhook_url'] == '' and settings['notifier_bot_token'] == '' else 'Change settings for keyword notifier.'
+            log_loc = 'Set log location.' if self.bot.log_conf['log_location'] == '' else 'Change log location.'
+            notifier = 'Set up notifier to ping you for keywords logged.' if self.bot.log_conf['webhook_url'] == '' and self.bot.log_conf['notifier_bot_token'] == '' else 'Change settings for keyword notifier.'
 
-            menu = await self.bot.send_message(ctx.message.channel, bot_prefix + '```\ud83d\udcdd Keyword Logger Settings. Enter a number:\n\n1. Turn on/off logger (currently {}).\n2. {}\n3. Add/remove a keyword.\n4. Blacklist words/users/server/channels.\n5. {}\n6. User following options.\n7. See all current settings.\n8. Help.```'.format(settings['keyword_logging'], log_loc, notifier))
+            menu = await self.bot.send_message(ctx.message.channel, bot_prefix + '```\ud83d\udcdd Keyword Logger Settings. Enter a number:\n\n1. Turn on/off logger (currently {}).\n2. {}\n3. Add/remove a keyword.\n4. Blacklist words/users/server/channels.\n5. {}\n6. User following options.\n7. See all current settings.\n8. Help.```'.format(self.bot.log_conf['keyword_logging'], log_loc, notifier))
 
             val = 9
             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author, check=check)
             if reply and not reply.content.startswith(pre):
                 await self.bot.delete_message(reply)
 
-                if int(reply.content) > 2 and settings['log_location'] == '':
+                if int(reply.content) > 2 and self.bot.log_conf['log_location'] == '':
                     return await self.bot.edit_message(menu, bot_prefix + 'Please set a log location (option 2) before setting up the notifier. See the help section (option 8) to for help on understanding the keyword logger better.')
 
                 # Toggle keyword logging
                 if reply.content == '1':
                     await self.bot.delete_message(menu)
-                    return await self.stop_logger(ctx) if settings['keyword_logging'] == 'on' else await self.start_logger(ctx)
+                    return await self.stop_logger(ctx) if self.bot.log_conf['keyword_logging'] == 'on' else await self.start_logger(ctx)
 
                 # Set log location
                 elif reply.content == '2':
@@ -273,17 +260,17 @@ class KeywordLogger:
                                 if reply and not reply.content.startswith(pre):
                                     await self.bot.delete_message(reply)
                                     if reply.content == '1':
-                                        settings['keywords'].append(word)
+                                        self.bot.log_conf['keywords'].append(word)
                                         await self.bot.edit_message(menu,
                                                                     bot_prefix + 'Keyword ``{}`` successfully set.'.format(
                                                                         o_word))
                                     elif reply.content == '2':
-                                        settings['keywords'].append(word + ' [server]{}'.format(ctx.message.server.id))
+                                        self.bot.log_conf['keywords'].append(word + ' [server]{}'.format(ctx.message.server.id))
                                         await self.bot.edit_message(menu,
                                                                     bot_prefix + 'Keyword ``{}`` successfully set for this server.'.format(
                                                                         o_word))
                                     else:
-                                        settings['keywords'].append(
+                                        self.bot.log_conf['keywords'].append(
                                             word + ' [channel]{}'.format(ctx.message.channel.id))
                                         await self.bot.edit_message(menu,
                                                                     bot_prefix + 'Keyword ``{}`` successfully set for this channel.'.format(
@@ -292,7 +279,7 @@ class KeywordLogger:
                                     with open('settings/log.json', 'r+') as log:
                                         log.seek(0)
                                         log.truncate()
-                                        json.dump(settings, log, indent=4)
+                                        json.dump(self.bot.log_conf, log, indent=4)
                                     with open('settings/log.json', 'r') as log:
                                         self.bot.log_conf = json.load(log)
 
@@ -301,7 +288,7 @@ class KeywordLogger:
 
                             msg = '1. '
                             count = 0
-                            for count, word in enumerate(settings['keywords']):
+                            for count, word in enumerate(self.bot.log_conf['keywords']):
                                 if ' [server]' in word:
                                     key, server = word.split(' [server]')
                                     server = self.bot.get_server(server)
@@ -331,13 +318,13 @@ class KeywordLogger:
                                 await self.bot.delete_message(reply)
 
                                 index = int(reply.content) - 1
-                                word = settings['keywords'][index]
-                                del settings['keywords'][index]
+                                word = self.bot.log_conf['keywords'][index]
+                                del self.bot.log_conf['keywords'][index]
 
                                 with open('settings/log.json', 'r+') as log:
                                     log.seek(0)
                                     log.truncate()
-                                    json.dump(settings, log, indent=4)
+                                    json.dump(self.bot.log_conf, log, indent=4)
                                 with open('settings/log.json', 'r') as log:
                                     self.bot.log_conf = json.load(log)
 
@@ -348,7 +335,7 @@ class KeywordLogger:
                         # Show list of keywords
                         else:
                             msg = 'List of keywords:\n\n'
-                            for word in settings['keywords']:
+                            for word in self.bot.log_conf['keywords']:
                                 if ' [server]' in word:
                                     key, server = word.split(' [server]')
                                     server = self.bot.get_server(server)
@@ -394,11 +381,11 @@ class KeywordLogger:
                                     if reply and not reply.content.startswith(pre):
                                         blacklisted_word = reply.content
                                         await self.bot.delete_message(reply)
-                                        settings['blacklisted_words'].append(blacklisted_word)
+                                        self.bot.log_conf['blacklisted_words'].append(blacklisted_word)
                                         with open('settings/log.json', 'r+') as log:
                                             log.seek(0)
                                             log.truncate()
-                                            json.dump(settings, log, indent=4)
+                                            json.dump(self.bot.log_conf, log, indent=4)
                                         with open('settings/log.json', 'r') as log:
                                             self.bot.log_conf = json.load(log)
                                         await self.bot.edit_message(menu,
@@ -431,12 +418,12 @@ class KeywordLogger:
                                                 await self.bot.edit_message(menu,
                                                                             bot_prefix + 'Could not find the server.')
                                             else:
-                                                settings['blacklisted_words'].append(
+                                                self.bot.log_conf['blacklisted_words'].append(
                                                     '{} [server]{}'.format(blacklisted_word, server.id))
                                                 with open('settings/log.json', 'r+') as log:
                                                     log.seek(0)
                                                     log.truncate()
-                                                    json.dump(settings, log, indent=4)
+                                                    json.dump(self.bot.log_conf, log, indent=4)
                                                 with open('settings/log.json', 'r') as log:
                                                     self.bot.log_conf = json.load(log)
                                                 await self.bot.edit_message(menu,
@@ -469,12 +456,12 @@ class KeywordLogger:
                                                 await self.bot.edit_message(menu,
                                                                             bot_prefix + 'Could not find the channel.')
                                             else:
-                                                settings['blacklisted_words'].append(
+                                                self.bot.log_conf['blacklisted_words'].append(
                                                     '{} [channel]{}'.format(blacklisted_word, channel.id))
                                                 with open('settings/log.json', 'r+') as log:
                                                     log.seek(0)
                                                     log.truncate()
-                                                    json.dump(settings, log, indent=4)
+                                                    json.dump(self.bot.log_conf, log, indent=4)
                                                 with open('settings/log.json', 'r') as log:
                                                     self.bot.log_conf = json.load(log)
                                                 await self.bot.edit_message(menu,
@@ -500,11 +487,11 @@ class KeywordLogger:
                                     await self.bot.edit_message(menu,
                                                                 bot_prefix + 'Could not find the user. Are they in this server?')
                                 else:
-                                    settings['blacklisted_users'].append(user.id)
+                                    self.bot.log_conf['blacklisted_users'].append(user.id)
                                     with open('settings/log.json', 'r+') as log:
                                         log.seek(0)
                                         log.truncate()
-                                        json.dump(settings, log, indent=4)
+                                        json.dump(self.bot.log_conf, log, indent=4)
                                     with open('settings/log.json', 'r') as log:
                                         self.bot.log_conf = json.load(log)
                                     await self.bot.edit_message(menu,
@@ -526,11 +513,11 @@ class KeywordLogger:
                                     await self.bot.edit_message(menu,
                                                                 bot_prefix + 'Could not find the server.')
                                 else:
-                                    settings['blacklisted_servers'].append(server.id)
+                                    self.bot.log_conf['blacklisted_servers'].append(server.id)
                                     with open('settings/log.json', 'r+') as log:
                                         log.seek(0)
                                         log.truncate()
-                                        json.dump(settings, log, indent=4)
+                                        json.dump(self.bot.log_conf, log, indent=4)
                                     with open('settings/log.json', 'r') as log:
                                         self.bot.log_conf = json.load(log)
                                     await self.bot.edit_message(menu,
@@ -552,11 +539,11 @@ class KeywordLogger:
                                     await self.bot.edit_message(menu,
                                                                 bot_prefix + 'Could not find the channel.')
                                 else:
-                                    settings['blacklisted_channels'][channel.id] = channel.server.id
+                                    self.bot.log_conf['blacklisted_channels'][channel.id] = channel.server.id
                                     with open('settings/log.json', 'r+') as log:
                                         log.seek(0)
                                         log.truncate()
-                                        json.dump(settings, log, indent=4)
+                                        json.dump(self.bot.log_conf, log, indent=4)
                                     with open('settings/log.json', 'r') as log:
                                         self.bot.log_conf = json.load(log)
                                     await self.bot.edit_message(menu,
@@ -578,7 +565,7 @@ class KeywordLogger:
 
                                 # Remove a blacklisted word
                                 if reply.content == '1':
-                                    for count, word in enumerate(settings['blacklisted_words']):
+                                    for count, word in enumerate(self.bot.log_conf['blacklisted_words']):
                                         if ' [server]' in word:
                                             key, server = word.split(' [server]')
                                             server = self.bot.get_server(server)
@@ -606,13 +593,13 @@ class KeywordLogger:
                                         await self.bot.delete_message(reply)
 
                                         index = int(reply.content) - 1
-                                        word = settings['blacklisted_words'][index]
-                                        del settings['blacklisted_words'][index]
+                                        word = self.bot.log_conf['blacklisted_words'][index]
+                                        del self.bot.log_conf['blacklisted_words'][index]
 
                                         with open('settings/log.json', 'r+') as log:
                                             log.seek(0)
                                             log.truncate()
-                                            json.dump(settings, log, indent=4)
+                                            json.dump(self.bot.log_conf, log, indent=4)
                                         with open('settings/log.json', 'r') as log:
                                             self.bot.log_conf = json.load(log)
 
@@ -622,7 +609,7 @@ class KeywordLogger:
 
                                 # Remove a blacklisted user
                                 elif reply.content == '2':
-                                    for count, word in enumerate(settings['blacklisted_users']):
+                                    for count, word in enumerate(self.bot.log_conf['blacklisted_users']):
                                         user = None
                                         for i in self.bot.servers:
                                             user = i.get_member(word)
@@ -644,13 +631,13 @@ class KeywordLogger:
                                         await self.bot.delete_message(reply)
 
                                         index = int(reply.content) - 1
-                                        word = settings['blacklisted_users'][index]
-                                        del settings['blacklisted_users'][index]
+                                        word = self.bot.log_conf['blacklisted_users'][index]
+                                        del self.bot.log_conf['blacklisted_users'][index]
 
                                         with open('settings/log.json', 'r+') as log:
                                             log.seek(0)
                                             log.truncate()
-                                            json.dump(settings, log, indent=4)
+                                            json.dump(self.bot.log_conf, log, indent=4)
                                         with open('settings/log.json', 'r') as log:
                                             self.bot.log_conf = json.load(log)
 
@@ -660,7 +647,7 @@ class KeywordLogger:
 
                                 # Remove a blacklisted server
                                 elif reply.content == '3':
-                                    for count, word in enumerate(settings['blacklisted_servers']):
+                                    for count, word in enumerate(self.bot.log_conf['blacklisted_servers']):
                                         word = '{}  {}. '.format(self.bot.get_server(word), count + 2)
 
                                         msg += word
@@ -677,13 +664,13 @@ class KeywordLogger:
                                         await self.bot.delete_message(reply)
 
                                         index = int(reply.content) - 1
-                                        word = settings['blacklisted_servers'][index]
-                                        del settings['blacklisted_servers'][index]
+                                        word = self.bot.log_conf['blacklisted_servers'][index]
+                                        del self.bot.log_conf['blacklisted_servers'][index]
 
                                         with open('settings/log.json', 'r+') as log:
                                             log.seek(0)
                                             log.truncate()
-                                            json.dump(settings, log, indent=4)
+                                            json.dump(self.bot.log_conf, log, indent=4)
                                         with open('settings/log.json', 'r') as log:
                                             self.bot.log_conf = json.load(log)
 
@@ -694,7 +681,7 @@ class KeywordLogger:
                                 # Remove a blacklisted channel
                                 else:
                                     list_of_channels = []
-                                    for count, word in enumerate(settings['blacklisted_channels']):
+                                    for count, word in enumerate(self.bot.log_conf['blacklisted_channels']):
                                         list_of_channels.append(word)
                                         word = '{}  {}. '.format(self.bot.get_channel(word), count + 2)
 
@@ -712,20 +699,19 @@ class KeywordLogger:
                                         await self.bot.delete_message(reply)
 
                                         index = int(reply.content) - 1
-                                        word = settings['blacklisted_channels'][list_of_channels[index]]
-                                        del settings['blacklisted_channels'][list_of_channels[index]]
+                                        word = self.bot.log_conf['blacklisted_channels'][list_of_channels[index]]
+                                        del self.bot.log_conf['blacklisted_channels'][list_of_channels[index]]
 
                                         with open('settings/log.json', 'r+') as log:
                                             log.seek(0)
                                             log.truncate()
-                                            json.dump(settings, log, indent=4)
+                                            json.dump(self.bot.log_conf, log, indent=4)
                                         with open('settings/log.json', 'r') as log:
                                             self.bot.log_conf = json.load(log)
 
                                         await self.bot.edit_message(menu,
                                                                     bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
                                                                         word))
-
 
                 # Keyword notifier settings
                 elif reply.content == '5':
@@ -742,7 +728,7 @@ class KeywordLogger:
                         bot_token_info = '```\u2757 This requires a proxy bot. Here\'s how you can set that up:\n\n1. Create a Discord bot account and get the bot\'s token. Then add the bot to the server where you are logging. Follow these quick steps: https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token\n2. Make sure to give the bot read, send, edit messages, and embed permissions in the channel you are keyword logging in.\n\nPaste the **token** below (NOT the client secret!). Navigate back to this menu and paste the token again if no confirmation is given.```'
                         if reply.content == '1' or reply.content == '2':
                             # Set up webhook url
-                            if settings['webhook_url'] == '':
+                            if self.bot.log_conf['webhook_url'] == '':
                                 await self.bot.edit_message(menu,
                                                                     bot_prefix + webhook_info)
                                 url = await self.bot.wait_for_message(author=ctx.message.author,
@@ -773,7 +759,7 @@ class KeywordLogger:
 
                         # Set notifications to dm
                         elif reply.content == '3':
-                            if settings['notifier_bot_token'] == '':
+                            if self.bot.log_conf['notifier_bot_token'] == '':
                                 await self.bot.edit_message(menu,
                                                                     bot_prefix + bot_token_info)
                                 reply = await self.bot.wait_for_message(author=ctx.message.author,
@@ -792,13 +778,27 @@ class KeywordLogger:
 
                 # User following options
                 elif reply.content == '6':
-                    val = 4
+                    val = 5
                     await self.bot.edit_message(menu,
-                                                         bot_prefix + '```\ud83c\udfc3 Stalking people is fun! What are we doing? Enter a number.\n\n1. Add a person to follow.\n2. Remove a person that is being followed.\n3. View who you are following.```')
+                                                         bot_prefix + '```\ud83c\udfc3 Stalking people is fun! What are we doing? Enter a number.\n\n1. Turn on/off user following (currently {}).\n2. Add a person to follow.\n3. Remove a person that is being followed.\n4. View who you are following.```'.format(self.bot.log_conf['user_logging']))
                     reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
                     if reply and not reply.content.startswith(pre):
                         await self.bot.delete_message(reply)
+
                     if reply.content == '1':
+                        with open('settings/log.json', 'r+') as log:
+                            if self.bot.log_conf['user_logging'] == 'on':
+                                self.bot.log_conf['user_logging'] = 'off'
+                            else:
+                                self.bot.log_conf['user_logging'] = 'on'
+                            log.seek(0)
+                            log.truncate()
+                            json.dump(self.bot.log_conf, log, indent=4)
+                        await self.bot.edit_message(menu, bot_prefix + 'Turned {} the user logger.'.format(self.bot.log_conf['user_logging']))
+                        with open('settings/log.json', 'r') as log:
+                            self.bot.log_conf = json.load(log)
+
+                    elif reply.content == '2':
                         await self.bot.edit_message(menu,
                                                              bot_prefix + '```\ud83c\udfc3 Input the person you want to follow. Can be a mention, the user id, or the fullname + discriminator. User id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the user in chat > copy id.\n\nInput user:```')
                         reply = await self.bot.wait_for_message(author=ctx.message.author, check=not_block)
@@ -807,9 +807,16 @@ class KeywordLogger:
                             try:
                                 user = reply.mentions[0]
                             except:
-                                user = ctx.message.server.get_member_named(reply.content)
+                                user = None
+                                for j in self.bot.servers:
+                                    user = j.get_member_named(reply.content)
+                                    if user:
+                                        break
                                 if not user:
-                                    user = ctx.message.server.get_member(reply.content)
+                                    for j in self.bot.servers:
+                                        user = j.get_member(reply.content)
+                                        if user:
+                                            break
                             if not user:
                                 return await self.bot.edit_message(menu, bot_prefix + 'Could not find user.')
                             await self.bot.edit_message(menu,
@@ -818,22 +825,22 @@ class KeywordLogger:
                             if reply and not reply.content.startswith(pre):
                                 await self.bot.delete_message(reply)
                                 if reply.content.isdigit():
-                                    settings['keyusers']['{} all'.format(user.id)] = [0.0, float(reply.content) * 60.0]
+                                    self.bot.log_conf['keyusers']['{} all'.format(user.id)] = [0.0, float(reply.content) * 60.0]
                                 else:
                                     return await self.bot.edit_message(menu, bot_prefix + 'Error, not a number.')
                                 with open('settings/log.json', 'r+') as log:
                                     log.seek(0)
                                     log.truncate()
-                                    json.dump(settings, log, indent=4)
+                                    json.dump(self.bot.log_conf, log, indent=4)
                                 with open('settings/log.json', 'r') as log:
                                     self.bot.log_conf = json.load(log)
                                 await self.bot.edit_message(menu, bot_prefix + 'Successfully added user: ``{}``'.format(user.name))
 
-                    elif reply.content == '2':
+                    elif reply.content == '3':
                         msg = '1. '
                         count = 0
                         list_of_users = []
-                        for count, user in enumerate(settings['keyusers']):
+                        for count, user in enumerate(self.bot.log_conf['keyusers']):
                             try:
                                 member = None
                                 if ' all' in user:
@@ -841,7 +848,7 @@ class KeywordLogger:
                                         member = server.get_member(user[:-4])
                                         if member:
                                             msg += '{} CD: {} mins  {}. '.format(str(member.name),
-                                                                             str(settings['keyusers'][user][1] / 60.0), count+2)
+                                                                             str(self.bot.log_conf['keyusers'][user][1] / 60.0), count+2)
                                             list_of_users.append(user)
                                             break
                                     if not member:
@@ -852,7 +859,7 @@ class KeywordLogger:
                                         member = server.get_member(user.split(' ')[0])
                                         msg += '{} in server: {} CD: {} mins  {}. '.format(str(member.name),
                                                                                        str(server.name), str(
-                                                settings['keyusers'][user][1] / 60.0), count+2)
+                                                self.bot.log_conf['keyusers'][user][1] / 60.0), count+2)
                                         list_of_users.append(user)
                                     except:
                                         continue
@@ -868,13 +875,13 @@ class KeywordLogger:
                         if reply and not reply.content.startswith(pre):
                             await self.bot.delete_message(reply)
                             index = int(reply.content) - 1
-                            word = settings['keyusers'][list_of_users[index]]
-                            del settings['keyusers'][list_of_users[index]]
+                            word = self.bot.log_conf['keyusers'][list_of_users[index]]
+                            del self.bot.log_conf['keyusers'][list_of_users[index]]
 
                             with open('settings/log.json', 'r+') as log:
                                 log.seek(0)
                                 log.truncate()
-                                json.dump(settings, log, indent=4)
+                                json.dump(self.bot.log_conf, log, indent=4)
                             with open('settings/log.json', 'r') as log:
                                 self.bot.log_conf = json.load(log)
 
@@ -884,7 +891,7 @@ class KeywordLogger:
 
                     else:
                         msg = ''
-                        for user in settings['keyusers']:
+                        for user in self.bot.log_conf['keyusers']:
                             try:
                                 member = None
                                 if ' all' in user:
@@ -892,7 +899,7 @@ class KeywordLogger:
                                         member = server.get_member(user[:-4])
                                         if member:
                                             msg += '{} CD: {} mins, '.format(str(member.name),
-                                                                             str(settings['keyusers'][user][1] / 60.0))
+                                                                             str(self.bot.log_conf['keyusers'][user][1] / 60.0))
                                             break
                                     if not member:
                                         continue
@@ -902,7 +909,7 @@ class KeywordLogger:
                                         member = server.get_member(user.split(' ')[0])
                                         msg += '{} in server: {} CD: {} mins, '.format(str(member.name),
                                                                                        str(server.name), str(
-                                                settings['keyusers'][user][1] / 60.0))
+                                                self.bot.log_conf['keyusers'][user][1] / 60.0))
                                     except:
                                         continue
                             except:
@@ -919,18 +926,16 @@ class KeywordLogger:
                     with open('settings/notify.json') as n:
                         notif = json.load(n)
                         notif_type = notif['type']
-                    with open('settings/log.json') as log:
-                        settings = json.load(log)
                         msg = 'Message logger info:\n```\n\ud83d\udcfa Keyword logging: %s\n\nNotification type: %s\n\nLog location: ' % (
-                        settings['keyword_logging'], notif_type)
-                        if settings['log_location'] == '':
+                        self.bot.log_conf['keyword_logging'], notif_type)
+                        if self.bot.log_conf['log_location'] == '':
                             msg += 'No log location set.\n\n'
                         else:
-                            location = settings['log_location'].split()
+                            location = self.bot.log_conf['log_location'].split()
                             server = self.bot.get_server(location[1])
                             msg += '%s in server %s\n\n' % (str(server.get_channel(location[0])), str(server))
                         msg += 'Keywords: '
-                        for word in settings['keywords']:
+                        for word in self.bot.log_conf['keywords']:
                             if ' [server]' in word:
                                 key, server = word.split(' [server]')
                                 server = self.bot.get_server(server)
@@ -945,9 +950,9 @@ class KeywordLogger:
                                 msg += word + ', '
 
                         msg = msg.rstrip(', ')
-                        if settings['allservers'] == 'False':
+                        if self.bot.log_conf['allservers'] == 'False':
                             server = ''
-                            for i in settings['servers']:
+                            for i in self.bot.log_conf['servers']:
                                 try:
                                     server = self.bot.get_server(i)
                                 except:
@@ -957,7 +962,7 @@ class KeywordLogger:
                         else:
                             msg += 'All Servers'
                         msg += '\n\nBlacklisted Words: '
-                        for i in settings['blacklisted_words']:
+                        for i in self.bot.log_conf['blacklisted_words']:
                             if '[server]' in i:
                                 word, id = i.split('[server]')
                                 name = self.bot.get_server(id)
@@ -974,7 +979,7 @@ class KeywordLogger:
                         msg += '\n\nBlacklisted Users: '
                         names = []
                         for i in self.bot.servers:
-                            for j in settings['blacklisted_users']:
+                            for j in self.bot.log_conf['blacklisted_users']:
                                 name = i.get_member(j)
                                 if name:
                                     if name.name not in names:
@@ -983,7 +988,7 @@ class KeywordLogger:
                         msg = msg.rstrip(', ')
                         server = ''
                         msg += '\n\nBlacklisted Servers: '
-                        for i in settings['blacklisted_servers']:
+                        for i in self.bot.log_conf['blacklisted_servers']:
                             try:
                                 server = self.bot.get_server(i)
                             except:
@@ -993,17 +998,17 @@ class KeywordLogger:
                         msg = msg.rstrip(', ')
                         channel = ''
                         msg += '\n\nBlacklisted Channels: '
-                        for i in settings['blacklisted_channels']:
+                        for i in self.bot.log_conf['blacklisted_channels']:
                             try:
                                 channel = self.bot.get_channel(i)
-                                server = self.bot.get_server(settings['blacklisted_channels'][i])
+                                server = self.bot.get_server(self.bot.log_conf['blacklisted_channels'][i])
                             except:
                                 pass
                             if channel:
                                 msg += '{} in server: {}, '.format(str(channel), str(server))
                         msg = msg.rstrip(', ')
-                        msg += '\n\nContext length: %s messages\n\nUser follows: ' % settings['context_len']
-                        for user in settings['keyusers']:
+                        msg += '\n\nContext length: %s messages\n\nUser follows: ' % self.bot.log_conf['context_len']
+                        for user in self.bot.log_conf['keyusers']:
                             try:
                                 member = None
                                 if ' all' in user:
@@ -1011,7 +1016,7 @@ class KeywordLogger:
                                         member = server.get_member(user[:-4])
                                         if member:
                                             msg += '{} CD: {} mins, '.format(str(member.name),
-                                                                             str(settings['keyusers'][user][1] / 60.0))
+                                                                             str(self.bot.log_conf['keyusers'][user][1] / 60.0))
                                             break
                                     if not member:
                                         continue
@@ -1021,7 +1026,7 @@ class KeywordLogger:
                                         member = server.get_member(user.split(' ')[0])
                                         msg += '{} in server: {} CD: {} mins, '.format(str(member.name),
                                                                                        str(server.name), str(
-                                                settings['keyusers'][user][1] / 60.0))
+                                                self.bot.log_conf['keyusers'][user][1] / 60.0))
                                     except:
                                         continue
                             except:
