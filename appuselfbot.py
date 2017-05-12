@@ -8,6 +8,7 @@ import glob
 import gc
 import psutil
 import sys
+import re
 from datetime import timezone
 from cogs.utils.allmsgs import *
 from discord_webhooks import *
@@ -38,6 +39,8 @@ async def on_ready():
     bot.icount = bot.message_count = bot.mention_count = bot.keyword_log = 0
     bot.self_log = bot.all_log = {}
     bot.imagedumps = []
+    bot.default_status = ''
+    bot.is_stream = False
     bot.game = bot.game_interval = bot.avatar = bot.avatar_interval = bot.subpro = bot.keyword_found = None
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
 
@@ -51,13 +54,20 @@ async def on_ready():
         bot.log_conf = json.load(log)
         bot.key_users = bot.log_conf['keyusers']
     if os.path.isfile('settings/games.json'):
-        with open('settings/games.json', 'r') as g:
+        with open('settings/games.json', 'r+') as g:
             games = json.load(g)
-        if type(games['games']) is list:
-            bot.game = games['games'][0]
-            bot.game_interval = games['interval']
-        else:
-            bot.game = games['games']
+            if type(games['games']) is list:
+                bot.game = games['games'][0]
+                bot.game_interval = games['interval']
+            else:
+                bot.game = games['games']
+            if 'stream' not in games:
+                games['stream'] = 'no'
+            if games['stream'] == 'yes':
+                bot.is_stream = True
+            g.seek(0)
+            g.truncate()
+            json.dump(games, g, indent=4)
     if not os.path.exists('avatars'):
         os.makedirs('avatars')
     if not os.path.isfile('settings/avatars.json'):
@@ -82,6 +92,8 @@ async def on_ready():
             opt['customcmd_color'] = '27007A'
         if 'rich_embed' not in opt:
             opt['rich_embed'] = 'on'
+        if 'default_status' not in opt:
+            opt['default_status'] = 'idle'
         fp.seek(0)
         fp.truncate()
         json.dump(opt, fp, indent=4)
@@ -251,53 +263,42 @@ async def on_message(message):
 
         try:
             word_found = False
-            if bot.log_conf['allservers'] == 'True' and message.server.id not in bot.log_conf['blacklisted_servers'] and message.channel.id not in bot.log_conf['blacklisted_channels']:
+            if (bot.log_conf['allservers'] == 'True' or str(message.server.id) in bot.log_conf['servers']) and (message.server.id not in bot.log_conf['blacklisted_servers'] and message.channel.id not in bot.log_conf['blacklisted_channels']):
                 add_alllog(message.channel.id, message.server.id, message)
-                for word in bot.log_conf['keywords']:
-                    if word.lower() in message.content.lower() and message.author.id != bot.user.id:
-                        word_found = True
-                        if message.author.bot:
-                            word_found = False
-                        for x in bot.log_conf['blacklisted_users']:
-                            if message.author.id == x:
-                                word_found = False
-                                break
-                        for x in bot.log_conf['blacklisted_words']:
-                            if '[server]' in x:
-                                bword, id = x.split('[server]')
-                                if bword.strip().lower() in message.content.lower() and message.server.id == id:
-                                    word_found = False
-                                    break
-                            if '[channel]' in x:
-                                bword, id = x.split('[channel]')
-                                if bword.strip().lower() in message.content.lower() and message.channel.id == id:
-                                    word_found = False
-                                    break
-                            if x.lower() in message.content.lower():
-                                word_found = False
-                                break
-                        break
-            else:
-                if str(message.server.id) in bot.log_conf['servers'] and message.channel.id not in bot.log_conf['blacklisted_channels']:
-                    add_alllog(message.channel.id, message.server.id, message)
+                if not message.author.bot and not any(x in message.author.id for x in bot.log_conf['blacklisted_users']):
                     for word in bot.log_conf['keywords']:
-                        if word.lower() in message.content.lower() and message.author.id != bot.user.id:
-                            word_found = True
-                            if message.author.bot:
+                        if ' [server]' in word:
+                            word, server = word.split(' [server]')
+                            if message.server.id != server:
+                                continue
+                        elif ' [channel]' in word:
+                            word, channel = word.split(' [channel]')
+                            if message.channel.id != channel:
+                                continue
+                        if word.startswith('[isolated]'):
+                            word = word[10:].lower()
+                            found = re.findall('\\b' + word + '\\b', message.content.lower())
+                            if found:
+                                word_found = True
+                                break
+                        else:
+                            if word.lower() in message.content.lower() and message.author.id != bot.user.id:
+                                word_found = True
+                                break
+
+                    for x in bot.log_conf['blacklisted_words']:
+                        if '[server]' in x:
+                            bword, id = x.split('[server]')
+                            if bword.strip().lower() in message.content.lower() and message.server.id == id:
                                 word_found = False
-                            for x in bot.log_conf['blacklisted_users']:
-                                if message.author.id == x:
-                                    word_found = False
-                                    break
-                            for x in bot.log_conf['blacklisted_words']:
-                                if '[server]' in x:
-                                    bword, id = x.split('[server]')
-                                    if bword.strip().lower() in message.content.lower() and message.server.id == id:
-                                        word_found = False
-                                        break
-                                if x.lower() in message.content.lower():
-                                    word_found = False
-                                    break
+                                break
+                        elif '[channel]' in x:
+                            bword, id = x.split('[channel]')
+                            if bword.strip().lower() in message.content.lower() and message.channel.id == id:
+                                word_found = False
+                                break
+                        if x.lower() in message.content.lower():
+                            word_found = False
                             break
 
             user_found = False
@@ -450,15 +451,24 @@ async def game_and_avatar(bot):
                                 next_game = random.randint(0, len(games['games']) - 1)
                             current_game = next_game
                             bot.game = games['games'][next_game]
-                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.idle, afk=True)
+                            if bot.is_stream and '=' in games['games'][next_game]:
+                                g, url = games['games'][next_game].split('=')
+                                await bot.change_presence(game=discord.Game(name=g, type=1,
+                                                                            url=url),
+                                                          status=set_status(bot), afk=True)
+                            else:
+                                await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=set_status(bot), afk=True)
                         else:
                             if next_game+1 == len(games['games']):
                                 next_game = 0
                             else:
                                 next_game += 1
                             bot.game = games['games'][next_game]
-                            await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=discord.Status.idle, afk=True)
-
+                            if bot.is_stream and '=' in games['games'][next_game]:
+                                g, url = games['games'][next_game].split('=')
+                                await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
+                            else:
+                                await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=set_status(bot), afk=True)
 
                 else:
                     if game_time_check(bot, bot.game_time, 180):
@@ -466,7 +476,11 @@ async def game_and_avatar(bot):
                             games = json.load(g)
 
                         bot.game = games['games']
-                        await bot.change_presence(game=discord.Game(name=games['games']), status=discord.Status.idle, afk=True)
+                        if bot.is_stream and '=' in games['games']:
+                            g, url = games['games'].split('=')
+                            await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
+                        else:
+                            await bot.change_presence(game=discord.Game(name=games['games']), status=set_status(bot), afk=True)
 
         # Cycles avatar if avatar cycling is enabled.
         if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
@@ -496,13 +510,17 @@ async def game_and_avatar(bot):
                             with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
 
-        # Sets status to idle when user goes offline (won't trigger while user is online because client takes priority)
+        # Sets status to default status when user goes offline (client status takes priority when user is online)
         if hasattr(bot, 'refresh_time'):
             if has_passed(bot, bot.refresh_time):
-                if bot.game:
-                    await bot.change_presence(game=discord.Game(name=bot.game), status=discord.Status.idle, afk=True)
+                if bot.game and bot.is_stream and '=' in bot.game:
+                    g, url = bot.game.split('=')
+                    await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
+                elif bot.game and not bot.is_stream:
+                    await bot.change_presence(game=discord.Game(name=bot.game),
+                                              status=set_status(bot), afk=True)
                 else:
-                    await bot.change_presence(status=discord.Status.idle, afk=True)
+                    await bot.change_presence(status=set_status(bot), afk=True)
 
         if hasattr(bot, 'gc_time'):
             if gc_clear(bot, bot.gc_time):

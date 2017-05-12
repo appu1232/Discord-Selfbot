@@ -27,6 +27,15 @@ def has_passed(bot, oldtime):
     return True
 
 
+def set_status(bot):
+    if bot.default_status == 'idle':
+        return discord.Status.idle
+    elif bot.default_status == 'dnd':
+        return discord.Status.dnd
+    else:
+        return discord.Status.invisible
+
+
 def user_post(bot, user):
     if time.time() - float(bot.key_users[user][0]) < float(bot.key_users[user][1]):
         bot.key_users[user] = [time.time(), bot.key_users[user][1]]
