@@ -139,7 +139,7 @@ class Misc:
                 if char_count == 1:
                     react_me = react_me.replace(char, Misc.emoji_dict[char][0])
         return react_me
-    
+
     @commands.command(pass_context=True)
     async def about(self, ctx, txt: str = None):
         """Links to the bot's github page."""
@@ -254,8 +254,11 @@ class Misc:
                     elif i.strip().lower().startswith('author='):
                         author = i.strip()[7:].strip()
                 if color:
+                    if color.startswith('#'):
+                        color = color[1:]
                     if not color.startswith('0x'):
                         color = '0x' + color
+
                 if color:
                     em = discord.Embed(title=title, description=description, color=int(color, 16))
                 else:
@@ -299,20 +302,35 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['stream'])
     async def game(self, ctx, *, game: str = None):
-        """Set playing status. Ex: >game napping >help game for more info
+        """Set game/stream. Ex: >game napping >help game for more info
 
-        Your game status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
+        Your game/stream status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
 
+        --Setting game--
         To set a rotating game status, do >game game1 | game2 | game3 | etc.
         It will then prompt you with an interval in seconds to wait before changing the game and after that the order in which to change (in order or random)
-        Ex: >game with matches | sleeping | watching anime"""
+        Ex: >game with matches | sleeping | watching anime
+
+        --Setting stream--
+        Same as above but you also need a link to the stream. (must be a valid link to a stream or else the status will not show as streaming).
+        Add the link like so: <words>=<link>
+        Ex: >stream Underwatch=https://www.twitch.tv/a_seagull
+        or >stream Some moba=https://www.twitch.tv/doublelift | Underwatch=https://www.twitch.tv/a_seagull"""
+        pre = cmd_prefix_len()
+        if ctx.message.content[pre:].startswith('game'):
+            is_stream = False
+            status_type = 'Game'
+        else:
+            is_stream = True
+            status_type = 'Stream'
+            self.bot.is_stream = True
         if game:
 
             # Cycle games if more than one game is given.
             if ' | ' in game:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Input interval in seconds to wait before changing to the next game (``n`` to cancel):')
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Input interval in seconds to wait before changing to the next {} (``n`` to cancel):'.format(status_type.lower()))
 
                 def check(msg):
                     return msg.content.isdigit() or msg.content.lower().strip() == 'n'
@@ -331,13 +349,13 @@ class Misc:
                         self.bot.game_interval = interval
                         games = game.split(' | ')
                         if len(games) != 2:
-                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Change game in order or randomly? Input ``o`` for order or ``r`` for random:')
+                            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Change {} in order or randomly? Input ``o`` for order or ``r`` for random:'.format(status_type.lower()))
                             s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
                             if not s:
                                 return
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
                                 await self.bot.send_message(ctx.message.channel,
-                                                            bot_prefix + 'Game set. Game will randomly change every ``%s`` seconds' % reply.content.strip())
+                                                            bot_prefix + '{status} set. {status} will randomly change every ``{time}`` seconds'.format(status=status_type, time=reply.content.strip()))
                                 loop_type = 'random'
                             else:
                                 loop_type = 'ordered'
@@ -346,9 +364,10 @@ class Misc:
 
                         if loop_type == 'ordered':
                             await self.bot.send_message(ctx.message.channel,
-                                                        bot_prefix + 'Game set. Game will change every ``%s`` seconds' % reply.content.strip())
+                                                        bot_prefix + '{status} set. {status} will change every ``{time}`` seconds'.format(status=status_type, time=reply.content.strip()))
 
-                        games = {'games': game.split(' | '), 'interval': interval, 'type': loop_type}
+                        stream = 'no' if is_stream else 'yes'
+                        games = {'games': game.split(' | '), 'interval': interval, 'type': loop_type, 'stream': stream}
                         with open('settings/games.json', 'w') as g:
                             json.dump(games, g, indent=4)
 
@@ -361,16 +380,23 @@ class Misc:
             else:
                 self.bot.game_interval = None
                 self.bot.game = game
-                games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none'}
+                stream = 'no' if is_stream else 'yes'
+                games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none', 'stream': stream}
                 with open('settings/games.json', 'w') as g:
                     json.dump(games, g, indent=4)
-                await self.bot.change_presence(game=discord.Game(name=game))
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Game set as: ``Playing %s``' % game)
+                if is_stream and '=' in game:
+                    g, url = game.split('=')
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Stream set as: ``Streaming %s``' % g)
+                    await self.bot.change_presence(game=discord.Game(name=g, type=1, url=url))
+                else:
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Game set as: ``Playing %s``' % game)
+                    await self.bot.change_presence(game=discord.Game(name=game))
 
         # Remove game status.
         else:
             self.bot.game_interval = None
             self.bot.game = None
+            self.bot.is_stream = False
             await self.bot.change_presence(game=None)
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set playing status off')
             if os.path.isfile('settings/games.json'):
@@ -554,6 +580,7 @@ class Misc:
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):
         """Create a strawpoll. Ex: >poll Favorite color = Blue | Red | Green"""
+        loop = asyncio.get_event_loop()
         try:
             options = [op.strip() for op in msg.split('|')]
             if '=' in options[0]:
@@ -564,7 +591,7 @@ class Misc:
         except:
             return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid Syntax. Example use: ``>poll Favorite color = Blue | Red | Green | Purple``')
 
-        poll = strawpy.create_poll(title.strip(), options)
+        poll = await loop.run_in_executor(None, strawpy.create_poll, title.strip(), options)
         await self.bot.send_message(ctx.message.channel, bot_prefix + poll.url)
 
     @commands.command(pass_context=True)
@@ -801,6 +828,31 @@ class Misc:
             if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                 for i in reactions:
                     await self.bot.add_reaction(message, i)
+
+    @commands.command(pass_context=True)
+    async def afk(self, ctx, txt: str = None):
+        """Set your Discord status for when you aren't online. Ex: >afk idle"""
+        info = 'Options: ``idle``, ``dnd``, ``offline``. When the status is set, the bot will set you to this by default when you are not on Discord. Ex: >afk idle'
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            if txt:
+                if txt.strip() == 'idle':
+                    opt['default_status'] = 'idle'
+                    self.bot.default_status = 'idle'
+                elif txt.strip() == 'dnd' or txt.strip() == 'do not disturb':
+                    opt['default_status'] = 'dnd'
+                    self.bot.default_status = 'dnd'
+                elif txt.strip() == 'offline' or 'invis' in txt.strip() or txt.strip() == 'incognito':
+                    opt['default_status'] = 'invisible'
+                    self.bot.default_status = 'invisible'
+                else:
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + info)
+            else:
+                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid status. %s' % info)
+            fp.seek(0)
+            fp.truncate()
+            json.dump(opt, fp, indent=4)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set default afk status. You will now appear as ``{}`` when not on Discord.'.format(opt['default_status']))
 
 
 def setup(bot):
