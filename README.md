@@ -22,7 +22,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 
 - Google web and image search.
 - Keyword/user logger and notifier. Get notified when keywords you specified are said in any of your server or follow users and get notified when they send a message (with a cooldown). Useful to track someone or see if someone mentioned your name or your favorite show/book/whatever else keywords and you want to stalk— I mean, talk to them about it.
-- Set your game to anything or set up multiple and cycle through them.
+- Set your game/stream to anything or set up multiple and cycle through them.
 - Cycle through avatars automatically.
 - Save image/gif/webm dumps (urls or attachments) in channels quickly to your computer (checks for duplicates as well).
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
@@ -100,6 +100,7 @@ Manual update: Unless otherwise stated, all you need to do is save your ``settin
 - ``>quit`` - quits the bot.
 - ``>update`` - updates the bot to the latest version.
 - ``>game <text>`` or ``>game <text1> | <text2> | <text3> | ...`` - Set your game. If multiple are given, it will cycle through them. **The game won't show for yourself but other people can see it.** The bot sets the game status on startup as well if you set it up once. Do ``>game`` with nothing else to turn off your game.
+  + ``>stream <text>=<url_to_stream>`` - Set stream.
 - ``>avatar`` - sets your avatar by cycling through the images you have under the ``avatars`` folder (.jpg, .jpeg, and .png only). It will prompt you with your desired interval and whether to change randomly or in order.
   + On first use, this command will require your discord password. This is just a limitation of the API. In no way is your password being distributed. It is just stored locally and called on internally to change your avatar. Just make sure you input the password in a private channel so no one sees it.
 - ``>stats`` - Bot stats and some user info. Includes information such as uptime, messages sent and received across servers (since the bot started) and some other info. What it looks like:
@@ -145,7 +146,7 @@ More options:
   + ``dim=WidthxHeight`` - only download items with these dimensions. Ex: ``dim=1920x1080`` Optionally, do ``dim>=WidthxHeight`` for images greater than or equal and ``dim<=WidthxHeight`` for less than or equal to these dimensions.
   + ``ratio=Width:Height`` - only download items with these ratios. Ex: ``ratio=16:9``
   + ``type=<type_of_item>`` - only download these types of files. Ex: ``type=png`` or ``type=gif, webm`` All options: jpg, png, gif (includes gifv), webm.
-  + ``channel=<id>`` - download from a different channel (can be from a different server). Useful if you can't send messages in that channel. [Enable developer mode,](https://i.imgur.com/AmOZHzL.png) right click on the channel name, and hit ``copy id`` to get the id. Ex: ``channel=299293492645986307``
+  + ``channel=<id>`` - download from a different channel (can be from a different server). Useful if you can't send messages in that channel. [Enable developer mode,](http://i.imgur.com/KMDS8cb.png) right click on the channel name, and hit ``copy id`` to get the id. Ex: ``channel=299293492645986307``
   + ``user=<id>`` - download only items posted by this user. Right click on the user to get their id. Ex: user=124910128582361092
   
 Example: I want a new wallpaper. I download 100 items with type .png that fit on my 16:9 monitor with at least 720p quality:
@@ -210,6 +211,7 @@ A MAL search result:
 - ``>space <text>`` or ``>space <n> <text>`` - put a space between each letter in the message. Optionally, specify how many spaces to put between each letter with ``<n>``
 - ``>react <text>`` or ``>react <text> <id>`` - react to the above message with the given text. If the message id is given, it will react to that message instead.
 - ``>uni <emoji>`` - convert the emoji to unicode emoji if possible.
+- ``>afk <status>`` - Set your default status when you are not online Discord but the bot is still on. All options: idle, dnd, offline. Default is idle.
 
 **Logging commands**
 
@@ -288,43 +290,40 @@ As you can see, it shows the context, the keyword it matched, time message was s
 So, here's how you get started with setting up the notifier:
 
 1. Go to the server where you want to receive notifications. You probably want a private server just for yourself or one where you are admin and can create private channels.
-2. Set up the notifications settings for this server/channel so that you get notified on every new message, not just mentions.
+2. Do ``>log`` and ensure that the logger is on. Now set the log location for the logger (option 2). This is where the bot will post the found messages.
 3. Go to your **Server Settings** ([it's here](https://i.imgur.com/PofYpiZ.png)) and go to **WebHooks** near the bottom. Create a webhook.
-4. Give it whatever name and avatar you like and change the channel to the channel where you want to receive notifications. Copy the url and **make sure you hit save.** [It should look something like this.](https://i.imgur.com/AmaaMaA.png)
-5. Do ``>webhook <url>`` where ``<url>`` is the webhook url.
-6. In the channel you want to receive notifications, do ``>log location``
-7. Do ``>notify msg`` to enable notifications through this webhook. ``>notify ping`` will send the notification and also ping you. To disable the webhook and all notifications, do ``>notify none``
-8. Personalize your keyword notifier for specific servers/words and more:
+4. Give it whatever name and avatar you like and change the channel to the channel where you want to receive notifications. Copy the url and **make sure you hit save.** [It should look something like this.](http://i.imgur.com/ndGSLSb.png)
+5. Do ``>log`` again and select option 5 (keyword notifier) and then select either options 1 or 2 (option 3 requires a proxy bot, see below in the **proxy bot** section).
+6. Paste the url for the webhook when prompted to do so.
+7. Personalize your keyword logger/notifier by adding keywords, blacklisting, and more. Use the menu in ``>log`` to navigate and enter your settings easily.
 
 ----
 
-- **View settings and turn on and off the keyword logging:**
-  + ``>log`` - All settings related to keyword logging. Will be mostly empty if nothing is setup yet.
+**Proxy bot setup for getting notifications via direct message:**
+
+1. Create a Discord bot account and get the bot's token. Then add the bot to the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
+2. Make sure to give the bot read, send, edit messages, and embed permissions in the channel you are keyword logging in.
+3. Do ``>log`` and select option 5 (keyword notifier) and then select direct messages. Enter the token when prompted. Make sure you grabbed the **token** not the client secret!
+
+If all goes well, you should see your proxy bot on the sidebar come online.
+
+**Shorthand commands that you can do without having to use the ``>log`` menu.**
+
+- View settings and turn on and off the keyword logging:
   + ``>log on`` - Turn on keyword logging. (should be on by default)
   + ``>log off`` - Turn off keyword logging.
   + ``>log context <number>`` - set how many messages before the logged message to show when logging a keyword. Default is four.
-  + ``>log location`` - sets the channel you typed this in as the log and notification location for the logger (unless you have it set to direct messages)
 
-- **Set up words to log for:**
+- Set up words to log for:
   + ``>log addkey <word>`` - adds this word (or words) as a keyword. Ex: ``>log addkey appu`` or ``>log addkey kaguya wants to be confessed to``
   + ``>log removekey <word>`` - removes this keyword.
 
-- **Set up which servers you want to get notified for or set it up for all servers:**
+- Set up which servers you want to get notified for or set it up for all servers. Set to all servers by default.
   + ``>log add`` - adds the server you are in to be checked for keywords.
   + ``>log remove`` - removes the server from keyword check.
   + ``>log toggle`` - toggle between just the servers you added or all servers. Default is set to all servers so you do not need to add every server.
 
-- **Blacklist users, servers, and words that you don't want to recieve notifications for:**
-  + ``>log addblacklist [user] <user>`` - blacklists the user from the keyword notifier. ``<user>`` can be their name + discriminator, a mention, or their user id.
-  + ``>log addblacklist [word] <word>`` - blacklists this word from the keyword notifier.
-  + ``>log addblacklist [server]`` - blacklists the current server from the keyword notifier.
-  + ``>log addblacklist [channel]`` - blacklists the current channel from the keyword notifier.
-  + ``>log addblacklist [word] [server] <word>`` - blacklists the current word for only this server (the one you are typing in).
-    - Ex: ``overwatch`` is a keyword but you don't want notifs from the Overwatch server. Go to the server and in any channel, type ``>log addblacklist [word] [server] overwatch``.
-  + ``>log addblacklist [word] [channel] <word>`` - blacklists the current word for only this channel (the one you are typing in).
-  + ``>log removeblacklist [user] <user>`` or ``>log removeblacklist [word] <word>`` etc. - self-explanatory.  
-
-- **Set how you want to receive notifications:**
+- Set how you want to receive notifications:
   + ``>notify msg`` - posts in the keyword notifier channel using the webhook. (default)
   + ``>notify ping`` - posts in the keyword notifier channel but also get pinged when it does so (helpful if you want to see your logs in the recent mentions tab).
   + ``>notify dm`` - recieve via direct message. **This requires the proxy bot to be set up. See below**
@@ -341,31 +340,20 @@ So, here's how you get started with setting up the notifier:
 
 It's just for convenience. If you have 50+ servers and only a handful that you don't want to log, it would be a hastle to add every one to the ``servers`` list so instead you can just enable all servers and add the few to the blacklist. For words being blacklisted, this is just to allow you to specify more in-depth what kind of messages you are trying to look for with the keyword notifier.
 
-**What if I want to recieve notifications via direct message instead?**
-
-This is possible, but you'll need a **proxy bot** for this. Here's how you can set that up:
-
-1. First, go to the channel where you are getting notifications in and do ``>log location``. This lets the proxy bot know that this is where it should take the logs from to send to you via direct message.
-2. Create a Discord bot account and get the bot's token. Then add the bot to the server where you are logging. [Follow these quick steps.](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
-3. Make sure to give the bot read, send, edit messages, and embed permissions in the channel you are keyword logging in.
-4. Do ``>notify token <token>`` where ``<token>`` is the token you grabbed in step 1. Make sure you grabbed the **token** not the client secret!
-5. Enable the proxy bot and set it to send via direct messages with ``>notify dm``. ``>notify off`` will turn off the proxy bot.
-
-To switch back to the webhook method of posting notifications in channels, just do ``>notify msg`` or ``>notify ping`` again.
-
 ## Follow Users:
 
 **Note:** You must set up the [Keyword Notifier](#keyword-notifier) (steps 1-8 at the start of the section) in order to use this feature.
 
 **Set up people to follow and get notified when they post a message:**
 
-- [Enable developer mode](https://i.imgur.com/AmOZHzL.png) in your user settings to copy [user](https://i.imgur.com/7694JCl.png) and [server](https://i.imgur.com/sc74gxG.png) ids.
+- Use the ``>log`` command and select the User follow section in the menu to go about it the simple way. Otherwise, here are some more detail
+
+- [Enable developer mode](http://i.imgur.com/KMDS8cb.png) in your user settings to copy [user](https://i.imgur.com/7694JCl.png) and [server](https://i.imgur.com/sc74gxG.png) ids.
 - ``>log adduser <user_id> | <n>`` - get notified when this user sends a message across any of your servers. The ``<n>`` is the cooldown in minutes before that user posting will notify you again. See below for a more thorough explanation.
     + Ex: ``>log adduser 124910128582361092 | 10`` - I will get notified when user with id ``124910128582361092`` posts a message anywhere with a cooldown of 10 minutes.
 - ``>log adduser <user_id> | <server_id> | <n>`` - get notified when this user sends a message in the given server. ``<n>`` is the same as above.
 - ``>log removeuser <user_id>`` and ``>log removeuser <user_id> | <server_id>`` - remove the user from all servers or that one server respectively.
 - ``>log refresh`` or ``>log refresh <user_id>`` - refresh the notifier for all users or this specific user if ``<user_id>`` is given. Basically allows you to get notified on the very next message from your users. Aka "I need to know where they are posting right now".
-- ``>log`` - will show who you are ~~stalking~~ following (keyword settings are at the top and user settings are at the bottom)
 
 **More important information about user following:**
 
@@ -390,7 +378,7 @@ In order to use the ``>i`` command to image search and in order to get more accu
 Follow these steps to obtain them:
 
 1. Visit the [Google API Console](https://console.developers.google.com/). Once you are in the Console, create a new project.
-2. Go to ``Library`` and search ``Custom Search API``. Click it and enable it.
+2. Go to ``Library`` and search ``Custom Search API``. **Click it and enable it.**
 3. Go to ``Credentials`` and click ``create credentials`` and choose ``API Key`` (no need to restrict the key). The value under "Key" is your api key. Paste this into the optional_config.json under ``google_api_key``.
 4. Go [here](https://cse.google.com/cse/all) and click ``Add`` and then ``Create`` (if asked to specify a site, just do www.google.com)
 5. On the home page of the Custom Search webpage, click on the newly created search engine and change the ``Sites to Search`` option to ``Search the entire web but emphasize included sites``.
