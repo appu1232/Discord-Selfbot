@@ -6,7 +6,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities, keyword
 
 ![](http://i.imgur.com/3H9zpop.gif)
 
-## **[Visit the wiki]**(https://github.com/appu1232/Discord-Selfbot/wiki) for an installation guide, list of all commands, and more.
+### [**Visit the wiki**](https://github.com/appu1232/Discord-Selfbot/wiki) for an installation guide, list of all commands, and more.
 
 ## Features
 
