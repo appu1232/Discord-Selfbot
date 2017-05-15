@@ -1041,7 +1041,7 @@ class KeywordLogger:
 
                 # Detailed information about the keyword logger/notifier
                 else:
-                    await self.bot.edit_message(menu, bot_prefix + '```The Keyword Logger/Notifier is a nice way to keep track of anything and everything that\'s going on in your Discord servers.\nWant to find out when people are talking about you? Add your name as a keyword!\nWant to know when someone is talking about your favorite character/game/whatever? Add the game as a keyword.\n\nFirst steps:\n1. Set up where you want the bot to log these messages that will contain your keywords. Set a log location via option 2 in the main menu.\n2. Set up a way to get notified when the messages get logged. This is done via option 5 in the main menu.\n3. Customize even more by blacklisting certain words, users, etc.\n\nFor more detailed information, view the README section: https://github.com/appu1232/Discord-Selfbot#keyword-notifier```')
+                    await self.bot.edit_message(menu, bot_prefix + '```The Keyword Logger/Notifier is a nice way to keep track of anything and everything that\'s going on in your Discord servers.\nWant to find out when people are talking about you? Add your name as a keyword!\nWant to know when someone is talking about your favorite character/game/whatever? Add the game as a keyword.\n\nFirst steps:\n1. Set up where you want the bot to log these messages that will contain your keywords. Set a log location via option 2 in the main menu.\n2. Set up a way to get notified when the messages get logged. This is done via option 5 in the main menu.\n3. Customize even more by blacklisting certain words, users, etc.\n\nFor more detailed information, view the wiki section: https://github.com/appu1232/Discord-Selfbot#keyword-notifier```')
 
     @log.command(pass_context=True)
     async def history(self, ctx, txt: str = None):
@@ -1138,12 +1138,12 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def location(self, ctx, *, msg: str = None):
-        """Set log location for keyword logging. See README for more info"""
+        """Set log location for keyword logging. See wiki for more info"""
         await self.log_location(ctx, msg)
 
     @log.command(pass_context=True)
     async def location2(self, ctx):
-        """Set optional seperate location for user follows. See README for more info"""
+        """Set optional seperate location for user follows. See wiki for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             settings['user_location'] = ctx.message.channel.id + ' ' + ctx.message.server.id
@@ -1239,7 +1239,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def context(self, ctx, *, msg: str = None):
-        """Set context length for keywords logged. See README for more info"""
+        """Set context length for keywords logged. See wiki for more info"""
         if msg:
             if msg.isdigit():
                 if 0 < int(msg) < 21:
@@ -1261,7 +1261,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def add(self, ctx):
-        """Add a server to log from. See README for more info"""
+        """Add a server to log from. See wiki for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if ctx.message.server.id not in settings['servers']:
@@ -1277,7 +1277,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def remove(self, ctx):
-        """Remove a server that is being logged. See README for more info"""
+        """Remove a server that is being logged. See wiki for more info"""
         with open('settings/log.json', 'r+') as log:
             settings = json.load(log)
             if ctx.message.server.id in settings['servers']:
@@ -1293,12 +1293,12 @@ class KeywordLogger:
 
     @log.command(pass_context=True, aliases=['removekey', 'addblacklist', 'removeblacklist'])
     async def addkey(self, ctx):
-        """Add a keyword to the keyword logger. See README for more info"""
+        """Add a keyword to the keyword logger. See wiki for more info"""
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'This is no longer a command. Use ``>log`` instead to change keyword logger/notifier settings.')
 
     @log.command(pass_context=True)
     async def adduser(self, ctx, *, msg: str):
-        """Add a user to follow. See README for more info"""
+        """Add a user to follow. See wiki for more info"""
         if ' | ' in msg.strip():
             data = msg.strip().split(' | ')
             if len(data) == 2:
@@ -1348,7 +1348,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def removeuser(self, ctx, *, msg: str):
-        """Remove a user that is being followed. See README for more info"""
+        """Remove a user that is being followed. See wiki for more info"""
         if ' | ' in msg.strip():
             user = msg.strip().replace(' | ', ' ')
         else:
@@ -1369,12 +1369,12 @@ class KeywordLogger:
 
     @commands.command(pass_context=True)
     async def webhook(self, ctx, *, msg):
-        """Set up a webhook for keyword logging. See README for more info"""
+        """Set up a webhook for keyword logging. See wiki for more info"""
         await self.webhook_url(ctx, msg)
 
     @commands.command(pass_context=True)
     async def webhook2(self, ctx, *, msg):
-        """Set up optional second webhook for user follows. See README for more info"""
+        """Set up optional second webhook for user follows. See wiki for more info"""
         with open('settings/log.json', 'r+') as l:
             log = json.load(l)
             if 'webhook_url' not in log:
@@ -1389,38 +1389,38 @@ class KeywordLogger:
 
     @commands.group(pass_context=True)
     async def notify(self, ctx):
-        """Manage notifier bot. See README for more info."""
+        """Manage notifier bot. See wiki for more info."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the proxy bot.\n``>notify msg`` - sends message to your keyword logger channel through webhook. (get notification if you have notification settings set to all messages in that server).\n``>notify ping`` - recieve notifications via mention in your keyword logger channel through webhook.\n``>notify dm`` - recieve notifications via direct message through proxy bot.\n``>notify off`` - Turn off all notifications.')
 
     # Set notifications to ping
     @notify.command(pass_context=True)
     async def ping(self, ctx):
-        """Set to ping you when a keyword gets logged. See README for more info"""
+        """Set to ping you when a keyword gets logged. See wiki for more info"""
         await self.notify_ping(ctx)
 
     # Set notifications to msg
     @notify.command(aliases=['message'], pass_context=True)
     async def msg(self, ctx):
-        """Set to just send msg when keyword gets logged. See README for more info"""
+        """Set to just send msg when keyword gets logged. See wiki for more info"""
         await self.notify_msg(ctx)
 
     # Set notifications to dm
     @notify.command(aliases=['pm', 'pms', 'direct message', 'direct messages', 'dms'], pass_context=True)
     async def dm(self, ctx):
-        """Set to direct message you when keyword gets logged. See README for more info"""
+        """Set to direct message you when keyword gets logged. See wiki for more info"""
         await self.notify_dm(ctx)
 
     # Set notifications to ping
     @notify.command(aliases=['none'], pass_context=True)
     async def off(self, ctx):
-        """Turn off notifier for keyword logging. See README for more info"""
+        """Turn off notifier for keyword logging. See wiki for more info"""
         await self.notify_off(ctx)
 
     # Set bot token
     @notify.command(pass_context=True)
     async def token(self, ctx, *, msg):
-        """Set token for direct message bot. See README for more info"""
+        """Set token for direct message bot. See wiki for more info"""
         await self.bot_token(ctx, msg)
 
 

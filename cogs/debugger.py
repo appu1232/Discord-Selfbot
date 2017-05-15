@@ -92,7 +92,7 @@ class Debugger:
 
     @commands.group(pass_context=True)
     async def py(self, ctx):
-        """Python interpreter. See the README for more info."""
+        """Python interpreter. See the wiki for more info."""
 
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()

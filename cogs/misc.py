@@ -404,7 +404,7 @@ class Misc:
 
     @commands.group(aliases=['avatars'], pass_context=True)
     async def avatar(self, ctx):
-        """Rotate avatars. See README for more info."""
+        """Rotate avatars. See wiki for more info."""
 
         if ctx.invoked_subcommand is None:
             with open('settings/avatars.json', 'r+') as a:
@@ -466,7 +466,7 @@ class Misc:
 
     @avatar.command(aliases=['pass', 'pw'], pass_context=True)
     async def password(self, ctx, *, msg):
-        """Set your discord acc password to rotate avatars. See README for more info."""
+        """Set your discord acc password to rotate avatars. See wiki for more info."""
         with open('settings/avatars.json', 'r+') as a:
             avi_config = json.load(a)
             avi_config['password'] = msg.strip().strip('"').lstrip('<').rstrip('>')

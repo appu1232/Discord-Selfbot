@@ -33,7 +33,7 @@ class Server:
     # Stats about server
     @commands.group(pass_context=True)
     async def server(self, ctx):
-        """Various info about the server. See the README for more info."""
+        """Various info about the server. See the wiki for more info."""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
             if ctx.message.content[6 + pre:].strip():

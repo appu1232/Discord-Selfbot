@@ -71,7 +71,7 @@ class Customcmds:
 
     @customcmds.command(pass_context=True)
     async def long(self, ctx):
-        """Lists detailed version of customcmds. Ex: >customcmd long"""
+        """Lists detailed version of customcmds. Ex: >customcmds long"""
         with open('settings/commands.json') as commands:
             if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
                 cmds = commands.read()
@@ -125,7 +125,7 @@ class Customcmds:
     # Change customcmd embed color
     @customcmds.command(pass_context=True, aliases=['colour'])
     async def color(self, ctx, *, msg: str = None):
-        '''Set color (hex) of a custom command image. Ex: >customcmd color 000000'''
+        '''Set color (hex) of a custom command image. Ex: >customcmds color 000000'''
         if msg:
             try:
                 msg = msg.lstrip('#')
