@@ -2,6 +2,8 @@ Come join the dedicated server for this bot: https://discord.gg/TBQE72k Feel fre
 
 # Discord Selfbot
 
+### [**Install guide + list of all commands.**](https://github.com/appu1232/Discord-Selfbot/wiki)
+
 Takes less than 5 minutes to set up. Has various commands and utilities, keyword logger/notifier, and adding custom commands/reactions.
 
 ![](http://i.imgur.com/3H9zpop.gif)
