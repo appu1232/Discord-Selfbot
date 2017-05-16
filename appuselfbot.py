@@ -222,7 +222,7 @@ async def on_message(message):
             if message.channel.id not in bot.self_log:
                 bot.self_log[message.channel.id] = collections.deque(maxlen=100)
             bot.self_log[message.channel.id].append(message)
-            if message.content.startswith(config['customcmd_prefix'][0]):
+            if message.content.startswith(config['customcmd_prefix']):
                 response = custom(message.content.lower().strip())
                 if response:
                     await bot.delete_message(message)
