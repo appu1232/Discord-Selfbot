@@ -242,7 +242,7 @@ class KeywordLogger:
 
                         if reply.content == '1':
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\ud83d\udd8a Note: If you don\'t want substrings to trigger the logger, (i.e. your keyword is bill but you don\'t want billy to trigger the logger, enter your keyword in quotes. "bill" Phrases are also supported. Ex: "I love you"\n\nEnter the keyword (not case sensitive!):```')
+                                                                bot_prefix + '```\ud83d\udd8a Note: If you don\'t want substrings to trigger the logger (i.e. your keyword is bill but you don\'t want billy to trigger the logger), enter your keyword in quotes. "bill" Phrases are also supported. Ex: "I love you"\n\nEnter the keyword (not case sensitive!):```')
                             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                     check=not_block)
                             if reply and not reply.content.startswith(pre):
@@ -715,9 +715,13 @@ class KeywordLogger:
 
                 # Keyword notifier settings
                 elif reply.content == '5':
-                    val = 5
+                    val = 7
+                    webhook_is_set = 'Set' if self.bot.log_conf['webhook_url'] == '' else 'Change'
+
+                    bot_token_is_set = 'Set' if self.bot.log_conf['notifier_bot_token'] == '' else 'Change'
+
                     await self.bot.edit_message(menu,
-                                                         bot_prefix + '```\u2757 Get notified when a keyword gets detected. How should you get notified? Enter a number:\n\n1. Get pinged in the log location channel.\n2. Send a message in the log location channel (np ping).\n3. Get notified via direct message.\n4. Turn off notifier.```')
+                                                         bot_prefix + '```\u2757 Get notified when a keyword gets detected. How should you get notified? Enter a number:\n\n1. Get pinged in the log location channel.\n2. Send a message in the log location channel (no ping).\n3. Get notified via direct message.\n4. Turn off notifier.\n5. {} webhook url (for ping/message).\n6. {} proxy bot token (for direct message).```'.format(webhook_is_set, bot_token_is_set))
 
                     reply = await self.bot.wait_for_message(author=ctx.message.author,
                                                             check=check)
@@ -772,9 +776,33 @@ class KeywordLogger:
                             else:
                                 await self.bot.delete_message(menu)
                                 await self.notify_dm(ctx)
-                        else:
+
+                        # Turn off the notifier
+                        elif reply.content == '4':
                             await self.bot.delete_message(menu)
                             await self.notify_off(ctx)
+
+                        # Set webhook url
+                        elif reply.content == '5':
+                            await self.bot.edit_message(menu, bot_prefix + webhook_info)
+                            url = await self.bot.wait_for_message(author=ctx.message.author,
+                                                                check=not_block)
+
+                            if reply and not reply.content.startswith(pre):
+                                await self.bot.delete_message(menu)
+                                await self.bot.delete_message(url)
+                                await self.webhook_url(ctx, url.content)
+
+                        # Set dm bot token
+                        elif reply.content == '6':
+                            await self.bot.edit_message(menu, bot_prefix + bot_token_info)
+                            token = await self.bot.wait_for_message(author=ctx.message.author,
+                                                                check=not_block)
+
+                            if reply and not reply.content.startswith(pre):
+                                await self.bot.delete_message(menu)
+                                await self.bot.delete_message(token)
+                                await self.bot_token(ctx, token.content)
 
                 # User following options
                 elif reply.content == '6':
@@ -889,7 +917,7 @@ class KeywordLogger:
                                                         bot_prefix + 'Successfully removed the user.'.format(
                                                             word))
 
-                    else:
+                    elif reply.content == '4':
                         msg = ''
                         for user in self.bot.log_conf['keyusers']:
                             try:
@@ -950,6 +978,7 @@ class KeywordLogger:
                                 msg += word + ', '
 
                         msg = msg.rstrip(', ')
+                        msg += '\n\nServers to log: '
                         if self.bot.log_conf['allservers'] == 'False':
                             server = ''
                             for i in self.bot.log_conf['servers']:

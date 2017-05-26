@@ -94,6 +94,8 @@ async def on_ready():
             opt['rich_embed'] = 'on'
         if 'default_status' not in opt:
             opt['default_status'] = 'idle'
+        if 'ascii_font' not in opt:
+            opt['ascii_font'] = 'big'
         fp.seek(0)
         fp.truncate()
         json.dump(opt, fp, indent=4)

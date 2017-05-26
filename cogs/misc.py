@@ -8,6 +8,9 @@ from appuselfbot import bot_prefix
 from discord.ext import commands
 from discord import utils
 from cogs.utils.checks import *
+from bs4 import BeautifulSoup
+from pyfiglet import figlet_format
+from urllib.request import Request, urlopen
 
 '''Module for miscellaneous commands'''
 
@@ -170,6 +173,9 @@ class Misc:
             game = self.bot.game
         except:
             game = 'None'
+        channel_count = 0
+        for i in self.bot.servers:
+            channel_count += len(i.channels)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
@@ -177,6 +183,7 @@ class Misc:
             em.add_field(name=u'\U0001F4E5 Messages recieved', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
+            em.add_field(name=u'\ud83d\udcd1 Channels', value=str(channel_count))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
             em.add_field(name=u'\U0001F3AE Game', value=game)
             mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024**2)
@@ -227,7 +234,24 @@ class Misc:
     # Embeds the message
     @commands.command(pass_context=True)
     async def embed(self, ctx, *, msg: str = None):
-        """Embed given text. Ex: Do >embed for more help"""
+        """Embed given text. Ex: Do >embed for more help
+        
+        Example: >embed title=test this | description=some words | color=3AB35E | field=name=test value=test
+        
+        You do NOT need to specify every property, only the ones you want.
+        
+        **All properties and the syntax:
+        - title=words
+        - description=words
+        - color=hexvalue
+        - image=url_to_image (must be https)
+        - thumbnail=url_to_image
+        - author=words **OR** author=name=words
+        - icon=url_to_image footer=words **OR** footer=name=words icon=url_to_image
+        - field=name=words value=words (you can add as many fields as you want)
+        - ptext=words
+        
+        NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it."""
         if msg:
             if embed_perms(ctx.message):
                 ptext = title = description = image = thumbnail = color = footer = author = None
@@ -258,6 +282,10 @@ class Misc:
                         color = color[1:]
                     if not color.startswith('0x'):
                         color = '0x' + color
+
+                if ptext is title is description is image is thumbnail is color is footer is author is None:
+                    await self.bot.delete_message(ctx.message)
+                    return await self.bot.send_message(ctx.message.channel, content=None, embed=discord.Embed(description=msg))
 
                 if color:
                     em = discord.Embed(title=title, description=description, color=int(color, 16))
@@ -532,24 +560,27 @@ class Misc:
         result = channel = None
         await self.bot.delete_message(ctx.message)
         if msg:
-            length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
-            if length < 201:
-                size = length
-            else:
-                size = 200
-            for channel in ctx.message.server.channels:
-                if str(channel.type) == 'text':
-                    if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
-                        for i in range(length - 2, length - size, -1):
-                            try:
-                                search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
-                            except:
-                                continue
-                            if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.content[6:].strip() == search[0].id):
-                                result = search[0]
+            try:
+                length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
+                if length < 201:
+                    size = length
+                else:
+                    size = 200
+                for channel in ctx.message.server.channels:
+                    if str(channel.type) == 'text':
+                        if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
+                            for i in range(length - 2, length - size, -1):
+                                try:
+                                    search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
+                                except:
+                                    continue
+                                if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.content[6:].strip() == search[0].id):
+                                    result = search[0]
+                                    break
+                            if result:
                                 break
-                        if result:
-                            break
+            except:
+                pass
             if not result:
                 for channel in ctx.message.server.channels:
                     try:
@@ -853,6 +884,135 @@ class Misc:
             fp.truncate()
             json.dump(opt, fp, indent=4)
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set default afk status. You will now appear as ``{}`` when not on Discord.'.format(opt['default_status']))
+
+    @commands.command(pass_context=True, aliases=['source'])
+    async def sauce(self, ctx, *, txt: str = None):
+        """Find source of image. Ex: >sauce http://i.imgur.com/NIq2U67.png"""
+        await self.bot.delete_message(ctx.message)
+        sauce_nao = 'http://saucenao.com/search.php?db=999&url='
+        request_headers = {
+            "Accept-Language": "en-US,en;q=0.5",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Referer": "http://thewebsite.com",
+            "Connection": "keep-alive"
+        }
+        loop = asyncio.get_event_loop()
+        try:
+            req = Request(sauce_nao + txt, headers=request_headers)
+            webpage = await loop.run_in_executor(None, urlopen, req)
+        except:
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Exceeded daily request limit. Try again tomorrow, sorry!')
+        soup = BeautifulSoup(webpage, 'html.parser')
+        pretty_soup = soup.prettify()
+        em = discord.Embed(color=0xaa550f, description='**Input:**\n{}\n\n**Results:**'.format(txt))
+        try:
+            em.set_thumbnail(url=txt)
+        except:
+            pass
+        match = re.findall(r'(?s)linkify" href="(.*?)"', str(soup.find('div', id='middle')))
+        title = re.findall(r'(?s)<div class="resulttitle">(.*?)</td', str(soup.find('div', id='middle')))
+        similarity_percent = re.findall(r'(?s)<div class="resultsimilarityinfo">(.*?)<', str(soup.find('div', id='middle')))
+        if title and float(similarity_percent[0][:-1]) > 60.0:
+            title = title[0].strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').replace('<div class="resultcontentcolumn">', '').replace('<span class="subtext">', '\n').replace('<small>', '').replace('</span>', ' ').replace('</small>', '').replace('</tr>', '').replace('</td>', '').replace('</table>', '').replace('</div>', '').split('\n')
+            ti = '\n'.join([i.strip() for i in title if i.strip() != ''])
+            if '</a>' not in ti:
+                em.add_field(name='Source', value=ti)
+
+            try:
+                pretty_soup = pretty_soup.split('id="result-hidden-notification"', 1)[0]
+            except:
+                pass
+            episode = re.findall(r'(?s)<span class="subtext">\n EP(.*?)<div', pretty_soup)
+            ep = ''
+            if episode:
+                episode = episode[0].strip().replace('<br/>', '').replace('<strong>', '**').replace('</strong>', '**').replace('<span class="subtext">', '').replace('</span>', '').replace('</tr>', '').replace('</td>', '').replace('</table>', '').replace('</div>', '').split('\n')
+
+                ep = ' '.join([j.strip() for j in episode if j.strip() != ''])
+                ep = ep.replace('Est Time:', '\nEst Time:')
+                em.add_field(name='More Info', value='**Episode** ' + ep, inline=False)
+            est_time = re.findall(r'(?s)Est Time:(.*?)<div', pretty_soup)
+            if est_time and 'Est Time:' not in ep:
+                est_time = est_time[0].strip().replace('<br/>', '').replace('<strong>', '').replace('</strong>', '').replace('<span class="subtext">', '').replace('</span>', '').replace('</tr>', '').replace('</td>', '').replace('</table>', '').replace('</div>', '').split('\n')
+
+                est = ' '.join([j.strip() for j in est_time if j.strip() != ''])
+                est = est.replace('Est Time:', '\nEst Time:')
+                em.add_field(name='More Info', value='**Est Time:** ' + est, inline=False)
+
+        sources = ''
+        count = 0
+        source_sites = {'www.pixiv.net': 'pixiv', 'danbooru': 'danbooru', 'seiga.nicovideo': 'nico nico seiga', 'yande.re': 'yande.re', 'openings.moe': 'openings.moe', 'fakku.net': 'fakku', 'gelbooru': 'gelbooru',
+                        'deviantart': 'deviantart', 'bcy.net': 'bcy.net', 'konachan.com': 'konachan', 'anime-pictures.net': 'anime-pictures.net', 'drawr.net': 'drawr'}
+        for i in match:
+            if not i.startswith('http://saucenao.com'):
+                if float(similarity_percent[count][:-1]) > 60.0:
+                    link_to_site = '{} - {}, '.format(i, similarity_percent[count])
+                    for site in source_sites:
+                        if site in i:
+                            link_to_site = '[{}]({}) - {}, '.format(source_sites[site], i, similarity_percent[count])
+                            break
+                    sources += link_to_site
+                    count += 1
+
+            if count == 4:
+                break
+        sources = sources.rstrip(', ')
+
+        material = re.search(r'(?s)Material:(.*?)</div', str(soup.find('div', id='middle')))
+        if material and ('Materials: ' not in ti and 'Material: ' not in ti):
+            material_list = material.group(1).strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').split('\n')
+            mat = ', '.join([i.strip() for i in material_list if i.strip() != ''])
+            em.add_field(name='Material(s)', value=mat)
+
+        characters = re.search(r'(?s)Characters:(.*?)</div', str(soup.find('div', id='middle')))
+        if characters and ('Characters: ' not in ti and 'Character: ' not in ti):
+            characters_list = characters.group(1).strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').split('\n')
+            chars = ', '.join([i.strip() for i in characters_list if i.strip() != ''])
+            em.add_field(name='Character(s)', value=chars)
+
+        creator = re.search(r'(?s)Creator:(.*?)</div', str(soup.find('div', id='middle')))
+        if creator and ('Creators: ' not in ti and 'Creator: ' not in ti):
+            creator_list = creator.group(1).strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').split('\n')
+            creat = ', '.join([i.strip() for i in creator_list if i.strip() != ''])
+            em.add_field(name='Creator(s)', value=creat)
+
+        if sources != '' and sources:
+            em.add_field(name='Source sites - percent similarity', value=sources, inline=False)
+
+        if not sources and not creator and not characters and not material and (not title or float(similarity_percent[0][:-1]) < 60.0):
+            em = discord.Embed(color=0xaa550f, description='**Input:**\n{}\n\n**No results found.**'.format(txt))
+
+        await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+
+    @commands.group(pass_context=True)
+    async def ascii(self, ctx):
+        """Convert text to ascii art. Ex: >ascii stuff >help ascii for more info."""
+        if ctx.invoked_subcommand is None:
+
+            pre = cmd_prefix_len()
+            with open('settings/optional_config.json', 'r+') as fp:
+                opt = json.load(fp)
+            msg = str(figlet_format(ctx.message.content[pre + 5:].strip(), font=opt['ascii_font']))
+            if len(msg) > 2000:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Message too long, rip.')
+            else:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + '```{}```'.format(msg))
+
+    @ascii.command(pass_context=True)
+    async def font(self, ctx, *, txt: str):
+        """Change font for ascii. All fonts: http://www.figlet.org/examples.html for all fonts."""
+        try:
+            str(figlet_format('test', font=txt))
+        except:
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid font type.')
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            opt['ascii_font'] = txt
+            fp.seek(0)
+            fp.truncate()
+            json.dump(opt, fp, indent=4)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set ascii font.')
+
 
 
 def setup(bot):

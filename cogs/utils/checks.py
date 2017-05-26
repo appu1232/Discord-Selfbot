@@ -83,8 +83,8 @@ def update_bot(message):
         else:
             version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
         version = str(int(version) + 1)
-        if int(version) > 10:
-            version = "10"
+        if int(version) > 4:
+            version = "4"
         commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])
         commits = commits.split('\n')
         em = discord.Embed(color=0x24292E, title='Latest changes for the selfbot:')
@@ -111,6 +111,18 @@ def embed_perms(message):
         check = True
 
     return check
+
+
+def get_user(message, user):
+    try:
+        member = message.mentions[0]
+    except:
+        member = message.server.get_member_named(user)
+    if not member:
+        member = message.server.get_member(user)
+    if not member:
+        return False
+    return member
 
 
 def attach_perms(message):
