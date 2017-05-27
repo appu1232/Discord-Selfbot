@@ -913,6 +913,7 @@ class Misc:
         match = re.findall(r'(?s)linkify" href="(.*?)"', str(soup.find('div', id='middle')))
         title = re.findall(r'(?s)<div class="resulttitle">(.*?)</td', str(soup.find('div', id='middle')))
         similarity_percent = re.findall(r'(?s)<div class="resultsimilarityinfo">(.*?)<', str(soup.find('div', id='middle')))
+        ti = ''
         if title and float(similarity_percent[0][:-1]) > 60.0:
             title = title[0].strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').replace('<div class="resultcontentcolumn">', '').replace('<span class="subtext">', '\n').replace('<small>', '').replace('</span>', ' ').replace('</small>', '').replace('</tr>', '').replace('</td>', '').replace('</table>', '').replace('</div>', '').split('\n')
             ti = '\n'.join([i.strip() for i in title if i.strip() != ''])
