@@ -152,7 +152,7 @@ async def restart(ctx):
 
 
 @bot.command(pass_context=True, aliases=['upgrade'])
-async def update(ctx, msg:str = None):
+async def update(ctx, msg: str = None):
     """Update the bot if there is an update available."""
     if msg:
         latest = update_bot(False) if msg == 'show' else update_bot(True)

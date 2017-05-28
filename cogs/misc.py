@@ -512,8 +512,15 @@ class Misc:
     @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
         """Embed a custom emoji (from any server). Ex: >emoji :smug:"""
+        if msg.startswith('s '):
+            msg = msg[2:]
+            get_server = True
+        else:
+            get_server = False
         msg = msg.strip(':')
-        url = None
+        if msg.startswith('<'):
+            msg = msg[2:].split(':', 1)[0].strip()
+        url = emoji = server = None
         exact_match = False
         for server in self.bot.servers:
             for emoji in server.emojis:
@@ -526,7 +533,10 @@ class Misc:
             if exact_match:
                 break
         if embed_perms(ctx.message) and url:
-            em = discord.Embed()
+            if get_server:
+                em = discord.Embed(title=emoji.name,  description='**ID:** {}\n**Server:** {}'.format(emoji.id, server.name))
+            else:
+                em = discord.Embed()
             em.set_image(url=url)
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         elif not embed_perms(ctx.message) and url:
@@ -888,6 +898,8 @@ class Misc:
     @commands.command(pass_context=True, aliases=['source'])
     async def sauce(self, ctx, *, txt: str = None):
         """Find source of image. Ex: >sauce http://i.imgur.com/NIq2U67.png"""
+        if not txt:
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Input a link to check the source. Ex: ``>sauce http://i.imgur.com/NIq2U67.png``')
         await self.bot.delete_message(ctx.message)
         sauce_nao = 'http://saucenao.com/search.php?db=999&url='
         request_headers = {
@@ -960,19 +972,19 @@ class Misc:
         sources = sources.rstrip(', ')
 
         material = re.search(r'(?s)Material:(.*?)</div', str(soup.find('div', id='middle')))
-        if material and ('Materials: ' not in ti and 'Material: ' not in ti):
+        if material and ('Materials:' not in ti and 'Material:' not in ti):
             material_list = material.group(1).strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').split('\n')
             mat = ', '.join([i.strip() for i in material_list if i.strip() != ''])
             em.add_field(name='Material(s)', value=mat)
 
         characters = re.search(r'(?s)Characters:(.*?)</div', str(soup.find('div', id='middle')))
-        if characters and ('Characters: ' not in ti and 'Character: ' not in ti):
+        if characters and ('Characters:' not in ti and 'Character:' not in ti):
             characters_list = characters.group(1).strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').split('\n')
             chars = ', '.join([i.strip() for i in characters_list if i.strip() != ''])
             em.add_field(name='Character(s)', value=chars)
 
         creator = re.search(r'(?s)Creator:(.*?)</div', str(soup.find('div', id='middle')))
-        if creator and ('Creators: ' not in ti and 'Creator: ' not in ti):
+        if creator and ('Creators:' not in ti and 'Creator:' not in ti):
             creator_list = creator.group(1).strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').split('\n')
             creat = ', '.join([i.strip() for i in creator_list if i.strip() != ''])
             em.add_field(name='Creator(s)', value=creat)
@@ -989,15 +1001,18 @@ class Misc:
     async def ascii(self, ctx):
         """Convert text to ascii art. Ex: >ascii stuff >help ascii for more info."""
         if ctx.invoked_subcommand is None:
-
             pre = cmd_prefix_len()
-            with open('settings/optional_config.json', 'r+') as fp:
-                opt = json.load(fp)
-            msg = str(figlet_format(ctx.message.content[pre + 5:].strip(), font=opt['ascii_font']))
-            if len(msg) > 2000:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Message too long, rip.')
+            if ctx.message.content[pre + 5:]:
+                with open('settings/optional_config.json', 'r+') as fp:
+                    opt = json.load(fp)
+                msg = str(figlet_format(ctx.message.content[pre + 5:].strip(), font=opt['ascii_font']))
+                if len(msg) > 2000:
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Message too long, rip.')
+                else:
+                    await self.bot.delete_message(ctx.message)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + '```{}```'.format(msg))
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + '```{}```'.format(msg))
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Please input text to convert to ascii art. Ex: ``>ascii stuff``')
 
     @ascii.command(pass_context=True)
     async def font(self, ctx, *, txt: str):
@@ -1013,7 +1028,6 @@ class Misc:
             fp.truncate()
             json.dump(opt, fp, indent=4)
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set ascii font.')
-
 
 
 def setup(bot):
