@@ -715,12 +715,12 @@ class Misc:
                 await self.bot.delete_message(msg)
                 await self.bot.delete_message(killmsg)
             else:
-                await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
+                await self.bot.delete_message(ctx.message)
                 deleted = 0
                 async for sent_message in self.bot.logs_from(ctx.message.channel, limit=200):
                     if sent_message.author == ctx.message.author:
                         try:
-                            await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
+                            await self.bot.delete_message(sent_message)
                             deleted += 1
                         except:
                             pass
@@ -993,7 +993,7 @@ class Misc:
         if sources != '' and sources:
             em.add_field(name='Source sites - percent similarity', value=sources, inline=False)
 
-        if not sources and not creator and not characters and not material and (not title or float(similarity_percent[0][:-1]) < 60.0):
+        if not sources and not creator and not characters and not material or float(similarity_percent[0][:-1]) < 60.0:
             em = discord.Embed(color=0xaa550f, description='**Input:**\n{}\n\n**No results found.**'.format(txt))
 
         await self.bot.send_message(ctx.message.channel, content=None, embed=em)
