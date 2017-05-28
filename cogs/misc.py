@@ -569,6 +569,7 @@ class Misc:
         >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids)."""
         result = channel = None
         await self.bot.delete_message(ctx.message)
+        quote_cmd = ctx.message.content.split(' ', 1)[0]
         if msg:
             try:
                 length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
@@ -584,7 +585,7 @@ class Misc:
                                     search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
                                 except:
                                     continue
-                                if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.content[6:].strip() == search[0].id):
+                                if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or not search[0].content.startswith(quote_cmd))) or ctx.message.content[6:].strip() == search[0].id:
                                     result = search[0]
                                     break
                             if result:
@@ -595,7 +596,7 @@ class Misc:
                 for channel in ctx.message.server.channels:
                     try:
                         async for sent_message in self.bot.logs_from(channel, limit=500):
-                            if (msg.lower().strip() in sent_message.content and (sent_message.author != ctx.message.author or sent_message.content[:7] != '>quote ')) or (msg.strip() == sent_message.id):
+                            if (msg.lower().strip() in sent_message.content.lower() and (sent_message.author != ctx.message.author or not sent_message.content.startswith(quote_cmd))) or msg.strip() == sent_message.id:
                                 result = sent_message
                                 break
                     except:
