@@ -55,15 +55,13 @@ class Userinfo:
     @info.command(pass_context=True)
     async def avi(self, ctx, txt: str = None):
         """View bigger version of user's avatar. Ex: >info avi @user"""
-        user = None
-        name = txt.strip()
-        if name:
+        if txt:
             try:
                 user = ctx.message.mentions[0]
             except:
-                user = ctx.message.server.get_member_named(name)
+                user = ctx.message.server.get_member_named(txt)
             if not user:
-                user = ctx.message.server.get_member(name)
+                user = ctx.message.server.get_member(txt)
             if not user:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user.')
                 return

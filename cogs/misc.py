@@ -283,7 +283,7 @@ class Misc:
                     if not color.startswith('0x'):
                         color = '0x' + color
 
-                if ptext is title is description is image is thumbnail is color is footer is author is None:
+                if ptext is title is description is image is thumbnail is color is footer is author is None and 'field=' not in msg:
                     await self.bot.delete_message(ctx.message)
                     return await self.bot.send_message(ctx.message.channel, content=None, embed=discord.Embed(description=msg))
 
