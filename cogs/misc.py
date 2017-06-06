@@ -3,6 +3,7 @@ import asyncio
 import strawpy
 import random
 import re
+import requests
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
@@ -251,7 +252,8 @@ class Misc:
         - field=name=words value=words (you can add as many fields as you want)
         - ptext=words
         
-        NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it."""
+        NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it.
+        PS: Hyperlink text like so: [text](https://www.whateverlink.com)"""
         if msg:
             if embed_perms(ctx.message):
                 ptext = title = description = image = thumbnail = color = footer = author = None
@@ -532,13 +534,22 @@ class Misc:
                     break
             if exact_match:
                 break
-        if embed_perms(ctx.message) and url:
+        response = requests.get(emoji.url, stream=True)
+        name = emoji.url.split('/')[-1]
+        with open(name, 'wb') as img:
+
+            for block in response.iter_content(1024):
+                if not block:
+                    break
+
+                img.write(block)
+
+        if attach_perms(ctx.message) and url:
             if get_server:
-                em = discord.Embed(title=emoji.name,  description='**ID:** {}\n**Server:** {}'.format(emoji.id, server.name))
-            else:
-                em = discord.Embed()
-            em.set_image(url=url)
-            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+                await self.bot.send_message(ctx.message.channel, '**ID:** {}\n**Server:** {}'.format(emoji.id, server.name))
+            with open(name, 'rb') as fp:
+                await self.bot.send_file(ctx.message.channel, fp)
+            os.remove(name)
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
         else:

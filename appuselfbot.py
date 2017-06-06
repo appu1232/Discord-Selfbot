@@ -68,6 +68,8 @@ async def on_ready():
             g.seek(0)
             g.truncate()
             json.dump(games, g, indent=4)
+
+    # Dealing with old versions updating
     if not os.path.exists('avatars'):
         os.makedirs('avatars')
     if not os.path.isfile('settings/avatars.json'):
