@@ -1,5 +1,7 @@
 # Discord Selfbot
 
+[![Patreon](http://ionicabizau.github.io/badges/patreon.svg)](https://patreon.com/appu1232)
+
 Come join the dedicated server for this bot! Ask questions, give suggestions, get help, or just hang out. Don't be shy, we don't bite:
 
 [<img src="https://canary.discordapp.com/api/guilds/299293492645986307/widget.png?style=banner2">](https://discord.gg/TBQE72k)
