@@ -48,6 +48,21 @@ class Mod:
         else:
             return await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
 
+    @commands.has_permissions(ban_members=True)
+    @commands.command(aliases=['sban'], pass_context=True)
+    async def softban(self, ctx, *, user: str):
+        """Softbans a user (if you have the permission)."""
+        user = get_user(ctx.message, user)
+        if user:
+            try:
+                await self.bot.edit_message(ctx.message, bot_prefix + 'Softbanned user: %s' % user.mention)
+                await self.bot.ban(user)
+                await self.bot.unban(ctx.message.server, user)
+            except discord.HTTPException:
+                await self.bot.edit_message(ctx.message, bot_prefix + 'Could not softban user. Not enough permissions.')
+        else:
+            return await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+
     @commands.has_permissions(manage_roles=True)
     @commands.has_permissions(manage_channels=True)
     @commands.group(pass_context=True, no_pm=True)
@@ -132,8 +147,8 @@ class Mod:
             await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
 
     @commands.has_permissions(manage_messages=True)
-    @commands.command(pass_context=True, no_pm=True)
-    async def purge(self, ctx, msgs: int, *, txt = None):
+    @commands.command(aliases=['p'], pass_context=True, no_pm=True)
+    async def purge(self, ctx, msgs: int, *, txt=None):
         """Purge last n msgs or n msgs with a word. >help purge for more info.
         
         Ex:

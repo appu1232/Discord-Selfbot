@@ -28,7 +28,7 @@ class Misc:
                           's': '\N{REGIONAL INDICATOR SYMBOL LETTER S}', 't': '\N{REGIONAL INDICATOR SYMBOL LETTER T}', 'u': '\N{REGIONAL INDICATOR SYMBOL LETTER U}',
                           'v': '\N{REGIONAL INDICATOR SYMBOL LETTER V}', 'w': '\N{REGIONAL INDICATOR SYMBOL LETTER W}', 'x': '\N{REGIONAL INDICATOR SYMBOL LETTER X}',
                           'y': '\N{REGIONAL INDICATOR SYMBOL LETTER Y}', 'z': '\N{REGIONAL INDICATOR SYMBOL LETTER Z}', '0': '0⃣', '1': '1⃣', '2': '2⃣', '3': '3⃣',
-                          '4': '4⃣', '5': '5⃣', '6': '6⃣', '7': '7⃣', '8': '8⃣', '9': '9⃣'}
+                          '4': '4⃣', '5': '5⃣', '6': '6⃣', '7': '7⃣', '8': '8⃣', '9': '9⃣', '!': '\u2757', '?': '\u2753'}
         self.emoji_reg = re.compile(r'<:.+?:([0-9]{15,21})>')
         self.ball = ['It is certain', 'It is decidedly so', 'Without a doubt', 'Yes definitely', 'You may rely on it', 'As I see it, yes', 'Most likely', 'Outlook good', 'Yes', 'Signs point to yes', 'Reply hazy try again',
                      'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Concentrate and ask again', 'Don\'t count on it', 'My reply is no', 'My sources say no', 'Outlook not so good', 'Very doubtful']
@@ -241,16 +241,16 @@ class Misc:
         
         You do NOT need to specify every property, only the ones you want.
         
-        **All properties and the syntax:
-        - title=words
-        - description=words
-        - color=hexvalue
-        - image=url_to_image (must be https)
-        - thumbnail=url_to_image
-        - author=words **OR** author=name=words
-        - icon=url_to_image footer=words **OR** footer=name=words icon=url_to_image
-        - field=name=words value=words (you can add as many fields as you want)
-        - ptext=words
+        **All properties and the syntax (put your custom stuff in place of the <> stuff):
+        - title=<words>
+        - description=<words>
+        - color=<hex_value>
+        - image=<url_to_image> (must be https)
+        - thumbnail=<url_to_image>
+        - author=<words> **OR** author=name=<words> icon=<url_to_image>
+        - footer=<words> **OR** footer=name=<words> icon=<url_to_image>
+        - field=name=<words> value=<words> (you can add as many fields as you want)
+        - ptext=<words>
         
         NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it.
         PS: Hyperlink text like so: [text](https://www.whateverlink.com)"""
@@ -325,10 +325,10 @@ class Misc:
             else:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'No embed permissions in this channel.')
         else:
-            msg = '**How to use the >embed command:**\n**Example:** >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\n**You do NOT need to specify every property, only the ones you want.**' \
-                  '\n**All properties and the syntax:**\ntitle=words\ndescription=words\ncolor=hexvalue\nimage=url_to_image (must be https)\nthumbnail=url_to_image\nauthor=words **OR** author=name=words icon=url_to_image\nfooter=words ' \
-                  '**OR** footer=name=words icon=url_to_image\nfield=name=words value=words (you can add as many fields as you want)\nptext=words\n\n**NOTE:** After the command is sent, the bot will delete your message and replace it with ' \
-                  'the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.'
+            msg = '```How to use the >embed command:\nExample: >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\nYou do NOT need to specify every property, only the ones you want.' \
+                  '\nAll properties and the syntax (put your custom stuff in place of the <> stuff):\ntitle=<words>\ndescription=<words>\ncolor=<hex_value>\nimage=<url_to_image> (must be https)\nthumbnail=<url_to_image>\nauthor=<words> **OR** author=name=<words> icon=<url_to_image>\nfooter=<words> ' \
+                  '**OR** footer=name=<words> icon=<url_to_image>\nfield=name=<words> value=<words> (you can add as many fields as you want)\nptext=<words>\n\nNOTE: After the command is sent, the bot will delete your message and replace it with ' \
+                  'the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.\nPS: Hyperlink text like so: [text](https://www.whateverlink.com)```'
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
@@ -784,7 +784,7 @@ class Misc:
         """Replace letters with regional indicator emojis"""
         await self.bot.delete_message(ctx.message)
         msg = list(msg)
-        regional_list = [self.regionals[x.lower()] if x.isalnum() else x for x in msg]
+        regional_list = [self.regionals[x.lower()] if x.isalnum() or x == '!' or x == '?' else x for x in msg]
         regional_output = '  '.join(regional_list)
         await self.bot.send_message(ctx.message.channel, regional_output)
 
@@ -1040,6 +1040,43 @@ class Misc:
             fp.truncate()
             json.dump(opt, fp, indent=4)
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set ascii font.')
+
+    @commands.command(pass_context=True)
+    async def dice(self, ctx, *, txt: str = None):
+        "Roll dice. Optionally input # of dice and # of sides. Ex: >dice 5 12"
+        await self.bot.delete_message(ctx.message)
+        dice = 1
+        sides = 6
+        invalid = 'Invalid syntax. Ex: `>dice 4` - roll four normal dice. `>dice 4 12` - roll four 12 sided dice.'
+        if txt:
+            if ' ' in txt:
+                dice, sides = txt.split(' ')
+                try:
+                    dice = int(dice)
+                    sides = int(sides)
+                except:
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + invalid)
+            else:
+                try:
+                    dice = int(txt)
+                except:
+                    return await self.bot.send_message(ctx.message.channel, bot_prefix + invalid)
+        dice_rolls = []
+        for roll in range(dice):
+            dice_rolls.append(str(random.randint(1, sides)))
+        output = '\n'.join(dice_rolls)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Dice roll(s):\n' + output)
+
+    @commands.has_permissions(change_nickname=True)
+    @commands.command(aliases=['nick'], pass_context=True, no_pm=True)
+    async def nickname(self, ctx, *, txt: str = None):
+        """Change your nickname on a server. Leave empty to remove nick."""
+        await self.bot.delete_message(ctx.message)
+        try:
+            await self.bot.change_nickname(ctx.message.author, txt)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Changed nickname to: `%s`' % txt)
+        except:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Unable to change nickname.')
 
 
 def setup(bot):
