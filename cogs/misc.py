@@ -653,7 +653,7 @@ class Misc:
                 em = discord.Embed(description=result.content, timestamp=result.timestamp, color=0xbc0b0b)
                 em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
                 if channel != ctx.message.channel:
-                    em.set_footer(text='Sent in: {} [Server: {} ]'.format(channel.name, channel.server.name))
+                    em.set_footer(text='#{} | {} '.format(channel.name, channel.server.name))
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result.author.name, result.timestamp, result.content))
