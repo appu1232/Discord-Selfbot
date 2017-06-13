@@ -574,46 +574,76 @@ class Misc:
     @commands.command(pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
         """Quote a message. >help quote for more info.
-
         >quote - quotes the last message sent in the channel.
         >quote <words> - tries to search for a message in the server that contains the given words and quotes it.
-        >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids)."""
+        >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids).
+        >quote <words> | channel=<channel_name> - quotes the message with the given words from the channel name specified in the second argument
+        >quote <message_id> | channel=<channel_name> - quotes the message with the given message id in the given channel name"""
         result = channel = None
         await self.bot.delete_message(ctx.message)
-        quote_cmd = ctx.message.content.split(' ', 1)[0]
         if msg:
-            try:
-                length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
-                if length < 201:
-                    size = length
-                else:
-                    size = 200
-                for channel in ctx.message.server.channels:
-                    if str(channel.type) == 'text':
-                        if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
-                            for i in range(length - 2, length - size, -1):
-                                try:
-                                    search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
-                                except:
-                                    continue
-                                if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or not search[0].content.startswith(quote_cmd))) or ctx.message.content[6:].strip() == search[0].id:
-                                    result = search[0]
+            length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
+            if length < 201:
+                size = length
+            else:
+                size = 200
+            for channel in ctx.message.server.channels:
+                if str(channel.type) == 'text':
+                    if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
+                        for i in range(length - 2, length - size, -1):
+                            try:
+                                search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
+                            except:
+                                continue
+                            if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.content[6:].strip() == search[0].id):
+                                result = search[0]
+                                break
+                        if result:
+                            break
+                    
+            if not result:
+                if " | channel=" in msg:
+                    channelList = []
+                    for channels in self.bot.get_all_channels():
+                        if channels.name == msg.split("| channel=")[1]:
+                            channelList.append(channels)
+                    msg = msg.split(" | channel=")[0]
+                    for channel in channelList:
+                        if str(channel.type) == 'text':
+                            if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
+                                for i in range(length - 2, length - size, -1):
+                                    try:
+                                        search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
+                                    except:
+                                        continue
+                                    if (msg.lower().strip() in search[0].content.lower() and (search[0].author != ctx.message.author or search[0].content[:7] != '>quote ')) or (ctx.message.content[6:].strip() == search[0].id):
+                                        result = search[0]
+                                        break
+                                if result:
                                     break
+                    if not result:
+                        for channel in channelList:
+                            try:
+                                async for sent_message in self.bot.logs_from(channel, limit=500):
+                                    if (msg.lower().strip() in sent_message.content and (sent_message.author != ctx.message.author or sent_message.content[:7] != '>quote ')) or (msg.strip() == sent_message.id):
+                                        result = sent_message
+                                        break
+                            except:
+                                pass
                             if result:
                                 break
-            except:
-                pass
             if not result:
                 for channel in ctx.message.server.channels:
                     try:
                         async for sent_message in self.bot.logs_from(channel, limit=500):
-                            if (msg.lower().strip() in sent_message.content.lower() and (sent_message.author != ctx.message.author or not sent_message.content.startswith(quote_cmd))) or msg.strip() == sent_message.id:
+                            if (msg.lower().strip() in sent_message.content and (sent_message.author != ctx.message.author or sent_message.content[:7] != '>quote ')) or (msg.strip() == sent_message.id):
                                 result = sent_message
                                 break
                     except:
                         pass
                     if result:
                         break
+        
         else:
             channel = ctx.message.channel
             search = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id][-2]
@@ -623,7 +653,7 @@ class Misc:
                 em = discord.Embed(description=result.content, timestamp=result.timestamp, color=0xbc0b0b)
                 em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
                 if channel != ctx.message.channel:
-                    em.set_footer(text='Sent in: {}'.format(channel.name))
+                    em.set_footer(text='Sent in: {} [Server: {} ]'.format(channel.name, channel.server.name))
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 await self.bot.send_message(ctx.message.channel, '%s - %s```%s```' % (result.author.name, result.timestamp, result.content))
