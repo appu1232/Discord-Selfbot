@@ -1107,6 +1107,30 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Changed nickname to: `%s`' % txt)
         except:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Unable to change nickname.')
+            
+    @commands.command(pass_context=True)
+    async def translate(self, ctx, to_language, *, msg):
+        """Translates words from one language to another. Do >help translate for more information.
+        Usage:
+        >translate <new language> <words> - Translate words from one language to another. Full language names must be used.
+        The original language will be assumed automatically.
+        """
+        real_language = False
+        to_language = to_language.lower()
+        for entry in lang_codes:
+            if to_language in lang_codes[entry]["name"].replace(";", "").replace(",", "").lower().split():
+                language = lang_codes[entry]["name"].replace(";", "").replace(",", "").split()[0]
+                to_language = entry
+                real_language = True
+        if real_language:
+            translate = requests.get("https://translate.google.com/m?hl={}&sl=auto&q={}".format(to_language, msg)).text
+            result = str(translate).split('class="t0">')[1].split("</div>")[0]
+            if not result == msg:
+                await self.bot.say(":robot: '{}' in {} is '{}'".format(msg, language, result))
+            else:
+                await self.bot.say(":robot: That language either isn't supported by Google Translate, or there's a bug in the bot.")
+        else:
+            await self.bot.say(":robot: That's not a real language.")
 
 
 def setup(bot):
