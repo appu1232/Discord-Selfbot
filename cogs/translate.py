@@ -1,10 +1,10 @@
-import urllib.request
 import re
 import requests
 import string
 import json
 import discord
 import prettytable
+from urllib import parse
 from bs4 import BeautifulSoup
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
