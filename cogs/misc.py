@@ -214,6 +214,33 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
+    @commands.group(aliases=['date'], pass_context=True)
+    async def time(self, ctx):
+        """Date time module."""
+        dandt = str(datetime.datetime.now())
+        listdandt = dandt.split(" ")
+        date = listdandt[0].split("-")
+        year = date[0]
+        month = date[1]
+        day = date[2]
+        time = listdandt[1].split(":")
+        hour = time[0]
+        minute = time[1]
+        second = time[2].split(".")[0] #remove the milliseconds
+        
+        if embed_perms(ctx.message):
+            em = discord.Embed(title='Date and Time', color=discord.Color.blue())
+            em.add_field(name='Local Time', value=hour + " hrs " + minute + " mins " + second + " secs", inline=False)
+            em.add_field(name='Day', value=day)
+            em.add_field(name='Month', value=month)
+            em.add_field(name='Year', value=year)
+            
+            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        else:
+            msg = '**Local Date and Time:** ```Time: %s\nDate: %s```' % (listdandt[1].split(".")[0], listdandt[0])
+            await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+        await self.bot.delete_message(ctx.message)
+
     # 8ball
     @commands.command(pass_context=True, aliases=['8ball'])
     async def ball8(self, ctx, *, msg: str):
