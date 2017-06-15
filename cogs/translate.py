@@ -5,6 +5,7 @@ import string
 import json
 import discord
 import prettytable
+from bs4 import BeautifulSoup
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
@@ -49,6 +50,7 @@ class Translate:
                 result = re.sub('\&\#(.*?)\;',listb[i],result,1) 
                 i = i+1
             if result:
+                result = BeautifulSoup(result).text
                 embed = discord.Embed(color=discord.Color.blue())
                 embed.add_field(name="Original", value=orMsg, inline=False)
                 embed.add_field(name=language, value=result.replace("&amp;","&"), inline=False)
