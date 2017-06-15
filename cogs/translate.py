@@ -36,27 +36,18 @@ class Translate:
                 to_language = entry
                 real_language = True
         if real_language:
-            orMsg = msg
-            msg = msg.replace("&","%26")
+            search = parse.quote(msg)            
             translate = requests.get("https://translate.google.com/m?hl={}&sl=auto&q={}".format(to_language, msg)).text
             result = str(translate).split('class="t0">')[1].split("</div>")[0]
-            l1 = re.findall('\&\#(.*?)\;',result)
-            listb = []
-            for a in l1:
-                listb.append(chr(int(a)))
-            i = 0 
-            while i < len(listb): 
-                result = re.sub('\&\#(.*?)\;',listb[i],result,1) 
-                i = i+1
-            if result:
-                embed = discord.Embed(color=discord.Color.blue())
-                embed.add_field(name="Original", value=orMsg, inline=False)
-                embed.add_field(name=language, value=result.replace("&amp;","&"), inline=False)
-                await self.bot.say("", embed=embed)
-            else:
-                await self.bot.say("That language either isn't supported by Google Translate, or there's a bug in the bot.")
+            result = BeautifulSoup(result).text
+            embed = discord.Embed(color=discord.Color.blue())
+            embed.add_field(name="Original", value=msg, inline=False)
+            embed.add_field(name=language, value=result.replace("&amp;","&"), inline=False)
+            if result == msg:
+                embed.add_field(name="Warning", value="This language may not be supported by Google Translate.")
+            await self.bot.say("", embed=embed)
         else:
-            await self.bot.say("That's not a real language.")
+            await self.bot.say(bot_prefix + "That's not a real language.")
 
 def setup(bot):
     bot.add_cog(Translate(bot))
