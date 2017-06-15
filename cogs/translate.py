@@ -48,7 +48,7 @@ class Translate:
                 embed.add_field(name="Warning", value="This language may not be supported by Google Translate.")
             await self.bot.say("", embed=embed)
         else:
-            await self.bot.say("That's not a real language.")
+            await self.bot.say(bot_prefix + "That's not a real language.")
 
 def setup(bot):
     bot.add_cog(Translate(bot))
