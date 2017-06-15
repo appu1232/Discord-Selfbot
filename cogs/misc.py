@@ -55,7 +55,7 @@ class Misc:
                   'r' : ['🇷','®'],
                   's' : ['🇸','💲','5⃣','⚡','💰','💵'],
                   't' : ['🇹', '✝','➕','🎚','🌴','7⃣'],
-                  'u' : ['🇺','⛎','🐉'],
+                  '🚑u' : ['🇺','⛎','🐉'],
                   'v' : ['🇻','♈','☑'],
                   'w' : ['🇼','〰','📈'],
                   'x' : ['🇽','❎','✖','❌','⚒'],
@@ -1132,7 +1132,8 @@ class Misc:
                 top_result = result["list"][int(number)-1]
                 embed = discord.Embed(title=top_result["word"], description=top_result["definition"], url=top_result["permalink"])
                 embed.add_field(name="Example:", value=top_result["example"])
-                embed.add_field(name="Tags:", value=" ".join(result["tags"]))
+                if result["tags"]:
+                    embed.add_field(name="Tags:", value=" ".join(result["tags"]))
                 embed.set_author(name=top_result["author"], icon_url="https://lh5.ggpht.com/oJ67p2f1o35dzQQ9fVMdGRtA7jKQdxUFSQ7vYstyqTp-Xh-H5BAN4T5_abmev3kz55GH=w300")          
                 number = str(int(number)+1)
                 embed.set_footer(text="{} results were found. To see a different result, use >ud {} | {}.".format(len(result["list"]), msg, number))
