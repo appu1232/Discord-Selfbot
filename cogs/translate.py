@@ -37,7 +37,7 @@ class Translate:
                 to_language = entry
                 real_language = True
         if real_language:
-            search = urllib.parse.quote(msg)            
+            search = parse.quote(msg)            
             translate = requests.get("https://translate.google.com/m?hl={}&sl=auto&q={}".format(to_language, msg)).text
             result = str(translate).split('class="t0">')[1].split("</div>")[0]
             result = BeautifulSoup(result).text
