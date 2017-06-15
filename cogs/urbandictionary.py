@@ -25,6 +25,7 @@ class Urban:
         You can pick a specific result to use with >ud <term> | <result>.
         If no result is specified, the first result will be used.
         """
+        await self.bot.delete_message(ctx.message)
         number = 1
         if " | " in msg:
             msg, number = msg.rsplit(" | ", 1)
