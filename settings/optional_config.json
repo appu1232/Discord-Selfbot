@@ -2,5 +2,9 @@
     "google_api_key": "",
     "custom_search_engine": "",
     "mal_username": "",
-    "mal_password": ""
+    "mal_password": "",
+    "customcmd_color": "27007A",
+    "rich_embed": "on",
+    "default_status": "idle",
+    "ascii_font": "big"
 }
