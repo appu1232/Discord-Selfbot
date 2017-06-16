@@ -67,7 +67,8 @@ class Todo:
                     else:
                         m, s = divmod(todo_list[entry], 60)
                         h, m = divmod(m, 60)
-                        embed.description += "\u2022 {} - remaining time {}\n".format(entry, "{}:{}:{}".format(h, m, s))
+                        d, h = divmod(h, 24)
+                        embed.description += "\u2022 {} - remaining time {}\n".format(entry, "{}:{}:{}:{}".format(int(d), int(h), int(m), int(s)))
                 await self.bot.say("", embed=embed)
             
     @todo.command(pass_context=True)
