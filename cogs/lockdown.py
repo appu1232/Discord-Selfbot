@@ -14,7 +14,6 @@ class Lockdown:
     """
     def __init__(self, bot):
         self.bot = bot
-        print('Addon "{}" loaded'.format(self.__class__.__name__))
 
     @commands.has_permissions(manage_nicknames=True)
     @commands.command(pass_context=True, name="lockdown")
@@ -29,7 +28,7 @@ class Lockdown:
             server = ctx.message.server
             overwrites_everyone = ctx.message.channel.overwrites_for(server.default_role)
             overwrites_owner = ctx.message.channel.overwrites_for(server.role_hierarchy[0])
-            if overwrites_everyone.send_messages == False:
+            if overwrites_everyone.send_messages is False:
                 await self.bot.say("🔒 Channel is already locked down. Use `unlock` to unlock.")
                 return
             overwrites_owner.send_messages = True
@@ -37,7 +36,6 @@ class Lockdown:
             await self.bot.edit_channel_permissions(ctx.message.channel, server.default_role, overwrites_everyone)
             for modrole in mod_roles:
                 await self.bot.edit_channel_permissions(ctx.message.channel, modrole, overwrites_owner)
-            await self.bot.edit_channel_permissions(ctx.message.channel, server.get_member("135204578986557440"), overwrites_owner)
             await self.bot.say("🔒 Channel locked down. Only roles with permissions specified in `moderation.json` can speak.")
        except discord.errors.Forbidden:
             await self.bot.say("Missing Permissions.")
@@ -49,7 +47,7 @@ class Lockdown:
        try:
             server = ctx.message.server
             overwrites_everyone = ctx.message.channel.overwrites_for(server.default_role)
-            if overwrites_everyone.send_messages == None:
+            if overwrites_everyone.send_messages is None:
                 await self.bot.say("🔓 Channel is already unlocked.")
                 return
             overwrites_everyone.send_messages = None

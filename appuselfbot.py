@@ -43,6 +43,7 @@ async def on_ready():
     bot.is_stream = False
     bot.game = bot.game_interval = bot.avatar = bot.avatar_interval = bot.subpro = bot.keyword_found = None
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
+    bot.notify = load_notify_config()
 
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
@@ -53,6 +54,15 @@ async def on_ready():
     with open('settings/log.json', 'r') as log:
         bot.log_conf = json.load(log)
         bot.key_users = bot.log_conf['keyusers']
+    if not os.path.isfile('settings/moderation.json'):
+        with open('settings/moderation.json', 'w') as m:
+            mod = {}
+            json.dump(mod, m, indent=4)
+    if not os.path.isfile('settings/todo.json'):
+        with open('settings/todo.json', 'w') as t:
+            todo = {}
+            json.dump(todo, t, indent=4)
+
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r+') as g:
             games = json.load(g)
@@ -221,7 +231,8 @@ async def on_message(message):
 
     # If the message was sent by me
     if message.author.id == bot.user.id:
-        bot.icount += 1
+        if hasattr(bot, 'icount'):
+            bot.icount += 1
         if hasattr(bot, 'self_log'):
             if message.channel.id not in bot.self_log:
                 bot.self_log[message.channel.id] = collections.deque(maxlen=100)
@@ -342,7 +353,6 @@ async def on_message(message):
                         msg = 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
 
                     part = int(math.ceil(len(msg) / 1950))
-                    notify = load_notify_config()
                     if user_found:
                         title = '%s posted' % user_found
                     else:
@@ -358,9 +368,9 @@ async def on_message(message):
                             em.set_thumbnail(url=message.author.avatar_url)
                         except:
                             pass
-                        if notify['type'] == 'msg':
+                        if bot.notify['type'] == 'msg':
                             await webhook(em, 'embed', is_separate)
-                        elif notify['type'] == 'ping':
+                        elif bot.notify['type'] == 'ping':
                             await webhook(em, 'embed ping', is_separate)
                         else:
                             await bot.send_message(server.get_channel(location[0]), embed=em)
@@ -379,16 +389,16 @@ async def on_message(message):
                             logged_msg = '``%s`` mentioned' % word
                         for b, i in enumerate(all_words):
                             if b == 0:
-                                if notify['type'] == 'msg':
+                                if bot.notify['type'] == 'msg':
                                     await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message', is_separate)
-                                elif notify['type'] == 'ping':
+                                elif bot.notify['type'] == 'ping':
                                     await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message ping', is_separate)
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i))
                             else:
-                                if notify['type'] == 'msg':
+                                if bot.notify['type'] == 'msg':
                                     await webhook('```%s```' % i, 'message', is_separate)
-                                elif notify['type'] == 'ping':
+                                elif bot.notify['type'] == 'ping':
                                     await webhook('```%s```' % i, 'message ping', is_separate)
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), '```%s```' % i)

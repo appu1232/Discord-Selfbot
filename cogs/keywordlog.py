@@ -70,6 +70,7 @@ class KeywordLogger:
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        self.bot.notify = load_notify_config()
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off notifications.')
         if self.bot.subpro:
             self.bot.subpro.kill()
@@ -87,6 +88,7 @@ class KeywordLogger:
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        self.bot.notify = load_notify_config()
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``ping``. The webhook will ping you.')
         if self.bot.subpro:
             self.bot.subpro.kill()
@@ -104,6 +106,7 @@ class KeywordLogger:
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        self.bot.notify = load_notify_config()
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``. The webhook will send notifications to your log location channel. Make sure you have notifications enabled for all messages in that channel.')
         if self.bot.subpro:
             self.bot.subpro.kill()
@@ -132,6 +135,7 @@ class KeywordLogger:
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        self.bot.notify = load_notify_config()
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``direct messages``. The proxy bot will direct message you.')
         if self.bot.subpro:
             self.bot.subpro.kill()
@@ -176,6 +180,7 @@ class KeywordLogger:
             n.seek(0)
             n.truncate()
             json.dump(notify, n, indent=4)
+        self.bot.notify = load_notify_config()
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Notifier bot token set.')
 
     @commands.group(pass_context=True)

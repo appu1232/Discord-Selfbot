@@ -1,12 +1,6 @@
-import re
 import requests
-import string
-import json
-import discord
-import prettytable
 from urllib import parse
 from bs4 import BeautifulSoup
-from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -37,7 +31,6 @@ class Translate:
                 to_language = entry
                 real_language = True
         if real_language:
-            search = parse.quote(msg)            
             translate = requests.get("https://translate.google.com/m?hl={}&sl=auto&q={}".format(to_language, msg)).text
             result = str(translate).split('class="t0">')[1].split("</div>")[0]
             result = BeautifulSoup(result, "lxml").text
@@ -49,6 +42,7 @@ class Translate:
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + "That's not a real language.")
+
 
 def setup(bot):
     bot.add_cog(Translate(bot))

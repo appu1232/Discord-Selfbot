@@ -190,7 +190,7 @@ class Misc:
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
             em.add_field(name=u'\U0001F4E4 Messages sent', value=str(self.bot.icount))
-            em.add_field(name=u'\U0001F4E5 Messages recieved', value=str(self.bot.message_count))
+            em.add_field(name=u'\U0001F4E5 Messages received', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
             em.add_field(name=u'\ud83d\udcd1 Channels', value=str(channel_count))
@@ -289,10 +289,12 @@ class Misc:
         - ptext=<words>
         
         NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it.
-        PS: Hyperlink text like so: [text](https://www.whateverlink.com)"""
+        PS: Hyperlink text like so: [text](https://www.whateverlink.com)
+        PPS: Force a field to go to the next line with the added parameter inline=False"""
         if msg:
             if embed_perms(ctx.message):
                 ptext = title = description = image = thumbnail = color = footer = author = None
+                timestamp = discord.Embed.Empty
                 embed_values = msg.split('|')
                 for i in embed_values:
                     if i.strip().lower().startswith('ptext='):
@@ -315,6 +317,8 @@ class Misc:
                         footer = i.strip()[7:].strip()
                     elif i.strip().lower().startswith('author='):
                         author = i.strip()[7:].strip()
+                    elif i.strip().lower().startswith('timestamp'):
+                        timestamp = ctx.message.timestamp
                 if color:
                     if color.startswith('#'):
                         color = color[1:]
@@ -326,9 +330,9 @@ class Misc:
                     return await self.bot.send_message(ctx.message.channel, content=None, embed=discord.Embed(description=msg))
 
                 if color:
-                    em = discord.Embed(title=title, description=description, color=int(color, 16))
+                    em = discord.Embed(timestamp=timestamp, title=title, description=description, color=int(color, 16))
                 else:
-                    em = discord.Embed(title=title, description=description)
+                    em = discord.Embed(timestamp=timestamp, title=title, description=description)
                 for i in embed_values:
                     if i.strip().lower().startswith('field='):
                         field_inline = True
@@ -364,7 +368,7 @@ class Misc:
             msg = '```How to use the >embed command:\nExample: >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\nYou do NOT need to specify every property, only the ones you want.' \
                   '\nAll properties and the syntax (put your custom stuff in place of the <> stuff):\ntitle=<words>\ndescription=<words>\ncolor=<hex_value>\nimage=<url_to_image> (must be https)\nthumbnail=<url_to_image>\nauthor=<words> **OR** author=name=<words> icon=<url_to_image>\nfooter=<words> ' \
                   '**OR** footer=name=<words> icon=<url_to_image>\nfield=name=<words> value=<words> (you can add as many fields as you want)\nptext=<words>\n\nNOTE: After the command is sent, the bot will delete your message and replace it with ' \
-                  'the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.\nPS: Hyperlink text like so: [text](https://www.whateverlink.com)```'
+                  'the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.\nPS: Hyperlink text like so: [text](https://www.whateverlink.com)\nPPS: Force a field to go to the next line with the added parameter inline=False```'
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
@@ -1070,7 +1074,7 @@ class Misc:
         if sources != '' and sources:
             em.add_field(name='Source sites - percent similarity', value=sources, inline=False)
 
-        if not sources and not creator and not characters and not material or float(similarity_percent[0][:-1]) < 60.0:
+        if not sources and not creator and not characters and not material and not title or float(similarity_percent[0][:-1]) < 60.0:
             em = discord.Embed(color=0xaa550f, description='**Input:**\n{}\n\n**No results found.**'.format(txt))
 
         await self.bot.send_message(ctx.message.channel, content=None, embed=em)
@@ -1137,7 +1141,6 @@ class Misc:
         embed.add_field(name="Total:", value=sum(dice_roll_ints))
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
-    @commands.has_permissions(change_nickname=True)
     @commands.command(aliases=['nick'], pass_context=True, no_pm=True)
     async def nickname(self, ctx, *, txt: str = None):
         """Change your nickname on a server. Leave empty to remove nick."""
@@ -1196,7 +1199,7 @@ class Misc:
                 result += self.text_flip[char]
             else:
                 result += char
-        await self.bot.send_message(ctx.message.channel, bot_prefix + result[::-1]) # slice reverses the string
+        await self.bot.send_message(ctx.message.channel, result[::-1])  # slice reverses the string
 
 def setup(bot):
     bot.add_cog(Misc(bot))
