@@ -65,7 +65,7 @@ class Todo:
                     elif todo_list[entry] == "done":
                         embed.description += "\u2022 {} - time's up!\n".format(entry)
                     else:
-                        m, s = divmod(todo_list[entry], 60)
+                        m, s = divmod(todo_list[entry]-current_time(), 60)
                         h, m = divmod(m, 60)
                         d, h = divmod(h, 24)
                         embed.description += "\u2022 {} - remaining time {}\n".format(entry, "{}:{}:{}:{}".format(int(d), int(h), int(m), int(s)))
