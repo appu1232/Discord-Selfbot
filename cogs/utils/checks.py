@@ -17,9 +17,14 @@ def load_optional_config():
 
 def load_notify_config():
     with open('settings/notify.json', 'r') as f:
+        return json.load(f)  
+    
+    
+def load_log_config():
+    with open('settings/log.json', 'r') as f:
         return json.load(f)
 
-
+    
 def has_passed(bot, oldtime):
     if time.time() - 20 < oldtime:
         return False
