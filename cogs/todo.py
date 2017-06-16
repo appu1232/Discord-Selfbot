@@ -1,6 +1,7 @@
 import re
 import json
 import discord
+import asyncio
 from time import time as current_time
 from appuselfbot import bot_prefix
 from discord_webhooks import *
@@ -15,9 +16,7 @@ try:
         todo_list = json.load(f)
 except IOError:
     todo_list = {}
-    
-notify = load_notify_config()
-log = load_log_config()
+
 
 
   
@@ -31,16 +30,17 @@ class Todo:
             json.dump(todo_list, f)
     
     # don't like to do this but the one from appuselfbot.py is slightly different to my needs
-    async def webhook(self, keyword_content, send_type):
-        temp = log['webhook_url'].split('/')
+    async def webhook(self, entry, send_type):
+        temp = self.bot.log_conf['webhook_url'].split('/')
         channel = temp[len(temp) - 2]
         token = temp[len(temp) - 1]
         webhook_class = Webhook(self.bot)
         request_webhook = webhook_class.request_webhook
+        em = discord.Embed(title='Timer Alert', color=0x4e42f4, description='Timer for item: %s just ran out.' % entry)
         if 'ping' in send_type:
-            await request_webhook('/{}/{}'.format(channel, token), content=keyword_content + '\n' + self.bot.user.mention)
+            await request_webhook('/{}/{}'.format(channel, token), embeds=[em.to_dict()], content=self.bot.user.mention)
         else:
-            await request_webhook('/{}/{}'.format(channel, token), content=keyword_content)
+            await request_webhook('/{}/{}'.format(channel, token), content=None, embeds=[em.to_dict()])
     
     @commands.group(pass_context=True)
     async def todo(self, ctx):
@@ -53,7 +53,7 @@ class Todo:
         When a timed to-do list item is completed, you will be notified via the webhook you set up for keyword logging.
         If you do not have keyword logging set up, go to https://github.com/appu1232/Discord-Selfbot/wiki/Keyword-Notifier---User-Following-Info-and-Setup
         """
-        if ctx.invoked_subcommand == None:
+        if ctx.invoked_subcommand is None:
             await self.bot.delete_message(ctx.message)
             if not todo_list:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + "Your to-do list is empty!")
@@ -68,7 +68,7 @@ class Todo:
                         m, s = divmod(todo_list[entry]-current_time(), 60)
                         h, m = divmod(m, 60)
                         d, h = divmod(h, 24)
-                        embed.description += "\u2022 {} - remaining time {}\n".format(entry, "{}:{}:{}:{}".format(int(d), int(h), int(m), int(s)))
+                        embed.description += "\u2022 {} - remaining time {}\n".format(entry, "%02d:%02d:%02d:%02d" % (int(d), int(h), int(m), int(s)))
                 await self.bot.send_message(ctx.message.channel, "", embed=embed)
             
     @todo.command(pass_context=True)
@@ -91,7 +91,8 @@ class Todo:
                 seconds = "none"
             else:
                 for item in match:
-                    seconds += (int(item[:-1]) * units[item[-1]]) + current_time()
+                    seconds += (int(item[:-1]) * units[item[-1]])
+                seconds += current_time()
         todo_list[msg] = seconds
         self.save_list()
         await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully added `{}` to your to-do list!".format(msg))
@@ -117,19 +118,29 @@ class Todo:
         todo_list.clear()
         self.save_list()
         await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully cleared your to-do list!")
-    
-    async def on_message(self, message):
-        for entry in todo_list:
-            if todo_list[entry] != "none" and todo_list[entry] != "done":
-                if todo_list[entry] < current_time():
-                    todo_list[entry] = "done"
-                    self.save_list()
-                    if notify['type'] == 'msg':
-                        await self.webhook("Your timer for the to-do list entry '{}' just ran out!".format(entry), 'message')
-                    elif notify['type'] == 'ping':
-                        await self.webhook("Your timer for the to-do list entry '{}' just ran out!".format(entry), 'message ping')
-                    else:
-                        await self.bot.send_message(self.server.get_channel(location[0]), "Your timer for the to-do list entry '{}' just ran out!".format(entry))
+
+    async def todo_timer(self):
+        while self is self.bot.get_cog("Todo"):
+            for entry in todo_list:
+                if todo_list[entry] != "none" and todo_list[entry] != "done":
+                    if todo_list[entry] < current_time():
+                        todo_list[entry] = "done"
+                        self.save_list()
+                        if self.bot.notify['type'] == 'msg':
+                            await self.webhook(entry, '')
+                        elif self.bot.notify['type'] == 'ping':
+                            await self.webhook(entry, 'ping')
+                        else:
+                            location = self.bot.log_conf['log_location'].split()
+                            server = self.bot.get_server(location[1])
+                            em = discord.Embed(title='Timer Alert', color=0x4e42f4,
+                                               description='Timer for item: %s just ran out.' % entry)
+                            await self.bot.send_message(server.get_channel(location[0]), content=None, embed=em)
+            await asyncio.sleep(2)
+
 
 def setup(bot):
-    bot.add_cog(Todo(bot))
+    t = Todo(bot)
+    loop = asyncio.get_event_loop()
+    loop.create_task(t.todo_timer())
+    bot.add_cog(t)
