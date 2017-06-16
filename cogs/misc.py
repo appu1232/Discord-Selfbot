@@ -1128,7 +1128,7 @@ class Misc:
             dice_roll_ints.append(result)
         embed = discord.Embed(title="Dice rolls:", description=' '.join(dice_rolls))
         embed.add_field(name="Total:", value=sum(dice_roll_ints))
-        await self.bot.say("", embed=embed)
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
     @commands.has_permissions(change_nickname=True)
     @commands.command(aliases=['nick'], pass_context=True, no_pm=True)
@@ -1152,12 +1152,11 @@ class Misc:
         number = 1
         if " | " in msg:
             msg, number = msg.rsplit(" | ", 1)
-        search = ""
         search = parse.quote(msg)
         response = requests.get("http://api.urbandictionary.com/v0/define?term={}".format(search)).text
         result = json.loads(response)
         if result["result_type"] == "no_results":
-            await self.bot.say(bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
         else:
             try:
                 top_result = result["list"][int(number)-1]
@@ -1168,10 +1167,17 @@ class Misc:
                 embed.set_author(name=top_result["author"], icon_url="https://lh5.ggpht.com/oJ67p2f1o35dzQQ9fVMdGRtA7jKQdxUFSQ7vYstyqTp-Xh-H5BAN4T5_abmev3kz55GH=w300")          
                 number = str(int(number)+1)
                 embed.set_footer(text="{} results were found. To see a different result, use >ud {} | {}.".format(len(result["list"]), msg, number))
-                await self.bot.say("", embed=embed)
+                await self.bot.send_message(ctx.message.channel, "", embed=embed)
             except IndexError:
-                await self.bot.say(bot_prefix + "That result doesn't exist! Try >ud {}.".format(msg))
-
+                await self.bot.send_message(ctx.message.channel, bot_prefix + "That result doesn't exist! Try >ud {}.".format(msg))
+    
+    @commands.command(pass_context=True)
+    async def youtube(self, ctx, *, msg):
+        """Search for videos on YouTube."""
+        search = parse.quote(msg)
+        response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
+        result = BeautifulSoup(response, "lxml")
+        await self.bot.send_message(ctx.message.channel, "https://www.youtube.com{}".format(result.find_all(attrs={'class':'yt-uix-tile-link'})[0].get('href')))
 
 def setup(bot):
     bot.add_cog(Misc(bot))

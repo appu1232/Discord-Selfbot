@@ -40,15 +40,15 @@ class Translate:
             search = parse.quote(msg)            
             translate = requests.get("https://translate.google.com/m?hl={}&sl=auto&q={}".format(to_language, msg)).text
             result = str(translate).split('class="t0">')[1].split("</div>")[0]
-            result = BeautifulSoup(result).text
+            result = BeautifulSoup(result, "lxml").text
             embed = discord.Embed(color=discord.Color.blue())
             embed.add_field(name="Original", value=msg, inline=False)
             embed.add_field(name=language, value=result.replace("&amp;","&"), inline=False)
             if result == msg:
                 embed.add_field(name="Warning", value="This language may not be supported by Google Translate.")
-            await self.bot.say("", embed=embed)
+            await self.bot.send_message(ctx.message.channel, "", embed=embed)
         else:
-            await self.bot.say(bot_prefix + "That's not a real language.")
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "That's not a real language.")
 
 def setup(bot):
     bot.add_cog(Translate(bot))
