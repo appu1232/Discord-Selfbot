@@ -1,7 +1,5 @@
 # Discord Selfbot
 
-[![Patreon](http://ionicabizau.github.io/badges/patreon.svg)](https://patreon.com/appu1232)
-
 Come join the dedicated server for this bot! Ask questions, give suggestions, get help, or just hang out. Don't be shy, we don't bite:
 
 [<img src="https://canary.discordapp.com/api/guilds/299293492645986307/widget.png?style=banner2">](https://discord.gg/TBQE72k)
@@ -22,6 +20,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities includin
 - Detailed image/gif source finder using sauce.nao
 - Add custom commands/reactions. The commands get saved to ``commands.json`` which has some sample commands added to start with. Can be used as macros for other commands as well.
 - Custom embeds.
+- Todo list with notifications.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
@@ -34,8 +33,10 @@ Takes less than 5 minutes to set up. Has various commands and utilities includin
 
 ## Acknowledgements
 
+- Thanks to [architdate](https://github.com/architdate) and [LyricLy](https://github.com/LyricLy) for actively participating in development and addition of new features.
 - Thanks to [Hubcapp](https://github.com/Hubcapp) for the much improved >react command.
 - Thanks to [adjnouobsref](https://github.com/adjnouobsref) for the spoiler tags and various other contributions.
+- Used the code for lockdown commands from [Kurisu](https://github.com/916253/Kurisu/blob/master/addons/lockdown.py) bot. Slight modifications is message sending and contents of messages.
 - Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards and the debugger.
 - Used [eye-sigil's](https://github.com/eye-sigil) code for the >repl command.
 - Thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
