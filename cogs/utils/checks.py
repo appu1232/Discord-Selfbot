@@ -14,6 +14,10 @@ def load_optional_config():
     with open('settings/optional_config.json', 'r') as f:
         return json.load(f)
 
+def load_moderation():
+    with open('settings/moderation.json', 'r') as f:
+        return json.load(f)
+
 
 def load_notify_config():
     with open('settings/notify.json', 'r') as f:
