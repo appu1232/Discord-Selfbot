@@ -1102,7 +1102,7 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def dice(self, ctx, *, txt: str = None):
-        "Roll dice. Optionally input # of dice and # of sides. Ex: >dice 5 12"
+        """Roll dice. Optionally input # of dice and # of sides. Ex: >dice 5 12"""
         await self.bot.delete_message(ctx.message)
         dice = 1
         sides = 6
@@ -1121,10 +1121,14 @@ class Misc:
                 except:
                     return await self.bot.send_message(ctx.message.channel, bot_prefix + invalid)
         dice_rolls = []
+        dice_roll_ints = []
         for roll in range(dice):
-            dice_rolls.append(str(random.randint(1, sides)))
-        output = '\n'.join(dice_rolls)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Dice roll(s):\n' + output)
+            result = random.randint(1, sides)
+            dice_rolls.append(str(result))
+            dice_roll_ints.append(result)
+        embed = discord.Embed(title="Dice rolls:", description=' '.join(dice_rolls))
+        embed.add_field(name="Total:", value=sum(dice_roll_ints))
+        await self.bot.say("", embed=embed)
 
     @commands.has_permissions(change_nickname=True)
     @commands.command(aliases=['nick'], pass_context=True, no_pm=True)
