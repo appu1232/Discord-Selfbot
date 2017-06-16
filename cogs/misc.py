@@ -115,6 +115,13 @@ class Misc:
                                    ['21','📅'],
                                 ]
                  }
+    
+    # used in textflip
+    text_flip = {}    
+    char_list = "abcdefghijklmnpqrtuvwxyzABCDEFGHIJKLMNPQRTUVWYZ12345679!&*(),."    
+    alt_char_list = "ɐqɔpǝɟƃɥᴉɾʞlɯudbɹʇnʌʍxʎz∀qƆpƎℲפHIſʞ˥WNԀQɹ┴∩ΛM⅄ZƖᄅƐㄣϛ9ㄥ6¡⅋*)('˙"
+    for idx, char in enumerate(char_list):
+        text_flip[char] = alt_char_list[idx]
 
     # used in >react, checks if it's possible to react with the duper string or not
     def has_dupe(duper):
@@ -1178,6 +1185,18 @@ class Misc:
         response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
         result = BeautifulSoup(response, "lxml")
         await self.bot.send_message(ctx.message.channel, "https://www.youtube.com{}".format(result.find_all(attrs={'class':'yt-uix-tile-link'})[0].get('href')))
+        
+    @commands.command(pass_context=True)
+    async def textflip(self, ctx, *, msg):
+        """Flip given text."""
+        await self.bot.delete_message(ctx.message)
+        result = ""
+        for char in msg:
+            if char in self.text_flip:
+                result += self.text_flip[char]
+            else:
+                result += char
+        await self.bot.send_message(ctx.message.channel, bot_prefix + result[::-1]) # slice reverses the string
 
 def setup(bot):
     bot.add_cog(Misc(bot))
