@@ -1198,7 +1198,7 @@ class Misc:
                 result += self.text_flip[char]
             else:
                 result += char
-        await self.bot.edit_message(ctx.message.channel, result[::-1])  # slice reverses the string
+        await self.bot.edit_message(ctx.message, result[::-1])  # slice reverses the string
 
 def setup(bot):
     bot.add_cog(Misc(bot))
