@@ -320,8 +320,14 @@ class Misc:
             if embed_perms(ctx.message):
                 ptext = title = description = image = thumbnail = color = footer = author = None
                 timestamp = discord.Embed.Empty
+                def_color = False
                 embed_values = msg.split('|')
                 for i in embed_values:
+                    with open('settings/optional_config.json', 'r+') as fp:
+                        opt = json.load(fp)
+                        if opt['embed_color'] != "":
+                            color = opt['embed_color']
+                            def_color = True
                     if i.strip().lower().startswith('ptext='):
                         ptext = i.strip()[6:].strip()
                     elif i.strip().lower().startswith('title='):
@@ -344,6 +350,12 @@ class Misc:
                         author = i.strip()[7:].strip()
                     elif i.strip().lower().startswith('timestamp'):
                         timestamp = ctx.message.timestamp
+
+                if def_color:
+                    if color.startswith('#'):
+                        color = color[1:]
+                    if not color.startswith('0x'):
+                        color = '0x' + color
                 if color:
                     if color.startswith('#'):
                         color = color[1:]
