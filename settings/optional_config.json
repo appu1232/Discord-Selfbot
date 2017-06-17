@@ -6,5 +6,6 @@
     "customcmd_color": "27007A",
     "rich_embed": "on",
     "default_status": "idle",
-    "ascii_font": "big"
+    "ascii_font": "big",
+    "quoteembed_color": "bc0b0b"
 }
