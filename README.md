@@ -22,6 +22,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities includin
 - Custom embeds.
 - Todo list with notifications.
 - Smart MyAnimeList search of anime and manga/LNs using google custom search (and if that fails, using myanimelist's api for search)
+- Get a countdown to the next episode of your favorite anime.
 - Save/output the last n number of messages from a chat, including any messages that were deleted.
 - Get detailed information about a server and all of its members.
 - Purge the last n messages you sent in a channel.
