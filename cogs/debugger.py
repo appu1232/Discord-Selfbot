@@ -8,6 +8,7 @@ import glob
 import math
 from PythonGists import PythonGists
 from discord.ext import commands
+from appuselfbot import bot_prefix
 from io import StringIO
 from cogs.utils.checks import *
 
