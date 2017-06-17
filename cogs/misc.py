@@ -1192,14 +1192,13 @@ class Misc:
     @commands.command(pass_context=True)
     async def textflip(self, ctx, *, msg):
         """Flip given text."""
-        await self.bot.delete_message(ctx.message)
         result = ""
         for char in msg:
             if char in self.text_flip:
                 result += self.text_flip[char]
             else:
                 result += char
-        await self.bot.send_message(ctx.message.channel, result[::-1])  # slice reverses the string
+        await self.bot.edit_message(ctx.message.channel, result[::-1])  # slice reverses the string
 
 def setup(bot):
     bot.add_cog(Misc(bot))
