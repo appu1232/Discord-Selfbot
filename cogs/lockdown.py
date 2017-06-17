@@ -14,23 +14,31 @@ class Lockdown:
     """
     def __init__(self, bot):
         self.bot = bot
+        self.states = []
 
-    @commands.has_permissions(manage_nicknames=True)
+    @commands.has_permissions(manage_channels=True)
     @commands.command(pass_context=True, name="lockdown")
     async def lockdown(self, ctx):
        """Lock message sending in the channel. Staff only."""
        try:
-            mod_strings = load_moderation()
-            mod_role_strings = mod_strings[ctx.message.server.name]
-            mod_roles = []
-            for m in mod_role_strings:
-                mod_roles.append(discord.utils.get(ctx.message.server.roles, name=m))
+            print(self.states)
+            try:
+                mod_strings = load_moderation()
+                mod_role_strings = mod_strings[ctx.message.server.name]
+                mod_roles = []
+                for m in mod_role_strings:
+                    mod_roles.append(discord.utils.get(ctx.message.server.roles, name=m))
+            except:
+                mod_roles = []
             server = ctx.message.server
             overwrites_everyone = ctx.message.channel.overwrites_for(server.default_role)
             overwrites_owner = ctx.message.channel.overwrites_for(server.role_hierarchy[0])
-            if overwrites_everyone.send_messages is False:
+            if len(self.states) > 0:
                 await self.bot.say("🔒 Channel is already locked down. Use `unlock` to unlock.")
                 return
+            for a in ctx.message.server.role_hierarchy:
+                self.states.append([a, ctx.message.channel.overwrites_for(a).send_messages])
+            print(self.states)
             overwrites_owner.send_messages = True
             overwrites_everyone.send_messages = False
             await self.bot.edit_channel_permissions(ctx.message.channel, server.default_role, overwrites_everyone)
@@ -44,18 +52,20 @@ class Lockdown:
        except discord.errors.Forbidden:
             await self.bot.say("Missing Permissions.")
 
-    @commands.has_permissions(manage_nicknames=True)
+    @commands.has_permissions(manage_channels=True)
     @commands.command(pass_context=True, name="unlock")
     async def unlock(self, ctx):
        """Unlock message sending in the channel. Staff only."""
        try:
             server = ctx.message.server
-            overwrites_everyone = ctx.message.channel.overwrites_for(server.default_role)
-            if overwrites_everyone.send_messages is None:
+            if self.states == []:
                 await self.bot.say("🔓 Channel is already unlocked.")
                 return
-            overwrites_everyone.send_messages = None
-            await self.bot.edit_channel_permissions(ctx.message.channel, server.default_role, overwrites_everyone)
+            for a in self.states:
+                overwrites_a = ctx.message.channel.overwrites_for(a[0])
+                overwrites_a.send_messages = a[1]
+                await self.bot.edit_channel_permissions(ctx.message.channel, a[0], overwrites_a)
+            self.states = []
             await self.bot.say("🔓 Channel unlocked.")
        except discord.errors.Forbidden:
             await self.bot.say("Missing Permissions.")
