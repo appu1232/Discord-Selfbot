@@ -3,6 +3,11 @@ import requests
 import re
 import asyncio
 import gc
+import aiohttp
+import tokage
+import discord
+import pytz
+from datetime import datetime, timedelta
 from discord.ext import commands
 from bs4 import BeautifulSoup
 from appuselfbot import bot_prefix
@@ -15,6 +20,7 @@ class Mal:
 
     def __init__(self, bot):
         self.bot = bot
+        self.t_client = tokage.Client()
 
     # Mal search (chained with either anime or manga)
     @commands.group(pass_context=True)
@@ -228,6 +234,64 @@ class Mal:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
             await self.bot.delete_message(fetch)
 
+    async def get_next_weekday(self, startdate, day):
+        days = {
+            "Monday": 0,
+            "Tuesday": 1,
+            "Wednesday": 2,
+            "Thursday": 3,
+            "Friday": 4,
+            "Saturday": 5,
+            "Sunday": 6
+        }
+        weekday = days[day]
+        d = datetime.strptime(startdate, '%Y-%m-%d')
+        t = timedelta((7 + weekday - d.weekday()) % 7)
+        return (d + t).strftime('%Y-%m-%d')
+    
+    async def get_remaining_time(self, anime):
+        day = anime.broadcast.split(" at ")[0][:-1]
+        hour = anime.broadcast.split(" at ")[1].split(" ")[0]
+        jp_time = datetime.now(pytz.timezone("Japan"))
+        air_date = await self.get_next_weekday(jp_time.strftime('%Y-%m-%d'), day)
+        time_now = jp_time.replace(tzinfo=None)
+        show_airs = datetime.strptime('{} - {}'.format(air_date, hour.strip()), '%Y-%m-%d - %H:%M')
+        remaining = show_airs - time_now
+        if remaining.days < 0:
+            return '6 Days {} Hours and {} Minutes.'.format(remaining.seconds // 3600, (remaining.seconds // 60)%60)
+        else:
+            return '{} Days {} Hours and {} Minutes.'.format(remaining.days, remaining.seconds // 3600, (remaining.seconds // 60)%60)
+    
+    @mal.command(pass_context=True, name="next")
+    async def next_(self, ctx, *, query):
+        config = load_optional_config()
+        search = self.bot.say(bot_prefix + "Searching...")
+        searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net anime " + query + "&start=" + '1' + "&key=" + \
+                            config['google_api_key'] + "&cx=" + config[
+                                'custom_search_engine']
+        async with aiohttp.ClientSession() as cs:
+            async with cs.get(searchUrl) as r:
+                response = await r.json()
+        anime_id = re.findall('/anime/(.*)/', str(response['items'][0]['link']))[0]
+        try:
+            anime = await self.t_client.get_anime(anime_id)
+        except Exception as e:
+            await self.bot.say(":exclamation: Oops!\n {}: {}".format(type(e).__name__, e))
+            await self.bot.delete_message(search)
+            await self.bot.delete_message(ctx.message)
+            return
+        if anime.status == "Finished Airing":
+            remaining = "This anime has finished airing!\n" + anime.air_time
+        else:
+            remaining = await self.get_remaining_time(anime)
+        embed = discord.Embed(title=anime.title, color=0x0066CC)
+        embed.add_field(name="Next Episode", value=remaining)
+        embed.set_footer(text='MyAnimeList')
+        embed.set_author(name='MyAnimeList', icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
+        embed.set_thumbnail(url=anime.image)
+        await self.bot.delete_message(search)
+        await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(embed=embed)
 
 def setup(bot):
     bot.add_cog(Mal(bot))
