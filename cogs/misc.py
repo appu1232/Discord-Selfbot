@@ -660,6 +660,12 @@ class Misc:
                                         bot_prefix + '``Response Time: %s ms``' % str(ping.microseconds / 1000.0))
 
     @commands.command(pass_context=True)
+    async def code(self, ctx, *, msg):
+        """Write text in code format"""
+        await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(ctx.message.channel, "```" + msg + "```")
+
+    @commands.command(pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
         """Quote a message. >help quote for more info.
         >quote - quotes the last message sent in the channel.
