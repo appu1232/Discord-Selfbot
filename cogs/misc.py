@@ -680,6 +680,26 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Type a prefix as an argument for the `prefix` command')
 
     @commands.command(pass_context=True)
+    async def quotecolor(self, ctx, *, msg):
+        '''Set color (hex) of a quote embed. Ex: >quotecolor 000000'''
+        if msg:
+            try:
+                msg = msg.lstrip('#')
+                int(msg, 16)
+            except:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for quote embeds.')
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
+            return
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            opt['quoteembed_color'] = msg
+            fp.seek(0)
+            fp.truncate()
+            json.dump(opt, fp, indent=4)
+
+    @commands.command(pass_context=True)
     async def botprefix(self, ctx, *, msg):
         '''Set bot prefix, needs a reboot to activate'''
         if msg:
@@ -784,7 +804,13 @@ class Misc:
             result = search[0]
         if result:
             if embed_perms(ctx.message) and result.content:
-                em = discord.Embed(description=result.content, timestamp=result.timestamp, color=0xbc0b0b)
+                with open('settings/optional_config.json', 'r+') as fp:
+                    opt = json.load(fp)
+                    embedColor = opt['quoteembed_color']
+                try:
+                    em = discord.Embed(description=result.content, timestamp=result.timestamp, color=int('0x' + embedColor, 16))
+                except:
+                    em = discord.Embed(description=result.content, timestamp=result.timestamp, color=0xbc0b0b)
                 em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
                 if channel != ctx.message.channel:
                     em.set_footer(text='#{} | {} '.format(channel.name, channel.server.name))
