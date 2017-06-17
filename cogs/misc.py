@@ -486,7 +486,7 @@ class Misc:
             else:
                 self.bot.game_interval = None
                 self.bot.game = game
-                stream = 'no' if is_stream else 'yes'
+                stream = 'yes' if is_stream else 'no'
                 games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none', 'stream': stream}
                 with open('settings/games.json', 'w') as g:
                     json.dump(games, g, indent=4)
