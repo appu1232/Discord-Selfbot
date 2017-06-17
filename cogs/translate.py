@@ -21,6 +21,7 @@ class Translate:
         >translate <new language> <words> - Translate words from one language to another. Full language names must be used.
         The original language will be assumed automatically.
         """
+        await self.bot.delete_message(ctx.message)
         codes = requests.get("http://lyricly.tk/langs.json").text
         lang_codes = json.loads(codes)
         real_language = False
