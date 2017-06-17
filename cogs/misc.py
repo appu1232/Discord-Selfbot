@@ -666,6 +666,35 @@ class Misc:
         await self.bot.send_message(ctx.message.channel, "```" + msg + "```")
 
     @commands.command(pass_context=True)
+    async def cmdprefix(self, ctx, *, msg):
+        '''Set command prefix, needs a reboot to activate'''
+        if msg:
+            with open('settings/config.json', 'r+') as fp:
+                opt = json.load(fp)
+                opt['cmd_prefix'] = msg
+                fp.seek(0)
+                fp.truncate()
+                json.dump(opt, fp, indent=4)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Prefix changed. use `restart` to reboot the bot for the updated prefix')
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Type a prefix as an argument for the `prefix` command')
+
+    @commands.command(pass_context=True)
+    async def botprefix(self, ctx, *, msg):
+        '''Set bot prefix, needs a reboot to activate'''
+        if msg:
+            with open('settings/config.json', 'r+') as fp:
+                opt = json.load(fp)
+                opt['bot_identifier'] = msg
+                fp.seek(0)
+                fp.truncate()
+                json.dump(opt, fp, indent=4)
+            bot_prefix = msg
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Prefix changed. use `restart` to reboot the bot for the updated prefix')
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Type a prefix as an argument for the `prefix` command')
+
+    @commands.command(pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
         """Quote a message. >help quote for more info.
         >quote - quotes the last message sent in the channel.
