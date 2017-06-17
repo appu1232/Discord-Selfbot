@@ -145,38 +145,6 @@ class Google:
 
         return e
 
-    async def get_google_entries(self, query):
-        params = {
-            'q': query,
-            'safe': 'off'
-        }
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64)'
-        }
-        entries = []
-        card = None
-        async with aiohttp.get('https://www.google.com/search', params=params, headers=headers) as resp:
-            if resp.status != 200:
-                config = load_optional_config()
-                async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
-                    result = json.loads(await resp.text())
-                return None, result['items'][0]['link']
-
-            root = etree.fromstring(await resp.text(), etree.HTMLParser())
-            card_node = root.find(".//div[@id='topstuff']")
-            card = self.parse_google_card(card_node)
-            search_nodes = root.findall(".//div[@class='g']")
-            for node in search_nodes:
-                url_node = node.find('.//h3/a')
-                if url_node is None:
-                    continue
-                url = url_node.attrib['href']
-                if not url.startswith('/url?'):
-                    continue
-                url = parse_qs(url[5:])['q'][0]
-                entries.append(url)
-        return card, entries
-
     @commands.command(pass_context=True)
     async def g(self, ctx, *, query):
         """Google web search. Ex: >g what is discordapp?"""
@@ -186,7 +154,9 @@ class Google:
                 result = json.loads(await resp.text())
             return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
         try:
-            card, entries = await self.get_google_entries(query)
+            entries, root = await get_google_entries(query)
+            card_node = root.find(".//div[@id='topstuff']")
+            card = self.parse_google_card(card_node)
         except RuntimeError as e:
             await self.bot.send_message(ctx.message.channel, str(e))
         else:

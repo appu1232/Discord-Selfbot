@@ -3,7 +3,6 @@ import requests
 import re
 import asyncio
 import gc
-import aiohttp
 import tokage
 import discord
 import pytz
@@ -22,6 +21,26 @@ class Mal:
         self.bot = bot
         self.t_client = tokage.Client()
 
+    @staticmethod
+    async def google_results(type, query):
+        loop = asyncio.get_event_loop()
+        config = load_optional_config()
+        try:
+            entries, root = await get_google_entries('site:myanimelist.net {} {}'.format(type, query))
+            result = entries[0]
+        except RuntimeError:
+            try:
+                search_url = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net {} {} ".format(type, query) + "&start=" + '1' + "&key=" + \
+                            config['google_api_key'] + "&cx=" + config[
+                                'custom_search_engine']
+                r = await loop.run_in_executor(None, requests.get, search_url)
+                response = r.content.decode('utf-8')
+                result = json.loads(response)['items'][0]['link']
+            except:
+                return False, None
+
+        return True, result
+
     # Mal search (chained with either anime or manga)
     @commands.group(pass_context=True)
     async def mal(self, ctx):
@@ -35,41 +54,29 @@ class Mal:
 
     # Anime search for Mal
     @mal.command(pass_context=True)
-    async def anime(self, ctx, *, msg: str):
+    async def anime(self, ctx, *, msg: str = None):
         """Search the anime database. Ex: >mal anime Steins;Gate"""
-        loop = asyncio.get_event_loop()
-        config = load_optional_config()
-        fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
-        try:
-            link = False
-            try:
+        if msg:
+            loop = asyncio.get_event_loop()
+            config = load_optional_config()
+            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
+            if msg.startswith('[link]'):
+                msg = msg[6:]
+                link = True
+            else:
+                link = False
 
-                if msg.startswith('[link]'):
-                    msg = msg[6:]
-                    link = True
-                # Search google for the anime under site:myanimelist.net
-                searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net anime " + msg.strip() + "&start=" + '1' + "&key=" + \
-                            config['google_api_key'] + "&cx=" + config[
-                                'custom_search_engine']
-                r = requests.get(searchUrl)
-                response = r.content.decode('utf-8')
-                result = json.loads(response)
-                animeID = re.findall('/anime/(.*)/', str(result['items'][0]['link']))
-                results = await loop.run_in_executor(None, spice.search_id, int(animeID[0]), spice.get_medium('anime'),
-                                       spice.init_auth(config['mal_username'], config['mal_password']))
+            found, result = await self.google_results('anime', msg)
+
+            if found:
+                anime_id = re.findall('/anime/(.*)/', result)
+                results = await loop.run_in_executor(None, spice.search_id, int(anime_id[0]), spice.get_medium('anime'),
+                                                     spice.init_auth(config['mal_username'], config['mal_password']))
                 gc.collect()
 
-                # If no results found or daily api limit exceeded, use spice's search
-                if not results:
-                    allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('anime'),
-                                           spice.init_auth(config['mal_username'], config['mal_password']))
-                    gc.collect()
-                    results = allresults[0]
-
-            # On any exception, search spice instead
-            except:
+            else:
                 allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('anime'),
-                                       spice.init_auth(config['mal_username'], config['mal_password']))
+                                                        spice.init_auth(config['mal_username'], config['mal_password']))
                 gc.collect()
                 results = allresults[0]
 
@@ -77,14 +84,12 @@ class Mal:
             if not results:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results.')
                 await self.bot.delete_message(fetch)
-                await self.bot.delete_message(ctx.message)
-                return
+                return await self.bot.delete_message(ctx.message)
 
             if not embed_perms(ctx.message) or link is True:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'https://myanimelist.net/anime/%s' % results.id)
                 await self.bot.delete_message(fetch)
-                await self.bot.delete_message(ctx.message)
-                return
+                return await self.bot.delete_message(ctx.message)
 
             # Formatting embed
             selection = results
@@ -126,51 +131,39 @@ class Mal:
             em.set_thumbnail(url=selection.image_url)
             em.set_author(name=selection.title,
                           icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
+            em.set_footer(text='MyAnimeList')
 
             await self.bot.send_message(ctx.message.channel, embed=em)
             await self.bot.delete_message(fetch)
             await self.bot.delete_message(ctx.message)
-        except:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
-            await self.bot.delete_message(fetch)
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Specify an anime to search for.')
 
     # Manga search for Mal
     @mal.command(pass_context=True)
-    async def manga(self, ctx, *, msg: str):
+    async def manga(self, ctx, *, msg: str = None):
         """Search the manga database. Ex: >mal manga Boku no Hero Academia"""
-        loop = asyncio.get_event_loop()
-        config = load_optional_config()
-        fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
-        try:
-            link = False
-            try:
+        if msg:
+            loop = asyncio.get_event_loop()
+            config = load_optional_config()
+            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
+            if msg.startswith('[link]'):
+                msg = msg[6:]
+                link = True
+            else:
+                link = False
 
-                if msg.startswith('[link]'):
-                    msg = msg[6:]
-                    link = True
-                config = load_optional_config()
-                # Search google for the manga under site:myanimelist.net
-                searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net manga " + msg.strip() + "&start=" + '1' + "&key=" + \
-                            config['google_api_key'] + "&cx=" + config[
-                                'custom_search_engine']
-                r = requests.get(searchUrl)
-                response = r.content.decode('utf-8')
-                result = json.loads(response)
-                mangaID = re.findall('/manga/(.*)/', str(result['items'][0]['link']))
-                results = await loop.run_in_executor(None, spice.search_id, int(mangaID[0]), spice.get_medium('manga'), spice.init_auth(config['mal_username'], config['mal_password']))
+            found, result = await self.google_results('manga', msg)
+
+            if found:
+                manga_id = re.findall('/manga/(.*)/', result)
+                results = await loop.run_in_executor(None, spice.search_id, int(manga_id[0]), spice.get_medium('manga'),
+                                                     spice.init_auth(config['mal_username'], config['mal_password']))
                 gc.collect()
 
-                # If no results found or daily api limit exceeded, use spice's search
-                if not results:
-                    allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('manga'),
-                                           spice.init_auth(config['mal_username'], config['mal_password']))
-                    gc.collect()
-                    results = allresults[0]
-
-            # On any exception, search spice instead
-            except:
+            else:
                 allresults = await loop.run_in_executor(None, spice.search, msg.strip(), spice.get_medium('manga'),
-                                       spice.init_auth(config['mal_username'], config['mal_password']))
+                                                        spice.init_auth(config['mal_username'], config['mal_password']))
                 gc.collect()
                 results = allresults[0]
 
@@ -178,15 +171,13 @@ class Mal:
             if not results:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results.')
                 await self.bot.delete_message(fetch)
-                await self.bot.delete_message(ctx.message)
-                return
+                return await self.bot.delete_message(ctx.message)
 
             if not embed_perms(ctx.message) or link is True:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'https://myanimelist.net/manga/%s' % results.id)
+                await self.bot.send_message(ctx.message.channel,
+                                            bot_prefix + 'https://myanimelist.net/manga/%s' % results.id)
                 await self.bot.delete_message(fetch)
-                await self.bot.delete_message(ctx.message)
-                return
-
+                return await self.bot.delete_message(ctx.message)
             # Formatting
             selection = results
             synopsis = BeautifulSoup(selection.synopsis, 'lxml')
@@ -227,14 +218,16 @@ class Mal:
             em.set_thumbnail(url=selection.image_url)
             em.set_author(name=selection.title,
                           icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
+            em.set_footer(text='MyAnimeList')
+
             await self.bot.send_message(ctx.message.channel, embed=em)
             await self.bot.delete_message(fetch)
             await self.bot.delete_message(ctx.message)
-        except:
+        else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
-            await self.bot.delete_message(fetch)
 
-    async def get_next_weekday(self, startdate, day):
+    @staticmethod
+    async def get_next_weekday(startdate, day):
         days = {
             "Monday": 0,
             "Tuesday": 1,
@@ -264,22 +257,18 @@ class Mal:
     
     @mal.command(pass_context=True, name="next")
     async def next_(self, ctx, *, query):
-        config = load_optional_config()
         search = await self.bot.say(bot_prefix + "Searching...")
-        searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net anime " + query + "&start=" + '1' + "&key=" + \
-                            config['google_api_key'] + "&cx=" + config[
-                                'custom_search_engine']
-        async with aiohttp.ClientSession() as cs:
-            async with cs.get(searchUrl) as r:
-                response = await r.json()
-        anime_id = re.findall('/anime/(.*)/', str(response['items'][0]['link']))[0]
-        try:
-            anime = await self.t_client.get_anime(anime_id)
-        except Exception as e:
-            await self.bot.say(":exclamation: Oops!\n {}: {}".format(type(e).__name__, e))
-            await self.bot.delete_message(search)
-            await self.bot.delete_message(ctx.message)
-            return
+        found, result = await self.google_results('anime', query)
+        if found:
+            anime_id = re.findall('/anime/(.*)/', result)[0]
+            try:
+                anime = await self.t_client.get_anime(anime_id)
+            except Exception as e:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + ":exclamation: Oops!\n {}: {}".format(type(e).__name__, e))
+                await self.bot.delete_message(search)
+                return await self.bot.delete_message(ctx.message)
+        else:
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Failed to find given anime.')
         if anime.status == "Finished Airing":
             remaining = "This anime has finished airing!\n" + anime.air_time
         else:
@@ -292,6 +281,7 @@ class Mal:
         await self.bot.delete_message(search)
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(ctx.message.channel, embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Mal(bot))

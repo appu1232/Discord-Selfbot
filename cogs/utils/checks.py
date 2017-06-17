@@ -3,6 +3,9 @@ import time
 import git
 import discord
 import os
+import aiohttp
+from urllib.parse import parse_qs
+from lxml import etree
 
 
 def load_config():
@@ -132,6 +135,35 @@ def get_user(message, user):
     if not member:
         return False
     return member
+
+async def get_google_entries(query):
+    params = {
+        'q': query,
+        'safe': 'off'
+    }
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64)'
+    }
+    entries = []
+    async with aiohttp.get('https://www.google.com/search', params=params, headers=headers) as resp:
+        if resp.status != 200:
+            config = load_optional_config()
+            async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+                result = json.loads(await resp.text())
+            return None, result['items'][0]['link']
+
+        root = etree.fromstring(await resp.text(), etree.HTMLParser())
+        search_nodes = root.findall(".//div[@class='g']")
+        for node in search_nodes:
+            url_node = node.find('.//h3/a')
+            if url_node is None:
+                continue
+            url = url_node.attrib['href']
+            if not url.startswith('/url?'):
+                continue
+            url = parse_qs(url[5:])['q'][0]
+            entries.append(url)
+    return entries, root
 
 
 def attach_perms(message):
