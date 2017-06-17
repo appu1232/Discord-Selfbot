@@ -265,7 +265,7 @@ class Mal:
     @mal.command(pass_context=True, name="next")
     async def next_(self, ctx, *, query):
         config = load_optional_config()
-        search = self.bot.say(bot_prefix + "Searching...")
+        search = await self.bot.say(bot_prefix + "Searching...")
         searchUrl = "https://www.googleapis.com/customsearch/v1?q=site:myanimelist.net anime " + query + "&start=" + '1' + "&key=" + \
                             config['google_api_key'] + "&cx=" + config[
                                 'custom_search_engine']
@@ -291,7 +291,7 @@ class Mal:
         embed.set_thumbnail(url=anime.image)
         await self.bot.delete_message(search)
         await self.bot.delete_message(ctx.message)
-        await self.bot.send_message(embed=embed)
+        await self.bot.send_message(ctx.message.channel, embed=embed)
 
 def setup(bot):
     bot.add_cog(Mal(bot))
