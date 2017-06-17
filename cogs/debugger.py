@@ -272,6 +272,8 @@ class Debugger:
         """Manage custom cogs. >help cog for more information.
         >cog install <cog> - Install a custom cog from the server.
         >cog uninstall <cog> - Uninstall one of your custom cogs.
+        >cog list - List all cogs on the server.
+        >cog view <cog> - View information about a cog.
         If you would like to add a custom cog to the server, see http://appucogs.tk
         """
         if ctx.invoked_subcommand is None:
@@ -337,6 +339,7 @@ class Debugger:
     
     @cog.command(pass_context=True)
     async def list(self, ctx):
+        """List all cogs on the server."""
         await self.bot.delete_message(ctx.message)
         site = requests.get('https://github.com/LyricLy/Selfbot-Cogs/tree/master/cogs').text
         soup = BeautifulSoup(site, "lxml")
@@ -355,6 +358,7 @@ class Debugger:
         
     @cog.command(pass_context=True)
     async def view(self, ctx, cog):
+        """View information about a cog."""
         await self.bot.delete_message(ctx.message)
         response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
         if response.status_code == 404:
