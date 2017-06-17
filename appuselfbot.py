@@ -102,6 +102,8 @@ async def on_ready():
         opt = json.load(fp)
         if 'embed_color' not in opt:
             opt['embed_color'] = ''
+        if 'quoteembed_color' not in opt:
+            opt['quoteembed_color'] = 'bc0b0b'
         if 'customcmd_color' not in opt:
             opt['customcmd_color'] = '27007A'
         if 'rich_embed' not in opt:
