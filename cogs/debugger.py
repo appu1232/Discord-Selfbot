@@ -300,7 +300,7 @@ class Debugger:
             embed.set_author(name=cog["author"])
             await self.bot.send_message(ctx.message.channel, bot_prefix + "Are you sure you want to download this cog? (y/n)", embed=embed)
             reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
-            if reply.content == "y":
+            if reply.content.lower() == "y":
                 download = requests.get(cog["link"]).text
                 filename = cog["link"].rsplit("/", 1)[1]
                 with open("cogs/" + filename, "wb+") as f:
@@ -329,7 +329,7 @@ class Debugger:
                 embed.set_author(name=found_cog["author"])
                 await self.bot.send_message(ctx.message.channel, bot_prefix + "Are you sure you want to delete this cog? (y/n)", embed=embed)
                 reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
-                if reply.content == "y":
+                if reply.content.lower() == "y":
                     os.remove("cogs/" + cog + ".py")
                     await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully deleted the `{}` cog.".format(found_cog["title"]))
                 else:
