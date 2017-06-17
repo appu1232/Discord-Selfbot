@@ -335,6 +335,35 @@ class Debugger:
             else:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + "You don't have `{}` installed!".format(found_cog["title"]))
     
-
+    @cog.command(pass_context=True)
+    async def list(self, ctx):
+        await self.bot.delete_message(ctx.message)
+        site = requests.get('https://github.com/LyricLy/Selfbot-Cogs/tree/master/cogs').text
+        soup = BeautifulSoup(site, "lxml")
+        data = soup.find_all(attrs={"class": "js-navigation-open"})
+        list = []
+        for a in data:
+            list.append(a.get("title"))
+        embed = discord.Embed(title="Cog list", description="")
+        for entry in list[2:]:
+            entry = entry.rsplit(".")[0]
+            if os.path.isfile("cogs/" + entry + ".py"):
+                embed.description += "• {} - installed\n".format(entry)
+            else:
+                embed.description += "• {} - not installed\n".format(entry)
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
+        
+    @cog.command(pass_context=True)
+    async def view(self, ctx, cog):
+        await self.bot.delete_message(ctx.message)
+        response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
+        if response.status_code == 404:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "That cog couldn't be found on the network. Check your spelling and try again.")
+        else:
+            cog = response.json()
+            embed = discord.Embed(title=cog["title"], description=cog["description"])
+            embed.set_author(name=cog["author"])
+            await self.bot.send_message(ctx.message.channel, embed=embed)
+    
 def setup(bot):
     bot.add_cog(Debugger(bot))
