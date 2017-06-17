@@ -140,10 +140,10 @@ async def restart(ctx):
     if latest:
         await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
         reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
+        with open('restart.txt', 'w') as re:
+            re.write(str(ctx.message.channel.id))
         if not reply or reply.content.lower().strip() == 'n':
-            with open('restart.txt', 'w') as re:
-                print('Restarting...')
-                re.write(str(ctx.message.channel.id))
+            print('Restarting...')
             await bot.send_message(ctx.message.channel, bot_prefix + 'Restarting...')
         else:
             await bot.send_message(ctx.message.channel, content=None, embed=latest)

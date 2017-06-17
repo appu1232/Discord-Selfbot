@@ -240,7 +240,7 @@ class Misc:
                 pass
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
-            msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Recieved: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (
+            msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Received: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (
             time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count),
             str(len(self.bot.servers)), str(self.bot.keyword_log), game)
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
