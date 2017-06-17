@@ -36,6 +36,10 @@ class Lockdown:
             await self.bot.edit_channel_permissions(ctx.message.channel, server.default_role, overwrites_everyone)
             for modrole in mod_roles:
                 await self.bot.edit_channel_permissions(ctx.message.channel, modrole, overwrites_owner)
+            try:
+                await self.bot.edit_channel_permissions(ctx.message.channel, server.get_member("135204578986557440"), overwrites_owner)
+            except:
+                print("If you have any issues with this feature, let 'thecommondude' know about it in Appu's Discord Server")
             await self.bot.say("🔒 Channel locked down. Only roles with permissions specified in `moderation.json` can speak.")
        except discord.errors.Forbidden:
             await self.bot.say("Missing Permissions.")
