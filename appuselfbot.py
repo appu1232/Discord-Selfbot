@@ -100,6 +100,8 @@ async def on_ready():
             json.dump(o_conf, oc, indent=4)
     with open('settings/optional_config.json', 'r+') as fp:
         opt = json.load(fp)
+        if 'embed_color' not in opt:
+            opt['embed_color'] = ''
         if 'customcmd_color' not in opt:
             opt['customcmd_color'] = '27007A'
         if 'rich_embed' not in opt:

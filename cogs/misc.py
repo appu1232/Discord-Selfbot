@@ -385,9 +385,17 @@ class Misc:
                 if author:
                     if 'icon=' in author:
                         text, icon = author.split('icon=')
-                        em.set_author(name=text.strip()[5:], icon_url=icon)
+                        if 'url=' in icon:
+                            print("here")
+                            em.set_author(name=text.strip()[5:], icon_url=icon.split('url=')[0].strip(), url=icon.split('url=')[1].strip())
+                        else:
+                            em.set_author(name=text.strip()[5:], icon_url=icon)
                     else:
-                        em.set_author(name=author)
+                        if 'url=' in author:
+                            print("here")
+                            em.set_author(name=author.split('url=')[0].strip()[5:], url=author.split('url=')[1].strip())
+                        else:
+                            em.set_author(name=author)
 
                 if image:
                     em.set_image(url=image)
@@ -713,16 +721,17 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def botprefix(self, ctx, *, msg):
-        '''Set bot prefix, needs a reboot to activate'''
+        """Set bot prefix, needs a reboot to activate"""
         if msg:
             with open('settings/config.json', 'r+') as fp:
                 opt = json.load(fp)
                 opt['bot_identifier'] = msg
                 fp.seek(0)
                 fp.truncate()
+
                 json.dump(opt, fp, indent=4)
-            bot_prefix = msg
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Prefix changed. use `restart` to reboot the bot for the updated prefix')
+            new_bot_prefix = msg
+            await self.bot.send_message(ctx.message.channel, new_bot_prefix + 'Prefix changed. use `restart` to reboot the bot for the updated prefix')
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Type a prefix as an argument for the `prefix` command')
 
@@ -735,6 +744,7 @@ class Misc:
         >quote <words> | channel=<channel_name> - quotes the message with the given words from the channel name specified in the second argument
         >quote <message_id> | channel=<channel_name> - quotes the message with the given message id in the given channel name"""
         result = channel = None
+        pre = cmd_prefix_len()
         await self.bot.delete_message(ctx.message)
         if msg:
             length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
@@ -751,7 +761,7 @@ class Misc:
                             except:
                                 continue
                             if (msg.lower().strip() in search[0].content.lower() and (
-                                    search[0].author != ctx.message.author or search[0].content[1:7] != 'quote ')) or (
+                                    search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
                                 ctx.message.content[6:].strip() == search[0].id):
                                 result = search[0]
                                 break
@@ -775,7 +785,7 @@ class Misc:
                                         continue
                                     if (msg.lower().strip() in search[0].content.lower() and (
                                             search[0].author != ctx.message.author or search[0].content[
-                                                                                      1:7] != 'quote ')) or (
+                                                                                      pre:7] != 'quote ')) or (
                                         ctx.message.content[6:].strip() == search[0].id):
                                         result = search[0]
                                         break
@@ -787,8 +797,7 @@ class Misc:
                                 async for sent_message in self.bot.logs_from(channel, limit=500):
                                     if (msg.lower().strip() in sent_message.content and (
                                             sent_message.author != ctx.message.author or sent_message.content[
-                                                                                         1:7] != 'quote ')) or (
-                                        msg.strip() == sent_message.id):
+                                                                                         pre:7] != 'quote ')) or (msg.strip() == sent_message.id):
                                         result = sent_message
                                         break
                             except:
@@ -801,8 +810,7 @@ class Misc:
                         async for sent_message in self.bot.logs_from(channel, limit=500):
                             if (msg.lower().strip() in sent_message.content and (
                                     sent_message.author != ctx.message.author or sent_message.content[
-                                                                                 1:7] != 'quote ')) or (
-                                msg.strip() == sent_message.id):
+                                                                                 pre:7] != 'quote ')) or (msg.strip() == sent_message.id):
                                 result = sent_message
                                 break
                     except:
@@ -816,11 +824,11 @@ class Misc:
             result = search[0]
         if result:
             if embed_perms(ctx.message) and result.content:
-                with open('settings/optional_config.json', 'r+') as fp:
+                with open('settings/optional_config.json') as fp:
                     opt = json.load(fp)
-                    embedColor = opt['quoteembed_color']
                 try:
-                    em = discord.Embed(description=result.content, timestamp=result.timestamp, color=int('0x' + embedColor, 16))
+                    embed_color = opt['quoteembed_color']
+                    em = discord.Embed(description=result.content, timestamp=result.timestamp, color=int('0x' + embed_color, 16))
                 except:
                     em = discord.Embed(description=result.content, timestamp=result.timestamp, color=0xbc0b0b)
                 em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
