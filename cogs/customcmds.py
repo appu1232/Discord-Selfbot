@@ -384,7 +384,6 @@ class Customcmds:
 
                 elif reply.content == '3':
                     await self.bot.delete_message(menu)
-                    await self.bot.delete_message(ctx.message)
                     await self.customcommands(ctx)
 
         else:
@@ -515,9 +514,7 @@ class Customcmds:
                             commands.seek(0)
                             commands.truncate()
                             try:
-                                print(all_cmds)
                                 cmd_to_remove = all_cmds[int(reply.content) - 1]
-                                print(cmd_to_remove)
                                 del cmds[cmd_to_remove]
 
                                 json.dump(cmds, commands, indent=4)

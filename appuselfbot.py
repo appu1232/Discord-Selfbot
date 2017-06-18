@@ -112,6 +112,8 @@ async def on_ready():
             opt['default_status'] = 'idle'
         if 'ascii_font' not in opt:
             opt['ascii_font'] = 'big'
+        if 'online_stats' not in opt:
+            opt['online_stats'] = 'on'
         fp.seek(0)
         fp.truncate()
         json.dump(opt, fp, indent=4)
