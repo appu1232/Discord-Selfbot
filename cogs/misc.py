@@ -1104,7 +1104,10 @@ class Misc:
                     for i in reactions:
                         await self.bot.add_reaction(message, i)
         else:
-            found_channel = discord.utils.get(ctx.message.server.channels, name=channel.replace("#", ""))
+            if channel.startswith("<#") and channel.endswith(">"):
+                found_channel = discord.utils.get(ctx.message.server.channels, id=channel.replace("<", "").replace(">", "").replace("#", ""))
+            else:
+                found_channel = discord.utils.get(ctx.message.server.channels, name=channel)
             if found_channel:
                 async for message in self.bot.logs_from(found_channel, limit=limit):
                     if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
