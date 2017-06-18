@@ -1383,6 +1383,22 @@ class Misc:
             else:
                 result += char
         await self.bot.edit_message(ctx.message, result[::-1])  # slice reverses the string
+        
+    @commands.command(pass_context=True)
+    async def xkcd(self, ctx, comic="latest"):
+        """Pull comics from xkcd."""
+        if comic == "latest":
+            site = requests.get("https://xkcd.com/info.0.json")
+        else:
+            site = requests.get("https://xkcd.com/{}/info.0.json".format(comic))
+        if site.status_code == 404:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "That comic doesn't exist! You cannot use comic names, you must use numbers.")
+        else:
+            json = site.json()
+            embed = discord.Embed(title="xkcd {}: {}".format(comic, json["title"]), url="https://xkcd.com/{}/".format(comic))
+            embed.set_image(url=json["img"])
+            embed.set_footer(text="{}".format(json["alt"]))
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
 
 def setup(bot):
