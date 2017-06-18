@@ -747,26 +747,29 @@ class Misc:
         pre = cmd_prefix_len()
         await self.bot.delete_message(ctx.message)
         if msg:
-            length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
-            if length < 201:
-                size = length
-            else:
-                size = 200
-            for channel in ctx.message.server.channels:
-                if str(channel.type) == 'text':
-                    if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
-                        for i in range(length - 2, length - size, -1):
-                            try:
-                                search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
-                            except:
-                                continue
-                            if (msg.lower().strip() in search[0].content.lower() and (
-                                    search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
-                                ctx.message.content[6:].strip() == search[0].id):
-                                result = search[0]
+            try:
+                length = len(self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id])
+                if length < 201:
+                    size = length
+                else:
+                    size = 200
+                for channel in ctx.message.server.channels:
+                    if str(channel.type) == 'text':
+                        if channel.id + ' ' + ctx.message.server.id in self.bot.all_log:
+                            for i in range(length - 2, length - size, -1):
+                                try:
+                                    search = self.bot.all_log[channel.id + ' ' + ctx.message.server.id][i]
+                                except:
+                                    continue
+                                if (msg.lower().strip() in search[0].content.lower() and (
+                                        search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
+                                    ctx.message.content[6:].strip() == search[0].id):
+                                    result = search[0]
+                                    break
+                            if result:
                                 break
-                        if result:
-                            break
+            except KeyError:
+                pass
 
             if not result:
                 if " | channel=" in msg:
