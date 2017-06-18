@@ -170,9 +170,9 @@ class Todo:
                         seconds += (int(item[:-1]) * units[item[-1]])
                     seconds += current_time()
 
-                if text and not channel:
+                if text and channel == 0:
                     channel = ctx.message.channel.id
-                if channel and not text:
+                if channel and text == 0:
                     text = msg[0]
                 if alert == 'off' or alert == 'false':
                     alert = False
