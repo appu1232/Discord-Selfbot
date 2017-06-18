@@ -105,7 +105,7 @@ class Online:
                     self.mark_online(self.bot.user.id)
                     pool.disconnect()
                 except:
-                    raise
+                    pass
                 await asyncio.sleep(500)
 
 
