@@ -1428,7 +1428,7 @@ class Misc:
                 comic = found
         if site:
             json = site.json()
-            embed = discord.Embed(title="xkcd {}: {}".format(site.url.split("/")[3], json["title"]), url="https://xkcd.com/{}/".format(comic))
+            embed = discord.Embed(title="xkcd {}: {}".format(json["num"], json["title"]), url="https://xkcd.com/{}/".format(comic))
             embed.set_image(url=json["img"])
             embed.set_footer(text="{}".format(json["alt"]))
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
