@@ -18,6 +18,7 @@ from discord.ext import commands
 
 config = load_config()
 
+
 bot_prefix = config['bot_identifier']
 if bot_prefix != '':
     bot_prefix += ' '
@@ -62,6 +63,9 @@ async def on_ready():
         with open('settings/todo.json', 'w') as t:
             todo = {}
             json.dump(todo, t, indent=4)
+
+    if os.path.isfile('cogs/online_users.py'):
+        os.remove('cogs/online_users.py')
 
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r+') as g:
