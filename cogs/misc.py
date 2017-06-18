@@ -1385,20 +1385,34 @@ class Misc:
         await self.bot.edit_message(ctx.message, result[::-1])  # slice reverses the string
         
     @commands.command(pass_context=True)
-    async def xkcd(self, ctx, comic="latest"):
+    async def xkcd(self, ctx, *, comic="latest"):
         """Pull comics from xkcd."""
         if comic == "latest":
             site = requests.get("https://xkcd.com/info.0.json")
         else:
             site = requests.get("https://xkcd.com/{}/info.0.json".format(comic))
         if site.status_code == 404:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + "That comic doesn't exist! You cannot use comic names, you must use numbers.")
-        else:
+            site = None
+            found = None
+            search = parse.quote(comic)
+            result = requests.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)).text
+            soup = BeautifulSoup(result, "lxml")
+            links = soup.find_all("cite")
+            for link in links:
+                if link.text.startswith("https://xkcd.com/"):
+                    found = link.text.split("/")[3]
+                    break
+            if not found:   
+                await self.bot.send_message(ctx.message.channel, bot_prefix + "That comic doesn't exist!")
+            else:
+                site = requests.get("https://xkcd.com/{}/info.0.json".format(found))
+                comic = found
+        if site:
             json = site.json()
-            embed = discord.Embed(title="xkcd {}: {}".format(comic, json["title"]), url="https://xkcd.com/{}/".format(comic))
+            embed = discord.Embed(title="xkcd {}: {}".format(site.url.split("/")[3], json["title"]), url="https://xkcd.com/{}/".format(comic))
             embed.set_image(url=json["img"])
             embed.set_footer(text="{}".format(json["alt"]))
-        await self.bot.send_message(ctx.message.channel, "", embed=embed)
+            await self.bot.send_message(ctx.message.channel, "", embed=embed)
         
     @commands.command(pass_context=True)
     async def hastebin(self, ctx, *, data):
