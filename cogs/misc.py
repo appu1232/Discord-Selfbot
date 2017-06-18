@@ -1027,7 +1027,7 @@ class Misc:
     # given String react_me, return a list of emojis that can construct the string with no duplicates (for the purpose of reacting)
     # TODO make it consider reactions already applied to the message
     @commands.command(pass_context=True, aliases=['r'])
-    async def react(self, ctx, msg: str, msg_id="last", prefer_combine: bool = False):
+    async def react(self, ctx, msg: str, channel="current", msg_id="last", prefer_combine: bool = False):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
         await self.bot.delete_message(ctx.message)
         msg = msg.lower()
@@ -1097,11 +1097,24 @@ class Misc:
                 else:
                     reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=non_unicode_emoji_list[lt_count]))
                     lt_count += 1
-
-        async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
-            if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
-                for i in reactions:
-                    await self.bot.add_reaction(message, i)
+        
+        if channel == "current":
+            async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
+                if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
+                    for i in reactions:
+                        await self.bot.add_reaction(message, i)
+        else:
+            found_channel = discord.utils.get(ctx.message.server.channels, name=channel.replace("#", ""))
+            if found_channel:
+                async for message in self.bot.logs_from(found_channel, limit=limit):
+                    if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
+                        for i in reactions:
+                            await self.bot.add_reaction(message, i)
+            else:
+                async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
+                    if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
+                        for i in reactions:
+                            await self.bot.add_reaction(message, i)
 
     @commands.command(pass_context=True)
     async def afk(self, ctx, txt: str = None):
