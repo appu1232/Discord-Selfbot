@@ -1399,6 +1399,12 @@ class Misc:
             embed.set_image(url=json["img"])
             embed.set_footer(text="{}".format(json["alt"]))
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
+        
+    @commands.command(pass_context=True)
+    async def hastebin(self, ctx, *, data):
+        """Post to Hastebin."""
+        post = requests.post("https://hastebin.com/documents", data=data)
+        await self.bot.send_message(ctx.message.channel, bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(post.json()["key"]))
 
 
 def setup(bot):
