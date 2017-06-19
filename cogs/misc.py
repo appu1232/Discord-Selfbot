@@ -903,8 +903,8 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def l2g(self, ctx, *, msg: str):
-        """Creates a googleitfor.me link. Ex: >l2g how do i become cool."""
-        lmgtfy = 'http://googleitfor.me/?q='
+        """Creates a lmgtfy link. Ex: >l2g how do i become cool."""
+        lmgtfy = 'http://lmgtfy.com/?q='
         await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy + msg.lower().strip().replace(' ', '+'))
         await self.bot.delete_message(ctx.message)
 
