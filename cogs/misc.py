@@ -633,7 +633,16 @@ class Misc:
 
     @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
-        """Embed a custom emoji (from any server). Ex: >emoji :smug:"""
+        """
+        Embed or copy a custom emoji (from any server).
+        Usage:
+        1) >emoji :smug: [Will display the smug emoji as an image]
+        2) >emoji :smug: [Will add the emoji as a custom emote for the server]
+        """
+        copy_emote_bool = False
+        if "copy " in msg:
+            msg = msg.split("copy ")[1]
+            copy_emote_bool = True 
         if msg.startswith('s '):
             msg = msg[2:]
             get_server = True
@@ -648,8 +657,10 @@ class Misc:
             for emoji in server.emojis:
                 if msg.strip().lower() in str(emoji):
                     url = emoji.url
+                    emote_name = emoji.name
                 if msg.strip() == str(emoji).split(':')[1]:
                     url = emoji.url
+                    emote_name = emoji.name
                     exact_match = True
                     break
             if exact_match:
@@ -669,7 +680,18 @@ class Misc:
                 await self.bot.send_message(ctx.message.channel,
                                             '**ID:** {}\n**Server:** {}'.format(emoji.id, server.name))
             with open(name, 'rb') as fp:
-                await self.bot.send_file(ctx.message.channel, fp)
+                if copy_emote_bool:
+                    e = fp.read()
+                else:
+                    await self.bot.send_file(ctx.message.channel, fp)
+            if copy_emote_bool:
+                try:
+                    embed = discord.Embed(title="Added new emote", color=discord.Color.blue())
+                    embed.description = "New emote added: " + emote_name
+                    await self.bot.say("", embed=embed)
+                    await self.bot.create_custom_emoji(ctx.message.server, name=emote_name, image=e)
+                except:
+                    await self.bot.say("Not enough permissions to do this")
             os.remove(name)
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
@@ -677,6 +699,7 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find emoji.')
 
         return await self.bot.delete_message(ctx.message)
+
 
     @commands.command(pass_context=True)
     async def ping(self, ctx):
