@@ -8,5 +8,6 @@
     "default_status": "idle",
     "ascii_font": "big",
     "quoteembed_color": "bc0b0b",
-    "embed_color": ""
+    "embed_color": "",
+    "timezone": ""
 }

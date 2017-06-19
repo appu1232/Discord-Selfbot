@@ -1,6 +1,7 @@
 import datetime
 import asyncio
 import strawpy
+import pytz
 import random
 import re
 import requests
@@ -249,7 +250,21 @@ class Misc:
     @commands.group(aliases=['date'], pass_context=True)
     async def time(self, ctx):
         """Date time module."""
-        dandt = str(datetime.datetime.now())
+        def_time = False
+        tz = ""
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            if opt['timezone']:
+                if opt['timezone'] != "":
+                    tz = opt['timezone']
+                    def_time = True
+            else:
+                opt['timezone'] = ""
+        if def_time:
+            a = pytz.timezone(tz)
+            dandt = str(datetime.datetime.now(a)).split("+")[0]
+        else:
+            dandt = str(datetime.datetime.now())
         listdandt = dandt.split(" ")
         date = listdandt[0].split("-")
         year = date[0]
@@ -618,7 +633,16 @@ class Misc:
 
     @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
-        """Embed a custom emoji (from any server). Ex: >emoji :smug:"""
+        """
+        Embed or copy a custom emoji (from any server).
+        Usage:
+        1) >emoji :smug: [Will display the smug emoji as an image]
+        2) >emoji :smug: [Will add the emoji as a custom emote for the server]
+        """
+        copy_emote_bool = False
+        if "copy " in msg:
+            msg = msg.split("copy ")[1]
+            copy_emote_bool = True 
         if msg.startswith('s '):
             msg = msg[2:]
             get_server = True
@@ -633,8 +657,10 @@ class Misc:
             for emoji in server.emojis:
                 if msg.strip().lower() in str(emoji):
                     url = emoji.url
+                    emote_name = emoji.name
                 if msg.strip() == str(emoji).split(':')[1]:
                     url = emoji.url
+                    emote_name = emoji.name
                     exact_match = True
                     break
             if exact_match:
@@ -654,7 +680,18 @@ class Misc:
                 await self.bot.send_message(ctx.message.channel,
                                             '**ID:** {}\n**Server:** {}'.format(emoji.id, server.name))
             with open(name, 'rb') as fp:
-                await self.bot.send_file(ctx.message.channel, fp)
+                if copy_emote_bool:
+                    e = fp.read()
+                else:
+                    await self.bot.send_file(ctx.message.channel, fp)
+            if copy_emote_bool:
+                try:
+                    embed = discord.Embed(title="Added new emote", color=discord.Color.blue())
+                    embed.description = "New emote added: " + emote_name
+                    await self.bot.say("", embed=embed)
+                    await self.bot.create_custom_emoji(ctx.message.server, name=emote_name, image=e)
+                except:
+                    await self.bot.say("Not enough permissions to do this")
             os.remove(name)
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
@@ -662,6 +699,45 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find emoji.')
 
         return await self.bot.delete_message(ctx.message)
+
+    @commands.command(pass_context=True)    
+    async def setavatar(self, ctx, *, msg):
+        """
+        Set an avatar from a URL: Usage >setavatar <url_to_image>
+        Image must be a .png or a .jpg
+        """
+        url = msg
+        response = requests.get(url, stream=True)
+        name = url.split('/')[-1]
+        with open(name, 'wb') as img:
+
+            for block in response.iter_content(1024):
+                if not block:
+                    break
+
+                img.write(block)
+
+        if url:
+            with open(name, 'rb') as fp:
+                e = fp.read()
+                with open('settings/config.json', 'r+') as fp:
+                        opt = json.load(fp)
+                        if opt['password']:
+                            if opt['password'] == "":
+                                await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+                            else:
+                                pw = opt['password']
+                                await self.bot.edit_profile(password=pw, avatar=e)
+                                await self.bot.send_message(ctx.message.channel, "Your avatar has been set to the specified image")
+                        else:
+                            opt['password'] = ""
+                            await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+            os.remove(name)
+        elif not embed_perms(ctx.message) and url:
+            await self.bot.send_message(ctx.message.channel, url)
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find image.')
+
 
     @commands.command(pass_context=True)
     async def ping(self, ctx):
@@ -698,6 +774,28 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Prefix changed. use `restart` to reboot the bot for the updated prefix')
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Type a prefix as an argument for the `prefix` command')
+
+    @commands.command(pass_context=True)
+    async def timezone(self, ctx, *, msg):
+        '''Set preferred timezone.Use `>timezonelist` for full list of timezones'''
+        if msg:
+            with open('settings/optional_config.json', 'r+') as fp:
+                opt = json.load(fp)
+                opt['timezone'] = msg
+                fp.seek(0)
+                fp.truncate()
+                json.dump(opt, fp, indent=4)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Preffered timezone has been set')
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'You can find the list of timezones at `https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef`')
+
+    @commands.command(pass_context=True)
+    async def timezonelist(self, ctx):
+        '''List of all available timezones'''
+        await self.bot.delete_message(ctx.message)
+        embed = discord.Embed(title="Timezone List")
+        embed.set_author(name="Github Link", url = "https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef")
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
     @commands.command(pass_context=True)
     async def quotecolor(self, ctx, *, msg):
@@ -907,6 +1005,17 @@ class Misc:
         lmgtfy = 'http://lmgtfy.com/?q='
         await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy + msg.lower().strip().replace(' ', '+'))
         await self.bot.delete_message(ctx.message)
+
+    @commands.command(pass_context=True)
+    async def vowelreplace(self, ctx, *, msg: str):
+        """Replaces all vowels in a word with a letter"""
+        word = msg.split(" ")[0]
+        letter = msg.split(" ")[1]
+        for ch in ['a', 'e', 'i', 'o', 'u']:
+            if ch in word:
+                word = word.replace(ch, letter)
+        await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(ctx.message.channel, word)
 
     @commands.command(pass_context=True)
     async def d(self, ctx, *, txt: str = None):
