@@ -946,6 +946,17 @@ class Misc:
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
+    async def vowelreplace(self, ctx, *, msg: str):
+        """Replaces all vowels in a word with a letter"""
+        word = msg.split(" ")[0]
+        letter = msg.split(" ")[1]
+        for ch in ['a', 'e', 'i', 'o', 'u']:
+            if ch in word:
+                word = word.replace(ch, letter)
+        await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(ctx.message.channel, word)
+
+    @commands.command(pass_context=True)
     async def d(self, ctx, *, txt: str = None):
         """Deletes the last message sent or n messages sent. Ex: >d 5"""
 
