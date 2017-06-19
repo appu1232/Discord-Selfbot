@@ -55,17 +55,6 @@ async def on_ready():
     with open('settings/log.json', 'r') as log:
         bot.log_conf = json.load(log)
         bot.key_users = bot.log_conf['keyusers']
-    if not os.path.isfile('settings/moderation.json'):
-        with open('settings/moderation.json', 'w') as m:
-            mod = {}
-            json.dump(mod, m, indent=4)
-    if not os.path.isfile('settings/todo.json'):
-        with open('settings/todo.json', 'w') as t:
-            todo = {}
-            json.dump(todo, t, indent=4)
-
-    if os.path.isfile('cogs/online_users.py'):
-        os.remove('cogs/online_users.py')
 
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r+') as g:
@@ -84,6 +73,17 @@ async def on_ready():
             json.dump(games, g, indent=4)
 
     # Dealing with old versions updating
+    if not os.path.isfile('settings/moderation.json'):
+        with open('settings/moderation.json', 'w') as m:
+            mod = {}
+            json.dump(mod, m, indent=4)
+    if not os.path.isfile('settings/todo.json'):
+        with open('settings/todo.json', 'w') as t:
+            todo = {}
+            json.dump(todo, t, indent=4)
+
+    if os.path.isfile('cogs/online_users.py'):
+        os.remove('cogs/online_users.py')
     if not os.path.exists('avatars'):
         os.makedirs('avatars')
     if not os.path.isfile('settings/avatars.json'):
@@ -121,6 +121,7 @@ async def on_ready():
         fp.seek(0)
         fp.truncate()
         json.dump(opt, fp, indent=4)
+
     with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['type'] == 'dm':
