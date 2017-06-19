@@ -642,7 +642,7 @@ class Misc:
         copy_emote_bool = False
         if "copy " in msg:
             msg = msg.split("copy ")[1]
-            copy_emote_bool = True 
+            copy_emote_bool = True
         if msg.startswith('s '):
             msg = msg[2:]
             get_server = True
@@ -700,7 +700,7 @@ class Misc:
 
         return await self.bot.delete_message(ctx.message)
 
-    @commands.command(pass_context=True)    
+    @commands.command(pass_context=True)
     async def setavatar(self, ctx, *, msg):
         """
         Set an avatar from a URL: Usage >setavatar <url_to_image>
