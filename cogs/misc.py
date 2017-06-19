@@ -1100,7 +1100,7 @@ class Misc:
                 else:
                     reactions.append(discord.utils.get(self.bot.get_all_emojis(), id=non_unicode_emoji_list[lt_count]))
                     lt_count += 1
-        
+
         if channel == "current":
             async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
                 if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
@@ -1402,7 +1402,7 @@ class Misc:
             else:
                 result += char
         await self.bot.edit_message(ctx.message, result[::-1])  # slice reverses the string
-        
+
     @commands.command(pass_context=True)
     async def xkcd(self, ctx, *, comic="latest"):
         """Pull comics from xkcd."""
@@ -1421,7 +1421,7 @@ class Misc:
                 if link.text.startswith("https://xkcd.com/"):
                     found = link.text.split("/")[3]
                     break
-            if not found:   
+            if not found:
                 await self.bot.send_message(ctx.message.channel, bot_prefix + "That comic doesn't exist!")
             else:
                 site = requests.get("https://xkcd.com/{}/info.0.json".format(found))
@@ -1432,12 +1432,16 @@ class Misc:
             embed.set_image(url=json["img"])
             embed.set_footer(text="{}".format(json["alt"]))
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
-        
+
     @commands.command(pass_context=True)
     async def hastebin(self, ctx, *, data):
         """Post to Hastebin."""
+        await self.bot.delete_message(ctx.message)
         post = requests.post("https://hastebin.com/documents", data=data)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(post.json()["key"]))
+        try:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(post.json()["key"]))
+        except json.JSONDecodeError:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "Failed to post to Hastebin. The API may be down right now.")
 
 
 def setup(bot):
