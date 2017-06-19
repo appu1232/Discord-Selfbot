@@ -720,6 +720,26 @@ class Misc:
             json.dump(opt, fp, indent=4)
 
     @commands.command(pass_context=True)
+    async def embedcolor(self, ctx, *, msg):
+        '''Set color (hex) of a embeds. Ex: >embedcolor 000000'''
+        if msg:
+            try:
+                msg = msg.lstrip('#')
+                int(msg, 16)
+            except:
+                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for embeds.')
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Use this command to set color automatically to embeds. Usage is `>embedcolor <hex_color_value>`')
+            return
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            opt['embed_color'] = msg
+            fp.seek(0)
+            fp.truncate()
+            json.dump(opt, fp, indent=4)
+
+    @commands.command(pass_context=True)
     async def botprefix(self, ctx, *, msg):
         """Set bot prefix, needs a reboot to activate"""
         if msg:
