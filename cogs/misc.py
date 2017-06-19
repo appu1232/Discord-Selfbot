@@ -1,6 +1,7 @@
 import datetime
 import asyncio
 import strawpy
+import pytz
 import random
 import re
 import requests
@@ -249,7 +250,21 @@ class Misc:
     @commands.group(aliases=['date'], pass_context=True)
     async def time(self, ctx):
         """Date time module."""
-        dandt = str(datetime.datetime.now())
+        def_time = False
+        tz = ""
+        with open('settings/optional_config.json', 'r+') as fp:
+            opt = json.load(fp)
+            if opt['timezone']:
+                if opt['timezone'] != "":
+                    tz = opt['timezone']
+                    def_time = True
+            else:
+                opt['timezone'] = ""
+        if def_time:
+            a = pytz.timezone(tz)
+            dandt = str(datetime.datetime.now(a)).split("+")[0]
+        else:
+            dandt = str(datetime.datetime.now())
         listdandt = dandt.split(" ")
         date = listdandt[0].split("-")
         year = date[0]
@@ -698,6 +713,28 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Prefix changed. use `restart` to reboot the bot for the updated prefix')
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Type a prefix as an argument for the `prefix` command')
+
+    @commands.command(pass_context=True)
+    async def timezone(self, ctx, *, msg):
+        '''Set preferred timezone.Use `>timezonelist` for full list of timezones'''
+        if msg:
+            with open('settings/optional_config.json', 'r+') as fp:
+                opt = json.load(fp)
+                opt['timezone'] = msg
+                fp.seek(0)
+                fp.truncate()
+                json.dump(opt, fp, indent=4)
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Preffered timezone has been set')
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'You can find the list of timezones at `https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef`')
+
+    @commands.command(pass_context=True)
+    async def timezonelist(self, ctx):
+        '''List of all available timezones'''
+        await self.bot.delete_message(ctx.message)
+        embed = discord.Embed(title="Timezone List")
+        embed.set_author(name="Github Link", url = "https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef")
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
     @commands.command(pass_context=True)
     async def quotecolor(self, ctx, *, msg):
