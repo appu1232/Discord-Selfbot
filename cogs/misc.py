@@ -700,6 +700,44 @@ class Misc:
 
         return await self.bot.delete_message(ctx.message)
 
+    @commands.command(pass_context=True)    
+    async def setavatar(self, ctx, *, msg):
+        """
+        Set an avatar from a URL: Usage >setavatar <url_to_image>
+        Image must be a .png or a .jpg
+        """
+        url = msg
+        response = requests.get(url, stream=True)
+        name = url.split('/')[-1]
+        with open(name, 'wb') as img:
+
+            for block in response.iter_content(1024):
+                if not block:
+                    break
+
+                img.write(block)
+
+        if url:
+            with open(name, 'rb') as fp:
+                e = fp.read()
+                with open('settings/config.json', 'r+') as fp:
+                        opt = json.load(fp)
+                        if opt['password']:
+                            if opt['password'] == "":
+                                await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+                            else:
+                                pw = opt['password']
+                                await self.bot.edit_profile(password=pw, avatar=e)
+                                await self.bot.send_message(ctx.message.channel, "Your avatar has been set to the specified image")
+                        else:
+                            opt['password'] = ""
+                            await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+            os.remove(name)
+        elif not embed_perms(ctx.message) and url:
+            await self.bot.send_message(ctx.message.channel, url)
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find image.')
+
 
     @commands.command(pass_context=True)
     async def ping(self, ctx):
