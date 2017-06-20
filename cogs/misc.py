@@ -710,6 +710,77 @@ class Misc:
                                         bot_prefix + 'Set default afk status. You will now appear as ``{}`` when not on Discord.'.format(
                                             opt['default_status']))
 
+    @commands.command(pass_context=True)
+    async def d(self, ctx, *, txt: str = None):
+        """Deletes the last message sent or n messages sent. Ex: >d 5"""
+
+        # If number of seconds/messages are specified
+        if txt:
+            if txt[0] == '!':
+                killmsg = self.bot.self_log[ctx.message.channel.id][len(self.bot.self_log[ctx.message.channel.id]) - 2]
+                timer = int(txt[1:].strip())
+
+                # Animated countdown because screw rate limit amirite
+                destroy = await self.bot.edit_message(ctx.message,
+                                                      bot_prefix + 'The above message will self-destruct in:')
+                msg = await self.bot.send_message(ctx.message.channel, '``%s  |``' % timer)
+                for i in range(0, timer, 4):
+                    if timer - 1 - i == 0:
+                        await self.bot.delete_message(destroy)
+                        msg = await self.bot.edit_message(msg, '``0``')
+                        break
+                    else:
+                        msg = await self.bot.edit_message(msg, '``%s  |``' % int(timer - 1 - i))
+                        await asyncio.sleep(1)
+                    if timer - 1 - i != 0:
+                        if timer - 2 - i == 0:
+                            await self.bot.delete_message(destroy)
+                            msg = await self.bot.edit_message(msg, '``0``')
+                            break
+                        else:
+                            msg = await self.bot.edit_message(msg, '``%s  /``' % int(timer - 2 - i))
+                            await asyncio.sleep(1)
+                    if timer - 2 - i != 0:
+                        if timer - 3 - i == 0:
+                            await self.bot.delete_message(destroy)
+                            msg = await self.bot.edit_message(msg, '``0``')
+                            break
+                        else:
+                            msg = await self.bot.edit_message(msg, '``%s  -``' % int(timer - 3 - i))
+                            await asyncio.sleep(1)
+                    if timer - 3 - i != 0:
+                        if timer - 4 - i == 0:
+                            await self.bot.delete_message(destroy)
+                            msg = await self.bot.edit_message(msg, '``0``')
+                            break
+                        else:
+                            msg = await self.bot.edit_message(msg, '``%s  \ ``' % int(timer - 4 - i))
+                            await asyncio.sleep(1)
+                await self.bot.edit_message(msg, ':bomb:')
+                await asyncio.sleep(.5)
+                await self.bot.edit_message(msg, ':fire:')
+                await self.bot.edit_message(killmsg, ':fire:')
+                await asyncio.sleep(.5)
+                await self.bot.delete_message(msg)
+                await self.bot.delete_message(killmsg)
+            else:
+                await self.bot.delete_message(ctx.message)
+                deleted = 0
+                async for sent_message in self.bot.logs_from(ctx.message.channel, limit=200):
+                    if sent_message.author == ctx.message.author:
+                        try:
+                            await self.bot.delete_message(sent_message)
+                            deleted += 1
+                        except:
+                            pass
+                        if deleted == int(txt):
+                            break
+
+        # If no number specified, delete message immediately
+        else:
+            await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
+            await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
+
 
 def setup(bot):
     bot.add_cog(Misc(bot))
