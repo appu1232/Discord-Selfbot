@@ -1,6 +1,8 @@
 ﻿import discord
 import os
 import requests
+from github import Github
+import json
 from discord.ext import commands
 from bs4 import BeautifulSoup
 from appuselfbot import bot_prefix
@@ -11,6 +13,17 @@ class CogDownloading:
     
     def __init__(self, bot):
         self.bot = bot
+
+    async def githubUpload(self, username, password, repo_name, link, file_name):
+        g = Github(username, password)
+        repo = g.get_user().get_repo(repo_name)
+        req = requests.get(link)
+        if req.encoding != "utf-8":
+            filecontent = req.text.encode("utf-8")
+        else:
+            filecontent = req.text
+        await self.bot.say("Uploading to GitHub. Heroku users, wait for the bot to restart")
+        repo.create_file('/cogs/' + file_name, 'Commiting file: ' + file_name + ' to GitHub', filecontent)
         
     @commands.group(pass_context=True)
     async def cog(self, ctx):
@@ -46,8 +59,16 @@ class CogDownloading:
             await self.bot.send_message(ctx.message.channel, bot_prefix + "Are you sure you want to download this cog? (y/n)", embed=embed)
             reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
             if reply.content.lower() == "y":
+                coglink = cog["link"]
                 download = requests.get(cog["link"]).text
                 filename = cog["link"].rsplit("/", 1)[1]
+                with open("settings/github.json", "r+") as fp:
+                    opt = json.load(fp)
+                    if opt['username'] != "":
+                        #try:
+                            await self.githubUpload(opt['username'], opt['password'], opt['reponame'], coglink, filename)
+                        #except:
+                         #   await self.bot.send_message(ctx.message.channel, "Wrong GitHub account credentials")
                 with open("cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
                 await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully downloaded `{}` to your cogs folder. Run the `load cogs.{}` command to load in your cog.".format(cog["title"], filename.rsplit(".", 1)[0]))

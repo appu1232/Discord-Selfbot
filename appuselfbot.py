@@ -122,6 +122,18 @@ async def on_ready():
         fp.truncate()
         json.dump(opt, fp, indent=4)
 
+    with open('settings/github.json', 'r+') as fp:
+        opt = json.load(fp)
+        if 'username' not in opt:
+            opt['username'] = ''
+        if 'password' not in opt:
+            opt['password'] = ''
+        if 'reponame' not in opt:
+            opt['reponame'] = ''
+        fp.seek(0)
+        fp.truncate()
+        json.dump(opt, fp, indent=4)
+
     with open('settings/notify.json', 'r') as n:
         notif = json.load(n)
     if notif['type'] == 'dm':
