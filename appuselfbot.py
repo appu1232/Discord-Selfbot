@@ -122,6 +122,10 @@ async def on_ready():
         fp.truncate()
         json.dump(opt, fp, indent=4)
 
+    if not os.path.isfile('settings/github.json'):
+        with open('settings/github.json', 'w') as fp:
+            git = {}
+            json.dump(git, fp, indent=4)
     with open('settings/github.json', 'r+') as fp:
         opt = json.load(fp)
         if 'username' not in opt:
