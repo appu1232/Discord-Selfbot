@@ -1,0 +1,19 @@
+{
+    "keyword_logging": "on",
+	"user_logging": "on",
+	"log_location": "",
+	"user_location": "",
+    "allservers": "True",
+	"servers": [],
+    "keywords": [],
+    "blacklisted_words": [],
+	"blacklisted_users": [],
+    "blacklisted_servers": [],
+	"blacklisted_channels": {},
+    "log_size": "25",
+    "context_len": "4",
+    "keyusers": {},
+	"webhook_url": "",
+	"webhook_url2": "",
+    "notifier_bot_token": ""
+}

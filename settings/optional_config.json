@@ -1,13 +1,14 @@
 {
-    "google_api_key": "",
-    "custom_search_engine": "",
-    "mal_username": "",
     "mal_password": "",
-    "customcmd_color": "27007A",
+    "quoteembed_color": "bc0b0b",
+    "custom_search_engine": "",
+    "timezone": "",
+    "google_api_key": "",
+    "embed_color": "",
+    "ascii_font": "big",
     "rich_embed": "on",
     "default_status": "idle",
-    "ascii_font": "big",
-    "quoteembed_color": "bc0b0b",
-    "embed_color": "",
-    "timezone": ""
+    "customcmd_color": "27007A",
+    "online_stats": "on",
+    "mal_username": ""
 }
