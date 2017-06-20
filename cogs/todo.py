@@ -48,7 +48,7 @@ class Todo:
             await request_webhook('/{}/{}'.format(channel, token), content=None, embeds=[em.to_dict()])
     
     @commands.group(pass_context=True)
-    async def todo(self, ctx, *, msg: str = None):
+    async def todo(self, ctx):
         """Manage your to-do list. >help todo for more information.
 
         >todo - List all of the entries in your to-do list.
@@ -92,10 +92,6 @@ class Todo:
                 all_entries = []
 
                 for entry in sorted_keys:
-                    if msg == 'timers' and self.todo_list[entry][0] == "none":
-                        continue
-                    if msg == 'no timers' and (self.todo_list[entry][0] == "done" or type(self.todo_list[entry][0]) is float):
-                        continue
 
                     if self.todo_list[entry][0] == "none":
                         embed.description += "\u2022 {}\n".format(entry)
