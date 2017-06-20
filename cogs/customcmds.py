@@ -179,10 +179,10 @@ class Customcmds:
         with open('settings/github.json', 'r+') as fp:
             opt = json.load(fp)
             if opt['username'] != "":
-                #try:
+                try:
                     await self.githubUpload(opt['username'], opt['password'], opt['reponame'])
-                #except:
-                    #await self.bot.send_message(ctx.message.channel, "Incorrect GitHub credentials")
+                except:
+                    await self.bot.send_message(ctx.message.channel, "Incorrect GitHub credentials")
             else:
                 await self.bot.send_message(ctx.message.channel, "GitHub account and repo not specified in `github.json`")
 
