@@ -425,12 +425,6 @@ class Misc:
         return await self.bot.send_message(ctx.message.channel,
                                            bot_prefix + 'Password set. Do ``>avatar`` to toggle cycling avatars.')
 
-    @commands.command(pass_context=True, aliases=['pick'])
-    async def choose(self, ctx, *, choices: str):
-        """Choose randomly from the options you give. >choose this | that"""
-        await self.bot.send_message(ctx.message.channel,
-                                    bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
-
     @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
         """
