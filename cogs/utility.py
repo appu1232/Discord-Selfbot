@@ -533,8 +533,8 @@ class Utility:
         search = parse.quote(msg)
         response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
         result = BeautifulSoup(response, "lxml")
-        await self.bot.send_message(ctx.message.channel, "https://www.youtube.com{}".format(
-            result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')))
+        await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(ctx.message.channel, "https://www.youtube.com{}".format(result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')))
 
     @commands.command(pass_context=True)
     async def xkcd(self, ctx, *, comic="latest"):
@@ -576,6 +576,24 @@ class Utility:
         except json.JSONDecodeError:
             await self.bot.send_message(ctx.message.channel, bot_prefix + "Failed to post to Hastebin. The API may be down right now.")
 
+    @commands.command(pass_context=True)
+    async def whoisplaying(self, ctx, *, game):
+        """Check how many people are playing a certain game."""
+        msg = ""
+        for server in self.bot.servers:
+            for user in server.members:
+                if user.game is not None:
+                    if user.game.name == game:
+                        msg += "{}#{}\n".format(user.name, user.discriminator)
+        msg = "\n".join(set(msg.split("\n"))) # remove dupes
+        if len(msg) > 1500:
+            gist = PythonGists.Gist(description="Number of people playing {}".format(game), content=msg, name="Output")
+            await self.bot.send_message(ctx.message.channel, "{}Large output posted to Gist: {}".format(bot_prefix, gist))
+        elif len(msg) == 0:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "Nobody is playing that game!")
+        else:
+            embed = discord.Embed(title="Number of people playing {}".format(game), description=msg)
+            await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
 def setup(bot):
     bot.add_cog(Utility(bot))
