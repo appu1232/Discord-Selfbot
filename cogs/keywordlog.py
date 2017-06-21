@@ -619,10 +619,12 @@ class KeywordLogger:
                                         for i in self.bot.servers:
                                             user = i.get_member(word)
                                             if user:
+                                                user = '{}  {}. '.format(user.name + '#' + user.discriminator, count + 2)
                                                 break
-                                        word = '{}  {}. '.format(user.name + '#' + user.discriminator, count + 2)
+                                        if not user:
+                                            user = 'User not found.   '
 
-                                        msg += word
+                                        msg += user
                                     msg = msg[:-(len(str(count + 2)) + 2)]
 
                                     await self.bot.edit_message(menu,
