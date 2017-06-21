@@ -1,5 +1,6 @@
 #Importing libraries
 import discord
+from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 from sys import argv
@@ -84,7 +85,7 @@ class Lockdown:
             embed = discord.Embed(title="Moderator Roles", description="")
             for server in mods:
                 embed.description += server + ":\n"
-                for mod in mods["server"]:
+                for mod in mods[server]:
                     embed.description += "    {}\n".format(mod)
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
@@ -130,7 +131,7 @@ class Lockdown:
                 json.dump(mods, f)
             await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully removed {} from the list of mod roles on {}!".format(role, server))
         except (ValueError, KeyError):
-            await self.bot.send_message(ctx.message.channel, bot_prefix + "You can't remove something that doesn't exist!")        
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "You can't remove something that doesn't exist!")
 
 def setup(bot):
     bot.add_cog(Lockdown(bot))
