@@ -13,3 +13,4 @@ Pillow==4.1.1
 pyfiglet==0.7.5
 tokage==0.1.4
 pytz==2017.2
+PyGithub==1.34

@@ -1,5 +1,6 @@
 import math
 import re
+from github import Github
 from PythonGists import PythonGists
 from appuselfbot import bot_prefix
 from discord.ext import commands
@@ -12,6 +13,15 @@ class Customcmds:
 
     def __init__(self, bot):
         self.bot = bot
+
+    async def githubUpload(self, username, password, repo_name):
+        g = Github(username, password)
+        repo = g.get_user().get_repo(repo_name)
+        with open('settings/commands.json', 'r') as fp:
+            contents = fp.read()
+        updateFile = '/settings/commands.json'
+        sha = repo.get_contents(updateFile).sha
+        repo.update_file('/settings/commands.json', 'Updating customcommands', contents, sha)
 
     async def check(self, ctx, val, pre):
         def is_numb(msg):
@@ -162,6 +172,19 @@ class Customcmds:
             fp.seek(0)
             fp.truncate()
             json.dump(opt, fp, indent=4)
+
+    @customcmds.command(pass_context=True)
+    async def update(self, ctx):
+        """Needs GitHub repo set for an update"""
+        with open('settings/github.json', 'r+') as fp:
+            opt = json.load(fp)
+            if opt['username'] != "":
+                try:
+                    await self.githubUpload(opt['username'], opt['password'], opt['reponame'])
+                except:
+                    await self.bot.send_message(ctx.message.channel, "Incorrect GitHub credentials")
+            else:
+                await self.bot.send_message(ctx.message.channel, "GitHub account and repo not specified in `github.json`")
 
     # Toggle auto-embed for images/gifs
     @customcmds.command(pass_context=True)
