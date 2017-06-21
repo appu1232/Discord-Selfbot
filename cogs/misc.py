@@ -25,6 +25,7 @@ class Misc:
             em.add_field(name='\ud83d\udd17 Link to download',
                          value='[Github link](https://github.com/appu1232/Discord-Selfbot/tree/master)')
             em.add_field(name='\ud83c\udfa5Quick examples:', value='[Simple commands](http://i.imgur.com/3H9zpop.gif)')
+            if txt == 'link': em.add_field(name='👋 Discord Server', value='Join the official Discord server [here](https://discord.gg/FGnM5DM)!')
             em.set_footer(text='Made by appu1232#2569', icon_url='https://i.imgur.com/RHagTDg.png')
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
@@ -634,6 +635,7 @@ class Misc:
             await self.bot.send_message(ctx.message.channel,
                                         bot_prefix + 'Set default afk status. You will now appear as ``{}`` when not on Discord.'.format(
                                             opt['default_status']))
+
 
 
 def setup(bot):
