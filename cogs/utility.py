@@ -583,7 +583,7 @@ class Utility:
         for server in self.bot.servers:
             for user in server.members:
                 if user.game is not None:
-                    if user.game.name == game:
+                    if user.game.name.lower() == game.lower():
                         msg += "{}#{}\n".format(user.name, user.discriminator)
         msg = "\n".join(set(msg.split("\n"))) # remove dupes
         if len(msg) > 1500:
