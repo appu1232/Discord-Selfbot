@@ -307,7 +307,7 @@ async def on_message(message):
             word_found = False
             if (bot.log_conf['allservers'] == 'True' or str(message.server.id) in bot.log_conf['servers']) and (message.server.id not in bot.log_conf['blacklisted_servers'] and message.channel.id not in bot.log_conf['blacklisted_channels']):
                 add_alllog(message.channel.id, message.server.id, message)
-                if not message.author.bot and not any(x in message.author.id for x in bot.log_conf['blacklisted_users']):
+                if message.author.id != bot.user.id and (not message.author.bot and not any(x in message.author.id for x in bot.log_conf['blacklisted_users'])):
                     for word in bot.log_conf['keywords']:
                         if ' [server]' in word:
                             word, server = word.split(' [server]')
@@ -324,7 +324,7 @@ async def on_message(message):
                                 word_found = True
                                 break
                         else:
-                            if word.lower() in message.content.lower() and message.author.id != bot.user.id:
+                            if word.lower() in message.content.lower():
                                 word_found = True
                                 break
 
