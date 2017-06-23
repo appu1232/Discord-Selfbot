@@ -62,8 +62,9 @@ class Todo:
           - Other possible parameters you can add when you set a timer:
             +  repeat=<n> - repeat timer <n> times. repeat=yes for indefinite.
             +  channel=<channel_id> - sends <item> (or text parameter if given) as a message to this channel when the timer runs out.
+               -  Multiple channels are supported as well. Separate the ids with a comma.
                -  To get a channel's id: http://i.imgur.com/KMDS8cb.png then right click channel > copy id.
-            +  text=<text> - sends this text (instead of the <item> field) to the channel specified
+            +  text=<text> - sends this text (instead of the <item> field) to the channel specified.
             +  alert=off - add this if you don't want to get notified when the timer runs out.
 
         Example:
@@ -104,11 +105,19 @@ class Todo:
                         embed.description += "\u2022 {} - time left: {}\n".format(entry, "%02d:%02d:%02d:%02d" % (int(d), int(h), int(m), int(s)))
                         if entry[1] != 0:
                             if self.todo_list[entry][2] != 0:
-                                channel = self.bot.get_channel(self.todo_list[entry][2])
-                                if channel:
-                                    embed.description += '    - Send to channel: #%s \n' % str(channel)
+                                channels = []
+                                if type(self.todo_list[entry][2]) is str:
+                                    channel = self.bot.get_channel(self.todo_list[entry][2])
+                                    channels.append(channel)
                                 else:
-                                    embed.description += '    - Send to channel: Could not find channel. Message will not be sent.\n'
+                                    for channel in self.todo_list[entry][2]:
+                                        chnl = self.bot.get_channel(channel.strip())
+                                        channels.append(chnl)
+                                for channel in channels:
+                                    if channel:
+                                        embed.description += '    - Send to channel: #%s \n' % str(channel)
+                                    else:
+                                        embed.description += '    - Send to channel: Could not find channel. Message will not be sent.\n'
                             m, s = divmod(self.todo_list[entry][5], 60)
                             h, m = divmod(m, 60)
                             d, h = divmod(h, 24)
@@ -166,6 +175,8 @@ class Todo:
             else:
                 timer = msg[1]
 
+            if ',' in channel:
+                channel = channel.split(',')
             if timer != 0:
                 # taken from kurisu
                 units = {
@@ -237,8 +248,13 @@ class Todo:
                             self.todo_list[entry][0] = "done"
                         try:
                             if self.todo_list[entry][2] != 0:
-                                channel = self.bot.get_channel(self.todo_list[entry][2])
-                                await self.bot.send_message(channel, self.todo_list[entry][1])
+                                if type(self.todo_list[entry][2]) is list:
+                                    for channel in self.todo_list[entry][2]:
+                                        chnl = self.bot.get_channel(channel.strip())
+                                        await self.bot.send_message(chnl, self.todo_list[entry][1])
+                                else:
+                                    channel = self.bot.get_channel(self.todo_list[entry][2])
+                                    await self.bot.send_message(channel, self.todo_list[entry][1])
                         except:
                             print('Unable to send message for todo list entry: %s' % entry)
 
