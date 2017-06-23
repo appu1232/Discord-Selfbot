@@ -598,7 +598,24 @@ class Utility:
             
     @commands.command(pass_context=True)
     async def animate(self, ctx, animation):
-        """Play an animation from a text file."""
+        """Play an animation from a text file. >help animate for more details.
+        >animate <animation> - Animate a text file.
+        Animation text files are stored in the anims folder. Each frame of animation is put on a new line.
+        
+        An example text file looks like this:
+        family
+        fam ily
+        fam i ly
+        fam i love y
+        fam i love you
+        
+        You can additionally add a number to the top of the file to denote the delay between each frame. The default is 0.2 seconds.
+        1
+        fam
+        fam i
+        fam i love
+        fam i love you
+        """
         try:
             with open("anims/{}.txt".format(animation)) as f:
                 anim = f.read().split("\n")
