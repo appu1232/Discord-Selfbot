@@ -595,6 +595,25 @@ class Utility:
         else:
             embed = discord.Embed(title="Number of people playing {}".format(game), description=msg)
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
+            
+    @commands.command(pass_context=True)
+    async def animate(self, ctx, animation):
+        """Play an animation from a text file."""
+        try:
+            with open("anims/{}.txt".format(animation)) as f:
+                anim = f.read().split("\n")
+        except IOError:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "You don't have that animation in your anims folder!")
+        if anim:
+            try:
+                delay = float(anim[0])
+                for frame in anim[1:]:
+                    await asyncio.sleep(delay)
+                    await self.bot.edit_message(ctx.message, frame)
+            except ValueError:
+                for frame in anim:
+                    await asyncio.sleep(0.2)
+                    await self.bot.edit_message(ctx.message, frame)
 
 def setup(bot):
     bot.add_cog(Utility(bot))
