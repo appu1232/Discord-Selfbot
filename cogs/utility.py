@@ -631,6 +631,26 @@ class Utility:
                 for frame in anim:
                     await asyncio.sleep(0.2)
                     await self.bot.edit_message(ctx.message, frame)
+                    
+    @commands.command(pass_context=True)
+    async def roles(self, ctx, *, user):
+        """Check the roles of a user."""
+        await self.bot.delete_message(ctx.message)
+        member = ctx.message.server.get_member_named(user)
+        if not member:
+            member = ctx.message.server.get_member(user)
+        if not member:
+            try:
+                member = ctx.message.mentions[0]
+            except IndexError:
+                pass
+        if not member:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "That user couldn't be found. Please check your spelling and try again.")
+        elif len(member.roles[1:]) >= 1:
+            embed = discord.Embed(title="{}'s roles".format(member.name), description="\n".join([x.name for x in member.roles[::-1][:-1]]), colour=member.colour)
+            await self.bot.send_message(ctx.message.channel, "", embed=embed)
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "That user has no roles!")
 
 def setup(bot):
     bot.add_cog(Utility(bot))
