@@ -175,7 +175,7 @@ class Todo:
             else:
                 timer = msg[1]
 
-            if ',' in channel:
+            if ',' in str(channel):
                 channel = channel.split(',')
             if timer != 0:
                 # taken from kurisu
