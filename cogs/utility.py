@@ -595,6 +595,62 @@ class Utility:
         else:
             embed = discord.Embed(title="Number of people playing {}".format(game), description=msg)
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
+            
+    @commands.command(pass_context=True)
+    async def animate(self, ctx, animation):
+        """Play an animation from a text file. >help animate for more details.
+        >animate <animation> - Animate a text file.
+        Animation text files are stored in the anims folder. Each frame of animation is put on a new line.
+        
+        An example text file looks like this:
+        family
+        fam ily
+        fam i ly
+        fam i love y
+        fam i love you
+        
+        You can additionally add a number to the top of the file to denote the delay between each frame. The default is 0.2 seconds.
+        1
+        fam
+        fam i
+        fam i love
+        fam i love you
+        """
+        try:
+            with open("anims/{}.txt".format(animation)) as f:
+                anim = f.read().split("\n")
+        except IOError:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "You don't have that animation in your anims folder!")
+        if anim:
+            try:
+                delay = float(anim[0])
+                for frame in anim[1:]:
+                    await asyncio.sleep(delay)
+                    await self.bot.edit_message(ctx.message, frame)
+            except ValueError:
+                for frame in anim:
+                    await asyncio.sleep(0.2)
+                    await self.bot.edit_message(ctx.message, frame)
+                    
+    @commands.command(pass_context=True)
+    async def roles(self, ctx, *, user):
+        """Check the roles of a user."""
+        await self.bot.delete_message(ctx.message)
+        member = ctx.message.server.get_member_named(user)
+        if not member:
+            member = ctx.message.server.get_member(user)
+        if not member:
+            try:
+                member = ctx.message.mentions[0]
+            except IndexError:
+                pass
+        if not member:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "That user couldn't be found. Please check your spelling and try again.")
+        elif len(member.roles[1:]) >= 1:
+            embed = discord.Embed(title="{}'s roles".format(member.name), description="\n".join([x.name for x in member.roles[::-1][:-1]]), colour=member.colour)
+            await self.bot.send_message(ctx.message.channel, "", embed=embed)
+        else:
+            await self.bot.send_message(ctx.message.channel, bot_prefix + "That user has no roles!")
 
 def setup(bot):
     bot.add_cog(Utility(bot))
