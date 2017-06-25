@@ -195,15 +195,16 @@ class Fun:
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
-    async def vowelreplace(self, ctx, *, msg: str):
+    async def vowelreplace(self, ctx, replace, *, msg):
         """Replaces all vowels in a word with a letter"""
-        word = msg.split(" ")[0]
-        letter = msg.split(" ")[1]
-        for ch in ['a', 'e', 'i', 'o', 'u']:
-            if ch in word:
-                word = word.replace(ch, letter)
+        result = ""
+        for letter in msg:
+            if letter in "aeiou":
+                result += replace
+            else:
+                result += letter
         await self.bot.delete_message(ctx.message)
-        await self.bot.send_message(ctx.message.channel, word)
+        await self.bot.send_message(ctx.message.channel, result)
 
     @commands.group(pass_context=True)
     async def ascii(self, ctx):
