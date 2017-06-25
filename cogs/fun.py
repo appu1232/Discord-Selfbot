@@ -239,31 +239,19 @@ class Fun:
         await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set ascii font.')
 
     @commands.command(pass_context=True)
-    async def dice(self, ctx, *, txt: str = None):
+    async def dice(self, ctx, dice="1", sides="6"):
         """Roll dice. Optionally input # of dice and # of sides. Ex: >dice 5 12"""
         await self.bot.delete_message(ctx.message)
-        dice = 1
-        sides = 6
         invalid = 'Invalid syntax. Ex: `>dice 4` - roll four normal dice. `>dice 4 12` - roll four 12 sided dice.'
-        if txt:
-            if ' ' in txt:
-                dice, sides = txt.split(' ')
-                try:
-                    dice = int(dice)
-                    sides = int(sides)
-                except:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + invalid)
-            else:
-                try:
-                    dice = int(txt)
-                except:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + invalid)
         dice_rolls = []
         dice_roll_ints = []
-        for roll in range(dice):
-            result = random.randint(1, sides)
-            dice_rolls.append(str(result))
-            dice_roll_ints.append(result)
+        try:
+            for roll in range(int(dice)):
+                result = random.randint(1, int(sides))
+                dice_rolls.append(str(result))
+                dice_roll_ints.append(result)
+        except ValueError:
+            return await self.bot.send_message(ctx.message.channel, bot_prefix + invalid)
         embed = discord.Embed(title="Dice rolls:", description=' '.join(dice_rolls))
         embed.add_field(name="Total:", value=sum(dice_roll_ints))
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
