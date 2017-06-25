@@ -4,6 +4,7 @@ from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 from pyfiglet import figlet_format
+import urllib.parse
 
 '''Module for fun/meme commands commands'''
 
@@ -191,7 +192,7 @@ class Fun:
     async def l2g(self, ctx, *, msg: str):
         """Creates a lmgtfy link. Ex: >l2g how do i become cool."""
         lmgtfy = 'http://lmgtfy.com/?q='
-        await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy + msg.lower().strip().replace(' ', '+'))
+        await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy + urllib.parse.quote_plus(msg.lower().strip())
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
