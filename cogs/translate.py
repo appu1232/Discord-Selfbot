@@ -1,7 +1,6 @@
 import requests
 from urllib import parse
 from bs4 import BeautifulSoup
-from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
@@ -42,7 +41,7 @@ class Translate:
                 embed.add_field(name="Warning", value="This language may not be supported by Google Translate.")
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + "That's not a real language.")
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "That's not a real language.")
 
 
 def setup(bot):

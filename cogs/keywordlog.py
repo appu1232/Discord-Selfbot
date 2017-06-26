@@ -1,5 +1,4 @@
 from discord.ext import commands
-from appuselfbot import bot_prefix
 import json
 import math
 import os
@@ -28,7 +27,7 @@ class KeywordLogger:
         if msg:
             channel = self.bot.get_channel(msg)
             if not channel:
-                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find specified channel. Are you entering in the channel id correctly? Example id: 299293492645986307')
+                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find specified channel. Are you entering in the channel id correctly? Example id: 299293492645986307')
         else:
             channel = ctx.message.channel
         with open('settings/log.json', 'r+') as log:
@@ -37,7 +36,7 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set log location to channel: ``{}``.'.format(channel.name))
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set log location to channel: ``{}``.'.format(channel.name))
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -48,7 +47,7 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned on the keyword logger.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Turned on the keyword logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -59,7 +58,7 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off the keyword logger.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Turned off the keyword logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -71,7 +70,7 @@ class KeywordLogger:
             n.truncate()
             json.dump(notify, n, indent=4)
         self.bot.notify = load_notify_config()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off notifications.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Turned off notifications.')
         if self.bot.subpro:
             self.bot.subpro.kill()
         if os.path.exists('notifier.txt'):
@@ -81,7 +80,7 @@ class KeywordLogger:
         with open('settings/log.json', 'r+') as log:
             location = json.load(log)['log_location']
         if location == '':
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             notify['type'] = 'ping'
@@ -89,7 +88,7 @@ class KeywordLogger:
             n.truncate()
             json.dump(notify, n, indent=4)
         self.bot.notify = load_notify_config()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``ping``. The webhook will ping you.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set notification type to ``ping``. The webhook will ping you.')
         if self.bot.subpro:
             self.bot.subpro.kill()
         if os.path.exists('notifier.txt'):
@@ -99,7 +98,7 @@ class KeywordLogger:
         with open('settings/log.json') as l:
             location = json.load(l)['log_location']
         if location == '':
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             notify['type'] = 'msg'
@@ -107,7 +106,7 @@ class KeywordLogger:
             n.truncate()
             json.dump(notify, n, indent=4)
         self.bot.notify = load_notify_config()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``msg``. The webhook will send notifications to your log location channel. Make sure you have notifications enabled for all messages in that channel.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set notification type to ``msg``. The webhook will send notifications to your log location channel. Make sure you have notifications enabled for all messages in that channel.')
         if self.bot.subpro:
             self.bot.subpro.kill()
         if os.path.exists('notifier.txt'):
@@ -117,17 +116,17 @@ class KeywordLogger:
         with open('settings/log.json') as l:
             location = json.load(l)['log_location']
         if location == '':
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set the channel where you want to keyword log first! See the **Keyword Logger** section in the README for instructions on how to set it up.')
         with open('settings/log.json') as l:
             location = json.load(l)['log_location'].split(' ')[0]
         with open('settings/notify.json', 'r+') as n:
             notify = json.load(n)
             if notify['bot_token'] == '':
                 return await self.bot.send_message(ctx.message.channel,
-                                                   bot_prefix + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
+                                                   self.bot.bot_prefix + 'Missing bot token. You must set up a second bot in order to receive notifications (selfbots can\'t ping themselves!). Read the ``Notifier Setup`` in the Keyword Logger section of the README for step-by-step instructions.')
             if notify['type'] == 'dm':
                 return await self.bot.send_message(ctx.message.channel,
-                                                   bot_prefix + 'Proxy notifier bot is already on.')
+                                                   self.bot.bot_prefix + 'Proxy notifier bot is already on.')
             notify['type'] = 'dm'
             channel = location
             notify['channel'] = channel
@@ -136,7 +135,7 @@ class KeywordLogger:
             n.truncate()
             json.dump(notify, n, indent=4)
         self.bot.notify = load_notify_config()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set notification type to ``direct messages``. The proxy bot will direct message you.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set notification type to ``direct messages``. The proxy bot will direct message you.')
         if self.bot.subpro:
             self.bot.subpro.kill()
         if os.path.exists('notifier.txt'):
@@ -160,7 +159,7 @@ class KeywordLogger:
             l.seek(0)
             l.truncate()
             json.dump(log, l, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set up webhook for keyword notifications!')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set up webhook for keyword notifications!')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -181,7 +180,7 @@ class KeywordLogger:
             n.truncate()
             json.dump(notify, n, indent=4)
         self.bot.notify = load_notify_config()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Notifier bot token set.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Notifier bot token set.')
 
     @commands.group(pass_context=True)
     async def log(self, ctx):
@@ -205,7 +204,7 @@ class KeywordLogger:
             log_loc = 'Set log location.' if self.bot.log_conf['log_location'] == '' else 'Change log location.'
             notifier = 'Set up notifier to ping you for keywords logged.' if self.bot.log_conf['webhook_url'] == '' and self.bot.log_conf['notifier_bot_token'] == '' else 'Change settings for keyword notifier.'
 
-            menu = await self.bot.send_message(ctx.message.channel, bot_prefix + '```\n\ud83d\udcdd Keyword Logger Settings. Enter a number:\n\n1. Turn on/off logger (currently {}).\n2. {}\n3. Add/remove a keyword.\n4. Blacklist words/users/server/channels.\n5. {}\n6. User following options.\n7. See all current settings.\n8. Help.```'.format(self.bot.log_conf['keyword_logging'], log_loc, notifier))
+            menu = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '```\n\ud83d\udcdd Keyword Logger Settings. Enter a number:\n\n1. Turn on/off logger (currently {}).\n2. {}\n3. Add/remove a keyword.\n4. Blacklist words/users/server/channels.\n5. {}\n6. User following options.\n7. See all current settings.\n8. Help.```'.format(self.bot.log_conf['keyword_logging'], log_loc, notifier))
 
             val = 9
             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author, check=check)
@@ -213,7 +212,7 @@ class KeywordLogger:
                 await self.bot.delete_message(reply)
 
                 if int(reply.content) > 2 and self.bot.log_conf['log_location'] == '':
-                    return await self.bot.edit_message(menu, bot_prefix + 'Please set a log location (option 2) before setting up the notifier. See the help section (option 8) to for help on understanding the keyword logger better.')
+                    return await self.bot.edit_message(menu, self.bot.bot_prefix + 'Please set a log location (option 2) before setting up the notifier. See the help section (option 8) to for help on understanding the keyword logger better.')
 
                 # Toggle keyword logging
                 if reply.content == '1':
@@ -223,7 +222,7 @@ class KeywordLogger:
                 # Set log location
                 elif reply.content == '2':
                     await self.bot.edit_message(menu,
-                                                        bot_prefix + '```\n\ud83d\udd8a Enter the channel id of where you want to log keywords. Enter 1 for this channel. Channel id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the channel name > copy id.```')
+                                                        self.bot.bot_prefix + '```\n\ud83d\udd8a Enter the channel id of where you want to log keywords. Enter 1 for this channel. Channel id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the channel name > copy id.```')
                     reply = await self.bot.wait_for_message(author=ctx.message.author, check=not_block)
                     if reply and not reply.content.startswith(pre):
                         await self.bot.delete_message(reply)
@@ -238,7 +237,7 @@ class KeywordLogger:
                 elif reply.content == '3':
                     val = 4
                     await self.bot.edit_message(menu,
-                                                         bot_prefix + '```\n\ud83d\udd8a Enter a number:\n\n1. Add a keyword.\n2. Remove a keyword.\n3. Show current list of keywords.```')
+                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Enter a number:\n\n1. Add a keyword.\n2. Remove a keyword.\n3. Show current list of keywords.```')
 
                     reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author, check=check)
 
@@ -247,7 +246,7 @@ class KeywordLogger:
 
                         if reply.content == '1':
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd8a Note: If you don\'t want substrings to trigger the logger (i.e. your keyword is bill but you don\'t want billy to trigger the logger), enter your keyword in quotes. "bill" Phrases are also supported. Ex: "I love you"\n\nEnter the keyword (not case sensitive!):```')
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd8a Note: If you don\'t want substrings to trigger the logger (i.e. your keyword is bill but you don\'t want billy to trigger the logger), enter your keyword in quotes. "bill" Phrases are also supported. Ex: "I love you"\n\nEnter the keyword (not case sensitive!):```')
                             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                     check=not_block)
                             if reply and not reply.content.startswith(pre):
@@ -258,7 +257,7 @@ class KeywordLogger:
                                     '"') and reply.content.endswith('"') else reply.content
 
                                 await self.bot.edit_message(menu,
-                                                                     bot_prefix + '```\n\ud83d\udd8a Keyword is: {}\nWhere should this keyword be detected?\n1. Across all servers.\n2. Only this server.\n3. Only this channel.```'.format(
+                                                                     self.bot.bot_prefix + '```\n\ud83d\udd8a Keyword is: {}\nWhere should this keyword be detected?\n1. Across all servers.\n2. Only this server.\n3. Only this channel.```'.format(
                                                                          reply.content))
                                 reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                         check=check)
@@ -267,18 +266,18 @@ class KeywordLogger:
                                     if reply.content == '1':
                                         self.bot.log_conf['keywords'].append(word)
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Keyword ``{}`` successfully set.'.format(
+                                                                    self.bot.bot_prefix + 'Keyword ``{}`` successfully set.'.format(
                                                                         o_word))
                                     elif reply.content == '2':
                                         self.bot.log_conf['keywords'].append(word + ' [server]{}'.format(ctx.message.server.id))
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Keyword ``{}`` successfully set for this server.'.format(
+                                                                    self.bot.bot_prefix + 'Keyword ``{}`` successfully set for this server.'.format(
                                                                         o_word))
                                     else:
                                         self.bot.log_conf['keywords'].append(
                                             word + ' [channel]{}'.format(ctx.message.channel.id))
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Keyword ``{}`` successfully set for this channel.'.format(
+                                                                    self.bot.bot_prefix + 'Keyword ``{}`` successfully set for this channel.'.format(
                                                                         o_word))
 
                                     with open('settings/log.json', 'r+') as log:
@@ -312,7 +311,7 @@ class KeywordLogger:
                             msg = msg[:-(len(str(count + 2)) + 2)]
 
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd8a Pick which keyword to remove (enter a number):\n\n{}```'.format(
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd8a Pick which keyword to remove (enter a number):\n\n{}```'.format(
                                                                     msg))
 
                             val = count + 3
@@ -334,7 +333,7 @@ class KeywordLogger:
                                     self.bot.log_conf = json.load(log)
 
                                 await self.bot.edit_message(menu,
-                                                            bot_prefix + 'Successfully removed ``{}`` from your keywords.'.format(
+                                                            self.bot.bot_prefix + 'Successfully removed ``{}`` from your keywords.'.format(
                                                                 word))
 
                         # Show list of keywords
@@ -354,13 +353,13 @@ class KeywordLogger:
                                 msg += word + ', '
 
                             msg = msg.rstrip(', ')
-                            await self.bot.edit_message(menu, bot_prefix + '```{}```'.format(msg))
+                            await self.bot.edit_message(menu, self.bot.bot_prefix + '```{}```'.format(msg))
 
                 # Blacklisting options
                 elif reply.content == '4':
                     val = 6
                     await self.bot.edit_message(menu,
-                                                         bot_prefix + '```\n\ud83d\udd8a Enter a number:\n\n1. Blacklist a word.\n2. Blacklist a user.\n3. Blacklist a server.\n4. Blacklist a channel.\n5. Remove a word/user/server/channel from the blacklist.```')
+                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Enter a number:\n\n1. Blacklist a word.\n2. Blacklist a user.\n3. Blacklist a server.\n4. Blacklist a channel.\n5. Remove a word/user/server/channel from the blacklist.```')
 
                     reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author, check=check)
 
@@ -371,14 +370,14 @@ class KeywordLogger:
                         if reply.content == '1':
                             val = 4
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd8a Info: Blacklisted items make it so that a message with a keyword does not trigger the keyword logger if it has the blacklisted item (word/by certain user/in server/in channel).\nEnter a number:\n\n1. Add a word to blacklist everywhere.\n2. Add a word to blacklist in a specific server.\n3. Add a word to blacklist in a specific channel.```')
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd8a Info: Blacklisted items make it so that a message with a keyword does not trigger the keyword logger if it has the blacklisted item (word/by certain user/in server/in channel).\nEnter a number:\n\n1. Add a word to blacklist everywhere.\n2. Add a word to blacklist in a specific server.\n3. Add a word to blacklist in a specific channel.```')
 
                             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author, check=check)
                             if reply and not reply.content.startswith(pre):
                                 await self.bot.delete_message(reply)
                                 if reply.content == '1':
                                     await self.bot.edit_message(menu,
-                                                                         bot_prefix + '```\n\ud83d\udd8a Enter a word to blacklist (not case sensitive):```')
+                                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Enter a word to blacklist (not case sensitive):```')
                                     reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                             check=not_block)
 
@@ -394,13 +393,13 @@ class KeywordLogger:
                                         with open('settings/log.json', 'r') as log:
                                             self.bot.log_conf = json.load(log)
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Done! Blacklisted ``{}``.'.format(
+                                                                    self.bot.bot_prefix + 'Done! Blacklisted ``{}``.'.format(
                                                                         blacklisted_word))
 
                                 # Blacklist the word for a specific server
                                 elif reply.content == '2':
                                     await self.bot.edit_message(menu,
-                                                                         bot_prefix + '```\n\ud83d\udd8a Enter a word to blacklist (not case sensitive):```')
+                                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Enter a word to blacklist (not case sensitive):```')
                                     reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                             check=not_block)
 
@@ -409,7 +408,7 @@ class KeywordLogger:
                                         blacklisted_word = reply.content
                                         await self.bot.delete_message(reply)
                                         await self.bot.edit_message(menu,
-                                                                            bot_prefix + '```\n\ud83d\udd8a Enter the server id where this word should be blacklisted. Enter 1 if it\'s this server.\nServer id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the server > copy id.```')
+                                                                            self.bot.bot_prefix + '```\n\ud83d\udd8a Enter the server id where this word should be blacklisted. Enter 1 if it\'s this server.\nServer id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the server > copy id.```')
                                         reply = await self.bot.wait_for_message(timeout=120,
                                                                                 author=ctx.message.author,
                                                                                 check=not_block)
@@ -421,7 +420,7 @@ class KeywordLogger:
                                                 reply.content)
                                             if not server:
                                                 await self.bot.edit_message(menu,
-                                                                            bot_prefix + 'Could not find the server.')
+                                                                            self.bot.bot_prefix + 'Could not find the server.')
                                             else:
                                                 self.bot.log_conf['blacklisted_words'].append(
                                                     '{} [server]{}'.format(blacklisted_word, server.id))
@@ -432,13 +431,13 @@ class KeywordLogger:
                                                 with open('settings/log.json', 'r') as log:
                                                     self.bot.log_conf = json.load(log)
                                                 await self.bot.edit_message(menu,
-                                                                            bot_prefix + 'Added ``{}`` to the blacklist for server ``{}``.'.format(
+                                                                            self.bot.bot_prefix + 'Added ``{}`` to the blacklist for server ``{}``.'.format(
                                                                                 blacklisted_word, server.name))
 
                                 # Blacklist the word for a specific channel
                                 else:
                                     await self.bot.edit_message(menu,
-                                                                         bot_prefix + '```\n\ud83d\udd8a Enter a word to blacklist (not case sensitive):```')
+                                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Enter a word to blacklist (not case sensitive):```')
                                     reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                             check=not_block)
 
@@ -447,7 +446,7 @@ class KeywordLogger:
                                         blacklisted_word = reply.content
                                         await self.bot.delete_message(reply)
                                         await self.bot.edit_message(menu,
-                                                                            bot_prefix + '```\n\ud83d\udd8a Enter the channel id where this word should be blacklisted. Enter 1 if it\'s this channel.\nChannel id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the channel name > copy id.```')
+                                                                            self.bot.bot_prefix + '```\n\ud83d\udd8a Enter the channel id where this word should be blacklisted. Enter 1 if it\'s this channel.\nChannel id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the channel name > copy id.```')
                                         reply = await self.bot.wait_for_message(timeout=120,
                                                                                 author=ctx.message.author,
                                                                                 check=not_block)
@@ -459,7 +458,7 @@ class KeywordLogger:
                                                 reply.content)
                                             if not channel:
                                                 await self.bot.edit_message(menu,
-                                                                            bot_prefix + 'Could not find the channel.')
+                                                                            self.bot.bot_prefix + 'Could not find the channel.')
                                             else:
                                                 self.bot.log_conf['blacklisted_words'].append(
                                                     '{} [channel]{}'.format(blacklisted_word, channel.id))
@@ -470,13 +469,13 @@ class KeywordLogger:
                                                 with open('settings/log.json', 'r') as log:
                                                     self.bot.log_conf = json.load(log)
                                                 await self.bot.edit_message(menu,
-                                                                            bot_prefix + 'Added ``{}`` to the blacklist for channel ``{}``.'.format(
+                                                                            self.bot.bot_prefix + 'Added ``{}`` to the blacklist for channel ``{}``.'.format(
                                                                                 blacklisted_word, channel.name))
 
                         # Blacklist a user
                         elif reply.content == '2':
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd8a Blacklist a user.\nYou can mention the user, type out their full username + discriminator, or put their user id. They MUST be in the server you are using this command in.\n\nEnter the user:```')
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd8a Blacklist a user.\nYou can mention the user, type out their full username + discriminator, or put their user id. They MUST be in the server you are using this command in.\n\nEnter the user:```')
 
                             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                     check=not_block)
@@ -490,7 +489,7 @@ class KeywordLogger:
                                         user = ctx.message.server.get_member(reply.content)
                                 if not user:
                                     await self.bot.edit_message(menu,
-                                                                bot_prefix + 'Could not find the user. Are they in this server?')
+                                                                self.bot.bot_prefix + 'Could not find the user. Are they in this server?')
                                 else:
                                     self.bot.log_conf['blacklisted_users'].append(user.id)
                                     with open('settings/log.json', 'r+') as log:
@@ -500,13 +499,13 @@ class KeywordLogger:
                                     with open('settings/log.json', 'r') as log:
                                         self.bot.log_conf = json.load(log)
                                     await self.bot.edit_message(menu,
-                                                                bot_prefix + 'Blacklisted user ``{}``. This person cannot trigger the keyword logger now.'.format(
+                                                                self.bot.bot_prefix + 'Blacklisted user ``{}``. This person cannot trigger the keyword logger now.'.format(
                                                                     user.name))
 
                         # Blacklist a server
                         elif reply.content == '3':
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd8a Enter the server id. Enter 1 if it\'s this server.\nServer id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the server > copy id.```')
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd8a Enter the server id. Enter 1 if it\'s this server.\nServer id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the server > copy id.```')
 
                             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                     check=not_block)
@@ -516,7 +515,7 @@ class KeywordLogger:
                                     reply.content)
                                 if not server:
                                     await self.bot.edit_message(menu,
-                                                                bot_prefix + 'Could not find the server.')
+                                                                self.bot.bot_prefix + 'Could not find the server.')
                                 else:
                                     self.bot.log_conf['blacklisted_servers'].append(server.id)
                                     with open('settings/log.json', 'r+') as log:
@@ -526,13 +525,13 @@ class KeywordLogger:
                                     with open('settings/log.json', 'r') as log:
                                         self.bot.log_conf = json.load(log)
                                     await self.bot.edit_message(menu,
-                                                                bot_prefix + 'Blacklisted server ``{}``. The keyword logger will not trigger for messages from this server.'.format(
+                                                                self.bot.bot_prefix + 'Blacklisted server ``{}``. The keyword logger will not trigger for messages from this server.'.format(
                                                                     server.name))
 
                         # Blacklist a channel
                         elif reply.content == '4':
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd8a Enter the channel id. Enter 1 if it\'s this channel.\nChannel id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the channel name > copy id.```')
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd8a Enter the channel id. Enter 1 if it\'s this channel.\nChannel id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the channel name > copy id.```')
 
                             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                     check=not_block)
@@ -542,7 +541,7 @@ class KeywordLogger:
                                     reply.content)
                                 if not channel:
                                     await self.bot.edit_message(menu,
-                                                                bot_prefix + 'Could not find the channel.')
+                                                                self.bot.bot_prefix + 'Could not find the channel.')
                                 else:
                                     self.bot.log_conf['blacklisted_channels'][channel.id] = channel.server.id
                                     with open('settings/log.json', 'r+') as log:
@@ -552,14 +551,14 @@ class KeywordLogger:
                                     with open('settings/log.json', 'r') as log:
                                         self.bot.log_conf = json.load(log)
                                     await self.bot.edit_message(menu,
-                                                                bot_prefix + 'Blacklisted channel ``{}`` in server ``{}``. The keyword logger will not trigger for messages from this channel.'.format(
+                                                                self.bot.bot_prefix + 'Blacklisted channel ``{}`` in server ``{}``. The keyword logger will not trigger for messages from this channel.'.format(
                                                                     channel.name, channel.server.name))
 
                         # Remove an item from the blacklist
                         else:
                             val = 5
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd8a Remove what from the blacklist? Enter a number.\n\n1. Word\n2. User\n3. Server\n4. Channel```')
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd8a Remove what from the blacklist? Enter a number.\n\n1. Word\n2. User\n3. Server\n4. Channel```')
 
                             reply = await self.bot.wait_for_message(timeout=120, author=ctx.message.author,
                                                                     check=check)
@@ -588,7 +587,7 @@ class KeywordLogger:
                                     msg = msg[:-(len(str(count + 2)) + 2)]
 
                                     await self.bot.edit_message(menu,
-                                                                         bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
+                                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
                                                                              msg))
 
                                     val = count + 3
@@ -609,7 +608,7 @@ class KeywordLogger:
                                             self.bot.log_conf = json.load(log)
 
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
+                                                                    self.bot.bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
                                                                         word))
 
                                 # Remove a blacklisted user
@@ -628,7 +627,7 @@ class KeywordLogger:
                                     msg = msg[:-(len(str(count + 2)) + 2)]
 
                                     await self.bot.edit_message(menu,
-                                                                         bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
+                                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
                                                                              msg))
 
                                     val = count + 3
@@ -649,7 +648,7 @@ class KeywordLogger:
                                             self.bot.log_conf = json.load(log)
 
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
+                                                                    self.bot.bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
                                                                         word))
 
                                 # Remove a blacklisted server
@@ -661,7 +660,7 @@ class KeywordLogger:
                                     msg = msg[:-(len(str(count + 2)) + 2)]
 
                                     await self.bot.edit_message(menu,
-                                                                         bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
+                                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
                                                                              msg))
 
                                     val = count + 3
@@ -682,7 +681,7 @@ class KeywordLogger:
                                             self.bot.log_conf = json.load(log)
 
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
+                                                                    self.bot.bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
                                                                         word))
 
                                 # Remove a blacklisted channel
@@ -696,7 +695,7 @@ class KeywordLogger:
                                     msg = msg[:-(len(str(count + 2)) + 2)]
 
                                     await self.bot.edit_message(menu,
-                                                                         bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
+                                                                         self.bot.bot_prefix + '```\n\ud83d\udd8a Pick which blacklisted item to remove (enter a number):\n\n{}```'.format(
                                                                              msg))
 
                                     val = count + 3
@@ -717,7 +716,7 @@ class KeywordLogger:
                                             self.bot.log_conf = json.load(log)
 
                                         await self.bot.edit_message(menu,
-                                                                    bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
+                                                                    self.bot.bot_prefix + 'Successfully removed ``{}`` from the blacklist.'.format(
                                                                         word))
 
                 # Keyword notifier settings
@@ -728,7 +727,7 @@ class KeywordLogger:
                     bot_token_is_set = 'Set' if self.bot.log_conf['notifier_bot_token'] == '' else 'Change'
 
                     await self.bot.edit_message(menu,
-                                                         bot_prefix + '```\n\u2757 Get notified when a keyword gets detected. How should you get notified? Enter a number:\n\n1. Get pinged in the log location channel.\n2. Send a message in the log location channel (no ping).\n3. Get notified via direct message.\n4. Turn off notifier.\n5. {} webhook url (for ping/message).\n6. {} proxy bot token (for direct message).```'.format(webhook_is_set, bot_token_is_set))
+                                                         self.bot.bot_prefix + '```\n\u2757 Get notified when a keyword gets detected. How should you get notified? Enter a number:\n\n1. Get pinged in the log location channel.\n2. Send a message in the log location channel (no ping).\n3. Get notified via direct message.\n4. Turn off notifier.\n5. {} webhook url (for ping/message).\n6. {} proxy bot token (for direct message).```'.format(webhook_is_set, bot_token_is_set))
 
                     reply = await self.bot.wait_for_message(author=ctx.message.author,
                                                             check=check)
@@ -741,7 +740,7 @@ class KeywordLogger:
                             # Set up webhook url
                             if self.bot.log_conf['webhook_url'] == '':
                                 await self.bot.edit_message(menu,
-                                                                    bot_prefix + webhook_info)
+                                                                    self.bot.bot_prefix + webhook_info)
                                 url = await self.bot.wait_for_message(author=ctx.message.author,
                                                                       check=not_block)
                                 if url and not url.content.startswith(pre):
@@ -772,7 +771,7 @@ class KeywordLogger:
                         elif reply.content == '3':
                             if self.bot.log_conf['notifier_bot_token'] == '':
                                 await self.bot.edit_message(menu,
-                                                                    bot_prefix + bot_token_info)
+                                                                    self.bot.bot_prefix + bot_token_info)
                                 reply = await self.bot.wait_for_message(author=ctx.message.author,
                                                                         check=not_block)
                                 if reply and not reply.content.startswith(pre):
@@ -791,7 +790,7 @@ class KeywordLogger:
 
                         # Set webhook url
                         elif reply.content == '5':
-                            await self.bot.edit_message(menu, bot_prefix + webhook_info)
+                            await self.bot.edit_message(menu, self.bot.bot_prefix + webhook_info)
                             url = await self.bot.wait_for_message(author=ctx.message.author,
                                                                 check=not_block)
 
@@ -802,7 +801,7 @@ class KeywordLogger:
 
                         # Set dm bot token
                         elif reply.content == '6':
-                            await self.bot.edit_message(menu, bot_prefix + bot_token_info)
+                            await self.bot.edit_message(menu, self.bot.bot_prefix + bot_token_info)
                             token = await self.bot.wait_for_message(author=ctx.message.author,
                                                                 check=not_block)
 
@@ -815,7 +814,7 @@ class KeywordLogger:
                 elif reply.content == '6':
                     val = 5
                     await self.bot.edit_message(menu,
-                                                         bot_prefix + '```\n\ud83c\udfc3 Stalking people is fun! What are we doing? Enter a number.\n\n1. Turn on/off user following (currently {}).\n2. Add a person to follow.\n3. Remove a person that is being followed.\n4. View who you are following.```'.format(self.bot.log_conf['user_logging']))
+                                                         self.bot.bot_prefix + '```\n\ud83c\udfc3 Stalking people is fun! What are we doing? Enter a number.\n\n1. Turn on/off user following (currently {}).\n2. Add a person to follow.\n3. Remove a person that is being followed.\n4. View who you are following.```'.format(self.bot.log_conf['user_logging']))
                     reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
                     if reply and not reply.content.startswith(pre):
                         await self.bot.delete_message(reply)
@@ -829,13 +828,13 @@ class KeywordLogger:
                             log.seek(0)
                             log.truncate()
                             json.dump(self.bot.log_conf, log, indent=4)
-                        await self.bot.edit_message(menu, bot_prefix + 'Turned {} the user logger.'.format(self.bot.log_conf['user_logging']))
+                        await self.bot.edit_message(menu, self.bot.bot_prefix + 'Turned {} the user logger.'.format(self.bot.log_conf['user_logging']))
                         with open('settings/log.json', 'r') as log:
                             self.bot.log_conf = json.load(log)
 
                     elif reply.content == '2':
                         await self.bot.edit_message(menu,
-                                                             bot_prefix + '```\n\ud83c\udfc3 Input the person you want to follow. Can be a mention, the user id, or the fullname + discriminator. User id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the user in chat > copy id.\n\nInput user:```')
+                                                             self.bot.bot_prefix + '```\n\ud83c\udfc3 Input the person you want to follow. Can be a mention, the user id, or the fullname + discriminator. User id can be obtained by enabling developer mode (http://i.imgur.com/KMDS8cb.png) and then right clicking on the user in chat > copy id.\n\nInput user:```')
                         reply = await self.bot.wait_for_message(author=ctx.message.author, check=not_block)
                         if reply and not reply.content.startswith(pre):
                             await self.bot.delete_message(reply)
@@ -853,23 +852,23 @@ class KeywordLogger:
                                         if user:
                                             break
                             if not user:
-                                return await self.bot.edit_message(menu, bot_prefix + 'Could not find user.')
+                                return await self.bot.edit_message(menu, self.bot.bot_prefix + 'Could not find user.')
                             await self.bot.edit_message(menu,
-                                                                bot_prefix + '```\n\ud83d\udd50 Input the number of minutes the user must go without sending a message before you can get a notification from him posting. This is basically a cooldown to prevent mass pings. Decimals are supported.\n\nInput number of minutes:```')
+                                                                self.bot.bot_prefix + '```\n\ud83d\udd50 Input the number of minutes the user must go without sending a message before you can get a notification from him posting. This is basically a cooldown to prevent mass pings. Decimals are supported.\n\nInput number of minutes:```')
                             reply = await self.bot.wait_for_message(author=ctx.message.author, check=not_block)
                             if reply and not reply.content.startswith(pre):
                                 await self.bot.delete_message(reply)
                                 if reply.content.isdigit():
                                     self.bot.log_conf['keyusers']['{} all'.format(user.id)] = [0.0, float(reply.content) * 60.0]
                                 else:
-                                    return await self.bot.edit_message(menu, bot_prefix + 'Error, not a number.')
+                                    return await self.bot.edit_message(menu, self.bot.bot_prefix + 'Error, not a number.')
                                 with open('settings/log.json', 'r+') as log:
                                     log.seek(0)
                                     log.truncate()
                                     json.dump(self.bot.log_conf, log, indent=4)
                                 with open('settings/log.json', 'r') as log:
                                     self.bot.log_conf = json.load(log)
-                                await self.bot.edit_message(menu, bot_prefix + 'Successfully added user: ``{}``'.format(user.name))
+                                await self.bot.edit_message(menu, self.bot.bot_prefix + 'Successfully added user: ``{}``'.format(user.name))
 
                     elif reply.content == '3':
                         msg = '1. '
@@ -905,7 +904,7 @@ class KeywordLogger:
 
                         val = count+2
                         await self.bot.edit_message(menu,
-                                                            bot_prefix + '```\n\ud83c\udfc3 Enter the number to remove the user.\n\n{}```'.format(msg))
+                                                            self.bot.bot_prefix + '```\n\ud83c\udfc3 Enter the number to remove the user.\n\n{}```'.format(msg))
                         reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
                         if reply and not reply.content.startswith(pre):
                             await self.bot.delete_message(reply)
@@ -921,7 +920,7 @@ class KeywordLogger:
                                 self.bot.log_conf = json.load(log)
 
                             await self.bot.edit_message(menu,
-                                                        bot_prefix + 'Successfully removed the user.'.format(
+                                                        self.bot.bot_prefix + 'Successfully removed the user.'.format(
                                                             word))
 
                     elif reply.content == '4':
@@ -953,7 +952,7 @@ class KeywordLogger:
                                 msg = msg.rstrip(', ')
 
                         await self.bot.edit_message(menu,
-                                                            bot_prefix + '```\n\ud83c\udfc3 List of users being followed:\n\n{}```'.format(
+                                                            self.bot.bot_prefix + '```\n\ud83c\udfc3 List of users being followed:\n\n{}```'.format(
                                                                 msg))
 
                 # Show all settings
@@ -1071,13 +1070,13 @@ class KeywordLogger:
 
                     if len(msg) > 1950 or 'gist' in ctx.message.content:
                         gist_log = PythonGists.Gist(description='Logging info.', content=msg, name='log.txt')
-                        await self.bot.edit_message(menu, bot_prefix + gist_log)
+                        await self.bot.edit_message(menu, self.bot.bot_prefix + gist_log)
                     else:
-                        await self.bot.edit_message(menu, bot_prefix + msg)
+                        await self.bot.edit_message(menu, self.bot.bot_prefix + msg)
 
                 # Detailed information about the keyword logger/notifier
                 else:
-                    await self.bot.edit_message(menu, bot_prefix + '```The Keyword Logger/Notifier is a nice way to keep track of anything and everything that\'s going on in your Discord servers.\nWant to find out when people are talking about you? Add your name as a keyword!\nWant to know when someone is talking about your favorite character/game/whatever? Add the game as a keyword.\n\nFirst steps:\n1. Set up where you want the bot to log these messages that will contain your keywords. Set a log location via option 2 in the main menu.\n2. Set up a way to get notified when the messages get logged. This is done via option 5 in the main menu.\n3. Customize even more by blacklisting certain words, users, etc.\n\nFor more detailed information, view the wiki section: https://github.com/appu1232/Discord-Selfbot#keyword-notifier```')
+                    await self.bot.edit_message(menu, self.bot.bot_prefix + '```The Keyword Logger/Notifier is a nice way to keep track of anything and everything that\'s going on in your Discord servers.\nWant to find out when people are talking about you? Add your name as a keyword!\nWant to know when someone is talking about your favorite character/game/whatever? Add the game as a keyword.\n\nFirst steps:\n1. Set up where you want the bot to log these messages that will contain your keywords. Set a log location via option 2 in the main menu.\n2. Set up a way to get notified when the messages get logged. This is done via option 5 in the main menu.\n3. Customize even more by blacklisting certain words, users, etc.\n\nFor more detailed information, view the wiki section: https://github.com/appu1232/Discord-Selfbot#keyword-notifier```')
 
     @log.command(pass_context=True)
     async def history(self, ctx, txt: str = None):
@@ -1089,12 +1088,12 @@ class KeywordLogger:
                     if size.isdigit():
                         save = True
                         skip = 0
-                        fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Saving messages...')
+                        fetch = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Saving messages...')
                     else:
-                        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
+                        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax.')
                         return
                 else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax.')
                     return
             else:
                 save = False
@@ -1105,14 +1104,14 @@ class KeywordLogger:
                         return msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n'
                     else:
                         return False
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Are you sure you want to output all the messages here? ``(y/n)``.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Are you sure you want to output all the messages here? ``(y/n)``.')
                 reply = await self.bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
                 if reply:
                     if reply.content.lower().strip() == 'n':
-                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
+                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Cancelled.')
                 else:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
-                fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Fetching messages...')
+                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Cancelled.')
+                fetch = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Fetching messages...')
                 size = txt
             if size.isdigit:
                 size = int(size)
@@ -1151,7 +1150,7 @@ class KeywordLogger:
                     part = int(math.ceil(len(msg) / 1950))
                     if part == 1:
                         await self.bot.send_message(ctx.message.channel,
-                                                    bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (
+                                                    self.bot.bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (
                                                     txt, msg))
                         await self.bot.delete_message(fetch)
                     else:
@@ -1165,12 +1164,12 @@ class KeywordLogger:
                             splitmsg = ''
                         for b, i in enumerate(allWords):
                             if b == 0:
-                                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (txt, i))
+                                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Showing last ``%s`` messages: ```%s```' % (txt, i))
                             else:
                                 await self.bot.send_message(ctx.message.channel, '```%s```' % i)
                         await self.bot.delete_message(fetch)
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax.')
 
     @log.command(pass_context=True)
     async def location(self, ctx, *, msg: str = None):
@@ -1187,13 +1186,13 @@ class KeywordLogger:
             log.truncate()
             json.dump(settings, log, indent=4)
         if settings['user_location'] == settings['log_location']:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'User follows and keywords will both log in this channel.')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'User follows and keywords will both log in this channel.')
         else:
             if settings['webhook_url2'] == "":
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'User follows will now log in this channel, however, you will need to set up a separate webhook for this. '
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'User follows will now log in this channel, however, you will need to set up a separate webhook for this. '
                                                                               'Follow the instructions on how to set up a webhook found in the keyword logger section and add it for the user follows with ``>webhook2 <webhook_url>``')
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'User follows will now log in this channel instead of the keyword logger channel.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'User follows will now log in this channel instead of the keyword logger channel.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -1211,7 +1210,7 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -1234,7 +1233,7 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned on the user logger.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Turned on the user logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -1247,7 +1246,7 @@ class KeywordLogger:
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Turned off the user logger.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Turned off the user logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -1260,11 +1259,11 @@ class KeywordLogger:
                 for key in settings['keyusers']:
                     if user in key:
                         settings['keyusers'][key] = [0.0, settings['keyusers'][key][1]]
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Refreshed notification cooldown for this user.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Refreshed notification cooldown for this user.')
             else:
                 for user in settings['keyusers']:
                     settings['keyusers'][user] = [0.0, settings['keyusers'][user][1]]
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Refreshed notification cooldown.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Refreshed notification cooldown.')
             log.seek(0)
             log.truncate()
             json.dump(settings, log, indent=4)
@@ -1287,13 +1286,13 @@ class KeywordLogger:
                         json.dump(settings, log, indent=4)
                     with open('settings/log.json', 'r') as log:
                         self.bot.log_conf = json.load(log)
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set context length to ``%s``.' % msg)
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set context length to ``%s``.' % msg)
                 else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid context length.')
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid context length.')
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax.')
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. No value given.')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax. No value given.')
 
     @log.command(pass_context=True)
     async def add(self, ctx):
@@ -1305,9 +1304,9 @@ class KeywordLogger:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Added server to logger.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Added server to logger.')
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is already in the logger.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'This server is already in the logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -1321,16 +1320,16 @@ class KeywordLogger:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Removed server from the logger.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Removed server from the logger.')
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'This server is not in the logger.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'This server is not in the logger.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
     @log.command(pass_context=True, aliases=['removekey', 'addblacklist', 'removeblacklist'])
     async def addkey(self, ctx):
         """Add a keyword to the keyword logger. See wiki for more info"""
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'This is no longer a command. Use ``>log`` instead to change keyword logger/notifier settings.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'This is no longer a command. Use ``>log`` instead to change keyword logger/notifier settings.')
 
     @log.command(pass_context=True)
     async def adduser(self, ctx, *, msg: str):
@@ -1345,19 +1344,19 @@ class KeywordLogger:
                 id = data[0]
                 stalk_servers = self.bot.get_server(data[1])
                 if not stalk_servers:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Server not found. Are you using the command right?\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
+                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Server not found. Are you using the command right?\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
                 interval = data[2]
             try:
                 interval = float(interval)
             except:
-                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid interval. Enter a number.\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
+                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid interval. Enter a number.\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
             user = None
             for server in self.bot.servers:
                 user = server.get_member(id)
                 if user:
                     break
             if not user:
-                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find specified user. Are you using the command right?\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
+                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find specified user. Are you using the command right?\nSyntax:``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
 
             if stalk_servers is True:
                 key = id + ' all'
@@ -1372,15 +1371,15 @@ class KeywordLogger:
                     log.truncate()
                     json.dump(settings, log, indent=4)
             if stalk_servers is True:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Now ~~stalking~~ following ``{}``.'.format(user.name))
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Now ~~stalking~~ following ``{}``.'.format(user.name))
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Now ~~stalking~~ following ``{}`` in server ``{}``.'.format(user.name, self.bot.get_server(stalk_servers.id).name))
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Now ~~stalking~~ following ``{}`` in server ``{}``.'.format(user.name, self.bot.get_server(stalk_servers.id).name))
             with open('settings/log.json', 'r') as log:
                 self.bot.log_conf = json.load(log)
                 self.bot.key_users = self.bot.log_conf['keyusers']
 
         else:
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Proper use: ``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax. Proper use: ``>log adduser <user_id> | <minutes>``\nEx: ``>log adduser {} | 60``'.format(self.bot.user.id))
 
     @log.command(pass_context=True)
     async def removeuser(self, ctx, *, msg: str):
@@ -1396,9 +1395,9 @@ class KeywordLogger:
                 log.seek(0)
                 log.truncate()
                 json.dump(settings, log, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Stopped following this user.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Stopped following this user.')
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find user.')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
             self.bot.key_users = self.bot.log_conf['keyusers']
@@ -1419,7 +1418,7 @@ class KeywordLogger:
             l.seek(0)
             l.truncate()
             json.dump(log, l, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set up webhook for user follow notifications!')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set up webhook for user follow notifications!')
         with open('settings/log.json', 'r') as log:
             self.bot.log_conf = json.load(log)
 
@@ -1427,7 +1426,7 @@ class KeywordLogger:
     async def notify(self, ctx):
         """Manage notifier bot. See wiki for more info."""
         if ctx.invoked_subcommand is None:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the proxy bot.\n``>notify msg`` - sends message to your keyword logger channel through webhook. (get notification if you have notification settings set to all messages in that server).\n``>notify ping`` - recieve notifications via mention in your keyword logger channel through webhook.\n``>notify dm`` - recieve notifications via direct message through proxy bot.\n``>notify off`` - Turn off all notifications.')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax. Possible commands:\n``>notify token <token>`` - Set the bot token for the proxy bot.\n``>notify msg`` - sends message to your keyword logger channel through webhook. (get notification if you have notification settings set to all messages in that server).\n``>notify ping`` - recieve notifications via mention in your keyword logger channel through webhook.\n``>notify dm`` - recieve notifications via direct message through proxy bot.\n``>notify off`` - Turn off all notifications.')
 
     # Set notifications to ping
     @notify.command(pass_context=True)

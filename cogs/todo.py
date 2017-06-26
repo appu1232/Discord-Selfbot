@@ -3,7 +3,6 @@ import json
 import discord
 import asyncio
 from time import time as current_time
-from appuselfbot import bot_prefix
 from discord_webhooks import *
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -83,7 +82,7 @@ class Todo:
         if ctx.invoked_subcommand is None:
             await self.bot.delete_message(ctx.message)
             if not self.todo_list:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + "Your to-do list is empty!")
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Your to-do list is empty!")
             else:
                 embed = discord.Embed(title="{}'s to-do list:".format(ctx.message.author.name), description="")
                 sorted_items = sorted(self.todo_list.items(), key=lambda x: x[1][0] if type(x[1][0]) is float else 0)
@@ -206,21 +205,21 @@ class Todo:
         else:
             self.todo_list[msg] = [seconds, text, channel, alert, repeat, time]
         self.save_list()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully added `{}` to your to-do list!".format(msg))
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully added `{}` to your to-do list!".format(msg))
             
     @todo.command(pass_context=True)
     async def remove(self, ctx, *, msg):
         """Cross out entries from your to-do list."""
         await self.bot.delete_message(ctx.message)
         if not self.todo_list:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + "Your to-do list is empty!")
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Your to-do list is empty!")
         else:
             found = self.todo_list.pop(msg, None)
             if found:
                 self.save_list()
-                await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully removed `{}` from your to-do list!".format(msg)) 
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully removed `{}` from your to-do list!".format(msg))
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + "That entry doesn't exist!")
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "That entry doesn't exist!")
     
     @todo.command(pass_context=True)
     async def clear(self, ctx):
@@ -228,7 +227,7 @@ class Todo:
         await self.bot.delete_message(ctx.message)
         self.todo_list.clear()
         self.save_list()
-        await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully cleared your to-do list!")
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully cleared your to-do list!")
 
     async def todo_timer(self):
         await self.bot.wait_until_ready()

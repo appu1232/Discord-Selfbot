@@ -3,7 +3,6 @@ import random
 import requests
 import json
 from PythonGists import PythonGists
-from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
@@ -87,7 +86,7 @@ class Misc:
             msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Received: %s\nMentions: %s\nServers: %s\nKeywords logged: %s\nGame: %s```' % (
             time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count),
             str(len(self.bot.servers)), str(self.bot.keyword_log), game)
-            await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
     # Embeds the message
@@ -202,13 +201,13 @@ class Misc:
                         em.set_footer(text=footer)
                 await self.bot.send_message(ctx.message.channel, content=ptext, embed=em)
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'No embed permissions in this channel.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No embed permissions in this channel.')
         else:
             msg = '```How to use the >embed command:\nExample: >embed title=test this | description=some words | color=3AB35E | field=name=test value=test\n\nYou do NOT need to specify every property, only the ones you want.' \
                   '\nAll properties and the syntax (put your custom stuff in place of the <> stuff):\ntitle=<words>\ndescription=<words>\ncolor=<hex_value>\nimage=<url_to_image> (must be https)\nthumbnail=<url_to_image>\nauthor=<words> **OR** author=name=<words> icon=<url_to_image>\nfooter=<words> ' \
                   '**OR** footer=name=<words> icon=<url_to_image>\nfield=name=<words> value=<words> (you can add as many fields as you want)\nptext=<words>\n\nNOTE: After the command is sent, the bot will delete your message and replace it with ' \
                   'the embed. Make sure you have it saved or else you\'ll have to type it all again if the embed isn\'t how you want it.\nPS: Hyperlink text like so: [text](https://www.whateverlink.com)\nPPS: Force a field to go to the next line with the added parameter inline=False```'
-            await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
         try:
             await self.bot.delete_message(ctx.message)
         except:
@@ -226,12 +225,12 @@ class Misc:
                         color = color[2:]
                     int(color, 16)
                 except ValueError:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
+                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid color.')
                 opt['embed_color'] = color
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for embeds.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set color for embeds.')
             else:
                 opt['embed_color'] = ""
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set default embed color off for embed command. You will now need to specify the color parameter if you want your embed to be colored when using the embed command.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set default embed color off for embed command. You will now need to specify the color parameter if you want your embed to be colored when using the embed command.')
 
             fp.seek(0)
             fp.truncate()
@@ -266,7 +265,7 @@ class Misc:
             # Cycle games if more than one game is given.
             if ' | ' in game:
                 await self.bot.send_message(ctx.message.channel,
-                                            bot_prefix + 'Input interval in seconds to wait before changing to the next {} (``n`` to cancel):'.format(
+                                            self.bot.bot_prefix + 'Input interval in seconds to wait before changing to the next {} (``n`` to cancel):'.format(
                                                 status_type.lower()))
 
                 def check(msg):
@@ -279,7 +278,7 @@ class Misc:
                 if not reply:
                     return
                 if reply.content.lower().strip() == 'n':
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled')
+                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Cancelled')
                 elif reply.content.strip().isdigit():
                     interval = int(reply.content.strip())
                     if interval >= 10:
@@ -287,14 +286,14 @@ class Misc:
                         games = game.split(' | ')
                         if len(games) != 2:
                             await self.bot.send_message(ctx.message.channel,
-                                                        bot_prefix + 'Change {} in order or randomly? Input ``o`` for order or ``r`` for random:'.format(
+                                                        self.bot.bot_prefix + 'Change {} in order or randomly? Input ``o`` for order or ``r`` for random:'.format(
                                                             status_type.lower()))
                             s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
                             if not s:
                                 return
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
                                 await self.bot.send_message(ctx.message.channel,
-                                                            bot_prefix + '{status} set. {status} will randomly change every ``{time}`` seconds'.format(
+                                                            self.bot.bot_prefix + '{status} set. {status} will randomly change every ``{time}`` seconds'.format(
                                                                 status=status_type, time=reply.content.strip()))
                                 loop_type = 'random'
                             else:
@@ -304,7 +303,7 @@ class Misc:
 
                         if loop_type == 'ordered':
                             await self.bot.send_message(ctx.message.channel,
-                                                        bot_prefix + '{status} set. {status} will change every ``{time}`` seconds'.format(
+                                                        self.bot.bot_prefix + '{status} set. {status} will change every ``{time}`` seconds'.format(
                                                             status=status_type, time=reply.content.strip()))
 
                         stream = 'no' if is_stream else 'yes'
@@ -316,7 +315,7 @@ class Misc:
 
                     else:
                         return await self.bot.send_message(ctx.message.channel,
-                                                           bot_prefix + 'Cancelled. Interval is too short. Must be at least 10 seconds.')
+                                                           self.bot.bot_prefix + 'Cancelled. Interval is too short. Must be at least 10 seconds.')
 
             # Set game if only one game is given.
             else:
@@ -328,10 +327,10 @@ class Misc:
                     json.dump(games, g, indent=4)
                 if is_stream and '=' in game:
                     g, url = game.split('=')
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Stream set as: ``Streaming %s``' % g)
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Stream set as: ``Streaming %s``' % g)
                     await self.bot.change_presence(game=discord.Game(name=g, type=1, url=url))
                 else:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Game set as: ``Playing %s``' % game)
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Game set as: ``Playing %s``' % game)
                     await self.bot.change_presence(game=discord.Game(name=game))
 
         # Remove game status.
@@ -340,7 +339,7 @@ class Misc:
             self.bot.game = None
             self.bot.is_stream = False
             await self.bot.change_presence(game=None)
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Set playing status off')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Set playing status off')
             if os.path.isfile('settings/games.json'):
                 os.remove('settings/games.json')
 
@@ -353,7 +352,7 @@ class Misc:
                 avi_config = json.load(a)
             if avi_config['password'] == '':
                 return await self.bot.send_message(ctx.message.channel,
-                                                   bot_prefix + 'Cycling avatars requires you to input your password. Your password will not be sent anywhere and no one will have access to it. '
+                                                   self.bot.bot_prefix + 'Cycling avatars requires you to input your password. Your password will not be sent anywhere and no one will have access to it. '
                                                                 'Enter your password with``>avatar password <password>`` Make sure you are in a private channel where no one can see!')
             if avi_config['interval'] != '0':
                 self.bot.avatar = None
@@ -361,11 +360,11 @@ class Misc:
                 avi_config['interval'] = '0'
                 with open('settings/avatars.json', 'w') as avi:
                     json.dump(avi_config, avi, indent=4)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Disabled cycling of avatars.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Disabled cycling of avatars.')
             else:
                 if os.listdir('avatars'):
                     await self.bot.send_message(ctx.message.channel,
-                                                bot_prefix + 'Enabled cycling of avatars. Input interval in seconds to wait before changing avatars (``n`` to cancel):')
+                                                self.bot.bot_prefix + 'Enabled cycling of avatars. Input interval in seconds to wait before changing avatars (``n`` to cancel):')
 
                     def check(msg):
                         return msg.content.isdigit() or msg.content.lower().strip() == 'n'
@@ -377,22 +376,22 @@ class Misc:
                     if not interval:
                         return
                     if interval.content.lower().strip() == 'n':
-                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Cancelled.')
+                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Cancelled.')
                     elif int(interval.content) < 1800:
                         return await self.bot.send_message(ctx.message.channel,
-                                                           bot_prefix + 'Cancelled. Interval is too short. Must be at least 1800 seconds (30 minutes).')
+                                                           self.bot.bot_prefix + 'Cancelled. Interval is too short. Must be at least 1800 seconds (30 minutes).')
                     else:
                         avi_config['interval'] = int(interval.content)
                     if len(os.listdir('avatars')) != 2:
                         await self.bot.send_message(ctx.message.channel,
-                                                    bot_prefix + 'Change avatars in order or randomly? Input ``o`` for order or ``r`` for random:')
+                                                    self.bot.bot_prefix + 'Change avatars in order or randomly? Input ``o`` for order or ``r`` for random:')
                         cycle_type = await self.bot.wait_for_message(author=ctx.message.author, check=check2,
                                                                      timeout=60)
                         if not cycle_type:
                             return
                         if cycle_type.content.strip() == 'r' or cycle_type.content.strip() == 'random':
                             await self.bot.send_message(ctx.message.channel,
-                                                        bot_prefix + 'Avatar cycling enabled. Avatar will randomly change every ``%s`` seconds' % interval.content.strip())
+                                                        self.bot.bot_prefix + 'Avatar cycling enabled. Avatar will randomly change every ``%s`` seconds' % interval.content.strip())
                             loop_type = 'random'
                         else:
                             loop_type = 'ordered'
@@ -401,7 +400,7 @@ class Misc:
                     avi_config['type'] = loop_type
                     if loop_type == 'ordered':
                         await self.bot.send_message(ctx.message.channel,
-                                                    bot_prefix + 'Avatar cycling enabled. Avatar will change every ``%s`` seconds' % interval.content.strip())
+                                                    self.bot.bot_prefix + 'Avatar cycling enabled. Avatar will change every ``%s`` seconds' % interval.content.strip())
                     with open('settings/avatars.json', 'r+') as avi:
                         avi.seek(0)
                         avi.truncate()
@@ -411,7 +410,7 @@ class Misc:
 
                 else:
                     await self.bot.send_message(ctx.message.channel,
-                                                bot_prefix + 'No images found under ``avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')
+                                                self.bot.bot_prefix + 'No images found under ``avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')
 
     @avatar.command(aliases=['pass', 'pw'], pass_context=True)
     async def password(self, ctx, *, msg):
@@ -424,7 +423,7 @@ class Misc:
             json.dump(avi_config, a, indent=4)
         await self.bot.delete_message(ctx.message)
         return await self.bot.send_message(ctx.message.channel,
-                                           bot_prefix + 'Password set. Do ``>avatar`` to toggle cycling avatars.')
+                                           self.bot.bot_prefix + 'Password set. Do ``>avatar`` to toggle cycling avatars.')
 
     @commands.command(pass_context=True)
     async def setavatar(self, ctx, *, msg):
@@ -462,7 +461,7 @@ class Misc:
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find image.')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find image.')
 
     @commands.command(pass_context=True)
     async def ping(self, ctx):
@@ -478,7 +477,7 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, content=None, embed=pong)
         else:
             await self.bot.send_message(ctx.message.channel,
-                                        bot_prefix + '``Response Time: %s ms``' % str(ping.microseconds / 1000.0))
+                                        self.bot.bot_prefix + '``Response Time: %s ms``' % str(ping.microseconds / 1000.0))
 
     @commands.command(pass_context=True)
     async def quotecolor(self, ctx, *, msg):
@@ -488,10 +487,10 @@ class Misc:
                 msg = msg.lstrip('#')
                 int(msg, 16)
             except:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for quote embeds.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid color.')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set color for quote embeds.')
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
             return
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
@@ -607,7 +606,7 @@ class Misc:
                 await self.bot.send_message(ctx.message.channel,
                                             '%s - %s```%s```' % (result.author.name, result.timestamp, result.content))
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'No quote found.')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No quote found.')
 
     @commands.command(pass_context=True)
     async def afk(self, ctx, txt: str = None):
@@ -626,14 +625,14 @@ class Misc:
                     opt['default_status'] = 'invisible'
                     self.bot.default_status = 'invisible'
                 else:
-                    return await self.bot.send_message(ctx.message.channel, bot_prefix + info)
+                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + info)
             else:
-                return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid status. %s' % info)
+                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid status. %s' % info)
             fp.seek(0)
             fp.truncate()
             json.dump(opt, fp, indent=4)
             await self.bot.send_message(ctx.message.channel,
-                                        bot_prefix + 'Set default afk status. You will now appear as ``{}`` when not on Discord.'.format(
+                                        self.bot.bot_prefix + 'Set default afk status. You will now appear as ``{}`` when not on Discord.'.format(
                                             opt['default_status']))
 
 

@@ -1,6 +1,5 @@
 #Importing libraries
 import discord
-from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 from sys import argv
@@ -113,11 +112,11 @@ class Lockdown:
                     mods[server].append(role)
                 with open("settings/moderation.json", "w+") as f:
                     json.dump(mods, f)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully added {} to the list of mod roles on {}!".format(role, server))
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully added {} to the list of mod roles on {}!".format(role, server))
             else:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + "{} isn't a role on {}!".format(role, server))
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "{} isn't a role on {}!".format(role, server))
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + "{} isn't a server!".format(server))
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "{} isn't a server!".format(server))
 
     @mod.command(pass_context=True)
     async def remove(self, ctx, server, role):
@@ -129,9 +128,9 @@ class Lockdown:
             mods[server].remove(role)
             with open("settings/moderation.json", "w+") as f:
                 json.dump(mods, f)
-            await self.bot.send_message(ctx.message.channel, bot_prefix + "Successfully removed {} from the list of mod roles on {}!".format(role, server))
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully removed {} from the list of mod roles on {}!".format(role, server))
         except (ValueError, KeyError):
-            await self.bot.send_message(ctx.message.channel, bot_prefix + "You can't remove something that doesn't exist!")
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You can't remove something that doesn't exist!")
 
 def setup(bot):
     bot.add_cog(Lockdown(bot))
