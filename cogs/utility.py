@@ -22,41 +22,28 @@ class Utility:
     @commands.group(aliases=['date'], pass_context=True)
     async def time(self, ctx):
         """Date time module."""
-        def_time = False
-        tz = ""
-        with open('settings/optional_config.json', 'r+') as fp:
+        a = None
+        with open('settings/optional_config.json', 'r') as fp:
             opt = json.load(fp)
-            if opt['timezone']:
-                if opt['timezone'] != "":
+            try:
+                if not opt['timezone']:
                     tz = opt['timezone']
                     def_time = True
-            else:
-                opt['timezone'] = ""
-        if def_time:
-            a = pytz.timezone(tz)
-            dandt = str(datetime.datetime.now(a)).split("+")[0]
-        else:
-            dandt = str(datetime.datetime.now())
-        listdandt = dandt.split(" ")
-        date = listdandt[0].split("-")
-        year = date[0]
-        month = date[1]
-        day = date[2]
-        time = listdandt[1].split(":")
-        hour = time[0]
-        minute = time[1]
-        second = time[2].split(".")[0]  # remove the milliseconds
-
+                    a = pytz.timezone(tz)
+            except IndexError:
+                # Timezone entry missing in configuration file
+                pass
+        dandt = datetime.datetime.now(a)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Date and Time', color=discord.Color.blue())
-            em.add_field(name='Local Time', value=hour + " hrs " + minute + " mins " + second + " secs", inline=False)
-            em.add_field(name='Day', value=day)
-            em.add_field(name='Month', value=month)
-            em.add_field(name='Year', value=year)
+            em.add_field(name='Local Time', value="{:02d} hrs {:02d} mins {:02d} secs".format(dandt.hour, dandt.minute, dandt.second), inline=False)
+            em.add_field(name='Day', value="{:02d}".format(dandt.day))
+            em.add_field(name='Month', value="{:02d}".format(dandt.month))
+            em.add_field(name='Year', value=dandt.year)
 
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
-            msg = '**Local Date and Time:** ```Time: %s\nDate: %s```' % (listdandt[1].split(".")[0], listdandt[0])
+            msg = '**Local Date and Time:** ```{:Time: %H:%M:%S\nDate: %Y-%m-%d```}'.format(dandt)
             await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
