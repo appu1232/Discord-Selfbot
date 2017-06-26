@@ -26,7 +26,7 @@ class Utility:
         with open('settings/optional_config.json', 'r') as fp:
             opt = json.load(fp)
             try:
-                if not opt['timezone']:
+                if opt['timezone']:
                     tz = opt['timezone']
                     def_time = True
                     a = pytz.timezone(tz)
