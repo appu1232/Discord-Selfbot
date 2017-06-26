@@ -23,16 +23,18 @@ class Utility:
     async def time(self, ctx):
         """Date time module."""
         a = None
+        tzerror = False
         with open('settings/optional_config.json', 'r') as fp:
             opt = json.load(fp)
             try:
                 if opt['timezone']:
                     tz = opt['timezone']
-                    def_time = True
                     a = pytz.timezone(tz)
             except IndexError:
                 # Timezone entry missing in configuration file
                 pass
+            except pytz.exceptions.UnknownTimeZoneError:
+                tzerror = True
         dandt = datetime.datetime.now(a)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Date and Time', color=discord.Color.blue())
@@ -40,6 +42,8 @@ class Utility:
             em.add_field(name='Day', value="{:02d}".format(dandt.day))
             em.add_field(name='Month', value="{:02d}".format(dandt.month))
             em.add_field(name='Year', value=dandt.year)
+            if tzerror:
+                em.add_field(name=u'\u26A0 Warning', value="Invalid timezone specified, system timezone was used instead.", inline=False)
 
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
