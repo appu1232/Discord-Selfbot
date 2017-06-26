@@ -483,24 +483,15 @@ class Misc:
     async def quotecolor(self, ctx, *, msg):
         '''Set color (hex) of a quote embed. Ex: >quotecolor 000000'''
         if msg:
-<<<<<<< HEAD
             if msg == "auto":
                 pass
             else:
                 try:
                     msg = msg.lstrip('#')
                     int(msg, 16)
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for quote embeds.')
                 except:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for quote embeds.')
-=======
-            try:
-                msg = msg.lstrip('#')
-                int(msg, 16)
-            except:
-                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid color.')
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set color for quote embeds.')
->>>>>>> 636804eeae3d3571642311d22aa1135ff0872178
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
             return
