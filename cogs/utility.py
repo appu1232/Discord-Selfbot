@@ -171,7 +171,8 @@ class Utility:
                 fp.seek(0)
                 fp.truncate()
                 json.dump(opt, fp, indent=4)
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Prefix changed. use `restart` to reboot the bot for the updated prefix')
+            self.bot.customcmd_prefix = msg
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Prefix changed.')
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Type a prefix as an argument for the `prefix` command')
 
