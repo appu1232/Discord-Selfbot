@@ -484,11 +484,14 @@ class Misc:
     async def quotecolor(self, ctx, *, msg):
         '''Set color (hex) of a quote embed. Ex: >quotecolor 000000'''
         if msg:
-            try:
-                msg = msg.lstrip('#')
-                int(msg, 16)
-            except:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
+            if msg == "auto":
+                pass
+            else:
+                try:
+                    msg = msg.lstrip('#')
+                    int(msg, 16)
+                except:
+                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for quote embeds.')
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
@@ -592,13 +595,17 @@ class Misc:
             result = search[0]
         if result:
             if embed_perms(ctx.message) and result.content:
+                em = discord.Embed(description=result.content, timestamp=result.timestamp)
                 with open('settings/optional_config.json') as fp:
                     opt = json.load(fp)
                 try:
                     embed_color = opt['quoteembed_color']
-                    em = discord.Embed(description=result.content, timestamp=result.timestamp, color=int('0x' + embed_color, 16))
+                    if embed_color == "auto":
+                        em.color = result.author.roles[-1].color
+                    else:
+                        em.color = int('0x' + embed_color, 16)
                 except:
-                    em = discord.Embed(description=result.content, timestamp=result.timestamp, color=0xbc0b0b)
+                    em.color = 0xbc0b0b
                 em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
                 if channel != ctx.message.channel:
                     em.set_footer(text='#{} | {} '.format(channel.name, channel.server.name))
