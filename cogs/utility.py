@@ -132,7 +132,7 @@ class Utility:
                 fp.seek(0)
                 fp.truncate()
                 json.dump(opt, fp, indent=4)
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Preffered timezone has been set')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Preferred timezone has been set')
         else:
             await self.bot.send_message(ctx.message.channel, bot_prefix + 'You can find the list of timezones at `https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef`')
 
