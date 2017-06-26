@@ -30,8 +30,8 @@ class Userinfo:
                 user = ctx.message.author
 
             # Thanks to IgneelDxD for help on this
-            if user.avatar_url[60:].startswith('a_'):
-                avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[33:][:18] + user.avatar_url[59:-3] + 'gif'
+            if user.avatar_url[54:].startswith('a_'):
+                avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
             else:
                 avi = user.avatar_url
 
@@ -74,8 +74,8 @@ class Userinfo:
             user = ctx.message.author
 
         # Thanks to IgneelDxD for help on this
-        if user.avatar_url[60:].startswith('a_'):
-            avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[33:][:18] + user.avatar_url[59:-3] + 'gif'
+        if user.avatar_url[54:].startswith('a_'):
+            avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
         else:
             avi = user.avatar_url
         if embed_perms(ctx.message):
