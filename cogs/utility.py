@@ -184,7 +184,6 @@ class Utility:
                 opt['bot_identifier'] = msg
                 fp.seek(0)
                 fp.truncate()
-
                 json.dump(opt, fp, indent=4)
             self.bot.bot_prefix = msg
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Prefix changed.')
