@@ -4,7 +4,7 @@ import git
 import discord
 import os
 import aiohttp
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, quote_plus
 from lxml import etree
 
 
@@ -148,7 +148,7 @@ async def get_google_entries(query):
     async with aiohttp.get('https://www.google.com/search', params=params, headers=headers) as resp:
         if resp.status != 200:
             config = load_optional_config()
-            async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + query.replace(' ', '+') + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+            async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
                 result = json.loads(await resp.text())
             return None, result['items'][0]['link']
 

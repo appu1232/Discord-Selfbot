@@ -1,7 +1,6 @@
 import discord
 import asyncio
 from discord.ext import commands
-from appuselfbot import bot_prefix
 from cogs.utils.checks import *
 
 
@@ -26,12 +25,12 @@ class Mod:
         user = get_user(ctx.message, user)
         if user:
             try:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Kicked user: %s' % user.mention)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Kicked user: %s' % user.mention)
                 await self.bot.kick(user)
             except discord.HTTPException:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Could not kick user. Not enough permissions.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not kick user. Not enough permissions.')
         else:
-            return await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+            return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
 
     @commands.command(pass_context=True)
     async def ban(self, ctx, *, user: str):
@@ -39,12 +38,12 @@ class Mod:
         user = get_user(ctx.message, user)
         if user:
             try:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Banned user: %s' % user.mention)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Banned user: %s' % user.mention)
                 await self.bot.ban(user)
             except discord.HTTPException:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Could not ban user. Not enough permissions.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not ban user. Not enough permissions.')
         else:
-            return await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+            return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
 
     @commands.command(aliases=['sban'], pass_context=True)
     async def softban(self, ctx, *, user: str):
@@ -52,13 +51,13 @@ class Mod:
         user = get_user(ctx.message, user)
         if user:
             try:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Softbanned user: %s' % user.mention)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Softbanned user: %s' % user.mention)
                 await self.bot.ban(user)
                 await self.bot.unban(ctx.message.server, user)
             except discord.HTTPException:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Could not softban user. Not enough permissions.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not softban user. Not enough permissions.')
         else:
-            return await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+            return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
 
     @commands.group(pass_context=True, no_pm=True)
     async def mute(self, ctx, *, user: str):
@@ -74,10 +73,10 @@ class Mod:
                     try:
                         await self.bot.edit_channel_permissions(channel, user, overwrites)
                     except discord.Forbidden:
-                        return await self.bot.edit_message(ctx.message, bot_prefix + 'Unable to mute user. Not enough permissions.')
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Muted user: %s' % user.mention)
+                        return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unable to mute user. Not enough permissions.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Muted user: %s' % user.mention)
             else:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
 
     @mute.command(pass_context=True, no_pm=True)
     async def channel(self, ctx, *, user: str):
@@ -87,11 +86,11 @@ class Mod:
             overwrites.send_messages = False
             try:
                 await self.bot.edit_channel_permissions(ctx.message.channel, user, overwrites)
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Muted user in this channel: %s' % user.mention)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Muted user in this channel: %s' % user.mention)
             except discord.Forbidden:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Unable to mute user. Not enough permissions.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unable to mute user. Not enough permissions.')
         else:
-            await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+            await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
 
     @commands.group(pass_context=True, no_pm=True)
     async def unmute(self, ctx, *, user: str):
@@ -112,10 +111,10 @@ class Mod:
                             await self.bot.delete_channel_permissions(channel, user)
                         await self.bot.edit_channel_permissions(channel, user, overwrites)
                     except discord.Forbidden:
-                        return await self.bot.edit_message(ctx.message, bot_prefix + 'Unable to unmute user. Not enough permissions.')
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Unmuted user: %s' % user.mention)
+                        return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unable to unmute user. Not enough permissions.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unmuted user: %s' % user.mention)
             else:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
 
     @unmute.command(pass_context=True, no_pm=True)
     async def channel(self, ctx, *, user: str):
@@ -129,11 +128,11 @@ class Mod:
                 else:
                     await self.bot.delete_channel_permissions(ctx.message.channel, user)
                 await self.bot.edit_channel_permissions(ctx.message.channel, user, overwrites)
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Unmuted user in this channel: %s' % user.mention)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unmuted user in this channel: %s' % user.mention)
             except discord.Forbidden:
-                await self.bot.edit_message(ctx.message, bot_prefix + 'Unable to unmute user. Not enough permissions.')
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unable to unmute user. Not enough permissions.')
         else:
-            await self.bot.edit_message(ctx.message, bot_prefix + 'Could not find user.')
+            await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
 
     @commands.has_permissions(manage_messages=True)
     @commands.command(aliases=['p'], pass_context=True, no_pm=True)
@@ -156,7 +155,7 @@ class Mod:
                 except:
                     pass
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Too many messages to delete. Enter a number < 10000')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Too many messages to delete. Enter a number < 10000')
 
 
 def setup(bot):

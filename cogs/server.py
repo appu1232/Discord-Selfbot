@@ -1,6 +1,5 @@
 import prettytable
 from PythonGists import PythonGists
-from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
@@ -19,14 +18,14 @@ class Server:
                 float(msg)
                 server = self.bot.get_server(msg)
                 if not server:
-                    return bot_prefix + 'Server not found.', False
+                    return self.bot.bot_prefix + 'Server not found.', False
             except:
                 for i in self.bot.servers:
                     if i.name.lower() == msg.lower().strip():
                         server = i
                         break
                 if not server:
-                    return bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.', False
+                    return self.bot.bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.', False
 
         return server, True
 
@@ -43,14 +42,14 @@ class Server:
                     server = self.bot.get_server(ctx.message.content[6 + pre:].strip())
                     if not server:
                         return await self.bot.send_message(ctx.message.channel,
-                                                           bot_prefix + 'Server not found.')
+                                                           self.bot.bot_prefix + 'Server not found.')
                 except:
                     for i in self.bot.servers:
                         if i.name.lower() == ctx.message.content[6 + pre:].lower().strip():
                             server = i
                             break
                     if not server:
-                        return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
+                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find server. Note: You must be a member of the server you are trying to search.')
             else:
                 server = ctx.message.server
 
@@ -95,7 +94,7 @@ class Server:
             else:
                 msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (
                 server.name, server.owner, server.member_count, online, server.region, str(server.verification_level), server.role_hierarchy[0], server.default_channel, server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
             await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
@@ -123,7 +122,7 @@ class Server:
             em.set_image(url=server.icon_url)
             await self.bot.send_message(ctx.message.channel, embed=em)
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + server.icon_url)
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + server.icon_url)
         await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
@@ -155,7 +154,7 @@ class Server:
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
                 em.set_thumbnail(url='http://www.colorhexa.com/%s.png' % str(role.color).strip("#"))
                 return await self.bot.send_message(ctx.message.channel, content=None, embed=em)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find role ``%s``' % msg)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find role ``%s``' % msg)
         await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)

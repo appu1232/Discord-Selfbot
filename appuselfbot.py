@@ -18,13 +18,13 @@ from discord.ext import commands
 
 config = load_config()
 
-
-bot_prefix = config['bot_identifier']
-if bot_prefix != '':
-    bot_prefix += ' '
-
 bot = commands.Bot(command_prefix=config['cmd_prefix'], description='''Selfbot by appu1232''', self_bot=True)
 
+bot.bot_prefix = config['bot_identifier']
+if bot.bot_prefix != '':
+    bot.bot_prefix += ' '
+
+bot.customcmd_prefix = config['customcmd_prefix']
 
 # Startup
 @bot.event
@@ -50,7 +50,7 @@ async def on_ready():
         with open('restart.txt', 'r') as re:
             channel = bot.get_channel(re.readline())
             print('Bot has restarted.')
-            await bot.send_message(channel, bot_prefix + 'Bot has restarted.')
+            await bot.send_message(channel, bot.bot_prefix + 'Bot has restarted.')
         os.remove('restart.txt')
     with open('settings/log.json', 'r') as log:
         bot.log_conf = json.load(log)
@@ -165,25 +165,25 @@ async def restart(ctx):
 
     latest = update_bot(True)
     if latest:
-        await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
         reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
         with open('restart.txt', 'w') as re:
             re.write(str(ctx.message.channel.id))
         if not reply or reply.content.lower().strip() == 'n':
             print('Restarting...')
-            await bot.send_message(ctx.message.channel, bot_prefix + 'Restarting...')
+            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Restarting...')
         else:
             await bot.send_message(ctx.message.channel, content=None, embed=latest)
             with open('quit.txt', 'w') as q:
                 q.write('update')
             print('Downloading update and restarting...')
-            await bot.send_message(ctx.message.channel, bot_prefix + 'Downloading update and restarting (check your console to see the progress)...')
+            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Downloading update and restarting (check your console to see the progress)...')
 
     else:
         print('Restarting...')
         with open('restart.txt', 'w') as re:
             re.write(str(ctx.message.channel.id))
-        await bot.send_message(ctx.message.channel, bot_prefix + 'Restarting...')
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Restarting...')
 
     if bot.subpro:
         bot.subpro.kill()
@@ -201,7 +201,7 @@ async def update(ctx, msg: str = None):
         if not msg == 'show':
             if embed_perms(ctx.message):
                 await bot.send_message(ctx.message.channel, content=None, embed=latest)
-            await bot.send_message(ctx.message.channel, bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
+            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
         else:
             await bot.send_message(ctx.message.channel, content=None, embed=latest)
             return
@@ -213,7 +213,7 @@ async def update(ctx, msg: str = None):
             bot.subpro.kill()
         os._exit(0)
     else:
-        await bot.send_message(ctx.message.channel, bot_prefix + 'The bot is up to date.')
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'The bot is up to date.')
 
 
 @bot.command(pass_context=True, aliases=['stop'])
@@ -223,7 +223,7 @@ async def quit(ctx):
     if bot.subpro:
         bot.subpro.kill()
     open('quit.txt', 'a').close()
-    await bot.send_message(ctx.message.channel, bot_prefix + 'Bot shut down.')
+    await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Bot shut down.')
     os._exit(0)
 
 
@@ -239,12 +239,12 @@ async def reload(ctx):
         try:
             bot.load_extension(i)
         except:
-            await bot.send_message(ctx.message.channel, bot_prefix + 'Failed to reload extension ``%s``' % i)
+            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Failed to reload extension ``%s``' % i)
             fail = True
     if fail:
-        await bot.send_message(ctx.message.channel, bot_prefix + 'Reloaded remaining extensions.')
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Reloaded remaining extensions.')
     else:
-        await bot.send_message(ctx.message.channel, bot_prefix + 'Reloaded all extensions.')
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Reloaded all extensions.')
 
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
@@ -264,7 +264,7 @@ async def on_message(message):
             if message.channel.id not in bot.self_log:
                 bot.self_log[message.channel.id] = collections.deque(maxlen=100)
             bot.self_log[message.channel.id].append(message)
-            if message.content.startswith(config['customcmd_prefix']):
+            if message.content.startswith(bot.customcmd_prefix):
                 response = custom(message.content.lower().strip())
                 if response:
                     await bot.delete_message(message)
@@ -417,11 +417,11 @@ async def on_message(message):
                         for b, i in enumerate(all_words):
                             if b == 0:
                                 if bot.notify['type'] == 'msg':
-                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message', is_separate)
+                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message', is_separate)
                                 elif bot.notify['type'] == 'ping':
-                                    await webhook(bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message ping', is_separate)
+                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i), 'message ping', is_separate)
                                 else:
-                                    await bot.send_message(server.get_channel(location[0]), bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i))
+                                    await bot.send_message(server.get_channel(location[0]), bot.bot_prefix + '%s in server: ``%s`` Context: ```Channel: %s\n\n%s```' % (logged_msg, str(message.server), str(message.channel), i))
                             else:
                                 if bot.notify['type'] == 'msg':
                                     await webhook('```%s```' % i, 'message', is_separate)

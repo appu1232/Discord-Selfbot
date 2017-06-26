@@ -1,5 +1,4 @@
 import discord
-from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 
@@ -24,14 +23,14 @@ class Userinfo:
                 if not user:
                     user = ctx.message.server.get_member(name)
                 if not user:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user.')
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find user.')
                     return
             else:
                 user = ctx.message.author
 
             # Thanks to IgneelDxD for help on this
-            if user.avatar_url[60:].startswith('a_'):
-                avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[33:][:18] + user.avatar_url[59:-3] + 'gif'
+            if user.avatar_url[54:].startswith('a_'):
+                avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
             else:
                 avi = user.avatar_url
 
@@ -41,14 +40,19 @@ class Userinfo:
                 em.add_field(name='Nick', value=user.nick, inline=True)
                 em.add_field(name='Status', value=user.status, inline=True)
                 em.add_field(name='In Voice', value=user.voice_channel, inline=True)
+                em.add_field(name='Game', value=user.game, inline=True)
+                role = user.top_role.name
+                if role == "@everyone":
+                    role = "N/A"
+                em.add_field(name='Highest Role', value=role, inline=True)
                 em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=avi)
                 em.set_author(name=user, icon_url='https://i.imgur.com/RHagTDg.png')
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
-                msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (user.id, user.nick, user.status, user.voice_channel, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
-                await self.bot.send_message(ctx.message.channel, bot_prefix + msg)
+                msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nGame: %s\nHighest Role: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (user.id, user.nick, user.status, user.voice_channel, user.game, role, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
 
             await self.bot.delete_message(ctx.message)
 
@@ -63,14 +67,14 @@ class Userinfo:
             if not user:
                 user = ctx.message.server.get_member(txt)
             if not user:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'Could not find user.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find user.')
                 return
         else:
             user = ctx.message.author
 
         # Thanks to IgneelDxD for help on this
-        if user.avatar_url[60:].startswith('a_'):
-            avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[33:][:18] + user.avatar_url[59:-3] + 'gif'
+        if user.avatar_url[54:].startswith('a_'):
+            avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
         else:
             avi = user.avatar_url
         if embed_perms(ctx.message):
@@ -78,7 +82,7 @@ class Userinfo:
             em.set_image(url=avi)
             await self.bot.send_message(ctx.message.channel, embed=em)
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + avi)
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + avi)
         await self.bot.delete_message(ctx.message)
 
 

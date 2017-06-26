@@ -9,7 +9,6 @@ import pytz
 from datetime import datetime, timedelta
 from discord.ext import commands
 from bs4 import BeautifulSoup
-from appuselfbot import bot_prefix
 from cogs.utils.checks import *
 
 '''Module for MyAnimeList search of anime, manga, and light novels.'''
@@ -50,7 +49,7 @@ class Mal:
         Ex: >mal anime [link] Steins;Gate"""
         if ctx.invoked_subcommand is None:
             await self.bot.send_message(ctx.message.channel,
-                                       bot_prefix + 'Invalid Syntax. Example use: ``>mal anime steins;gate`` or ``>mal manga boku no hero academia``')
+                                       self.bot.bot_prefix + 'Invalid Syntax. Example use: ``>mal anime steins;gate`` or ``>mal manga boku no hero academia``')
 
     # Anime search for Mal
     @mal.command(pass_context=True)
@@ -59,7 +58,7 @@ class Mal:
         if msg:
             loop = asyncio.get_event_loop()
             config = load_optional_config()
-            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
+            fetch = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Searching...')
             if msg.startswith('[link]'):
                 msg = msg[6:]
                 link = True
@@ -82,12 +81,12 @@ class Mal:
 
             # No results found for specified tags
             if not results:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No results.')
                 await self.bot.delete_message(fetch)
                 return await self.bot.delete_message(ctx.message)
 
             if not embed_perms(ctx.message) or link is True:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'https://myanimelist.net/anime/%s' % results.id)
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'https://myanimelist.net/anime/%s' % results.id)
                 await self.bot.delete_message(fetch)
                 return await self.bot.delete_message(ctx.message)
 
@@ -137,7 +136,7 @@ class Mal:
             await self.bot.delete_message(fetch)
             await self.bot.delete_message(ctx.message)
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Specify an anime to search for.')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Specify an anime to search for.')
 
     # Manga search for Mal
     @mal.command(pass_context=True)
@@ -146,7 +145,7 @@ class Mal:
         if msg:
             loop = asyncio.get_event_loop()
             config = load_optional_config()
-            fetch = await self.bot.send_message(ctx.message.channel, bot_prefix + 'Searching...')
+            fetch = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Searching...')
             if msg.startswith('[link]'):
                 msg = msg[6:]
                 link = True
@@ -169,13 +168,13 @@ class Mal:
 
             # No results found for specified tags
             if not results:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results.')
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No results.')
                 await self.bot.delete_message(fetch)
                 return await self.bot.delete_message(ctx.message)
 
             if not embed_perms(ctx.message) or link is True:
                 await self.bot.send_message(ctx.message.channel,
-                                            bot_prefix + 'https://myanimelist.net/manga/%s' % results.id)
+                                            self.bot.bot_prefix + 'https://myanimelist.net/manga/%s' % results.id)
                 await self.bot.delete_message(fetch)
                 return await self.bot.delete_message(ctx.message)
             # Formatting
@@ -224,7 +223,7 @@ class Mal:
             await self.bot.delete_message(fetch)
             await self.bot.delete_message(ctx.message)
         else:
-            await self.bot.send_message(ctx.message.channel, bot_prefix + 'No results')
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No results')
 
     @staticmethod
     async def get_next_weekday(startdate, day):
@@ -257,18 +256,18 @@ class Mal:
     
     @mal.command(pass_context=True, name="next")
     async def next_(self, ctx, *, query):
-        search = await self.bot.say(bot_prefix + "Searching...")
+        search = await self.bot.say(self.bot.bot_prefix + "Searching...")
         found, result = await self.google_results('anime', query)
         if found:
             anime_id = re.findall('/anime/(.*)/', result)[0]
             try:
                 anime = await self.t_client.get_anime(anime_id)
             except Exception as e:
-                await self.bot.send_message(ctx.message.channel, bot_prefix + ":exclamation: Oops!\n {}: {}".format(type(e).__name__, e))
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + ":exclamation: Oops!\n {}: {}".format(type(e).__name__, e))
                 await self.bot.delete_message(search)
                 return await self.bot.delete_message(ctx.message)
         else:
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Failed to find given anime.')
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Failed to find given anime.')
         if anime.status == "Finished Airing":
             remaining = "This anime has finished airing!\n" + anime.air_time
         else:
