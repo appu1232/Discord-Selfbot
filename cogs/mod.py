@@ -27,7 +27,7 @@ class Mod:
             try:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Kicked user: %s' % user.mention)
                 await self.bot.kick(user)
-            except discord.HTTPException:
+            except discord.Forbidden:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not kick user. Not enough permissions.')
         else:
             return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
@@ -40,7 +40,7 @@ class Mod:
             try:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Banned user: %s' % user.mention)
                 await self.bot.ban(user)
-            except discord.HTTPException:
+            except discord.Forbidden:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not ban user. Not enough permissions.')
         else:
             return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
@@ -54,7 +54,7 @@ class Mod:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Softbanned user: %s' % user.mention)
                 await self.bot.ban(user)
                 await self.bot.unban(ctx.message.server, user)
-            except discord.HTTPException:
+            except discord.Forbidden:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not softban user. Not enough permissions.')
         else:
             return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
