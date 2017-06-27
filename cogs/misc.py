@@ -2,6 +2,7 @@ import datetime
 import random
 import requests
 import json
+from appuselfbot import bot_prefix
 from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.checks import *
@@ -493,7 +494,7 @@ class Misc:
                 except:
                     await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
         else:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
+            await self.bot.send_message(ctx.message.channel, bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
             return
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
