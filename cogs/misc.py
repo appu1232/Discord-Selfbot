@@ -489,9 +489,9 @@ class Misc:
                 try:
                     msg = msg.lstrip('#')
                     int(msg, 16)
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set color for quote embeds.')
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set color for quote embeds.')
                 except:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid color.')
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid color.')
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Use this command to set color to quote embeds. Usage is `>quotecolor <hex_color_value>`')
             return
