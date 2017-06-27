@@ -25,8 +25,8 @@ class Mod:
         user = get_user(ctx.message, user)
         if user:
             try:
-                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Kicked user: %s' % user.mention)
                 await self.bot.kick(user)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Kicked user: %s' % user.mention)
             except discord.Forbidden:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not kick user. Not enough permissions.')
         else:
@@ -38,8 +38,8 @@ class Mod:
         user = get_user(ctx.message, user)
         if user:
             try:
-                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Banned user: %s' % user.mention)
                 await self.bot.ban(user)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Banned user: %s' % user.mention)
             except discord.Forbidden:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not ban user. Not enough permissions.')
         else:
@@ -51,9 +51,9 @@ class Mod:
         user = get_user(ctx.message, user)
         if user:
             try:
-                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Softbanned user: %s' % user.mention)
                 await self.bot.ban(user)
                 await self.bot.unban(ctx.message.server, user)
+                await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Softbanned user: %s' % user.mention)
             except discord.Forbidden:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not softban user. Not enough permissions.')
         else:
