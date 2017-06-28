@@ -267,13 +267,11 @@ async def on_message(message):
                 response = custom(message.content.lower().strip())
                 if response:
                     await bot.delete_message(message)
-                    with open('settings/optional_config.json', 'r') as fp:
-                        opt = json.load(fp)
-                    if opt['rich_embed'] == 'on':
+                    if get_config_value('optional_config', 'rich_embed') == 'on':
                         if response[0] == 'embed' and embed_perms(message):
                             try:
-                                if opt['customcmd_color'] != '':
-                                    color = int('0x' + opt['customcmd_color'], 16)
+                                if get_config_value('optional_config', 'customcmd_color'):
+                                    color = int('0x' + get_config_value('optional_config', 'customcmd_color'), 16)
                                     await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=color).set_image(url=response[1]))
                                 else:
                                     await bot.send_message(message.channel, content=None, embed=discord.Embed().set_image(url=response[1]))
@@ -442,10 +440,8 @@ def add_alllog(channel, server, message):
     if channel + ' ' + server in bot.all_log:
         bot.all_log[channel + ' ' + server].append((message, message.clean_content))
     else:
-        with open('settings/log.json') as f:
-            config = json.load(f)
-            bot.all_log[channel + ' ' + server] = collections.deque(maxlen=int(config['log_size']))
-            bot.all_log[channel + ' ' + server].append((message, message.clean_content))
+        bot.all_log[channel + ' ' + server] = collections.deque(maxlen=int(get_config_value('log', 'log_size', 25)))
+        bot.all_log[channel + ' ' + server].append((message, message.clean_content))
 
 
 def remove_alllog(channel, server):
