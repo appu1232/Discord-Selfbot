@@ -41,11 +41,9 @@ class Utility:
         """Date time module."""
         dandt, tzerror = self.get_datetime()
         if embed_perms(ctx.message):
-            em = discord.Embed(title='Date and Time', color=discord.Color.blue())
-            em.add_field(name='Local Time', value="{:02d} hrs {:02d} mins {:02d} secs".format(dandt.hour, dandt.minute, dandt.second), inline=False)
-            em.add_field(name='Day', value="{:02d}".format(dandt.day))
-            em.add_field(name='Month', value="{:02d}".format(dandt.month))
-            em.add_field(name='Year', value=dandt.year)
+            em = discord.Embed(color=discord.Color.blue())
+            em.add_field(name=u'\u23F0 Time', value="{:%H:%M:%S}".format(dandt), inline=False)
+            em.add_field(name=u'\U0001F4C5 Date', value="{:%d %B %Y}".format(dandt), inline=False)
             if tzerror:
                 em.add_field(name=u'\u26A0 Warning', value="Invalid timezone specified, system timezone was used instead.", inline=False)
 
