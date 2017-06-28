@@ -33,7 +33,7 @@ Takes less than 5 minutes to set up. Has various commands and utilities includin
 
 ## Acknowledgements
 
-- Thanks to [architdate](https://github.com/architdate) and [LyricLy](https://github.com/LyricLy) for actively participating in development and addition of new features.
+- Thanks to [architdate](https://github.com/architdate), [LyricLy](https://github.com/LyricLy), and [chenzw95](https://github.com/chenzw95) for actively participating in development, addition of new features, and other optimizations.
 - Thanks to [Hubcapp](https://github.com/Hubcapp) for the much improved >react command.
 - Thanks to [adjnouobsref](https://github.com/adjnouobsref) for the spoiler tags and various other contributions.
 - Used the code for lockdown commands from [Kurisu](https://github.com/916253/Kurisu/blob/master/addons/lockdown.py) bot. Slight modifications is message sending and contents of messages.
