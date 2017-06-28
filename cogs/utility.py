@@ -18,9 +18,8 @@ class Utility:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(aliases=['date'], pass_context=True)
-    async def time(self, ctx):
-        """Date time module."""
+
+    def get_datetime(self):
         a = None
         tzerror = False
         with open('settings/optional_config.json', 'r') as fp:
@@ -34,7 +33,13 @@ class Utility:
                 pass
             except pytz.exceptions.UnknownTimeZoneError:
                 tzerror = True
-        dandt = datetime.datetime.now(a)
+        return datetime.datetime.now(a), tzerror
+
+
+    @commands.command(pass_context=True)
+    async def now(self, ctx):
+        """Date time module."""
+        dandt, tzerror = self.get_datetime()
         if embed_perms(ctx.message):
             em = discord.Embed(title='Date and Time', color=discord.Color.blue())
             em.add_field(name='Local Time', value="{:02d} hrs {:02d} mins {:02d} secs".format(dandt.hour, dandt.minute, dandt.second), inline=False)
