@@ -13,18 +13,17 @@ from datetime import timezone
 from cogs.utils.allmsgs import *
 from discord_webhooks import *
 from cogs.utils.checks import *
+from cogs.utils.config import *
 from discord.ext import commands
 
 
-config = load_config()
+bot = commands.Bot(command_prefix=get_config_value('config','cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
 
-bot = commands.Bot(command_prefix=config['cmd_prefix'], description='''Selfbot by appu1232''', self_bot=True)
-
-bot.bot_prefix = config['bot_identifier']
+bot.bot_prefix = get_config_value('config', 'bot_identifier')
 if bot.bot_prefix != '':
     bot.bot_prefix += ' '
 
-bot.customcmd_prefix = config['customcmd_prefix']
+bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
 
 # Startup
 @bot.event
@@ -579,4 +578,4 @@ if __name__ == '__main__':
                 print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
     bot.loop.create_task(game_and_avatar(bot))
-    bot.run(config['token'], bot=False)
+    bot.run(get_config_value('config', 'token'), bot=False)
