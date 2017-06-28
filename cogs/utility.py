@@ -53,6 +53,23 @@ class Utility:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
+
+    @commands.command(pass_context=True)
+    async def time(self, ctx):
+        await self.bot.delete_message(ctx.message)
+        dandt, tzerror = self.get_datetime()
+        msg = '{:Time: `%H:%M:%S`}'.format(dandt)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
+
+
+    @commands.command(pass_context=True)
+    async def date(self, ctx):
+        await self.bot.delete_message(ctx.message)
+        dandt, tzerror = self.get_datetime()
+        msg = '{:Date: `%d %B %Y`}'.format(dandt)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
+
+
     @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
         """
