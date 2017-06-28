@@ -484,7 +484,7 @@ class Misc:
         '''Set color (hex) of a quote embed. Ex: >quotecolor 000000'''
         if msg:
             if msg == "auto":
-                pass
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set color for quote embeds.')
             else:
                 try:
                     msg = msg.lstrip('#')
