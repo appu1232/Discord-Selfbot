@@ -7,7 +7,7 @@
     "rich_embed": "on",
     "default_status": "idle",
     "ascii_font": "big",
-    "quoteembed_color": "bc0b0b",
+    "quoteembed_color": "auto",
     "embed_color": "",
     "timezone": ""
 }

@@ -188,6 +188,12 @@ class Google:
             if resp.status != 200:
                 await self.bot.send_message(ctx.message.channel, 'Google failed to respond.')
             result = json.loads(await resp.text())
+            try:
+                result['items']
+            except:
+                await self.bot.send_message(ctx.message.channel, 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
+            if result['items'] < 1:
+                await self.bot.send_message(ctx.message.channel, 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
             em = discord.Embed()
             if embed_perms(ctx.message):
                 await self.bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][item]['link']))

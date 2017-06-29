@@ -1,6 +1,5 @@
 import random
 import re
-from appuselfbot import bot_prefix
 from discord.ext import commands
 from cogs.utils.checks import *
 from pyfiglet import figlet_format
@@ -186,13 +185,13 @@ class Fun:
     async def choose(self, ctx, *, choices: str):
         """Choose randomly from the options you give. >choose this | that"""
         await self.bot.send_message(ctx.message.channel,
-                                    bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
+                                    self.bot.bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
 
     @commands.command(pass_context=True)
     async def l2g(self, ctx, *, msg: str):
         """Creates a lmgtfy link. Ex: >l2g how do i become cool."""
         lmgtfy = 'http://lmgtfy.com/?q='
-        await self.bot.send_message(ctx.message.channel, bot_prefix + lmgtfy + urllib.parse.quote_plus(msg.lower().strip()))
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + lmgtfy + urllib.parse.quote_plus(msg.lower().strip()))
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True)
@@ -217,13 +216,13 @@ class Fun:
                     opt = json.load(fp)
                 msg = str(figlet_format(ctx.message.content[pre + 5:].strip(), font=opt['ascii_font']))
                 if len(msg) > 2000:
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + 'Message too long, rip.')
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Message too long, rip.')
                 else:
                     await self.bot.delete_message(ctx.message)
-                    await self.bot.send_message(ctx.message.channel, bot_prefix + '```{}```'.format(msg))
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '```{}```'.format(msg))
             else:
                 await self.bot.send_message(ctx.message.channel,
-                                            bot_prefix + 'Please input text to convert to ascii art. Ex: ``>ascii stuff``')
+                                            self.bot.bot_prefix + 'Please input text to convert to ascii art. Ex: ``>ascii stuff``')
 
     @ascii.command(pass_context=True)
     async def font(self, ctx, *, txt: str):
@@ -231,14 +230,14 @@ class Fun:
         try:
             str(figlet_format('test', font=txt))
         except:
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + 'Invalid font type.')
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid font type.')
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
             opt['ascii_font'] = txt
             fp.seek(0)
             fp.truncate()
             json.dump(opt, fp, indent=4)
-        await self.bot.send_message(ctx.message.channel, bot_prefix + 'Successfully set ascii font.')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set ascii font.')
 
     @commands.command(pass_context=True)
     async def dice(self, ctx, dice="1", sides="6"):
@@ -253,7 +252,7 @@ class Fun:
                 dice_rolls.append(str(result))
                 dice_roll_ints.append(result)
         except ValueError:
-            return await self.bot.send_message(ctx.message.channel, bot_prefix + invalid)
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + invalid)
         embed = discord.Embed(title="Dice rolls:", description=' '.join(dice_rolls))
         embed.add_field(name="Total:", value=sum(dice_roll_ints))
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
