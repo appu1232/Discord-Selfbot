@@ -125,10 +125,10 @@ class Utility:
                     await self.bot.send_file(ctx.message.channel, fp)
             if copy_emote_bool:
                 try:
+                    await self.bot.create_custom_emoji(ctx.message.server, name=emote_name, image=e)
                     embed = discord.Embed(title="Added new emote", color=discord.Color.blue())
                     embed.description = "New emote added: " + emote_name
                     await self.bot.say("", embed=embed)
-                    await self.bot.create_custom_emoji(ctx.message.server, name=emote_name, image=e)
                 except:
                     await self.bot.say("Not enough permissions to do this")
             os.remove(name)
