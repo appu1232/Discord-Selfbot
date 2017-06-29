@@ -51,9 +51,8 @@ async def on_ready():
             print('Bot has restarted.')
             await bot.send_message(channel, bot.bot_prefix + 'Bot has restarted.')
         os.remove('restart.txt')
-    with open('settings/log.json', 'r') as log:
-        bot.log_conf = json.load(log)
-        bot.key_users = bot.log_conf['keyusers']
+    bot.log_conf = load_log_config()
+    bot.key_users = bot.log_conf['keyusers']
 
     if os.path.isfile('settings/games.json'):
         with open('settings/games.json', 'r+') as g:
@@ -137,8 +136,7 @@ async def on_ready():
         fp.truncate()
         json.dump(opt, fp, indent=4)
 
-    with open('settings/notify.json', 'r') as n:
-        notif = json.load(n)
+    notif = load_notify_config()
     if notif['type'] == 'dm':
         if os.path.exists('notifier.txt'):
             pid = open('notifier.txt', 'r').read()
@@ -294,8 +292,7 @@ async def on_message(message):
                 bot.mention_count += 1
 
     if not hasattr(bot, 'log_conf'):
-        with open('settings/log.json', 'r') as log:
-            bot.log_conf = json.load(log)
+        bot.log_conf = load_log_config()
 
     # Keyword logging.
     if bot.log_conf['keyword_logging'] == 'on':
