@@ -445,18 +445,18 @@ class Misc:
         if url:
             with open(name, 'rb') as fp:
                 e = fp.read()
-                with open('settings/config.json', 'r+') as fp:
+                with open('settings/avatars.json', 'r+') as fp:
                         opt = json.load(fp)
                         if opt['password']:
                             if opt['password'] == "":
-                                await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+                                await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/avatars.json` Please do so and try again")
                             else:
                                 pw = opt['password']
                                 await self.bot.edit_profile(password=pw, avatar=e)
                                 await self.bot.send_message(ctx.message.channel, "Your avatar has been set to the specified image")
                         else:
                             opt['password'] = ""
-                            await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+                            await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/avatars.json` Please do so and try again")
             os.remove(name)
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
