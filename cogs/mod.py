@@ -64,7 +64,7 @@ class Mod:
         """Chat mutes a user (if you have the permission)."""
         if ctx.invoked_subcommand is None:
             user = get_user(ctx.message, user)
-            if user and user != self.bot.user:
+            if user:
                 for channel in ctx.message.server.channels:
                     if channel.type != discord.ChannelType.text:
                         continue
@@ -73,7 +73,7 @@ class Mod:
                     try:
                         await self.bot.edit_channel_permissions(channel, user, overwrites)
                     except discord.Forbidden:
-                        return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unable to mute user in one or more channels.')
+                        return await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Unable to mute user. Not enough permissions.')
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Muted user: %s' % user.mention)
             else:
                 await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Could not find user.')
