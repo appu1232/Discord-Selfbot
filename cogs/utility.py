@@ -661,6 +661,20 @@ class Utility:
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "That user has no roles!")
+            
+    @commands.command(pass_context=True)
+    async def messagedump(self, ctx, limit, filename, reverse="no"):
+        """Dump messages."""
+        await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Downloading messages...")
+        with open(filename.rsplit('.', 1)[0] + ".txt", "w+") as f:
+            if reverse == "yes":
+                async for message in self.bot.logs_from(ctx.message.channel, int(limit)):
+                    f.write(message.content + "\n")
+            else:
+                async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
+                    f.write(message.content + "\n")
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Finished downloading!")
 
 def setup(bot):
     bot.add_cog(Utility(bot))

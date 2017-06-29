@@ -16,6 +16,29 @@ from cogs.utils.checks import *
 from cogs.utils.config import *
 from discord.ext import commands
 
+try:
+    open('settings/config.json')
+except IOError:
+    # setup wizard
+    config = {}
+    print("Welcome to Appu's Discord Selfbot!")
+    print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
+    print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there) and scroll down until you find the 'token' entry.")
+    print("Paste the contents of that entry (without quotes) below.")
+    print("-------------------------------------------------------------")
+    config["token"] = input("| ")
+    print("Please enter the command prefix you will use for main commands (eg. if you enter ! you will use commands like '!about')")
+    print("-------------------------------------------------------------")
+    config["cmd_prefix"] = input("| ")
+    print("Enter the command prefix you will use for custom commands (commands that you add to the bot yourself with custom replies)")
+    print("-------------------------------------------------------------")
+    config["customcmd_prefix"] = input("| ")
+    print("What would you like to be sent before every bot message that is posted? (this is to differentiate user messages from bot ones, eg. :robot:)")
+    print("-------------------------------------------------------------")
+    config["bot_identifier"] = input("| ")
+    print("That concludes this setup wizard. For further setup options, refer to the Discord Selfbot wiki.")
+    with open('settings/config.json') as f:
+        json.dump(config, f, sort_keys=True, indent=4)
 
 bot = commands.Bot(command_prefix=get_config_value('config','cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
 
