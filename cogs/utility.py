@@ -663,17 +663,25 @@ class Utility:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "That user has no roles!")
             
     @commands.command(pass_context=True)
-    async def messagedump(self, ctx, limit, filename, reverse="no"):
+    async def messagedump(self, ctx, limit, filename, details="yes", reverse="no"):
         """Dump messages."""
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Downloading messages...")
-        with open("message_dump/" + filename.rsplit('.', 1)[0] + ".txt", "w+") as f:
+        with open("message_dump/" + filename.rsplit('.', 1)[0] + ".txt", "wb+") as f:
             if reverse == "yes":
-                async for message in self.bot.logs_from(ctx.message.channel, int(limit)):
-                    f.write(message.content + "\n")
+                if details == "yes":
+                    async for message in self.bot.logs_from(ctx.message.channel, int(limit)):
+                        f.write("<{} at {}> {}\n".format(message.author.name, message.timestamp.strftime('%d %b %Y'), message.content).encode())
+                else:
+                    async for message in self.bot.logs_from(ctx.message.channel, int(limit)):
+                        f.write(message.content.encode() + "\n".encode())
             else:
-                async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
-                    f.write(message.content + "\n")
+                if details == "yes":
+                    async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
+                        f.write("<{} at {}> {}\n".format(message.author.name, message.timestamp.strftime('%d %b %Y'), message.content).encode())
+                else:
+                    async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
+                        f.write(message.content.encode() + "\n".encode())
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Finished downloading!")
 
 def setup(bot):
