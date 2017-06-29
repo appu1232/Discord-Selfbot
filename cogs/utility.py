@@ -18,9 +18,8 @@ class Utility:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(aliases=['date'], pass_context=True)
-    async def time(self, ctx):
-        """Date time module."""
+
+    def get_datetime(self):
         a = None
         tzerror = False
         with open('settings/optional_config.json', 'r') as fp:
@@ -34,13 +33,17 @@ class Utility:
                 pass
             except pytz.exceptions.UnknownTimeZoneError:
                 tzerror = True
-        dandt = datetime.datetime.now(a)
+        return datetime.datetime.now(a), tzerror
+
+
+    @commands.command(pass_context=True)
+    async def now(self, ctx):
+        """Date time module."""
+        dandt, tzerror = self.get_datetime()
         if embed_perms(ctx.message):
-            em = discord.Embed(title='Date and Time', color=discord.Color.blue())
-            em.add_field(name='Local Time', value="{:02d} hrs {:02d} mins {:02d} secs".format(dandt.hour, dandt.minute, dandt.second), inline=False)
-            em.add_field(name='Day', value="{:02d}".format(dandt.day))
-            em.add_field(name='Month', value="{:02d}".format(dandt.month))
-            em.add_field(name='Year', value=dandt.year)
+            em = discord.Embed(color=discord.Color.blue())
+            em.add_field(name=u'\u23F0 Time', value="{:%H:%M:%S}".format(dandt), inline=False)
+            em.add_field(name=u'\U0001F4C5 Date', value="{:%d %B %Y}".format(dandt), inline=False)
             if tzerror:
                 em.add_field(name=u'\u26A0 Warning', value="Invalid timezone specified, system timezone was used instead.", inline=False)
 
@@ -49,6 +52,23 @@ class Utility:
             msg = '**Local Date and Time:** ```{:Time: %H:%M:%S\nDate: %Y-%m-%d```}'.format(dandt)
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
+
+
+    @commands.command(pass_context=True)
+    async def time(self, ctx):
+        await self.bot.delete_message(ctx.message)
+        dandt, tzerror = self.get_datetime()
+        msg = '{:Time: `%H:%M:%S`}'.format(dandt)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
+
+
+    @commands.command(pass_context=True)
+    async def date(self, ctx):
+        await self.bot.delete_message(ctx.message)
+        dandt, tzerror = self.get_datetime()
+        msg = '{:Date: `%d %B %Y`}'.format(dandt)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
+
 
     @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
