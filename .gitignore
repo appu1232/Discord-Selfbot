@@ -1,7 +1,6 @@
 .google-cookie
 discord.log
-commands.json
-config.json
+settings/*.json
 .idea/
 *~
 *__pycache__*
