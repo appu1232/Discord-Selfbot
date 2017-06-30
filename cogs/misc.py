@@ -593,6 +593,7 @@ class Misc:
             search = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id][-2]
             result = search[0]
         if result:
+            sender = result.author.nick if result.author.nick else result.author.name
             if embed_perms(ctx.message) and result.content:
                 em = discord.Embed(description=result.content, timestamp=result.timestamp)
                 with open('settings/optional_config.json') as fp:
@@ -605,13 +606,13 @@ class Misc:
                         em.color = int('0x' + embed_color, 16)
                 except:
                     em.color = 0xbc0b0b
-                em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
+                em.set_author(name=sender, icon_url=result.author.avatar_url)
                 if channel != ctx.message.channel:
                     em.set_footer(text='#{} | {} '.format(channel.name, channel.server.name))
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 await self.bot.send_message(ctx.message.channel,
-                                            '%s - %s```%s```' % (result.author.name, result.timestamp, result.content))
+                                            '%s - %s```%s```' % (sender, result.timestamp, result.content))
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No quote found.')
 
