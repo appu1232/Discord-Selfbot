@@ -230,8 +230,8 @@ class Utility:
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + answer)
 
-    @commands.command(pass_context=True)
-    async def d(self, ctx, *, txt: str = None):
+    @commands.command(aliases=['d'], pass_context=True)
+    async def delete(self, ctx, *, txt: str = None):
         """Deletes the last message sent or n messages sent. Ex: >d 5"""
 
         # If number of seconds/messages are specified
