@@ -125,13 +125,17 @@ def embed_perms(message):
     return check
 
 
-def get_user(message, user):
+def get_user(message, user, bot = None):
     try:
         member = message.mentions[0]
     except:
         member = message.server.get_member_named(user)
     if not member:
         member = message.server.get_member(user)
+    if not member and bot is not None:
+    for server in bot.servers:
+        member = server.get_member(user)
+        if member: break
     if not member:
         return False
     return member
