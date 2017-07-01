@@ -172,3 +172,8 @@ def attach_perms(message):
 
 def add_reaction_perms(message):
     return message.author.permissions_in(message.channel).add_reactions
+
+
+def parse_prefix(text):
+    cfg = load_config()
+    return text.replace("{p}", cfg["bot_prefix"])
