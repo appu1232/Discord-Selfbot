@@ -667,6 +667,8 @@ class Utility:
         """Dump messages."""
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Downloading messages...")
+        if not os.path.exists("message_dump"):
+            os.makedirs("message_dump")
         with open("message_dump/" + filename.rsplit('.', 1)[0] + ".txt", "wb+") as f:
             if reverse == "yes":
                 if details == "yes":
