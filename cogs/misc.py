@@ -2,9 +2,12 @@ import datetime
 import random
 import requests
 import json
+import discord
+import git
+import os
 from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import *
+from cogs.utils.checks import embed_perms, cmd_prefix_len
 
 '''Module for miscellaneous commands'''
 

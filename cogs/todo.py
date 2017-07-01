@@ -3,9 +3,8 @@ import json
 import discord
 import asyncio
 from time import time as current_time
-from discord_webhooks import *
+from discord_webhooks import Webhook
 from discord.ext import commands
-from cogs.utils.checks import *
 
 '''Todo list cog.'''
   

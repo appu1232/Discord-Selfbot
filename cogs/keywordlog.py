@@ -8,7 +8,7 @@ import psutil
 import sys
 from PythonGists import PythonGists
 from datetime import timezone
-from cogs.utils.checks import *
+from cogs.utils.checks import load_notify_config
 
 keywords = []
 log_servers = []

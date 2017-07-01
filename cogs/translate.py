@@ -1,8 +1,9 @@
 import requests
+import discord
 from urllib import parse
 from bs4 import BeautifulSoup
 from discord.ext import commands
-from cogs.utils.checks import *
+
 
 '''Translator cog - Love Archit & Lyric'''
 

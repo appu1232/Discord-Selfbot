@@ -9,10 +9,13 @@ import gc
 import psutil
 import sys
 import re
+import time
+import os
+import discord
 from datetime import timezone
-from cogs.utils.allmsgs import *
-from discord_webhooks import *
-from cogs.utils.checks import *
+from cogs.utils.allmsgs import custom, quickcmds
+from discord_webhooks import Webhook
+from cogs.utils.checks import load_config, load_notify_config, load_log_config, update_bot, embed_perms, user_post, game_time_check, set_status, avatar_time_check, gc_clear, has_passed
 from cogs.utils.config import *
 from discord.ext import commands
 
@@ -21,24 +24,44 @@ try:
 except IOError:
     # setup wizard
     config = {}
-    print("Welcome to Appu's Discord Selfbot!")
+    print("Welcome to Appu's Discord Selfbot!\n")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
-    print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there) and scroll down until you find the 'token' entry.")
+    print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
     print("Paste the contents of that entry (without quotes) below.")
     print("-------------------------------------------------------------")
-    config["token"] = input("| ")
+    config["token"] = input("| ").strip('"')
     print("Please enter the command prefix you will use for main commands (eg. if you enter ! you will use commands like '!about')")
     print("-------------------------------------------------------------")
     config["cmd_prefix"] = input("| ")
     print("Enter the command prefix you will use for custom commands (commands that you add to the bot yourself with custom replies)")
     print("-------------------------------------------------------------")
     config["customcmd_prefix"] = input("| ")
-    print("What would you like to be sent before every bot message that is posted? (this is to differentiate user messages from bot ones, eg. :robot:)")
+    print("What would you like to be sent before every bot message that is posted? (this is to differentiate user messages from bot ones, eg. :robot:) If not, press Enter to skip.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ")
-    print("That concludes this setup wizard. For further setup options, refer to the Discord Selfbot wiki.")
-    with open('settings/config.json') as f:
+    input("That concludes the setup wizard. For further setup options, refer to the Discord Selfbot wiki. Press Enter.\n")
+    with open('settings/config.json', 'w') as f:
         json.dump(config, f, sort_keys=True, indent=4)
+
+try:
+    open('settings/optional_config.json')
+except IOError:
+    # setup wizard
+    config = {}
+    print("It seems you don't have the optional config settings set up as well. This include entering a Google API key (by following the instructions on the wiki) and MAL credentials for anime/manga search. Check the wiki to see how to get these fields and enter them into the optional configuration.")
+    print("Starting up the bot (this may take a minute or two)...")
+    with open('settings/optional_config.json', 'w') as f:
+        opt = {}
+        json.dump(opt, f, sort_keys=True, indent=4)
+
+samples = os.listdir('settings')
+for f in samples:
+    if f.endswith('sample') and f[:-7] not in samples:
+        with open('settings/%s' % f) as template:
+            with open('settings/%s' % f[:-7], 'w') as g:
+                fields = json.load(template)
+                json.dump(fields, g, sort_keys=True, indent=4)
+
 
 bot = commands.Bot(command_prefix=get_config_value('config','cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
 
@@ -448,8 +471,9 @@ async def on_message(message):
                                     await bot.send_message(server.get_channel(location[0]), '```%s```' % i)
                     bot.keyword_log += 1
 
+        # Bad habit but this is for skipping errors when dealing with Direct messages, blocked users, etc. Better to just ignore.
         except:
-            pass
+            raise
 
     await bot.process_commands(message)
 

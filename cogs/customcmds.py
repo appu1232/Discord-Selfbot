@@ -1,9 +1,10 @@
 import math
 import re
+import json
 from github import Github
 from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import *
+from cogs.utils.checks import cmd_prefix_len, load_config
 
 '''Module for custom commands adding, removing, and viewing.'''
 

@@ -6,6 +6,12 @@ python -V >nul 2>&1 || goto :python
 git init . >nul || goto :git
 git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul 2>&1
 get fetch origin master >nul 2>&1
+if not exist appuselfbot.py (
+    echo This seems to be your first run. The setup will now proceed to download all required files. They will be downloaded to the same location as where this run.bat file is.
+    pause
+    git fetch --all
+	git reset --hard origin/master
+)
 git remote show origin > tmp.txt
 set findfile="tmp.txt"
 set findtext="up"
@@ -26,9 +32,6 @@ goto run
 :update
 	echo Starting update...
 	if exist tmp del /F /Q tmp
-	if exist cogs\afk.py (
-		del cogs\afk.py
-	)
 	echo Backing up your settings...
 	echo d | xcopy settings tmp /E >nul
 	ren settings settings2
@@ -40,7 +43,6 @@ goto run
 	rmdir /s /q settings >nul 2>&1
 	ren settings2 settings
 	echo Starting up...
-	ping 127.0.0.1 -n 4 >nul
 	goto run
 :force
 	git fetch --all
@@ -49,7 +51,6 @@ goto run
 	rmdir /s /q settings >nul 2>&1
 	ren settings2 settings
 	echo Starting up...
-	ping 127.0.0.1 -n 4 >nul
 	goto run
 :git
 	TITLE Error!

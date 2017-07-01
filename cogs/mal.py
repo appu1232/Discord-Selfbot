@@ -6,10 +6,11 @@ import gc
 import tokage
 import discord
 import pytz
+import json
 from datetime import datetime, timedelta
 from discord.ext import commands
 from bs4 import BeautifulSoup
-from cogs.utils.checks import *
+from cogs.utils.checks import load_optional_config, get_google_entries, embed_perms
 
 '''Module for MyAnimeList search of anime, manga, and light novels.'''
 

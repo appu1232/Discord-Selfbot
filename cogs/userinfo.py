@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from cogs.utils.checks import *
+from cogs.utils.checks import embed_perms, cmd_prefix_len
 
 '''Module for the >info command.'''
 
@@ -34,6 +34,7 @@ class Userinfo:
             else:
                 avi = user.avatar_url
 
+            role = user.top_role.name
             if embed_perms(ctx.message):
                 em = discord.Embed(timestamp=ctx.message.timestamp, colour=0x708DD0)
                 em.add_field(name='User ID', value=user.id, inline=True)
@@ -41,7 +42,6 @@ class Userinfo:
                 em.add_field(name='Status', value=user.status, inline=True)
                 em.add_field(name='In Voice', value=user.voice_channel, inline=True)
                 em.add_field(name='Game', value=user.game, inline=True)
-                role = user.top_role.name
                 if role == "@everyone":
                     role = "N/A"
                 em.add_field(name='Highest Role', value=role, inline=True)

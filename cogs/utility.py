@@ -4,9 +4,12 @@ import strawpy
 import pytz
 import re
 import requests
+import json
+import discord
+import os
 from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import *
+from cogs.utils.checks import embed_perms, cmd_prefix_len, attach_perms
 from bs4 import BeautifulSoup
 from urllib import parse
 from urllib.request import Request, urlopen

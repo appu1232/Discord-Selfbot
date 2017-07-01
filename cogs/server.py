@@ -1,7 +1,9 @@
 import prettytable
+import discord
+import os
 from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import *
+from cogs.utils.checks import embed_perms, cmd_prefix_len
 
 '''Module for server commands.'''
 

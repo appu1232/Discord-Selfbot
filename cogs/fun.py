@@ -1,7 +1,9 @@
 import random
 import re
+import json
 from discord.ext import commands
-from cogs.utils.checks import *
+import discord
+from cogs.utils.checks import embed_perms, cmd_prefix_len
 from pyfiglet import figlet_format
 import urllib.parse
 
