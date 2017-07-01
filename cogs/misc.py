@@ -31,6 +31,24 @@ class Misc:
             await self.bot.send_message(ctx.message.channel, 'https://github.com/appu1232/Selfbot-for-Discord')
         await self.bot.delete_message(ctx.message)
 
+
+    @commands.command(pass_context=True)
+    async def debug(self, ctx):
+        """Shows useful informations to people that try to help you."""
+        if embed_perms(ctx.message):
+            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot Debug Infos')
+            # em.add_field(name='Selfbot Version', value='%s'%self.bot.version)
+            em.add_field(name='Discord.py Version', value='%s'%discord.__version__)
+            em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version))
+            if sys.platform == 'linux': em.add_field(name='Operating System', value='%s'%subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8'))
+            else: em.add_field(name='Operating System', value='%s'%sys.platform)
+            em.add_field(name='Import Paths', value="\n".join(sys.path))
+            em.set_footer(text='Generated at {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()))
+            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        else:
+            await self.bot.send_message(ctx.message.channel, 'No permissions to embed debug info.')
+        await self.bot.delete_message(ctx.message)
+
     @commands.group(aliases=['status'], pass_context=True)
     async def stats(self, ctx):
         """Bot stats."""
