@@ -66,9 +66,10 @@ class Todo:
             +  text=<text> - sends this text (instead of the <item> field) to the channel specified.
             +  alert=off - add this if you don't want to get notified when the timer runs out.
 
-        Example:
+        Examples:
         >todo add Get Daily Tatsumaki Credits | 24h1m | text=t!daily | channel=299431230984683520 | repeat=yes | alert=off
-
+        >todo add Send Tatsumaki Rep to <@124910128582361092> | 24h1m | text=t!rep appu1232#2569 | channel=299431230984683520 | repeat=yes | alert=off
+        >todo add Send 1 Tatsumaki Guild Point to <@124910128582361092> | 24h1m | text=t!points appu1232#2569 1 | channel=299431230984683520 | repeat=yes | alert=off
 
         >todo remove <item> - Remove an item from your to-do list.
         >todo clear - Clear your entire to-do list.
