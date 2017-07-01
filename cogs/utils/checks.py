@@ -132,9 +132,10 @@ def get_user(message, user, bot = None):
         member = message.server.get_member_named(user)
     if not member:
         member = message.server.get_member(user)
-    if not member and bot is not None:
+    if not member and bot:
         for server in bot.servers:
             member = server.get_member(user)
+            if not member: member = server.get_member_named(user)
             if member:
                 break
     if not member:
