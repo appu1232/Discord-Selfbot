@@ -30,9 +30,9 @@ class Server:
         return server, True
 
     # Stats about server
-    @commands.group(pass_context=True)
-    async def server(self, ctx):
-        """Various info about the server. >help server for more info."""
+    @commands.group(aliases=['server'],pass_context=True)
+    async def serverinfo(self, ctx):
+        """Various info about the server. >help serverinfo for more info."""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
             if ctx.message.content[6 + pre:].strip():
