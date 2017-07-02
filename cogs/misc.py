@@ -217,6 +217,134 @@ class Misc:
             pass
 
     @commands.command(pass_context=True)
+    async def editembed(self, ctx, msg_id):
+        """Edit an embedded message."""
+        await self.bot.delete_message(ctx.message)
+        async for message in self.bot.logs_from(ctx.message.channel, 100):
+            if message.id == msg_id:
+                msg = message
+                break
+        if not msg:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "That message couldn't be found.")
+        else:
+            try:
+                fields = msg.embeds[0].pop("fields")
+            except KeyError:
+                fields = False
+            msg.embeds[0].pop("type")
+            try:
+                color = msg.embeds[0].pop("color")
+            except KeyError:
+                color = False
+            result = []
+            for field in msg.embeds[0]:
+                result.append("{}={}".format(field, msg.embeds[0][field]))
+            if fields:
+                for field in fields:
+                    result.append("field=name={} value={} inline={}".format(field["name"], field["value"], field["inline"]))
+            if color:
+                result.append("color={}".format(hex(color)))
+            if msg.content:
+                result.append("ptext={}".format(msg.content))
+            await self.bot.edit_message(msg, " | ".join(result))
+            info_msg = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Embed has been turned back into its command form. Make your changes, then type `done` to finish editing.")
+            confirmation_msg = await self.bot.wait_for_message(content="done")
+            await self.bot.delete_message(info_msg)
+            await self.bot.delete_message(confirmation_msg)
+            # not proud of this code
+            ptext = ""
+            title = ""
+            description = ""
+            image = ""
+            thumbnail = ""
+            color = ""
+            footer = ""
+            author = ""
+            timestamp = discord.Embed().Empty
+            # need to get the edited message again
+            async for message in self.bot.logs_from(ctx.message.channel, 100):
+                if message.id == msg_id:
+                    msg = message
+                    break
+            embed_values = msg.content.split('|')
+            for i in embed_values:
+                with open('settings/optional_config.json', 'r+') as fp:
+                    opt = json.load(fp)
+                    if opt['embed_color'] != "":
+                        color = opt['embed_color']
+                if i.strip().lower().startswith('ptext='):
+                    ptext = i.strip()[6:].strip()
+                elif i.strip().lower().startswith('title='):
+                    title = i.strip()[6:].strip()
+                elif i.strip().lower().startswith('description='):
+                    description = i.strip()[12:].strip()
+                elif i.strip().lower().startswith('desc='):
+                    description = i.strip()[5:].strip()
+                elif i.strip().lower().startswith('image='):
+                    image = i.strip()[6:].strip()
+                elif i.strip().lower().startswith('thumbnail='):
+                    thumbnail = i.strip()[10:].strip()
+                elif i.strip().lower().startswith('colour='):
+                    color = i.strip()[7:].strip()
+                elif i.strip().lower().startswith('color='):
+                    color = i.strip()[6:].strip()
+                elif i.strip().lower().startswith('footer='):
+                    footer = i.strip()[7:].strip()
+                elif i.strip().lower().startswith('author='):
+                    author = i.strip()[7:].strip()
+                elif i.strip().lower().startswith('timestamp'):
+                    timestamp = ctx.message.timestamp
+                else:
+                    if description is None and not i.strip().lower().startswith('field='):
+                        description = i.strip()
+
+            if color:
+                if color.startswith('#'):
+                    color = color[1:]
+                if not color.startswith('0x'):
+                    color = '0x' + color
+
+            if color:
+                em = discord.Embed(timestamp=timestamp, title=title, description=description, color=int(color, 16))
+            else:
+                em = discord.Embed(timestamp=timestamp, title=title, description=description)
+            for i in embed_values:
+                if i.strip().lower().startswith('field='):
+                    field_inline = True
+                    field = i.strip().lstrip('field=')
+                    field_name, field_value = field.split('value=')
+                    if 'inline=' in field_value:
+                        field_value, field_inline = field_value.split('inline=')
+                        if 'false' in field_inline.lower() or 'no' in field_inline.lower():
+                            field_inline = False
+                    field_name = field_name.strip().lstrip('name=')
+                    em.add_field(name=field_name, value=field_value.strip(), inline=field_inline)
+            if author:
+                if 'icon=' in author:
+                    text, icon = author.split('icon=')
+                    if 'url=' in icon:
+                        print("here")
+                        em.set_author(name=author.split('url=')[0].strip()[5:], url=author.split('url=')[1].strip())
+                    else:
+                        em.set_author(name=author)
+
+            if image:
+                em.set_image(url=image)
+            if thumbnail:
+                em.set_thumbnail(url=thumbnail)
+            if footer:
+                if 'icon=' in footer:
+                    text, icon = footer.split('icon=')
+                    em.set_footer(text=text.strip()[5:], icon_url=icon)
+                else:
+                    em.set_footer(text=footer)
+            print(ptext)
+            if not ptext:
+                await self.bot.edit_message(msg, "ᅠ", embed=em)
+            else:
+                await self.bot.edit_message(msg, ptext, embed=em)
+
+    @commands.command(pass_context=True)
     async def embedcolor(self, ctx, *, color: str = None):
         """Set color (hex) of a embeds. Ex: >embedcolor 000000"""
         with open('settings/optional_config.json', 'r+') as fp:
