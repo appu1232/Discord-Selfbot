@@ -192,7 +192,7 @@ class Google:
                 result['items']
             except:
                 await self.bot.send_message(ctx.message.channel, 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
-            if result['items'] < 1:
+            if len(result['items']) < 1:
                 await self.bot.send_message(ctx.message.channel, 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
             em = discord.Embed()
             if embed_perms(ctx.message):
