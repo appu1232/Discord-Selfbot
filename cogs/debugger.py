@@ -100,18 +100,22 @@ class Debugger:
             em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version))
             os = ''
             if sys.platform == 'linux':
-                os = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+                os = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 if 'ubuntu' in os.lower():
-                    os += '\n'+subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+                    os += '\n'+subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            elif sys.platform == 'win32':
+                try: platform
+                except: import platform
+                os = '%s %s (%s)'%(platform.system(),platform.version(),sys.platform)
+                # os = subprocess.run('systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"', stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
             else:
                 os = sys.platform
             em.add_field(name='Operating System', value='%s' % os)
-            em.add_field(name='Import Paths', value="\n".join(sys.path))
+            em.add_field(name='Import Paths', value="\n".join(sys.path).strip())
             user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-            hostname = 'localhost'
             if sys.platform == 'linux':
-                hostname = subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-            em.set_footer(text='Generated at {:%Y-%m-%d %H:%M:%S} by {}@{}'.format(datetime.datetime.now(),user,hostname))
+                user += user+'@'+subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            em.set_footer(text='Generated at {:%Y-%m-%d %H:%M:%S} by {}'.format(datetime.datetime.now(), user))
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         else:
             await self.bot.send_message(ctx.message.channel, 'No permissions to embed debug info.')
