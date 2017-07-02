@@ -472,8 +472,8 @@ async def on_message(message):
                     bot.keyword_log += 1
 
         # Bad habit but this is for skipping errors when dealing with Direct messages, blocked users, etc. Better to just ignore.
-        except:
-            raise
+        except (AttributeError, discord.errors.HTTPException):
+            pass
 
     await bot.process_commands(message)
 
