@@ -306,9 +306,10 @@ class Utility:
         """Spoiler tag. Ex: >spoiler Some book | They get married."""
         try:
             if " | " in msg:
-                spoiled_work, spoiler = msg.lower().split(" | ", 1)
+                spoiled_work, spoiler = msg.split(" | ", 1)
             else:
-                spoiled_work, _, spoiler = msg.lower().partition(" ")
+                spoiled_work = msg
+                spoiler = msg
             await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Spoiler for `' + spoiled_work + '`: \n`'
                                         + ''.join(
                 map(lambda c: chr(ord('a') + (((ord(c) - ord('a')) + 13) % 26)) if c >= 'a' and c <= 'z' else c,
