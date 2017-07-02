@@ -90,6 +90,30 @@ class Debugger:
             else:
                 return result
 
+    @commands.command(pass_context=True)
+    async def debug(self, ctx):
+        """Shows useful informations to people that try to help you."""
+        if embed_perms(ctx.message):
+            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot Debug Infos')
+            # em.add_field(name='Selfbot Version', value='%s'%self.bot.version)
+            em.add_field(name='Discord.py Version', value='%s'%discord.__version__)
+            em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version))
+            if sys.platform == 'linux':
+                os = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+                if 'ubuntu' in os.lower(): os = subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+                em.add_field(name='Operating System', value='%s'%os)
+            else: em.add_field(name='Operating System', value='%s'%sys.platform)
+            em.add_field(name='Import Paths', value="\n".join(sys.path))
+            user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            hostname = 'localhost'
+            if sys.platform == 'linux':
+                hostname = subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            em.set_footer(text='Generated at {:%Y-%m-%d %H:%M:%S} by {}@{}'.format(datetime.datetime.now(),user,hostname))
+            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+        else:
+            await self.bot.send_message(ctx.message.channel, 'No permissions to embed debug info.')
+        await self.bot.delete_message(ctx.message)
+
     @commands.group(pass_context=True)
     async def py(self, ctx):
         """Python interpreter. See the wiki for more info."""
