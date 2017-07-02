@@ -306,7 +306,7 @@ class Utility:
         """Spoiler tag. Ex: >spoiler Some book | They get married."""
         try:
             if " | " in msg:
-                spoiled_work, spoiler = msg.lower().split(" | ", 1)
+                spoiled_work, spoiler = msg.split(" | ", 1)
             else:
                 spoiled_work = msg
                 spoiler = msg
