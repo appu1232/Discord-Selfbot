@@ -98,11 +98,14 @@ class Debugger:
             # em.add_field(name='Selfbot Version', value='%s'%self.bot.version)
             em.add_field(name='Discord.py Version', value='%s'%discord.__version__)
             em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version))
+            os = ''
             if sys.platform == 'linux':
                 os = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-                if 'ubuntu' in os.lower(): os = subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-                em.add_field(name='Operating System', value='%s'%os)
-            else: em.add_field(name='Operating System', value='%s'%sys.platform)
+                if 'ubuntu' in os.lower():
+                    os += '\n'+subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+            else:
+                os = sys.platform
+            em.add_field(name='Operating System', value='%s' % os)
             em.add_field(name='Import Paths', value="\n".join(sys.path))
             user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
             hostname = 'localhost'
