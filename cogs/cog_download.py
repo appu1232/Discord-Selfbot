@@ -152,8 +152,8 @@ class CogDownloading:
                 link = requests.get("http://appucogs.tk/cogs/{}.json".format(entry)).json()["link"]
                 download = requests.get(link).text
                 filename = link.rsplit("/", 1)[1]
-            with open("cogs/" + filename, "wb+") as f:
-                f.write(download.encode("utf-8"))
+                with open("cogs/" + filename, "wb+") as f:
+                    f.write(download.encode("utf-8"))
         await self.bot.edit_message(msg, self.bot.bot_prefix + "Updated all cogs.")
         
 def setup(bot):
