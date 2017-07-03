@@ -180,3 +180,22 @@ def attach_perms(message):
 
 def add_reaction_perms(message):
     return message.author.permissions_in(message.channel).add_reactions
+
+
+async def success(bot, message):
+    if add_reaction_perms(message):
+        await bot.add_reaction(message, '✅')
+    else:
+        await bot.edit_message(message, '✅ ' + message.content)
+
+async def warn(bot, message):
+    if add_reaction_perms(message):
+        await bot.add_reaction(message, '⚠')
+    else:
+        await bot.edit_message(message, '⚠ ' + message.content)
+
+async def error(bot, message):
+    if add_reaction_perms(message):
+        await bot.add_reaction(message, '❌')
+    else:
+        await bot.edit_message(message, '❌ ' + message.content)

@@ -271,23 +271,44 @@ async def quit(ctx):
 
 
 @bot.command(pass_context=True)
-async def reload(ctx):
+async def reload(ctx, txt: str = None):
     """Reloads all modules."""
-    utils = []
-    for i in bot.extensions:
-        utils.append(i)
-    fail = False
-    for i in utils:
-        bot.unload_extension(i)
+    if txt:
+        bot.unload_extension(txt)
         try:
-            bot.load_extension(i)
-        except:
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Failed to reload extension ``%s``' % i)
-            fail = True
-    if fail:
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Reloaded remaining extensions.')
+            bot.load_extension(txt)
+        except Exception as e:
+            try:
+                txt = 'cogs.'+txt
+                bot.load_extension(txt)
+            except:
+                await error(bot, ctx.message)
+                await bot.send_message(ctx.message.channel, '``` {}: {} ```'.format(type(e).__name__, e))
+                return
+        await success(bot, ctx.message)
+        await asyncio.sleep(10)
+        await bot.delete_message(ctx.message)
     else:
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Reloaded all extensions.')
+        utils = []
+        for i in bot.extensions:
+            utils.append(i)
+        fail = False
+        l = len(utils)
+        for i in utils:
+            bot.unload_extension(i)
+            try:
+                bot.load_extension(i)
+            except Exception as e:
+                await bot.send_message(ctx.message.channel, '{}Failed to reload module `{}` ``` {}: {} ```'.format(bot.bot_prefix, i, type(e).__name__, e))
+                fail = True
+                l -= 1
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Reloaded {} of {} modules.'.format(l, len(utils)))
+        if fail:
+            await warn(bot, ctx.message)
+        else:
+            await success(bot, ctx.message)
+            await asyncio.sleep(10)
+            await bot.delete_message(ctx.message)
 
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
