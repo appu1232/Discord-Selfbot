@@ -273,17 +273,23 @@ class Debugger:
             os.chdir('..')
             os.chdir('..')
 
+
     @commands.command(pass_context=True)
     async def load(self, ctx, *, msg):
         """Load a module"""
         try:
             self.bot.load_extension(msg)
         except Exception as e:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Failed to load module: `{}`'.format(msg))
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
-        else:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))
+            try:
+                self.bot.load_extension('cogs.'+msg)
+            except:
+                await error(self.bot, ctx.message)
+                await self.bot.send_message(ctx.message.channel, '``` {}: {} ```'.format(type(e).__name__, e))
+                return
+        await success(self.bot,ctx.message)
+        await asyncio.sleep(10)
         await self.bot.delete_message(ctx.message)
+
 
     @commands.command(pass_context=True)
     async def unload(self, ctx, *, msg):
@@ -291,11 +297,16 @@ class Debugger:
         try:
             self.bot.unload_extension(msg)
         except Exception as e:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Failed to unload module: `{}`'.format(msg))
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
-        else:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Unloaded module: `{}`'.format(msg))
+            try:
+                self.bot.unload_extension('cogs.'+msg)
+            except:
+                await error(self.bot, ctx.message)
+                await self.bot.send_message(ctx.message.channel, '``` {}: {} ```'.format(type(e).__name__, e))
+                return
+        await success(self.bot,ctx.message)
+        await asyncio.sleep(10)
         await self.bot.delete_message(ctx.message)
-    
+
+
 def setup(bot):
     bot.add_cog(Debugger(bot))
