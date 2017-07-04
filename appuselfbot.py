@@ -15,7 +15,7 @@ import discord
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
 from discord_webhooks import Webhook
-from cogs.utils.checks import load_config, load_notify_config, load_log_config, update_bot, embed_perms, user_post, game_time_check, set_status, avatar_time_check, gc_clear, has_passed
+from cogs.utils.checks import *
 from cogs.utils.config import *
 from discord.ext import commands
 
