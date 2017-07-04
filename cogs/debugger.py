@@ -174,8 +174,15 @@ class Debugger:
     # Load a cmd/script saved with the >save cmd
     @py.command(aliases=['start'], pass_context=True)
     async def run(self, ctx, *, msg):
-        """Run code that you saved with the save commmand. Ex: >py run stuff"""
-        save_file = msg[:-4].strip() if msg.endswith('.txt') else msg.strip()
+        """Run code that you saved with the save commmand. Ex: >py run stuff parameter1 parameter2"""
+        # Like in unix, the first parameter is the script name
+        parameters = msg.split()
+        save_file = parameters[0] # Force scope
+        if save_file.endswith('.txt'): 
+            save_file = save_file[:-(len('.txt'))] # Temptation to put '.txt' in a constant increases
+        else:
+            parameters[0] += '.txt' # The script name is always full
+        
         if not os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)):
             return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find file ``%s.txt``' % save_file)
 
@@ -187,7 +194,8 @@ class Debugger:
             'message': ctx.message,
             'server': ctx.message.server,
             'channel': ctx.message.channel,
-            'author': ctx.message.author
+            'author': ctx.message.author,
+            'argv': parameters
         }
         env.update(globals())
 
