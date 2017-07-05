@@ -116,9 +116,9 @@ class CogDownloading:
         for entry in list[2:]:
             entry = entry.rsplit(".")[0]
             if os.path.isfile("cogs/" + entry + ".py"):
-                embed.description += "• {} - installed\n".format(entry)
+                embed.description += "\✅ {}\n".format(entry)
             else:
-                embed.description += "• {} - not installed\n".format(entry)
+                embed.description += "\�\n".format(entry)
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
         
     @cog.command(pass_context=True)
