@@ -207,4 +207,4 @@ def parse_prefix(bot, text):
     prefix = bot.cmd_prefix
     if type(prefix) is list:
         prefix = prefix[0]
-    return text.replace("{p}", prefix)
+    return text.replace("[c]", prefix).replace("[b]", bot.bot_prefix)
