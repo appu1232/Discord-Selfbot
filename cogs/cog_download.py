@@ -5,6 +5,7 @@ from github import Github
 import json
 from discord.ext import commands
 from bs4 import BeautifulSoup
+from cogs.utils.checks import parse_prefix
 
 """Cog for cog downloading."""
 
@@ -112,14 +113,14 @@ class CogDownloading:
         list = []
         for a in data:
             list.append(a.get("title"))
-        embed = discord.Embed(title="Cog list", description="")
+        embed = discord.Embed(title="Available Cogs", description="")
         for entry in list[2:]:
             entry = entry.rsplit(".")[0]
             if os.path.isfile("cogs/" + entry + ".py"):
                 embed.description += "\✅ `{}`\n".format(entry)
             else:
                 embed.description += "\🆕 `{}`\n".format(entry)
-        await self.bot.send_message(ctx.message.channel, "", embed=embed)
+        await self.bot.send_message(ctx.message.channel, content=parse_prefix(self.bot, "[b]Use `[c]install/uninstall <cog_name>` to manage your cogs."), embed=embed)
         
     @cog.command(pass_context=True)
     async def view(self, ctx, cog):
