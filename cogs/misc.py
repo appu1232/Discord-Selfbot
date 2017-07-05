@@ -70,7 +70,7 @@ class Misc:
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
                 g.execute(["git", "fetch", "origin", "master"])
-                version = g.execute(["git", "rev-list", "--right-only", "--count", "config-manager...origin/master"])
+                version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
                 commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])
                 if version == '0':
                     status = 'Up to date.'
