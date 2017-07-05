@@ -90,7 +90,7 @@ class Debugger:
             else:
                 return result
 
-     @commands.command(pass_context=True)
+    @commands.command(pass_context=True)
     async def debug(self, ctx, option: str = None):
         """Shows useful informations to people that try to help you."""
         try:
