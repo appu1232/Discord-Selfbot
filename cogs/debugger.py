@@ -9,6 +9,7 @@ import math
 from PythonGists import PythonGists
 from discord.ext import commands
 from io import StringIO
+from traceback import format_exc
 from cogs.utils.checks import *
 
 # Common imports that can be used by the debugger.
