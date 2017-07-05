@@ -540,7 +540,7 @@ class Utility:
                 await self.bot.send_message(ctx.message.channel,
                                             self.bot.bot_prefix + "That result doesn't exist! Try >ud {}.".format(msg))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['yt', 'vid', 'video'])
     async def youtube(self, ctx, *, msg):
         """Search for videos on YouTube."""
         search = parse.quote(msg)
