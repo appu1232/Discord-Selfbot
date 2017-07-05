@@ -50,8 +50,10 @@ class Misc:
         except:
             game = 'None'
         channel_count = 0
+        user_count = 0
         for i in self.bot.servers:
             channel_count += len(i.channels)
+            user_count += len(i.members)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
@@ -60,21 +62,22 @@ class Misc:
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
             em.add_field(name=u'\ud83d\udcd1 Channels', value=str(channel_count))
+            em.add_field(name=u'\U0001f46a Users', value=str(user_count))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
             em.add_field(name=u'\U0001F3AE Game', value=game)
             mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024 ** 2)
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
-                g.execute(["git", "fetch", "origin", "master"])
-                version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
-                commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])
+                g.execute(["git", "fetch", "origin", "config-manager"])
+                version = g.execute(["git", "rev-list", "--right-only", "--count", "config-manager...origin/config-manager"])
+                commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/config-manager"])
                 if version == '0':
                     status = 'Up to date.'
                 else:
                     latest = g.execute(
                         ["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version,
-                         "origin/master"])
+                         "origin/config-manager"])
                     gist_latest = PythonGists.Gist(description='Latest changes for the selfbot.', content=latest,
                                                    name='latest.txt')
                     if version == '1':
