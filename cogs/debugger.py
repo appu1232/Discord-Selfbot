@@ -91,35 +91,55 @@ class Debugger:
                 return result
 
     @commands.command(pass_context=True)
-    async def debug(self, ctx):
+    async def debug(self, ctx, option: str = None):
         """Shows useful informations to people that try to help you."""
-        if embed_perms(ctx.message):
-            em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot Debug Infos')
-            # em.add_field(name='Selfbot Version', value='%s'%self.bot.version)
-            em.add_field(name='Discord.py Version', value='%s'%discord.__version__)
-            em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version))
-            os = ''
-            if sys.platform == 'linux':
-                os = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-                if 'ubuntu' in os.lower():
-                    os += '\n'+subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-            elif sys.platform == 'win32':
-                try: platform
-                except: import platform
-                os = '%s %s (%s)'%(platform.system(),platform.version(),sys.platform)
-                # os = subprocess.run('systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"', stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+        try:
+            if embed_perms(ctx.message):
+                em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot Debug Infos')
+                # em.add_field(name='Selfbot Version', value='%s'%self.bot.version)
+                system = ''
+                if sys.platform == 'linux':
+                    system = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+                    if 'ubuntu' in os.lower():
+                        system += '\n'+subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+                elif sys.platform == 'win32':
+                    try: platform
+                    except: import platform
+                    system = '%s %s (%s)'%(platform.system(),platform.version(),sys.platform)
+                    # os = subprocess.run('systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"', stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+                else:
+                    system = sys.platform
+                em.add_field(name='Operating System', value='%s' % system)
+                # em.add_field(name='Discord.py Version', value='%s'%discord.__version__)
+                em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version))
+                em.add_field(name='PIP Version', value='%s'%pkg_resources.get_distribution('pip').version)
+                dependencies = ''
+                dep_file = open('%s/requirements.txt' % os.getcwd()).read().split("\n")
+                # [] + dep_file
+                for dep in dep_file:
+                    dep = dep.split('==')
+                    cur = pkg_resources.get_distribution(dep[0]).version
+                    if cur == dep[1]: dependencies += '\✅ %s: %s / %s\n'%(dep[0], cur, dep[1])
+                    else: dependencies += '\❌ %s: %s / %s\n'%(dep[0], cur, dep[1])
+                em.add_field(name='Dependencies', value='%s' % dependencies)
+                if option and 'path' in option.lower():
+                    paths = "\n".join(sys.path).strip()
+                    if len(paths) > 500:
+                        url = PythonGists.Gist(description='sys.path', content=str(paths), name='syspath.txt')
+                        em.add_field(name='Import Paths', value=paths[:500]+' [(Show more)](%s)'%url)
+                    else:
+                        em.add_field(name='Import Paths', value=paths)
+                user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+                if sys.platform == 'linux':
+                    user += user+'@'+subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+                em.set_footer(text='Generated at {:%Y-%m-%d %H:%M:%S} by {}'.format(datetime.datetime.now(), user))
+                try: await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+                except discord.errors.HTTPException as e:
+                    await self.bot.send_message(ctx.message.channel, content=None, embed=em)
             else:
-                os = sys.platform
-            em.add_field(name='Operating System', value='%s' % os)
-            em.add_field(name='Import Paths', value="\n".join(sys.path).strip())
-            user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-            if sys.platform == 'linux':
-                user += user+'@'+subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-            em.set_footer(text='Generated at {:%Y-%m-%d %H:%M:%S} by {}'.format(datetime.datetime.now(), user))
-            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
-        else:
-            await self.bot.send_message(ctx.message.channel, 'No permissions to embed debug info.')
-        await self.bot.delete_message(ctx.message)
+                await self.bot.send_message(ctx.message.channel, 'No permissions to embed debug info.')
+            await self.bot.delete_message(ctx.message)
+        except: await error(self.bot, ctx.message)
 
     @commands.group(pass_context=True)
     async def py(self, ctx):
