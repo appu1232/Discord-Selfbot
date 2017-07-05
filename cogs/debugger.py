@@ -90,7 +90,7 @@ class Debugger:
             else:
                 return result
 
-    @commands.command(pass_context=True)
+     @commands.command(pass_context=True)
     async def debug(self, ctx, option: str = None):
         """Shows useful informations to people that try to help you."""
         try:
@@ -100,7 +100,7 @@ class Debugger:
                 system = ''
                 if sys.platform == 'linux':
                     system = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
-                    if 'ubuntu' in os.lower():
+                    if 'ubuntu' in system.lower():
                         system += '\n'+subprocess.run(['lsb_release', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 elif sys.platform == 'win32':
                     try: platform
@@ -139,7 +139,9 @@ class Debugger:
             else:
                 await self.bot.send_message(ctx.message.channel, 'No permissions to embed debug info.')
             await self.bot.delete_message(ctx.message)
-        except: await error(self.bot, ctx.message)
+        except:
+            await error(self.bot, ctx.message)
+            await self.bot.send_message(ctx.message.channel, '``` %s ```'%format_exc())
 
     @commands.group(pass_context=True)
     async def py(self, ctx):
