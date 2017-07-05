@@ -188,14 +188,23 @@ async def success(bot, message):
     else:
         await bot.edit_message(message, '✅ ' + message.content)
 
+
 async def warn(bot, message):
     if add_reaction_perms(message):
         await bot.add_reaction(message, '⚠')
     else:
         await bot.edit_message(message, '⚠ ' + message.content)
 
+
 async def error(bot, message):
     if add_reaction_perms(message):
         await bot.add_reaction(message, '❌')
     else:
         await bot.edit_message(message, '❌ ' + message.content)
+
+
+def parse_prefix(bot, text):
+    prefix = bot.cmd_prefix
+    if type(prefix) is list:
+        prefix = prefix[0]
+    return text.replace("{p}", prefix)
