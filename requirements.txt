@@ -4,7 +4,7 @@ requests==2.12.4
 spice_api==1.0.4
 beautifulsoup4==4.5.3
 strawpy==1.1
-lxml
+lxml==3.8.0
 discord.webhooks==0.0.3
 psutil==5.2.1
 PythonGists==1.1.3
