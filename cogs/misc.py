@@ -77,15 +77,15 @@ class Misc:
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
-                g.execute(["git", "fetch", "origin", "config-manager"])
-                version = g.execute(["git", "rev-list", "--right-only", "--count", "config-manager...origin/config-manager"])
-                commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/config-manager"])
+                g.execute(["git", "fetch", "origin", "master"])
+                version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
+                commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])
                 if version == '0':
                     status = 'Up to date.'
                 else:
                     latest = g.execute(
                         ["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version,
-                         "origin/config-manager"])
+                         "origin/master"])
                     gist_latest = PythonGists.Gist(description='Latest changes for the selfbot.', content=latest,
                                                    name='latest.txt')
                     if version == '1':
