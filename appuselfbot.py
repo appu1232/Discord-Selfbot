@@ -69,6 +69,7 @@ bot.bot_prefix = get_config_value('config', 'bot_identifier')
 if bot.bot_prefix != '':
     bot.bot_prefix += ' '
 
+bot.cmd_prefix = get_config_value('config', 'cmd_prefix')
 bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
 
 # Startup

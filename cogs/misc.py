@@ -760,9 +760,11 @@ class Misc:
     @commands.command(pass_context=True)
     async def afk(self, ctx, txt: str = None):
         """Set your Discord status for when you aren't online. Ex: >afk idle"""
-        info = 'Options: ``idle``, ``dnd``, ``offline``. When the status is set, the bot will set you to this by default when you are not on Discord. Ex: >afk idle'
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
+            info = 'Current status returned by Discord: `{}` | Current Default status: `{}`\n'.format(str(ctx.message.author.status).title(), opt['default_status'].title())+\
+            'Options: ``idle``, ``dnd``, ``offline``. When the status is set, the bot will set you to this by default when you are not on Discord. Ex: {p}afk idle'
+            info = parse_prefix(self.bot, info)
             if txt:
                 if txt.strip() == 'idle':
                     opt['default_status'] = 'idle'
@@ -774,9 +776,9 @@ class Misc:
                     opt['default_status'] = 'invisible'
                     self.bot.default_status = 'invisible'
                 else:
-                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + info)
+                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid status. %s' % info)
             else:
-                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid status. %s' % info)
+                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + info)
             fp.seek(0)
             fp.truncate()
             json.dump(opt, fp, indent=4)
