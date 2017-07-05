@@ -7,7 +7,7 @@ import git
 import os
 from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import embed_perms, cmd_prefix_len
+from cogs.utils.checks import embed_perms, cmd_prefix_len, parse_prefix
 
 '''Module for miscellaneous commands'''
 
@@ -762,8 +762,8 @@ class Misc:
         """Set your Discord status for when you aren't online. Ex: >afk idle"""
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
-            info = 'Current status returned by Discord: `{}` | Current Default status: `{}`\n'.format(str(ctx.message.author.status).title(), opt['default_status'].title())+\
-            'Options: ``idle``, ``dnd``, ``offline``. When the status is set, the bot will set you to this by default when you are not on Discord. Ex: {p}afk idle'
+            info = parse_prefix(self.bot, 'Current status returned by Discord: `{}` | Current Default status: `{}`\n'.format(str(ctx.message.author.status).title(), opt['default_status'].title())+\
+            'Options: ``idle``, ``dnd``, ``offline``. When the status is set, the bot will set you to this by default when you are not on Discord. Ex: [c]afk idle')
             info = parse_prefix(self.bot, info)
             if txt:
                 if txt.strip() == 'idle':
