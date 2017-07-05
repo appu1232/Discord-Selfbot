@@ -118,7 +118,7 @@ class CogDownloading:
             if os.path.isfile("cogs/" + entry + ".py"):
                 embed.description += "\✅ {}\n".format(entry)
             else:
-                embed.description += "\�\n".format(entry)
+                embed.description += "\🆕\n".format(entry)
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
         
     @cog.command(pass_context=True)
