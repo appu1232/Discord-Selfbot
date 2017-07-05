@@ -89,7 +89,7 @@ class Misc:
                 else:
                     latest = g.execute(
                         ["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version,
-                         "origin/master"])
+                         "origin/%s" % branch])
                     gist_latest = PythonGists.Gist(description='Latest changes for the selfbot.', content=latest,
                                                    name='latest.txt')
                     if version == '1':
