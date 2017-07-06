@@ -479,7 +479,7 @@ class Misc:
             await self.bot.send_message(ctx.message.channel,
                                         self.bot.bot_prefix + '``Response Time: %s ms``' % str(ping.microseconds / 1000.0))
 
-    @commands.command(aliases=['q'],pass_context=True)
+    @commands.command(pass_context=True)
     async def quotecolor(self, ctx, *, msg):
         '''Set color (hex) of a quote embed. Ex: >quotecolor 000000'''
         if msg:
@@ -502,7 +502,7 @@ class Misc:
             fp.truncate()
             json.dump(opt, fp, indent=4)
 
-    @commands.command(pass_context=True)
+    @commands.command(aliases=['q'], pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
         """Quote a message. >help quote for more info.
         >quote - quotes the last message sent in the channel.
