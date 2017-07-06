@@ -86,7 +86,6 @@ class Customcmds:
                                                 '```css\n[List of Custom Commands %s/%s]\n%s ```' % (
                                                 b + 1, len(msgs), i.rstrip()))
 
-
     # List all custom commands
     @commands.group(pass_context=True)
     async def customcmds(self, ctx):

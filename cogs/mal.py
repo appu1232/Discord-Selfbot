@@ -251,9 +251,9 @@ class Mal:
         show_airs = datetime.strptime('{} - {}'.format(air_date, hour.strip()), '%Y-%m-%d - %H:%M')
         remaining = show_airs - time_now
         if remaining.days < 0:
-            return '6 Days {} Hours and {} Minutes.'.format(remaining.seconds // 3600, (remaining.seconds // 60)%60)
+            return '6 Days {} Hours and {} Minutes.'.format(remaining.seconds // 3600, (remaining.seconds // 60) % 60)
         else:
-            return '{} Days {} Hours and {} Minutes.'.format(remaining.days, remaining.seconds // 3600, (remaining.seconds // 60)%60)
+            return '{} Days {} Hours and {} Minutes.'.format(remaining.days, remaining.seconds // 3600, (remaining.seconds // 60) % 60)
     
     @mal.command(pass_context=True, name="next")
     async def next_(self, ctx, *, query):

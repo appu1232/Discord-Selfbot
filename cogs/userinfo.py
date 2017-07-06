@@ -4,6 +4,7 @@ from cogs.utils.checks import embed_perms, cmd_prefix_len
 
 '''Module for the >info command.'''
 
+
 class Userinfo:
 
     def __init__(self, bot):

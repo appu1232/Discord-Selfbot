@@ -21,7 +21,6 @@ class Utility:
     def __init__(self, bot):
         self.bot = bot
 
-
     def get_datetime(self):
         a = None
         tzerror = False
@@ -37,7 +36,6 @@ class Utility:
             except pytz.exceptions.UnknownTimeZoneError:
                 tzerror = True
         return datetime.datetime.now(a), tzerror
-
 
     @commands.command(pass_context=True)
     async def now(self, ctx):
@@ -56,7 +54,6 @@ class Utility:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
         await self.bot.delete_message(ctx.message)
 
-
     @commands.command(pass_context=True)
     async def time(self, ctx):
         await self.bot.delete_message(ctx.message)
@@ -64,14 +61,12 @@ class Utility:
         msg = '{:Time: `%H:%M:%S`}'.format(dandt)
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
 
-
     @commands.command(pass_context=True)
     async def date(self, ctx):
         await self.bot.delete_message(ctx.message)
         dandt, tzerror = self.get_datetime()
         msg = '{:Date: `%d %B %Y`}'.format(dandt)
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + msg)
-
 
     @commands.command(pass_context=True, aliases=['emote'])
     async def emoji(self, ctx, *, msg):
@@ -167,7 +162,7 @@ class Utility:
         """List of all available timezones"""
         await self.bot.delete_message(ctx.message)
         embed = discord.Embed(title="Timezone List")
-        embed.set_author(name="Github Link", url = "https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef")
+        embed.set_author(name="Github Link", url="https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef")
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
     @commands.command(pass_context=True)
@@ -599,7 +594,7 @@ class Utility:
                     if user.game.name is not None:
                         if user.game.name.lower() == game.lower():
                             msg += "{}#{}\n".format(user.name, user.discriminator)
-        msg = "\n".join(set(msg.split("\n"))) # remove dupes
+        msg = "\n".join(set(msg.split("\n")))  # remove dupes
         if len(msg) > 1500:
             gist = PythonGists.Gist(description="Number of people playing {}".format(game), content=msg, name="Output")
             await self.bot.send_message(ctx.message.channel, "{}Large output posted to Gist: {}".format(self.bot.bot_prefix, gist))
@@ -686,6 +681,7 @@ class Utility:
                     async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
                         f.write(message.content.encode() + "\n".encode())
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Finished downloading!")
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))

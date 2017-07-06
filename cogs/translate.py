@@ -37,7 +37,7 @@ class Translate:
             result = BeautifulSoup(result, "lxml").text
             embed = discord.Embed(color=discord.Color.blue())
             embed.add_field(name="Original", value=msg, inline=False)
-            embed.add_field(name=language, value=result.replace("&amp;","&"), inline=False)
+            embed.add_field(name=language, value=result.replace("&amp;", "&"), inline=False)
             if result == msg:
                 embed.add_field(name="Warning", value="This language may not be supported by Google Translate.")
             await self.bot.send_message(ctx.message.channel, "", embed=embed)

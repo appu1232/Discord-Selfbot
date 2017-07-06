@@ -131,7 +131,6 @@ class Fun:
     for idx, char in enumerate(char_list):
         text_flip[char] = alt_char_list[idx]
 
-
     # used in >react, checks if it's possible to react with the duper string or not
     def has_dupe(duper):
         collect_my_duper = list(filter(lambda x: x != '<' and x != '⃣',

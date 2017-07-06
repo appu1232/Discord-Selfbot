@@ -1,9 +1,9 @@
-#Importing libraries
 import discord
 import json
 from discord.ext import commands
 from cogs.utils.checks import load_moderation
 from sys import argv
+
 
 class Lockdown:
     """
@@ -132,6 +132,7 @@ class Lockdown:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully removed {} from the list of mod roles on {}!".format(role, server))
         except (ValueError, KeyError):
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You can't remove something that doesn't exist!")
+
 
 def setup(bot):
     bot.add_cog(Lockdown(bot))

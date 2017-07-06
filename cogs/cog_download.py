@@ -9,6 +9,7 @@ from cogs.utils.checks import parse_prefix
 
 """Cog for cog downloading."""
 
+
 class CogDownloading:
     
     def __init__(self, bot):
@@ -156,6 +157,7 @@ class CogDownloading:
                 with open("cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
         await self.bot.edit_message(msg, self.bot.bot_prefix + "Updated all cogs.")
-        
+
+
 def setup(bot):
     bot.add_cog(CogDownloading(bot))

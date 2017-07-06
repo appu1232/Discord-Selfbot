@@ -595,14 +595,14 @@ class Misc:
                         opt = json.load(fp)
                         if opt['password']:
                             if opt['password'] == "":
-                                await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+                                await self.bot.send_message(ctx.message.channel, "You have not set your password yet in `settings/config.json` Please do so and try again")
                             else:
                                 pw = opt['password']
                                 await self.bot.edit_profile(password=pw, avatar=e)
                                 await self.bot.send_message(ctx.message.channel, "Your avatar has been set to the specified image")
                         else:
                             opt['password'] = ""
-                            await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/config.json` Please do so and try again")
+                            await self.bot.send_message(ctx.message.channel, "You have not set your password yet in `settings/config.json` Please do so and try again")
             os.remove(name)
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
@@ -789,7 +789,6 @@ class Misc:
             await self.bot.send_message(ctx.message.channel,
                                         self.bot.bot_prefix + 'Set default afk status. You will now appear as ``{}`` when not on Discord.'.format(
                                             opt['default_status']))
-
 
 
 def setup(bot):

@@ -63,7 +63,7 @@ for f in samples:
                 json.dump(fields, g, sort_keys=True, indent=4)
 
 
-bot = commands.Bot(command_prefix=get_config_value('config','cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
+bot = commands.Bot(command_prefix=get_config_value('config', 'cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
 
 bot.bot_prefix = get_config_value('config', 'bot_identifier')
 if bot.bot_prefix != '':
@@ -71,6 +71,7 @@ if bot.bot_prefix != '':
 
 bot.cmd_prefix = get_config_value('config', 'cmd_prefix')
 bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
+
 
 # Startup
 @bot.event
