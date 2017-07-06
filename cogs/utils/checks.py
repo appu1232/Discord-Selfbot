@@ -208,3 +208,19 @@ def parse_prefix(bot, text):
     if type(prefix) is list:
         prefix = prefix[0]
     return text.replace("[c]", prefix).replace("[b]", bot.bot_prefix)
+
+
+def get_user_token():
+    try:
+        return os.environ['TOKEN']
+    except KeyError:
+        cfg = load_config()
+        return cfg["token"]
+
+
+def get_bot_token():
+    try:
+        return os.environ['BOT_TOKEN']
+    except KeyError:
+        cfg = load_notify_config()
+        return cfg["bot_token"]
