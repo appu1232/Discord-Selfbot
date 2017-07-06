@@ -21,7 +21,7 @@ class Lockdown:
     @commands.has_permissions(manage_channels=True)
     @commands.command(pass_context=True, name="lockdown")
     async def lockdown(self, ctx):
-        """Lock message sending in the channel. Staff only."""
+        """Lock message sending in the channel."""
         try:
             print(self.states)
             try:
@@ -60,7 +60,7 @@ class Lockdown:
     @commands.has_permissions(manage_channels=True)
     @commands.command(pass_context=True, name="unlock")
     async def unlock(self, ctx):
-        """Unlock message sending in the channel. Staff only."""
+        """Unlock message sending in the channel."""
         try:
             server = ctx.message.server
             if self.states == []:
