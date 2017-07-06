@@ -2,7 +2,6 @@ import discord
 import json
 from discord.ext import commands
 from cogs.utils.checks import load_moderation
-from sys import argv
 
 
 class Lockdown:
@@ -62,7 +61,6 @@ class Lockdown:
     async def unlock(self, ctx):
         """Unlock message sending in the channel."""
         try:
-            server = ctx.message.server
             if self.states == []:
                 await self.bot.say("🔓 Channel is already unlocked.")
                 return
