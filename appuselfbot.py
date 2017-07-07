@@ -12,6 +12,7 @@ import re
 import time
 import os
 import discord
+import traceback
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
 from discord_webhooks import Webhook
@@ -19,12 +20,12 @@ from cogs.utils.checks import *
 from cogs.utils.config import *
 from discord.ext import commands
 
-try:
-    open('settings/config.json')
-except IOError:
-    # setup wizard
+def setup_wizard(is_first_time):
     config = {}
-    print("Welcome to Appu's Discord Selfbot!\n")
+    if is_first_time:
+        print("Welcome to Appu's Discord Selfbot!\n")
+    else:
+        print("It seems the token you entered is incorrect or has changed. If you changed your password or enabled/disabled 2fa, your token will change. Grab your new token. Here's how you do it:\n")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
     print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
     print("Paste the contents of that entry below.")
@@ -44,9 +45,14 @@ except IOError:
         json.dump(config, f, sort_keys=True, indent=4)
 
 try:
-    open('settings/optional_config.json')
+    open('settings/config.json')
 except IOError:
     # setup wizard
+    setup_wizard(True)
+
+try:
+    open('settings/optional_config.json')
+except IOError:
     config = {}
     print("It seems you don't have the optional config settings set up as well. This include entering a Google API key (by following the instructions on the wiki) and MAL credentials for anime/manga search. Check the wiki to see how to get these fields and enter them into the optional configuration.")
     print("Starting up the bot (this may take a minute or two)...")
@@ -64,6 +70,7 @@ for f in samples:
 
 
 bot = commands.Bot(command_prefix=get_config_value('config', 'cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
+
 
 bot.bot_prefix = get_config_value('config', 'bot_identifier')
 if bot.bot_prefix != '':
@@ -261,7 +268,7 @@ async def update(ctx, msg: str = None):
         await bot.send_message(ctx.message.channel, bot.bot_prefix + 'The bot is up to date.')
 
 
-@bot.command(pass_context=True, aliases=['stop'])
+@bot.command(pass_context=True, aliases=['stop', 'shutdown'])
 async def quit(ctx):
     """Quits the bot."""
     print('Bot exiting...')
@@ -632,7 +639,6 @@ async def game_and_avatar(bot):
         await asyncio.sleep(5)
 
 if __name__ == '__main__':
-
     for extension in os.listdir("cogs"):
         if extension.endswith('.py'):
             try:
@@ -641,7 +647,15 @@ if __name__ == '__main__':
                 print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
     bot.loop.create_task(game_and_avatar(bot))
-    try:
-        bot.run(os.environ['TOKEN'], bot=False)
-    except KeyError:
-        bot.run(get_config_value('config', 'token'), bot=False)
+
+    while True:
+        try:
+            try:
+                bot.run(os.environ['TOKEN'], bot=False)
+            except KeyError:
+                bot.run(get_config_value('config', 'token'), bot=False)
+        except discord.errors.LoginFailure:
+            setup_wizard(False)
+            continue
+        break
+

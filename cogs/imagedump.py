@@ -227,7 +227,7 @@ class Imagedump:
                             if not user:
                                 return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'User not found. Are you using the right syntax? ``user=`` should be the user\'s id. '
                                                                                                      'Ex: ``>imagedump 500 | user=124910128582361092``')
-                            user_msg = 'User: {}'.format(channel.name)
+                            user_msg = 'User: {}'.format(user.name)
 
                 await self.bot.delete_message(ctx.message)
                 with open('settings/optional_config.json', 'r+') as fp:

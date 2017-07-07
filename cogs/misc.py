@@ -452,7 +452,7 @@ class Misc:
                                                         self.bot.bot_prefix + '{status} set. {status} will change every ``{time}`` seconds'.format(
                                                             status=status_type, time=reply.content.strip()))
 
-                        stream = 'no' if is_stream else 'yes'
+                        stream = 'yes' if is_stream else 'no'
                         games = {'games': game.split(' | '), 'interval': interval, 'type': loop_type, 'stream': stream}
                         with open('settings/games.json', 'w') as g:
                             json.dump(games, g, indent=4)

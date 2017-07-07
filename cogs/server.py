@@ -131,7 +131,7 @@ class Server:
     async def role(self, ctx, *, msg):
         """Get more info about a specific role. Ex: >server role Admins"""
         for role in ctx.message.server.roles:
-            if msg == role.name:
+            if msg == role.name or msg == role.id:
                 role_count = 0
                 all_users = []
                 for user in ctx.message.server.members:

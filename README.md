@@ -1,5 +1,7 @@
 # Discord Selfbot
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FFDATZ8NFFV6Y) [<img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square">](https://github.com/appu1232/Discord-Selfbot/blob/master/LICENSE.txt)
+
 Come join the dedicated server for this bot! Ask questions, give suggestions, get help, or just hang out. Don't be shy, we don't bite:
 
 [<img src="https://canary.discordapp.com/api/guilds/299293492645986307/widget.png?style=banner2">](https://discord.gg/TBQE72k)
@@ -33,10 +35,16 @@ Takes less than 5 minutes to set up. Has various commands and utilities includin
 
 ## Acknowledgements
 
-- Thanks to [architdate](https://github.com/architdate) and [LyricLy](https://github.com/LyricLy) for actively participating in development and addition of new features.
+- Thanks to [architdate](https://github.com/architdate), [LyricLy](https://github.com/LyricLy), and [chenzw95](https://github.com/chenzw95) for actively participating in development, addition of new features, and other optimizations.
 - Thanks to [Hubcapp](https://github.com/Hubcapp) for the much improved >react command.
 - Thanks to [adjnouobsref](https://github.com/adjnouobsref) for the spoiler tags and various other contributions.
 - Used the code for lockdown commands from [Kurisu](https://github.com/916253/Kurisu/blob/master/addons/lockdown.py) bot. Slight modifications is message sending and contents of messages.
 - Used a lot of [Danny's](https://github.com/Rapptz) code for certain parts, especially parsing Google cards and the debugger.
 - Used [eye-sigil's](https://github.com/eye-sigil) code for the >repl command.
 - Thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
+
+## Buy me a cup of coffee
+
+This bot is open source and always will be, even if I don't get donations. That said, I know there are those out there that may still want to donate just to show appreciation so this is for you guys. Thanks in advance!
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FFDATZ8NFFV6Y)

@@ -10,31 +10,31 @@ from lxml import etree
 from cogs.utils import common
 
 
-@common.deprecation_warn()
+# @common.deprecation_warn()
 def load_config():
     with open('settings/config.json', 'r') as f:
         return json.load(f)
 
 
-@common.deprecation_warn()
+# @common.deprecation_warn()
 def load_optional_config():
     with open('settings/optional_config.json', 'r') as f:
         return json.load(f)
 
 
-@common.deprecation_warn()
+# @common.deprecation_warn()
 def load_moderation():
     with open('settings/moderation.json', 'r') as f:
         return json.load(f)
 
 
-@common.deprecation_warn()
+# @common.deprecation_warn()
 def load_notify_config():
     with open('settings/notify.json', 'r') as f:
         return json.load(f)  
     
 
-@common.deprecation_warn()
+# @common.deprecation_warn()
 def load_log_config():
     with open('settings/log.json', 'r') as f:
         return json.load(f)
