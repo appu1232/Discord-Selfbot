@@ -144,6 +144,17 @@ def get_user(message, user, bot=None):
     return member
 
 
+def find_channel(channel_list, text):
+    if text.isdigit():
+        found_channel = discord.utils.get(channel_list, id=text)
+    elif text.startswith("<#") and text.endswith(">"):
+        found_channel = discord.utils.get(channel_list,
+                                          id=text.replace("<", "").replace(">", "").replace("#", ""))
+    else:
+        found_channel = discord.utils.get(channel_list, name=text)
+    return found_channel
+
+
 async def get_google_entries(query):
     params = {
         'q': query,

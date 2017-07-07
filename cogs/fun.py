@@ -369,22 +369,16 @@ class Fun:
                     for i in reactions:
                         await self.bot.add_reaction(message, i)
         else:
-            if channel.isdigit():
-                found_channel = discord.utils.get(ctx.message.server.channels, id=channel)
-            elif channel.startswith("<#") and channel.endswith(">"):
-                found_channel = discord.utils.get(ctx.message.server.channels, id=channel.replace("<", "").replace(">", "").replace("#", ""))
-            else:
-                found_channel = discord.utils.get(ctx.message.server.channels, name=channel)
+            found_channel = find_channel(ctx.message.server.channels, channel)
+            if not found_channel:
+                found_channel = find_channel(self.bot.get_all_channels(), channel)
             if found_channel:
                 async for message in self.bot.logs_from(found_channel, limit=limit):
                     if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                         for i in reactions:
                             await self.bot.add_reaction(message, i)
             else:
-                async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
-                    if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
-                        for i in reactions:
-                            await self.bot.add_reaction(message, i)
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Channel not found.")
 
 
 def setup(bot):
