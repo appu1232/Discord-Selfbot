@@ -17,6 +17,7 @@ def load_optional_config():
     with open('settings/optional_config.json', 'r') as f:
         return json.load(f)
 
+
 def load_moderation():
     with open('settings/moderation.json', 'r') as f:
         return json.load(f)
@@ -125,7 +126,7 @@ def embed_perms(message):
     return check
 
 
-def get_user(message, user, bot = None):
+def get_user(message, user, bot=None):
     try:
         member = message.mentions[0]
     except:
@@ -141,6 +142,7 @@ def get_user(message, user, bot = None):
     if not member:
         return False
     return member
+
 
 async def get_google_entries(query):
     params = {
