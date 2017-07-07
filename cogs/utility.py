@@ -161,8 +161,8 @@ class Utility:
     async def timezonelist(self, ctx):
         """List of all available timezones"""
         await self.bot.delete_message(ctx.message)
-        embed = discord.Embed(title="Timezone List")
-        embed.set_author(name="Github Link", url="https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef")
+        embed = discord.Embed()
+        embed.description = "[List of valid timezones](https://gist.github.com/anonymous/67129932414d0b82f58758a699a5a0ef)"
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
     @commands.command(pass_context=True)
