@@ -160,6 +160,31 @@ class Server:
         await self.bot.delete_message(ctx.message)
 
     @server.group(pass_context=True)
+    async def rolemembers(self, ctx, *, msg):
+        """Lists all users in a role without pinging them."""
+        for role in ctx.message.server.roles:
+            if msg.lower() == role.name.lower():
+                role_count = 0
+                all_users_mention = []
+                for user in ctx.message.server.members:
+                    if role in user.roles:
+                        role_count += 1
+                        all_users_mention.append(user.mention)
+                all_users_mention.sort()
+                all_users_mention = '\n'.join(all_users_mention)
+                title='{} Users in role \"{}\"'.format(role_count, role.name)
+                if embed_perms(ctx.message):
+                    em = discord.Embed(color=role.color)
+                    em.add_field(name=title, value=all_users_mention, inline=False)
+                    await self.bot.send_message(ctx.message.channel, content=None, embed=em)
+                else:
+                    message = await self.bot.send_message(ctx.message.channel, content=" ᅠ")
+                    await self.bot.edit_message(message, new_content='{}**{}**\n\n{}'.format(self.bot.bot_prefix, title, all_users_mention))
+                return await self.bot.delete_message(ctx.message)
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find role ``%s``' % msg)
+        await self.bot.delete_message(ctx.message)
+
+    @server.group(pass_context=True)
     async def members(self, ctx, msg: str = None):
         """List of members in the server."""
         if msg:
