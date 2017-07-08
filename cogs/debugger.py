@@ -337,6 +337,19 @@ class Debugger:
         await success(self.bot,ctx.message)
         await asyncio.sleep(10)
         await self.bot.delete_message(ctx.message)
+        
+    @commands.command(pass_context=True, aliases=['cc', 'clear', 'cleartrace'])
+    async def clearconsole(self, ctx):
+        """Clear the console of any errors or other messages."""
+        for _ in range(100):
+            print("")
+        print('Logged in as')
+        try:
+            print(self.bot.user.name)
+        except:
+            pass
+        print('User id:' + str(self.bot.user.id))
+        print('------')
 
 
 def setup(bot):
