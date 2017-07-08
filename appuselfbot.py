@@ -497,9 +497,12 @@ async def on_message(message):
         except (AttributeError, discord.errors.HTTPException):
             pass
 
-    if hasattr(bot, 'ignored_servers'):
-        if any(message.server.id == server_id for server_id in bot.ignored_servers['servers']):
-            return
+    try:
+        if hasattr(bot, 'ignored_servers'):
+            if any(message.server.id == server_id for server_id in bot.ignored_servers['servers']):
+                return
+    except AttributeError:  # Happens when it's a direct message.
+        pass
 
     await bot.process_commands(message)
 
