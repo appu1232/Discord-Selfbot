@@ -325,6 +325,12 @@ async def on_message(message):
     if message.author.id == bot.user.id:
         if hasattr(bot, 'icount'):
             bot.icount += 1
+        try:
+            if hasattr(bot, 'ignored_servers'):
+                if any(message.server.id == server_id for server_id in bot.ignored_servers['servers']):
+                    return
+        except AttributeError:  # Happens when it's a direct message.
+            pass
         if hasattr(bot, 'self_log'):
             if message.channel.id not in bot.self_log:
                 bot.self_log[message.channel.id] = collections.deque(maxlen=100)
@@ -496,13 +502,6 @@ async def on_message(message):
         # Bad habit but this is for skipping errors when dealing with Direct messages, blocked users, etc. Better to just ignore.
         except (AttributeError, discord.errors.HTTPException):
             pass
-
-    try:
-        if hasattr(bot, 'ignored_servers'):
-            if any(message.server.id == server_id for server_id in bot.ignored_servers['servers']):
-                return
-    except AttributeError:  # Happens when it's a direct message.
-        pass
 
     await bot.process_commands(message)
 
