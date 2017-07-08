@@ -85,6 +85,11 @@ async def on_ready():
     bot.game = bot.game_interval = bot.avatar = bot.avatar_interval = bot.subpro = bot.keyword_found = None
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
     bot.notify = load_notify_config()
+    if not os.path.isfile('settings/ignored.json'):
+        with open('settings/ignored.json', 'w') as fp:
+            json.dump({'servers': []}, fp, indent=4)
+    with open('settings/ignored.json') as fp:
+        bot.ignored_servers = json.load(fp)
 
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r') as re:
@@ -312,6 +317,7 @@ async def on_message(message):
 
     await bot.wait_until_ready()
     await bot.wait_until_login()
+
     if hasattr(bot, 'message_count'):
         bot.message_count += 1
 
@@ -490,6 +496,10 @@ async def on_message(message):
         # Bad habit but this is for skipping errors when dealing with Direct messages, blocked users, etc. Better to just ignore.
         except (AttributeError, discord.errors.HTTPException):
             pass
+
+    if hasattr(bot, 'ignored_servers'):
+        if any(message.server.id == server_id for server_id in bot.ignored_servers['servers']):
+            return
 
     await bot.process_commands(message)
 
