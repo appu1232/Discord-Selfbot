@@ -9,7 +9,7 @@ import discord
 import os
 from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import embed_perms, cmd_prefix_len, attach_perms
+from cogs.utils.checks import embed_perms, cmd_prefix_len, attach_perms, find_channel
 from bs4 import BeautifulSoup
 from urllib import parse
 from urllib.request import Request, urlopen
