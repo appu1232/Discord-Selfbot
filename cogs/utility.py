@@ -57,6 +57,7 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def time(self, ctx):
+        """Show current time"""
         await self.bot.delete_message(ctx.message)
         dandt, tzerror = self.get_datetime()
         msg = '{:Time: `%H:%M:%S`}'.format(dandt)
@@ -64,6 +65,7 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def date(self, ctx):
+        """Show current date"""
         await self.bot.delete_message(ctx.message)
         dandt, tzerror = self.get_datetime()
         msg = '{:Date: `%d %B %Y`}'.format(dandt)
@@ -667,6 +669,8 @@ class Utility:
         """Dump messages."""
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Downloading messages...")
+        if not os.path.isdir('message_dump'):
+            os.mkdir('message_dump')
         with open("message_dump/" + filename.rsplit('.', 1)[0] + ".txt", "wb+") as f:
             if reverse == "yes":
                 if details == "yes":
