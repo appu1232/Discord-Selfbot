@@ -229,74 +229,79 @@ class Utility:
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + answer)
 
-    @commands.command(aliases=['d'], pass_context=True)
-    async def delete(self, ctx, *, txt: str = None):
-        """Deletes the last message sent or n messages sent. Ex: >d 5"""
 
-        # If number of seconds/messages are specified
-        if txt:
-            if txt[0] == '!':
-                killmsg = self.bot.self_log[ctx.message.channel.id][len(self.bot.self_log[ctx.message.channel.id]) - 2]
-                timer = int(txt[1:].strip())
-
-                # Animated countdown because screw rate limit amirite
-                destroy = await self.bot.edit_message(ctx.message,
-                                                      self.bot.bot_prefix + 'The above message will self-destruct in:')
-                msg = await self.bot.send_message(ctx.message.channel, '``%s  |``' % timer)
-                for i in range(0, timer, 4):
-                    if timer - 1 - i == 0:
-                        await self.bot.delete_message(destroy)
-                        msg = await self.bot.edit_message(msg, '``0``')
-                        break
-                    else:
-                        msg = await self.bot.edit_message(msg, '``%s  |``' % int(timer - 1 - i))
-                        await asyncio.sleep(1)
-                    if timer - 1 - i != 0:
-                        if timer - 2 - i == 0:
-                            await self.bot.delete_message(destroy)
-                            msg = await self.bot.edit_message(msg, '``0``')
-                            break
-                        else:
-                            msg = await self.bot.edit_message(msg, '``%s  /``' % int(timer - 2 - i))
-                            await asyncio.sleep(1)
-                    if timer - 2 - i != 0:
-                        if timer - 3 - i == 0:
-                            await self.bot.delete_message(destroy)
-                            msg = await self.bot.edit_message(msg, '``0``')
-                            break
-                        else:
-                            msg = await self.bot.edit_message(msg, '``%s  -``' % int(timer - 3 - i))
-                            await asyncio.sleep(1)
-                    if timer - 3 - i != 0:
-                        if timer - 4 - i == 0:
-                            await self.bot.delete_message(destroy)
-                            msg = await self.bot.edit_message(msg, '``0``')
-                            break
-                        else:
-                            msg = await self.bot.edit_message(msg, '``%s  \ ``' % int(timer - 4 - i))
-                            await asyncio.sleep(1)
-                await self.bot.edit_message(msg, ':bomb:')
-                await asyncio.sleep(.5)
-                await self.bot.edit_message(msg, ':fire:')
-                await self.bot.edit_message(killmsg, ':fire:')
-                await asyncio.sleep(.5)
-                await self.bot.delete_message(msg)
-                await self.bot.delete_message(killmsg)
+    @commands.command(aliases=['sd'],pass_context=True)
+    async def selfdestruct(self, ctx, *, amount: str = None):
+        """Builds a self-destructing message. Ex: >sd 5"""
+        killmsg = self.bot.self_log[ctx.message.channel.id][len(self.bot.self_log[ctx.message.channel.id]) - 2]
+        timer = int(amount.strip())
+        # Animated countdown because screw rate limit amirite
+        destroy = await self.bot.edit_message(ctx.message,
+                                              self.bot.bot_prefix + 'The above message will self-destruct in:')
+        msg = await self.bot.send_message(ctx.message.channel, '``%s  |``' % timer)
+        for i in range(0, timer, 4):
+            if timer - 1 - i == 0:
+                await self.bot.delete_message(destroy)
+                msg = await self.bot.edit_message(msg, '``0``')
+                break
             else:
-                await self.bot.delete_message(ctx.message)
-                deleted = 0
-                async for sent_message in self.bot.logs_from(ctx.message.channel, limit=200):
-                    if sent_message.author == ctx.message.author:
-                        try:
-                            await self.bot.delete_message(sent_message)
-                            deleted += 1
-                        except:
-                            pass
-                        if deleted == int(txt):
-                            break
+                msg = await self.bot.edit_message(msg, '``%s  |``' % int(timer - 1 - i))
+                await asyncio.sleep(1)
+            if timer - 1 - i != 0:
+                if timer - 2 - i == 0:
+                    await self.bot.delete_message(destroy)
+                    msg = await self.bot.edit_message(msg, '``0``')
+                    break
+                else:
+                    msg = await self.bot.edit_message(msg, '``%s  /``' % int(timer - 2 - i))
+                    await asyncio.sleep(1)
+            if timer - 2 - i != 0:
+                if timer - 3 - i == 0:
+                    await self.bot.delete_message(destroy)
+                    msg = await self.bot.edit_message(msg, '``0``')
+                    break
+                else:
+                    msg = await self.bot.edit_message(msg, '``%s  -``' % int(timer - 3 - i))
+                    await asyncio.sleep(1)
+            if timer - 3 - i != 0:
+                if timer - 4 - i == 0:
+                    await self.bot.delete_message(destroy)
+                    msg = await self.bot.edit_message(msg, '``0``')
+                    break
+                else:
+                    msg = await self.bot.edit_message(msg, '``%s  \ ``' % int(timer - 4 - i))
+                    await asyncio.sleep(1)
+        await self.bot.edit_message(msg, ':bomb:')
+        await asyncio.sleep(.5)
+        await self.bot.edit_message(msg, ':fire:')
+        await self.bot.edit_message(killmsg, ':fire:')
+        await asyncio.sleep(.5)
+        await self.bot.delete_message(msg)
+        await self.bot.delete_message(killmsg)
 
-        # If no number specified, delete message immediately
-        else:
+    @commands.command(aliases=['d'], pass_context=True)
+    async def delete(self, ctx, txt: str=None, channel: str=None):
+        """Deletes the last message sent or n messages sent. Ex: >d 5"""
+        if txt: # If number of seconds/messages are specified
+            await self.bot.delete_message(ctx.message)
+            deleted = 0
+            if txt == "all":limit = 1000
+            else:
+                txt = int(txt)
+                limit = 200
+                if txt > 200: txt = 200
+            if channel:
+                channel = find_channel(ctx.message.server.channels, channel)
+                if not channel: channel = find_channel(self.bot.get_all_channels(), channel)
+            else: channel = ctx.message.channel
+            async for sent_message in self.bot.logs_from(channel, limit=limit):
+                if sent_message.author == ctx.message.author:
+                    try:
+                        await self.bot.delete_message(sent_message)
+                        deleted += 1
+                    except: pass
+                    if deleted == txt: break
+        else: # If no number specified, delete last message immediately
             await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
             await self.bot.delete_message(self.bot.self_log[ctx.message.channel.id].pop())
 
