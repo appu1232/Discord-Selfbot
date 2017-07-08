@@ -12,13 +12,13 @@ import re
 import time
 import os
 import discord
-import traceback
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
 from discord_webhooks import Webhook
 from cogs.utils.checks import *
 from cogs.utils.config import *
 from discord.ext import commands
+
 
 def setup_wizard(is_first_time):
     config = {}
@@ -78,7 +78,6 @@ if bot.bot_prefix != '':
 
 bot.cmd_prefix = get_config_value('config', 'cmd_prefix')
 bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
-
 
 # Startup
 @bot.event
@@ -658,4 +657,3 @@ if __name__ == '__main__':
             setup_wizard(False)
             continue
         break
-
