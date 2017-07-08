@@ -8,7 +8,7 @@ Come join the dedicated server for this bot! Ask questions, give suggestions, ge
 
 ### [**Install guide + list of all commands.**](https://github.com/appu1232/Discord-Selfbot/wiki)
 
-Takes less than 5 minutes to set up. Has various commands and utilities including a keyword logger/notifier, adding custom commands/reactions, and much more.
+Takes less than 2 minutes to set up. Has various commands and utilities including a keyword logger/notifier, adding custom commands/reactions, and much more.
 
 ![](http://i.imgur.com/3H9zpop.gif)
 
@@ -46,6 +46,6 @@ Takes less than 5 minutes to set up. Has various commands and utilities includin
 
 ## Buy me a cup of coffee
 
-This bot is open source and always will be, even if I don't get donations. That said, I know there are those out there that may still want to donate just to show appreciation so this is for you guys. Thanks in advance!
+This bot is open source and always will be, even if I don't get donations. That said, I know there are people out there that may still want to donate just to show their appreciation so this is for you guys. Thanks in advance!
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FFDATZ8NFFV6Y)

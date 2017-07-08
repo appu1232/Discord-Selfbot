@@ -28,16 +28,16 @@ def setup_wizard(is_first_time):
     print("Paste the contents of that entry below.")
     print("-------------------------------------------------------------")
     config["token"] = input("| ").strip('"')
-    print("Enter the command prefix you want to use for main commands (eg. if you enter > you will use commands like so: >about).")
+    print("\nEnter the command prefix you want to use for main commands (eg. if you enter > you will use commands like so: >about).")
     print("-------------------------------------------------------------")
     config["cmd_prefix"] = input("| ")
-    print("Enter the command prefix you want to use for custom commands (commands that you add to the bot yourself with custom replies). Using the same prefix as the main command prefix is allowed but not recommended.")
+    print("\nEnter the command prefix you want to use for custom commands (commands that you add to the bot yourself with custom replies). Using the same prefix as the main command prefix is allowed but not recommended.")
     print("-------------------------------------------------------------")
     config["customcmd_prefix"] = input("| ")
-    print("Enter something that will precede every response from the bot. This is to identify messages that came from the bot vs. just you talking. Ex: Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends. Recommended but if you don't want anything, press enter to skip.")
+    print("\nEnter something that will precede every response from the bot. This is to identify messages that came from the bot vs. just you talking. Ex: Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends. Recommended but if you don't want anything, press enter to skip.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ")
-    input("That concludes the setup wizard. For further setup options, refer to the Discord Selfbot wiki. Press Enter.\n")
+    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki. \n\nPress Enter to continue....\n")
     with open('settings/config.json', 'w') as f:
         json.dump(config, f, sort_keys=True, indent=4)
 
@@ -46,16 +46,6 @@ try:
 except IOError:
     # setup wizard
     setup_wizard(True)
-
-try:
-    open('settings/optional_config.json')
-except IOError:
-    config = {}
-    print("It seems you don't have the optional config settings set up as well. This include entering a Google API key (by following the instructions on the wiki) and MAL credentials for anime/manga search. Check the wiki to see how to get these fields and enter them into the optional configuration.")
-    print("Starting up the bot (this may take a minute or two)...")
-    with open('settings/optional_config.json', 'w') as f:
-        opt = {}
-        json.dump(opt, f, sort_keys=True, indent=4)
 
 samples = os.listdir('settings')
 for f in samples:

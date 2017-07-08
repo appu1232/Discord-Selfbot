@@ -101,12 +101,12 @@ def update_bot(message):
             version = 4
         else:
             version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
-        version = str(int(version) + 1)
+        version = description = str(int(version) + 1)
         if int(version) > 4:
             version = "4"
         commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])
         commits = commits.split('\n')
-        em = discord.Embed(color=0x24292E, title='Latest changes for the selfbot:')
+        em = discord.Embed(color=0x24292E, title='Latest changes for the selfbot:', description='%s release(s) behind.' % description)
         for i in range(int(version)-1):
             title = g.execute(["git", "log", "--format=%ar", "-n", "1", "%s" % commits[i]])
             field = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--shortstat", "%s" % commits[i], "^%s" % commits[i+1]])
