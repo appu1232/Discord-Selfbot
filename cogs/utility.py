@@ -21,7 +21,8 @@ class Utility:
     def __init__(self, bot):
         self.bot = bot
 
-    def get_datetime(self):
+    @staticmethod
+    def get_datetime():
         a = None
         tzerror = False
         with open('settings/optional_config.json', 'r') as fp:
@@ -204,7 +205,7 @@ class Utility:
                 fp.seek(0)
                 fp.truncate()
                 json.dump(opt, fp, indent=4)
-            self.bot.bot_prefix = msg
+            self.bot.bot_prefix = msg + ' '
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Prefix changed.')
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Type a prefix as an argument for the `prefix` command')
@@ -228,8 +229,8 @@ class Utility:
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + answer)
 
-    @commands.command(pass_context=True)
-    async def d(self, ctx, *, txt: str = None):
+    @commands.command(aliases=['d'], pass_context=True)
+    async def delete(self, ctx, *, txt: str = None):
         """Deletes the last message sent or n messages sent. Ex: >d 5"""
 
         # If number of seconds/messages are specified
@@ -304,9 +305,10 @@ class Utility:
         """Spoiler tag. Ex: >spoiler Some book | They get married."""
         try:
             if " | " in msg:
-                spoiled_work, spoiler = msg.lower().split(" | ", 1)
+                spoiled_work, spoiler = msg.split(" | ", 1)
             else:
-                spoiled_work, _, spoiler = msg.lower().partition(" ")
+                spoiled_work = msg
+                spoiler = msg
             await self.bot.edit_message(ctx.message, self.bot.bot_prefix + 'Spoiler for `' + spoiled_work + '`: \n`'
                                         + ''.join(
                 map(lambda c: chr(ord('a') + (((ord(c) - ord('a')) + 13) % 26)) if c >= 'a' and c <= 'z' else c,
@@ -628,7 +630,7 @@ class Utility:
             with open("anims/{}.txt".format(animation)) as f:
                 anim = f.read().split("\n")
         except IOError:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You don't have that animation in your anims folder!")
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You don't have that animation in your anims folder!")
         if anim:
             try:
                 delay = float(anim[0])
@@ -670,6 +672,7 @@ class Utility:
                 if details == "yes":
                     async for message in self.bot.logs_from(ctx.message.channel, int(limit)):
                         f.write("<{} at {}> {}\n".format(message.author.name, message.timestamp.strftime('%d %b %Y'), message.content).encode())
+
                 else:
                     async for message in self.bot.logs_from(ctx.message.channel, int(limit)):
                         f.write(message.content.encode() + "\n".encode())
@@ -677,6 +680,7 @@ class Utility:
                 if details == "yes":
                     async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
                         f.write("<{} at {}> {}\n".format(message.author.name, message.timestamp.strftime('%d %b %Y'), message.content).encode())
+
                 else:
                     async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
                         f.write(message.content.encode() + "\n".encode())

@@ -9,9 +9,6 @@ import gc
 import psutil
 import sys
 import re
-import time
-import os
-import discord
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
 from discord_webhooks import Webhook

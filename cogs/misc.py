@@ -50,29 +50,18 @@ class Misc:
         except:
             game = 'None'
         channel_count = 0
-        user_count = 0
-        for i in self.bot.servers:
-            channel_count += len(i.channels)
-            user_count += len(i.members)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
-            em.add_field(name=u'\U0001F4E4 Messages sent', value=str(self.bot.icount))
-            em.add_field(name=u'\U0001F4E5 Messages received', value=str(self.bot.message_count))
+            em.add_field(name=u'\U0001F4E4 Msgs sent', value=str(self.bot.icount))
+            em.add_field(name=u'\U0001F4E5 Msgs received', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.servers)))
             em.add_field(name=u'\ud83d\udcd1 Channels', value=str(channel_count))
-            em.add_field(name=u'\U0001f46a Users', value=str(user_count))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
             g = u'\U0001F3AE Game'
             if '=' in game: g = '\ud83c\udfa5 Stream'
             em.add_field(name=g, value=game)
-            status = str(ctx.message.author.status)
-            if status == 'online': status = '\📗 '+status
-            elif status == 'idle': status = '\📙 '+status
-            elif status == 'dnd': status = '\📕 '+status
-            elif status in ['invisible', 'offline']: status = '\📘 '+status
-            em.add_field(name='🌐 Status', value=status.title())
             mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024 ** 2)
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
             try:
@@ -591,18 +580,18 @@ class Misc:
         if url:
             with open(name, 'rb') as fp:
                 e = fp.read()
-                with open('settings/config.json', 'r+') as fp:
+                with open('settings/avatars.json', 'r+') as fp:
                         opt = json.load(fp)
                         if opt['password']:
                             if opt['password'] == "":
-                                await self.bot.send_message(ctx.message.channel, "You have not set your password yet in `settings/config.json` Please do so and try again")
+                                await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/avatars.json` Please do so and try again")
                             else:
                                 pw = opt['password']
                                 await self.bot.edit_profile(password=pw, avatar=e)
                                 await self.bot.send_message(ctx.message.channel, "Your avatar has been set to the specified image")
                         else:
                             opt['password'] = ""
-                            await self.bot.send_message(ctx.message.channel, "You have not set your password yet in `settings/config.json` Please do so and try again")
+                            await self.bot.send_message(ctx.message.channel,"You have not set your password yet in `settings/avatars.json` Please do so and try again")
             os.remove(name)
         elif not embed_perms(ctx.message) and url:
             await self.bot.send_message(ctx.message.channel, url)
@@ -648,7 +637,7 @@ class Misc:
             fp.truncate()
             json.dump(opt, fp, indent=4)
 
-    @commands.command(pass_context=True)
+    @commands.command(aliases=['q'], pass_context=True)
     async def quote(self, ctx, *, msg: str = None):
         """Quote a message. >help quote for more info.
         >quote - quotes the last message sent in the channel.
@@ -739,6 +728,7 @@ class Misc:
             search = self.bot.all_log[ctx.message.channel.id + ' ' + ctx.message.server.id][-2]
             result = search[0]
         if result:
+            sender = result.author.nick if result.author.nick else result.author.name
             if embed_perms(ctx.message) and result.content:
                 em = discord.Embed(description=result.content, timestamp=result.timestamp)
                 with open('settings/optional_config.json') as fp:
@@ -751,13 +741,13 @@ class Misc:
                         em.color = int('0x' + embed_color, 16)
                 except:
                     em.color = 0xbc0b0b
-                em.set_author(name=result.author.name, icon_url=result.author.avatar_url)
+                em.set_author(name=sender, icon_url=result.author.avatar_url)
                 if channel != ctx.message.channel:
                     em.set_footer(text='#{} | {} '.format(channel.name, channel.server.name))
                 await self.bot.send_message(ctx.message.channel, embed=em)
             else:
                 await self.bot.send_message(ctx.message.channel,
-                                            '%s - %s```%s```' % (result.author.name, result.timestamp, result.content))
+                                            '%s - %s```%s```' % (sender, result.timestamp, result.content))
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No quote found.')
 

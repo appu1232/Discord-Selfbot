@@ -6,8 +6,7 @@ import os
 import aiohttp
 from urllib.parse import parse_qs, quote_plus
 from lxml import etree
-
-from cogs.utils import common
+#from cogs.utils import common
 
 
 # @common.deprecation_warn()
@@ -133,16 +132,23 @@ def embed_perms(message):
     return check
 
 
-def get_user(message, user):
+def get_user(message, user, bot=None):
     try:
         member = message.mentions[0]
     except:
         member = message.server.get_member_named(user)
     if not member:
         member = message.server.get_member(user)
+    if not member and bot:
+        for server in bot.servers:
+            member = server.get_member(user)
+            if not member: member = server.get_member_named(user)
+            if member:
+                break
     if not member:
         return False
     return member
+
 
 def find_channel(channel_list, text):
     if text.isdigit():
