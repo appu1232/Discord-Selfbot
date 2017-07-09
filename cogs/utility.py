@@ -554,12 +554,9 @@ class Utility:
         await self.bot.send_message(ctx.message.channel, "https://www.youtube.com{}".format(result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')))
 
     @commands.command(pass_context=True)
-    async def xkcd(self, ctx, *, comic="latest"):
+    async def xkcd(self, ctx, *, comic=""):
         """Pull comics from xkcd."""
-        if comic == "latest":
-            site = requests.get("https://xkcd.com/info.0.json")
-        else:
-            site = requests.get("https://xkcd.com/{}/info.0.json".format(comic))
+        site = requests.get("https://xkcd.com/{}/info.0.json".format(comic))
         if site.status_code == 404:
             site = None
             found = None
@@ -578,7 +575,7 @@ class Utility:
                 comic = found
         if site:
             json = site.json()
-            embed = discord.Embed(title="xkcd {}: {}".format(json["num"], json["title"]), url="https://xkcd.com/{}/".format(comic))
+            embed = discord.Embed(title="xkcd {}: {}".format(json["num"], json["title"]), url="https://xkcd.com/{}".format(comic))
             embed.set_image(url=json["img"])
             embed.set_footer(text="{}".format(json["alt"]))
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
