@@ -267,6 +267,7 @@ async def quit(ctx):
 @bot.command(pass_context=True)
 async def reload(ctx, txt: str = None):
     """Reloads all modules."""
+    await bot.delete_message(ctx.message)
     if txt:
         bot.unload_extension(txt)
         try:
@@ -276,12 +277,8 @@ async def reload(ctx, txt: str = None):
                 txt = 'cogs.'+txt
                 bot.load_extension(txt)
             except:
-                await error(bot, ctx.message)
                 await bot.send_message(ctx.message.channel, '``` {}: {} ```'.format(type(e).__name__, e))
                 return
-        await success(bot, ctx.message)
-        await asyncio.sleep(10)
-        await bot.delete_message(ctx.message)
     else:
         utils = []
         for i in bot.extensions:
@@ -297,12 +294,6 @@ async def reload(ctx, txt: str = None):
                 fail = True
                 l -= 1
         await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Reloaded {} of {} modules.'.format(l, len(utils)))
-        if fail:
-            await warn(bot, ctx.message)
-        else:
-            await success(bot, ctx.message)
-            await asyncio.sleep(10)
-            await bot.delete_message(ctx.message)
 
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
