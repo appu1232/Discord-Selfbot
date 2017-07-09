@@ -74,11 +74,11 @@ class CogDownloading:
                          #   await self.bot.send_message(ctx.message.channel, "Wrong GitHub account credentials")
                 with open("cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
-                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully downloaded `{}` to your cogs folder. Loading the cog...".format(cog["title"]))
                 try:
                     self.bot.load_extension("cogs." + filename.rsplit(".", 1)[0])
-                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Succesfully loaded the cog. You're good to go!")
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully downloaded the `{}` cog.".format(cog["title"]))
                 except Exception as e:
+                    os.remove("cogs/" + filename)
                     await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "There was an error loading your cog: `{}: {}` You may want to report this error to the author of the cog.".format(type(e).__name__, str(e)))
             else:
                 await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Didn't download `{}`: user cancelled.".format(cog["title"]))
@@ -129,6 +129,7 @@ class CogDownloading:
                 embed.description += "\✅ `{}`\n".format(entry)
             else:
                 embed.description += "\🆕 `{}`\n".format(entry)
+        embed.set_footer(text="To view information about a specific cog, do >cog view <cog>")
         await self.bot.send_message(ctx.message.channel, content=parse_prefix(self.bot, "[b]Use `[c]install/uninstall <cog_name>` to manage your cogs."), embed=embed)
         
     @cog.command(pass_context=True)
@@ -156,15 +157,28 @@ class CogDownloading:
         for a in data:
             list.append(a.get("title"))
         embed = discord.Embed(title="Cog list", description="")
+        successful = 0
+        failures = 0
         for entry in list[2:]:
             entry = entry.rsplit(".")[0]
             if os.path.isfile("cogs/" + entry + ".py"):
-                link = requests.get("http://appucogs.tk/cogs/{}.json".format(entry)).json()["link"]
+                cog = requests.get("http://appucogs.tk/cogs/{}.json".format(entry)).json()
+                link = cog["link"]
                 download = requests.get(link).text
                 filename = link.rsplit("/", 1)[1]
                 with open("cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
-        await self.bot.edit_message(msg, self.bot.bot_prefix + "Updated all cogs.")
+                try:
+                    self.bot.load_extension("cogs." + filename.rsplit(".", 1)[0])
+                    successful += 1
+                except Exception as e:
+                    failures += 1
+                    os.remove("cogs/" + filename)
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "There was an error updating the `{}` cog: `{}: {}` You may want to report this error to the author of the cog.".format(cog["title"], type(e).__name__, str(e)))
+        if failures == 0:
+            await self.bot.edit_message(msg, self.bot.bot_prefix + "Updated all cogs successfully.")
+        else:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Updated {}/{} cogs successfully.".format(successful, successful + failures))
 
 
 def setup(bot):
