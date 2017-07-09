@@ -308,35 +308,26 @@ class Debugger:
     @commands.command(pass_context=True)
     async def load(self, ctx, *, msg):
         """Load a module"""
+        await self.bot.delete_message(ctx.message)
         try:
             self.bot.load_extension(msg)
         except Exception as e:
-            try:
-                self.bot.load_extension('cogs.'+msg)
-            except:
-                await error(self.bot, ctx.message)
-                await self.bot.send_message(ctx.message.channel, '``` {}: {} ```'.format(type(e).__name__, e))
-                return
-        await success(self.bot,ctx.message)
-        await asyncio.sleep(10)
-        await self.bot.delete_message(ctx.message)
-
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Failed to load module: `{}`'.format(msg))
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
+        else:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))
 
     @commands.command(pass_context=True)
     async def unload(self, ctx, *, msg):
         """Unload a module"""
+        await self.bot.delete_message(ctx.message)
         try:
             self.bot.unload_extension(msg)
         except Exception as e:
-            try:
-                self.bot.unload_extension('cogs.'+msg)
-            except:
-                await error(self.bot, ctx.message)
-                await self.bot.send_message(ctx.message.channel, '``` {}: {} ```'.format(type(e).__name__, e))
-                return
-        await success(self.bot,ctx.message)
-        await asyncio.sleep(10)
-        await self.bot.delete_message(ctx.message)
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Failed to unload module: `{}`'.format(msg))
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
+        else:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Unloaded module: `{}`'.format(msg))
         
     @commands.command(pass_context=True, aliases=['cc', 'clear', 'cleartrace'])
     async def clearconsole(self, ctx):
