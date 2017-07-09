@@ -74,7 +74,12 @@ class CogDownloading:
                          #   await self.bot.send_message(ctx.message.channel, "Wrong GitHub account credentials")
                 with open("cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
-                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully downloaded `{}` to your cogs folder. Run the `load cogs.{}` command to load in your cog.".format(cog["title"], filename.rsplit(".", 1)[0]))
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully downloaded `{}` to your cogs folder. Loading the cog...".format(cog["title"]))
+                try:
+                    self.bot.load_extension("cogs." + filename.rsplit(".", 1)[0])
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Succesfully loaded the cog. You're good to go!")
+                except Exception as e:
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "There was an error loading your cog: `{}: {}` You may want to report this error to the author of the cog.".format(type(e).__name__, str(e)))
             else:
                 await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Didn't download `{}`: user cancelled.".format(cog["title"]))
     
@@ -100,6 +105,7 @@ class CogDownloading:
                 reply = await self.bot.wait_for_message(author=ctx.message.author, check=check)
                 if reply.content.lower() == "y":
                     os.remove("cogs/" + cog + ".py")
+                    self.bot.unload_extension("cogs." + cog)
                     await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully deleted the `{}` cog.".format(found_cog["title"]))
                 else:
                     await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Didn't delete `{}`: user cancelled.".format(found_cog["title"]))
