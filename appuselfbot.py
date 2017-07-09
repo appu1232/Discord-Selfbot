@@ -17,12 +17,12 @@ from cogs.utils.config import *
 from discord.ext import commands
 
 
-def setup_wizard(is_first_time):
+try:
+    open('settings/config.json')
+except IOError:
+    # setup wizard
     config = {}
-    if is_first_time:
-        print("Welcome to Appu's Discord Selfbot!\n")
-    else:
-        print("It seems the token you entered is incorrect or has changed. If you changed your password or enabled/disabled 2fa, your token will change. Grab your new token. Here's how you do it:\n")
+    print("Welcome to Appu's Discord Selfbot!\n")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
     print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
     print("Paste the contents of that entry below.")
@@ -40,12 +40,6 @@ def setup_wizard(is_first_time):
     input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nPress Enter to start the bot....\n")
     with open('settings/config.json', 'w') as f:
         json.dump(config, f, sort_keys=True, indent=4)
-
-try:
-    open('settings/config.json')
-except IOError:
-    # setup wizard
-    setup_wizard(True)
 
 samples = os.listdir('settings')
 for f in samples:
@@ -653,6 +647,17 @@ if __name__ == '__main__':
             except KeyError:
                 bot.run(get_config_value('config', 'token'), bot=False)
         except discord.errors.LoginFailure:
-            setup_wizard(False)
+            print("It seems the token you entered is incorrect or has changed. If you changed your password or enabled/disabled 2fa, your token will change. Grab your new token. Here's how you do it:\n")
+            print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
+            print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
+            print("Paste the contents of that entry below.")
+            print("-------------------------------------------------------------")
+            token = input("| ").strip('"')
+            with open("settings/config.json", "r+") as fp:
+                config = json.load(fp)
+                config["token"] = token
+                fp.seek(0)
+                fp.truncate()
+                json.dump(config, fp, indent=4)
             continue
         break

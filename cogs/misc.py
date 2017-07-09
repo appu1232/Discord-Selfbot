@@ -45,9 +45,8 @@ class Misc:
             time = '%s days, %s hours, %s minutes, and %s seconds' % (days, hours, minutes, seconds)
         else:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
-        try:
-            game = self.bot.game
-        except:
+        game = self.bot.game
+        if not game:
             game = 'None'
         channel_count = 0
         if embed_perms(ctx.message):
