@@ -67,6 +67,7 @@ class Todo:
 
         Example:
         >todo add Get Daily Tatsumaki Credits | 24h1m | text=t!daily | channel=299431230984683520 | repeat=yes | alert=off
+        >todo add Send Daily Rep to <@124910128582361092> | 24h1m | text=t!rep 124910128582361092 | channel=299431230984683520 | repeat=yes | alert=off
 
 
         >todo remove <item> - Remove an item from your to-do list.
