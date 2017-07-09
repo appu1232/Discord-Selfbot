@@ -28,21 +28,23 @@ class CogDownloading:
         
     @commands.group(pass_context=True)
     async def cog(self, ctx):
-        """Manage custom cogs. >help cog for more information.
-        >cog install <cog> - Install a custom cog from the server.
-        >cog uninstall <cog> - Uninstall one of your custom cogs.
-        >cog list - List all cogs on the server.
-        >cog view <cog> - View information about a cog.
-        If you would like to add a custom cog to the server, see http://appucogs.tk
+        """Manage custom cogs from ASCII. >help cog for more information.
+        The Appu Selfbot Cog Importable Index (aka ASCII) is a server that hosts custom cogs for the bot.
+        >cog install <cog> - Install a custom cog from ASCII.
+        >cog uninstall <cog> - Uninstall one of your ASCII cogs.
+        >cog list - List all cogs on ASCII.
+        >cog view <cog> - View information about a cog on ASCII.
+        >cog update - Update all of your ASCII cogs.
+        If you would like to add a custom cog to ASCII, see http://appucogs.tk
         """
         if ctx.invoked_subcommand is None:
             await self.bot.delete_message(ctx.message)
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Invalid usage. >cog <install/uninstall> <cog>")
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Invalid usage. Valid subcommands: `install`, `uninstall`, `view`, `update`\nDo `help cog` for more information.")
         
                 
     @cog.command(pass_context=True)
     async def install(self, ctx, cog):
-        """Install a custom cog from the server."""
+        """Install a custom cog from ASCII."""
         def check(msg):
             if msg:
                 return msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n'
@@ -78,7 +80,7 @@ class CogDownloading:
     
     @cog.command(pass_context=True)
     async def uninstall(self, ctx, cog):
-        """Uninstall one of your custom cogs."""
+        """Uninstall one of your custom ASCII cogs."""
         def check(msg):
             if msg:
                 return msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n'
@@ -106,9 +108,9 @@ class CogDownloading:
     
     @cog.command(pass_context=True)
     async def list(self, ctx):
-        """List all cogs on the server."""
+        """List all cogs on ASCII."""
         await self.bot.delete_message(ctx.message)
-        site = requests.get('https://github.com/LyricLy/Selfbot-Cogs/tree/master/cogs').text
+        site = requests.get('https://github.com/LyricLy/ASCII/tree/master/cogs').text
         soup = BeautifulSoup(site, "lxml")
         data = soup.find_all(attrs={"class": "js-navigation-open"})
         list = []
@@ -125,7 +127,7 @@ class CogDownloading:
         
     @cog.command(pass_context=True)
     async def view(self, ctx, cog):
-        """View information about a cog."""
+        """View information about a cog on ASCII."""
         await self.bot.delete_message(ctx.message)
         response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
         if response.status_code == 404:
@@ -138,10 +140,10 @@ class CogDownloading:
             
     @cog.command(pass_context=True)
     async def update(self, ctx):
-        """Update all of your installed cogs."""
+        """Update all of your installed ASCII cogs."""
         await self.bot.delete_message(ctx.message)
         msg = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Updating...")
-        site = requests.get('https://github.com/LyricLy/Selfbot-Cogs/tree/master/cogs').text
+        site = requests.get('https://github.com/LyricLy/ASCII/tree/master/cogs').text
         soup = BeautifulSoup(site, "lxml")
         data = soup.find_all(attrs={"class": "js-navigation-open"})
         list = []
