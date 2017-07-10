@@ -694,7 +694,43 @@ class Utility:
                     async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
                         f.write(message.content.encode() + "\n".encode())
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Finished downloading!")
-
+        
+    @commands.group(pass_context=True)
+    async def link(self, ctx):
+        await self.bot.delete_message(ctx.message)
+        if ctx.invoked_subcommand is None:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Usage: `link <shorten/lengthen> <url>`")
+            
+    @link.command(pass_context=True)
+    async def shorten(self, ctx, url):
+        try:
+            r = requests.get(url).status_code
+        except requests.exceptions.RequestException:
+            r = 404
+        if r == 200:
+            params = {
+                "access_token": "757c24db53fac6a6a994439da41bdbbe325dfb99",
+                "longUrl": url
+            }
+            response = requests.get("https://api-ssl.bitly.com/v3/shorten", params=params)
+            if response.status_code == 200:
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "<{}>".format(response.json()["data"]["url"]))
+            else:
+                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "There was an error shortening your URL.")
+        else:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You did not enter a valid URL.")
+                
+    
+    @link.command(pass_context=True)
+    async def lengthen(self, ctx, url):
+        try:
+            r = requests.get(url).status_code
+        except requests.exceptions.RequestException:
+            r = 404
+        if r == 200:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "<{}>".format(requests.get(url).url))
+        else:
+            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You did not enter a valid URL.")
 
 def setup(bot):
     bot.add_cog(Utility(bot))
