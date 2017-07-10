@@ -1,3 +1,4 @@
+import pkg_resources
 import contextlib
 import sys
 import inspect
