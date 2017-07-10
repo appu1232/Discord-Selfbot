@@ -144,7 +144,7 @@ class Debugger:
             await error(self.bot, ctx.message)
             await self.bot.send_message(ctx.message.channel, '``` %s ```'%format_exc())
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, invoke_without_command=True)
     async def py(self, ctx, *, msg):
         """Python interpreter. See the wiki for more info."""
 
