@@ -185,24 +185,25 @@ class Google:
             query = query[1:]
         else:
             item = 0
-        async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + "&searchType=image") as resp:
-            if resp.status != 200:
-                if not config['google_api_key'] or not config['custom_search_engine']:
-                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You don't seem to have image searching configured properly. Refer to the wiki for details.")
-                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Google failed to respond.')
-            else:
-                result = json.loads(await resp.text())
-                try:
-                    result['items']
-                except:
-                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
-                if len(result['items']) < 1:
-                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
-                em = discord.Embed()
-                if embed_perms(ctx.message):
-                    await self.bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][item]['link']))
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + "&searchType=image") as resp:
+                if resp.status != 200:
+                    if not config['google_api_key'] or not config['custom_search_engine']:
+                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You don't seem to have image searching configured properly. Refer to the wiki for details.")
+                    return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Google failed to respond.')
                 else:
-                    await self.bot.send_message(ctx.message.channel, result['items'][item]['link'])
+                    result = json.loads(await resp.text())
+                    try:
+                        result['items']
+                    except:
+                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
+                    if len(result['items']) < 1:
+                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
+                    em = discord.Embed()
+                    if embed_perms(ctx.message):
+                        await self.bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][item]['link']))
+                    else:
+                        await self.bot.send_message(ctx.message.channel, result['items'][item]['link'])
 
 
 def setup(bot):
