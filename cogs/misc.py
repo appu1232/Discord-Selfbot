@@ -49,6 +49,8 @@ class Misc:
         if not game:
             game = 'None'
         channel_count = 0
+        for server in self.bot.servers:
+            channel_count += len(server.channels)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
