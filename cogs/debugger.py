@@ -127,9 +127,12 @@ class Debugger:
                 em.add_field(name='Dependencies', value='{0} modules imported successfully\n {1} modules imported unsuccessfully'.format(loaded_modules, unloaded_modules), inline=False)
                 
                 cogs = self.bot.cogs
-                cog_folder = os.listdir('cogs')
-                cog_folder.remove('utils')
-                cog_folder.remove('__pycache__')
+                cogs_folder = os.listdir('cogs')
+                cog_folder = []
+                for x in cogs_folder:
+                    if x.endswith('.py'):
+                        cog_folder.append(x)
+                    
                 
                 loaded_cogs = 0
                 unloaded_cogs = 0
@@ -341,6 +344,7 @@ class Debugger:
     @commands.command(pass_context=True, aliases=['cc', 'clear', 'cleartrace'])
     async def clearconsole(self, ctx):
         """Clear the console of any errors or other messages."""
+        await self.bot.delete_message(ctx.message)
         for _ in range(100):
             print("")
         print('Logged in as')
@@ -350,6 +354,7 @@ class Debugger:
             pass
         print('User id:' + str(self.bot.user.id))
         print('------')
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Console Cleared')
 
 
 def setup(bot):
