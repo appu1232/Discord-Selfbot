@@ -145,12 +145,11 @@ class Debugger:
             await self.bot.send_message(ctx.message.channel, '``` %s ```'%format_exc())
 
     @commands.group(pass_context=True)
-    async def py(self, ctx):
+    async def py(self, ctx, *, msg):
         """Python interpreter. See the wiki for more info."""
 
         if ctx.invoked_subcommand is None:
-            pre = cmd_prefix_len()
-            code = ctx.message.content[2 + pre:].strip().strip('` ')
+            code = msg.strip().strip('` ')
 
             env = {
                 'bot': self.bot,
