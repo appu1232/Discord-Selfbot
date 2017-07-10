@@ -133,7 +133,7 @@ class Mal:
             em.set_thumbnail(url=selection.image)
             em.set_author(name=selection.title,
                           icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
-            em.set_footer(text='MyAnimeList')
+            em.set_footer(text='MyAnimeList Anime Search')
 
             await self.bot.send_message(ctx.message.channel, embed=em)
             await self.bot.delete_message(fetch)
@@ -206,7 +206,7 @@ class Mal:
             em.set_thumbnail(url=selection.image)
             em.set_author(name=selection.title,
                           icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
-            em.set_footer(text='MyAnimeList')
+            em.set_footer(text='MyAnimeList Manga Search')
 
             await self.bot.send_message(ctx.message.channel, embed=em)
             await self.bot.delete_message(fetch)
@@ -276,7 +276,7 @@ class Mal:
         em.set_image(url=selection.image)
         em.set_author(name=selection.name,
                       icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
-        em.set_footer(text='MyAnimeList')
+        em.set_footer(text='MyAnimeList Character Search')
         await self.bot.send_message(ctx.message.channel, content=None, embed=em)
         await self.bot.delete_message(fetch)
         await self.bot.delete_message(ctx.message)
@@ -393,7 +393,7 @@ class Mal:
             remaining = await self.get_remaining_time(anime)
         embed = discord.Embed(title=anime.title, color=0x0066CC)
         embed.add_field(name="Next Episode", value=remaining)
-        embed.set_footer(text='MyAnimeList Character Search')
+        embed.set_footer(text='MyAnimeList Episode Time Search')
         embed.set_author(name='MyAnimeList', icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
         embed.set_thumbnail(url=anime.image)
         await self.bot.delete_message(search)
