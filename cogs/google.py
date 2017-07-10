@@ -185,7 +185,8 @@ class Google:
             query = query[1:]
         else:
             item = 0
-        async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + "&searchType=image") as resp:
+        async with aiohttp.ClientSession() as session:
+    async with session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + "&searchType=image") as resp:
             if resp.status != 200:
                 if not config['google_api_key'] or not config['custom_search_engine']:
                     return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You don't seem to have image searching configured properly. Refer to the wiki for details.")
