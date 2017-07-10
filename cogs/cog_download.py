@@ -122,15 +122,25 @@ class CogDownloading:
         list = []
         for a in data:
             list.append(a.get("title"))
-        embed = discord.Embed(title="Available Cogs", description="")
+        installed = []
+        uninstalled = []
         for entry in list[2:]:
             entry = entry.rsplit(".")[0]
             if os.path.isfile("cogs/" + entry + ".py"):
-                embed.description += "\✅ `{}`\n".format(entry)
+                installed.append(entry)
             else:
-                embed.description += "\🆕 `{}`\n".format(entry)
-        embed.set_footer(text="To view information about a specific cog, do >cog view <cog>")
-        await self.bot.send_message(ctx.message.channel, content=parse_prefix(self.bot, "[b]Use `[c]install/uninstall <cog_name>` to manage your cogs."), embed=embed)
+                uninstalled.append(entry)
+        embed = discord.Embed(title="List of ASCII cogs")
+        if installed:
+            embed.add_field(name="Installed", value="\n".join(installed), inline=True)
+        else:
+            embed.add_field(name="Installed", value="None!", inline=True)
+        if uninstalled:
+            embed.add_field(name="Not installed", value="\n".join(uninstalled), inline=True)
+        else:
+            embed.add_field(name="Not installed", value="None!", inline=True)
+        embed.set_footer(text=">help cog for more information.")
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
         
     @cog.command(pass_context=True)
     async def view(self, ctx, cog):
