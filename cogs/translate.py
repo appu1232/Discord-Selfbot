@@ -1,5 +1,6 @@
 import requests
 import discord
+import json
 from urllib import parse
 from bs4 import BeautifulSoup
 from discord.ext import commands
