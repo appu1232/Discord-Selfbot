@@ -57,11 +57,13 @@ class Mal:
     async def mal(self, ctx):
         """Search MyAnimeList for an anime/manga. Ex: >mal anime Steins;Gate
         
-        Optionally, put [link] after the anime/manga part to just get the link instead of the full info.
-        Ex: >mal anime [link] Steins;Gate"""
+        For >mal anime and >mal manga, put [link] after the anime/manga part to just get the link instead of the full info.
+        Ex: >mal anime [link] Steins;Gate
+
+        For >mal va, put [more] to get some more info. (Takes more time) Ex: >mal va [more] saori hayami"""
         if ctx.invoked_subcommand is None:
             await self.bot.send_message(ctx.message.channel,
-                                       self.bot.bot_prefix + 'Invalid Syntax. Example use: ``>mal anime steins;gate`` or ``>mal manga boku no hero academia``')
+                                       self.bot.bot_prefix + 'Invalid Syntax. See `>help mal` for more info on how to use this command.')
 
 
 
@@ -243,6 +245,7 @@ class Mal:
 
     @mal.command(pass_context=True, alias=['character'])
     async def char(self, ctx, *, query):
+        """Finds specified character actor on MyAnimeList"""
         fetch = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Searching...')
         found, result = await self.google_results('character', query)
         if found:
@@ -280,6 +283,7 @@ class Mal:
 
     @mal.command(pass_context=True, alias=['actor', 'voiceactor', 'person', 'voice'])
     async def va(self, ctx, *, query):
+        """Finds specified voice actor on MyAnimeList"""
         if query.startswith('[more] '):
             query = query[7:]
             more_info = True
@@ -368,6 +372,7 @@ class Mal:
 
     @mal.command(pass_context=True, name="next")
     async def next_(self, ctx, *, query):
+        """Time till next episode air date for specified anime"""
         search = await self.bot.say(self.bot.bot_prefix + "Searching...")
         found, result = await self.google_results('anime', query)
         if found:
