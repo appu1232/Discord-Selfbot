@@ -735,7 +735,7 @@ class Misc:
                 try:
                     embed_color = opt['quoteembed_color']
                     if embed_color == "auto":
-                        em.color = result.author.roles[-1].color
+                        em.color = result.author.top_role.color
                     else:
                         em.color = int('0x' + embed_color, 16)
                 except:
