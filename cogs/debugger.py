@@ -164,6 +164,8 @@ class Debugger:
             result = await self.interpreter(env, code)
 
             os.chdir(os.getcwd())
+            with open('%s/cogs/utils/temp.txt' % os.getcwd(), 'w') as temp:
+                temp.write(ctx.message.content[2 + pre:].strip())
 
             await self.bot.send_message(ctx.message.channel, result)
 
