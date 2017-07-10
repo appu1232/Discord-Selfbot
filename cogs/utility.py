@@ -556,6 +556,9 @@ class Utility:
     @commands.command(pass_context=True)
     async def xkcd(self, ctx, *, comic=""):
         """Pull comics from xkcd."""
+        if comic == "random":
+            randcomic = requests.get("https://c.xkcd.com/random/comic/".format(comic))
+            comic = randcomic.url.split("/")[-2]
         site = requests.get("https://xkcd.com/{}/info.0.json".format(comic))
         if site.status_code == 404:
             site = None
