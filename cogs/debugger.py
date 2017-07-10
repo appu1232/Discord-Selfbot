@@ -128,6 +128,9 @@ class Debugger:
                 
                 cogs = self.bot.cogs
                 cog_folder = os.listdir('cogs')
+                cog_folder.remove('utils')
+                cog_folder.remove('__pycache__')
+                
                 loaded_cogs = 0
                 unloaded_cogs = 0
                 for x in cogs:
@@ -137,7 +140,7 @@ class Debugger:
                     else:
                         unloaded_cogs += 1
                         
-                em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(loaded_cogs, unloaded_cogs), inline=False)
+                em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(loaded_cogs, len(cog_folder)-loaded_cogs), inline=False)
 
                 user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 if sys.platform == 'linux':
