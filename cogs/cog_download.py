@@ -130,9 +130,9 @@ class CogDownloading:
             found_cog = response.json()
             filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
             if os.path.isfile("cogs/" + filename + ".py"):
-                installed.append(entry)
+                installed.append(entry.rsplit(".",1)[0])
             else:
-                uninstalled.append(entry)
+                uninstalled.append(entry.rsplit(".",1)[0])
         embed = discord.Embed(title="List of ASCII cogs")
         if installed:
             embed.add_field(name="Installed", value="\n".join(installed), inline=True)
