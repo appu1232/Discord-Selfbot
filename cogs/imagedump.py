@@ -20,22 +20,18 @@ class Imagedump:
 
     def check_images(self, message, images, type_of_items):
         if message.attachments:
-            for item in message.attachments:
-                if item['url'] != '' and item['url'] not in images:
-                    for i in type_of_items:
-                        if item['url'].endswith(i.strip()):
-                            yield item['url']
+            yield from (item['url'] for item in message.attachments if item['url'] != '' and item['url'] not in images
+                        for i in type_of_items if item['url'].endswith(i.strip()))
 
         if message.embeds:
-            for data in message.embeds:
-                try:
-                    url = data['thumbnail']['url']
-                    if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in images:
-                        for i in type_of_items:
-                            if url.endswith(i.strip()):
-                                yield url
-                except:
-                    pass
+            try:
+                yield from (data['thumbnail']['url'] for data in message.embeds
+                            if (data['thumbnail']['url'].endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm'))
+                                or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'})
+                            and data['thumbnail']['url'] not in images
+                            for i in type_of_items if data['thumbnail']['url'].endswith(i.strip()))
+            except:
+                pass
 
         urls = []
         try:
@@ -44,11 +40,9 @@ class Imagedump:
             pass
 
         if urls is not []:
-            for url in urls:
-                if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images:
-                    for i in type_of_items:
-                        if url.endswith(i.strip()):
-                            yield url
+            yield from (url for url in urls
+                        if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images
+                        for i in type_of_items if url.endswith(i.strip()))
 
     @commands.group(pass_context=True)
     async def imagedump(self, ctx):
