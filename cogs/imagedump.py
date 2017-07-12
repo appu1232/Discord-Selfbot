@@ -26,7 +26,7 @@ class Imagedump:
                         if item['url'].endswith(i.strip()):
                             yield item['url']
 
-        elif message.embeds:
+        if message.embeds:
             for data in message.embeds:
                 try:
                     url = data['thumbnail']['url']
@@ -37,19 +37,18 @@ class Imagedump:
                 except:
                     pass
 
-        else:
-            urls = []
-            try:
-                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
-            except:
-                pass
+        urls = []
+        try:
+            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content)
+        except:
+            pass
 
-            if urls is not []:
-                for url in urls:
-                    if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images:
-                        for i in type_of_items:
-                            if url.endswith(i.strip()):
-                                yield url
+        if urls is not []:
+            for url in urls:
+                if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images:
+                    for i in type_of_items:
+                        if url.endswith(i.strip()):
+                            yield url
 
     @commands.group(pass_context=True)
     async def imagedump(self, ctx):
