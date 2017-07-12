@@ -24,7 +24,7 @@ class Imagedump:
                 if item['url'] != '' and item['url'] not in images:
                     for i in type_of_items:
                         if item['url'].endswith(i.strip()):
-                            return item['url']
+                            yield item['url']
 
         elif message.embeds:
             for data in message.embeds:
@@ -33,7 +33,7 @@ class Imagedump:
                     if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in images:
                         for i in type_of_items:
                             if url.endswith(i.strip()):
-                                return url
+                                yield url
                 except:
                     pass
 
@@ -49,9 +49,7 @@ class Imagedump:
                     if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images:
                         for i in type_of_items:
                             if url.endswith(i.strip()):
-                                return url
-
-        return None
+                                yield url
 
     @commands.group(pass_context=True)
     async def imagedump(self, ctx):
@@ -267,13 +265,12 @@ class Imagedump:
                     print('Fetching last %s messages...' % str(limit-1))
                 async for message in self.bot.logs_from(channel, limit=limit, before=before, after=after):
                     if message.author == user or not user:
-                        url = self.check_images(message, images, type_of_items)
+                        for url in self.check_images(message, images, type_of_items):
+                            if url:
+                                images.append(url)
 
-                        if url:
-                            images.append(url)
-
-                        if len(images) == limit_images:
-                            break
+                            if len(images) == limit_images:
+                                break
 
                 with open('cogs/utils/urls{}.txt'.format(new_dump), 'w') as fp:
                     for url in images:
