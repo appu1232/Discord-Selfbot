@@ -72,7 +72,7 @@ goto run
 	echo[
 	echo[
 	FOR /f %%p in ('where python') do SET PYTHONPATH=%%p
-	echo Checking requirements...
+	echo Checking/Installing requirements (takes some time on first install)...
 	chcp 65001 >nul
 	set PYTHONIOENCODING=utf-8
 	python -m pip install --upgrade pip >nul
