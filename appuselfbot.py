@@ -439,7 +439,7 @@ async def on_message(message):
                     else:
                         title = '%s mentioned: %s' % (message.author.name, word)
                     if part == 1 and success is True:
-                        em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s>\n\n**Context:**' % (str(message.server), str(message.channel.id)))
+                        em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.server), str(message.channel.id), message.channel.name))
                         for i in range(0, int(bot.log_conf['context_len'])):
                             temp = context.pop()
                             if temp[0].clean_content:
@@ -471,9 +471,9 @@ async def on_message(message):
                         for b, i in enumerate(all_words):
                             if b == 0:
                                 if bot.notify['type'] == 'msg':
-                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s>\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), i), 'message', is_separate)
+                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s> | %s\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), message.channel.name, i), 'message', is_separate)
                                 elif bot.notify['type'] == 'ping':
-                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s>\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), i), 'message ping', is_separate)
+                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s> | %s\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), message.channel.name, i), 'message ping', is_separate)
                                 else:
                                     await bot.send_message(server.get_channel(location[0]), bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s>\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), i))
                             else:
