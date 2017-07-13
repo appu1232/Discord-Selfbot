@@ -3,7 +3,7 @@ import re
 import json
 from discord.ext import commands
 import discord
-from cogs.utils.checks import embed_perms, cmd_prefix_len
+from cogs.utils.checks import embed_perms, cmd_prefix_len, find_channel
 from pyfiglet import figlet_format
 import urllib.parse
 
