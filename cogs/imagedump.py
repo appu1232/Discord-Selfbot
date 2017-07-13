@@ -24,14 +24,21 @@ class Imagedump:
                         for i in type_of_items if item['url'].endswith(i.strip()))
 
         if message.embeds:
-            try:
-                yield from (data['thumbnail']['url'] for data in message.embeds
-                            if (data['thumbnail']['url'].endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm'))
-                                or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'})
-                            and data['thumbnail']['url'] not in images
-                            for i in type_of_items if data['thumbnail']['url'].endswith(i.strip()))
-            except:
-                pass
+            for data in message.embeds:
+                try:
+                    url = data['image']['url']
+                except KeyError:
+                    try:
+                        url = data['thumbnail']['url']
+                    except KeyError:
+                        continue
+
+                if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm'))
+                        or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in images:
+                    for i in type_of_items:
+                        if url.endswith(i.strip()):
+                            yield url
+
 
         urls = []
         try:
