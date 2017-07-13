@@ -49,6 +49,8 @@ class Debugger:
 
     def __init__(self, bot):
         self.bot = bot
+        self.stream = io.StringIO()
+        self.channel = None
 
     # Executes/evaluates code. Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
     async def interpreter(self, env, code):
@@ -356,7 +358,38 @@ class Debugger:
         print('User id:' + str(self.bot.user.id))
         print('------')
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Console Cleared')
+        
+    @commands.command(pass_context=True)
+    async def redirect(self, ctx):
+        """Redirect STDOUT and STDERR to a channel for debugging purposes."""
+        sys.stdout = self.stream
+        sys.stderr = self.stream
+        self.channel = ctx.message.channel
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully redirected STDOUT and STDERR to the current channel!")
+        
+    @commands.command(pass_context=True)
+    async def unredirect(self, ctx):
+        """Redirect STDOUT and STDERR back to the console for debugging purposes."""
+        sys.stdout = sys.__stdout__
+        sys.stdout = sys.__stderr__
+        self.channel = None
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully redirected STDOUT and STDERR back to the console!")
+        
+    async def redirection_clock(self):
+        await self.bot.wait_until_ready()
+        await self.bot.wait_until_login()
+        while self is self.bot.get_cog("Debugger"):
+            await asyncio.sleep(0.2)
+            stream_content = self.stream.getvalue()
+            if stream_content and self.channel:
+                await self.bot.send_message(self.channel, "```" + stream_content + "```")
+                self.stream = io.StringIO()
+                sys.stdout = self.stream
+                sys.stderr = self.stream
 
 
 def setup(bot):
-    bot.add_cog(Debugger(bot))
+    debug_cog = Debugger(bot)
+    loop = asyncio.get_event_loop()
+    loop.create_task(debug_cog.redirection_clock())
+    bot.add_cog(debug_cog)
