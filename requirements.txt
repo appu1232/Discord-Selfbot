@@ -8,7 +8,7 @@ discord.webhooks==0.0.3
 psutil==5.2.1
 PythonGists==1.1.3
 GitPython==2.1.3
-Pillow==4.1.1
+Pillow==4.2.1
 pyfiglet==0.7.5
 tokage==0.1.6.5
 pytz==2017.2
