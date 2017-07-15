@@ -160,7 +160,7 @@ class Google:
             card_node = root.find(".//div[@id='topstuff']")
             card = self.parse_google_card(card_node)
         except RuntimeError as e:
-            return await self.bot.send_message(ctx.message.channel, str(e))
+            await self.bot.send_message(ctx.message.channel, str(e))
         else:
             if card:
                 value = '\n'.join(entries[:2])
