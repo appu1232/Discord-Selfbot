@@ -28,6 +28,7 @@ class Translate:
             embed = discord.Embed(color=discord.Color.blue())
             embed.add_field(name="Original", value=msg, inline=False)
             embed.add_field(name="ROT13", value=codecs.encode(msg, "rot_13"), inline=False)
+            return await self.bot.send_message(ctx.message.channel, "", embed=embed)
         codes = requests.get("http://lyricly.tk/langs.json").text
         lang_codes = json.loads(codes)
         real_language = False
