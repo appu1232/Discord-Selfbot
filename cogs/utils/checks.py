@@ -4,13 +4,11 @@ import git
 import discord
 import os
 import aiohttp
-from urllib.parse import parse_qs, quote_plus, urlparse
 try:
     from lxml import etree
 except ImportError:
-    import cssselect
-    from lxml.html import fromstring
-    from requests import get
+    from bs4 import BeautifulSoup
+from urllib.parse import parse_qs, quote_plus
 #from cogs.utils import common
 
 
@@ -197,13 +195,16 @@ async def get_google_entries(query):
                     url = parse_qs(url[5:])['q'][0]
                     entries.append(url)
             except NameError:
-                page = fromstring(await resp.text())
-                for result in page.cssselect(".r a"):
-                    url = result.get("href")
-                    if url.startswith("/url?"):
-                        url = parse_qs(urlparse(url).query)['q']
-                    entries.append(url[0])
-                root = page
+                root = BeautifulSoup(await resp.text(), 'html.parser')
+                for result in root.find_all("div", class_='g'):
+                    url_node = result.find('h3')
+                    if url_node:
+                        for link in url_node.find_all('a', href=True):
+                            url = link['href']
+                            if not url.startswith('/url?'):
+                                continue
+                            url = parse_qs(url[5:])['q'][0]
+                            entries.append(url)
     return entries, root
 
 
