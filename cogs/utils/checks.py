@@ -4,8 +4,13 @@ import git
 import discord
 import os
 import aiohttp
-from urllib.parse import parse_qs, quote_plus
-from lxml import etree
+from urllib.parse import parse_qs, quote_plus, urlparse
+try:
+    from lxml import etree
+except ImportError:
+    import cssselect
+    from lxml.html import fromstring
+    from requests import get
 #from cogs.utils import common
 
 
@@ -179,23 +184,31 @@ async def get_google_entries(query):
                     result = json.loads(await resp.text())
                 return None, result['items'][0]['link']
 
-            root = etree.fromstring(await resp.text(), etree.HTMLParser())
-            search_nodes = root.findall(".//div[@class='g']")
-            for node in search_nodes:
-                url_node = node.find('.//h3/a')
-                if url_node is None:
-                    continue
-                url = url_node.attrib['href']
-                if not url.startswith('/url?'):
-                    continue
-                url = parse_qs(url[5:])['q'][0]
-                entries.append(url)
+            try:
+                root = etree.fromstring(await resp.text(), etree.HTMLParser())
+                search_nodes = root.findall(".//div[@class='g']")
+                for node in search_nodes:
+                    url_node = node.find('.//h3/a')
+                    if url_node is None:
+                        continue
+                    url = url_node.attrib['href']
+                    if not url.startswith('/url?'):
+                        continue
+                    url = parse_qs(url[5:])['q'][0]
+                    entries.append(url)
+            except NameError:
+                page = fromstring(await resp.text())
+                for result in page.cssselect(".r a"):
+                    url = result.get("href")
+                    if url.startswith("/url?"):
+                        url = parse_qs(urlparse(url).query)['q']
+                    entries.append(url[0])
+                root = page
     return entries, root
 
 
 def attach_perms(message):
     return message.author.permissions_in(message.channel).attach_files
-
 
 
 def parse_prefix(bot, text):

@@ -4,6 +4,7 @@ requests==2.12.4
 beautifulsoup4==4.5.3
 strawpy==1.1
 lxml==3.8.0
+cssselect==1.0.1
 discord.webhooks==0.0.3
 psutil==5.2.1
 PythonGists==1.1.3

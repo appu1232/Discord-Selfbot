@@ -154,12 +154,13 @@ class Google:
             async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
                 result = json.loads(await resp.text())
             return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
+
         try:
             entries, root = await get_google_entries(query)
             card_node = root.find(".//div[@id='topstuff']")
             card = self.parse_google_card(card_node)
         except RuntimeError as e:
-            await self.bot.send_message(ctx.message.channel, str(e))
+            return await self.bot.send_message(ctx.message.channel, str(e))
         else:
             if card:
                 value = '\n'.join(entries[:2])
