@@ -1,6 +1,7 @@
 import requests
 import discord
 import json
+import codecs
 from urllib import parse
 from bs4 import BeautifulSoup
 from discord.ext import commands
@@ -23,6 +24,10 @@ class Translate:
         The original language will be assumed automatically.
         """
         await self.bot.delete_message(ctx.message)
+        if to_language == "rot13":  # little easter egg
+            embed = discord.Embed(color=discord.Color.blue())
+            embed.add_field(name="Original", value=msg, inline=False)
+            embed.add_field(name="ROT13", value=codecs.encode(msg, "rot_13"), inline=False)
         codes = requests.get("http://lyricly.tk/langs.json").text
         lang_codes = json.loads(codes)
         real_language = False
