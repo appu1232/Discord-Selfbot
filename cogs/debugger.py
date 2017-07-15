@@ -327,6 +327,13 @@ class Debugger:
         try:
             self.bot.load_extension(msg)
         except Exception as e:
+            if type(e) == ModuleNotFoundError:
+                try:
+                    self.bot.load_extension("cogs." + msg)
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))
+                    return
+                except:
+                    pass
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Failed to load module: `{}`'.format(msg))
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
@@ -339,6 +346,13 @@ class Debugger:
         try:
             self.bot.unload_extension(msg)
         except Exception as e:
+            if type(e) == ModuleNotFoundError:
+                try:
+                    self.bot.unload_extension("cogs." + msg)
+                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Unloaded module: `{}`'.format(msg))
+                    return
+                except:
+                    pass
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Failed to unload module: `{}`'.format(msg))
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:

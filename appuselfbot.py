@@ -9,6 +9,7 @@ import gc
 import psutil
 import sys
 import re
+import traceback
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
 from discord_webhooks import Webhook
@@ -191,6 +192,20 @@ async def on_ready():
         with open('notifier.txt', 'w') as fp:
             fp.write(str(bot.subpro.pid))
 
+@bot.event            
+async def on_command_error(error, ctx):
+    if isinstance(error, commands.errors.CommandNotFound):
+        pass
+    elif isinstance(error, commands.errors.CheckFailure):
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + "You don't have permissions to use that command.")
+    elif isinstance(error, commands.errors.MissingRequiredArgument):
+        formatter = commands.formatter.HelpFormatter()
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + "You are missing required arguments.\n" + formatter.format_help_for(ctx, ctx.command)[0])
+    else:
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command. Check the console for details.".format(ctx.command.name))
+        print("Ignoring exception in command {}".format(ctx.command.name))
+        trace = traceback.format_exception(type(error), error, error.__traceback__)
+        print("".join(trace))
 
 @bot.command(pass_context=True, aliases=['reboot'])
 async def restart(ctx):
