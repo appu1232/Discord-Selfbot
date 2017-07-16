@@ -5,7 +5,7 @@ import discord
 import os
 import aiohttp
 try:
-    from lxml import etree
+    from lxml import etreef
 except ImportError:
     from bs4 import BeautifulSoup
 from urllib.parse import parse_qs, quote_plus
@@ -95,7 +95,6 @@ def avatar_time_check(bot, oldtime, interval):
 
 def update_bot(message):
     g = git.cmd.Git(working_dir=os.getcwd())
-    branch = g.execute(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     g.execute(["git", "fetch", "origin", "master"])
     update = g.execute(["git", "remote", "show", "origin"])
     if ('up to date' in update or 'fast-forward' in update) and message:

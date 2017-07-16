@@ -15,7 +15,7 @@ class Google:
         self.bot = bot
 
     def parse_google_card(self, node):
-        if node is None:
+        if node is None or type(node) is int:
             return None
 
         e = discord.Embed(colour=0x0057e7)

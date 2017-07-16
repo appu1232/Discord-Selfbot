@@ -68,10 +68,10 @@ class CogDownloading:
                 with open("settings/github.json", "r+") as fp:
                     opt = json.load(fp)
                     if opt['username'] != "":
-                        #try:
+                        try:
                             await self.githubUpload(opt['username'], opt['password'], opt['reponame'], coglink, filename)
-                        #except:
-                         #   await self.bot.send_message(ctx.message.channel, "Wrong GitHub account credentials")
+                        except:
+                            await self.bot.send_message(ctx.message.channel, "Wrong GitHub account credentials")
                 with open("cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
                 try:
