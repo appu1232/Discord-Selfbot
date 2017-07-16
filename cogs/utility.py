@@ -531,11 +531,8 @@ class Utility:
                 top_result = result["list"][int(number) - 1]
                 embed = discord.Embed(title=top_result["word"], description=top_result["definition"],
                                       url=top_result["permalink"])
-                try:
-                    if result["example"]:
-                        embed.add_field(name="Example:", value=top_result["example"])
-                except KeyError:
-                    pass
+                if top_result["example"]:
+                    embed.add_field(name="Example:", value=top_result["example"])
                 if result["tags"]:
                     embed.add_field(name="Tags:", value=" ".join(result["tags"]))
                 embed.set_author(name=top_result["author"],
