@@ -5,7 +5,7 @@ import discord
 import os
 import aiohttp
 try:
-    from lxml import etreef
+    from lxml import etree
 except ImportError:
     from bs4 import BeautifulSoup
 from urllib.parse import parse_qs, quote_plus
