@@ -7,6 +7,7 @@ import requests
 import json
 import discord
 import os
+from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.checks import embed_perms, cmd_prefix_len, attach_perms, find_channel
