@@ -1,0 +1,13 @@
+language: python
+python:
+  - "3.5.2"
+  - "3.6.1"
+install:
+  - pip install -r requirements.txt
+script:
+  - python -m compileall ./appuselfbot.py
+  - python -m compileall ./cogs
+  - python ./appuselfbot.py
+cache: pip
+notifications:
+  email: false
