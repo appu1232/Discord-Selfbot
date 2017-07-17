@@ -721,7 +721,6 @@ class Utility:
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You did not enter a valid URL.")
                 
-    
     @link.command(pass_context=True)
     async def lengthen(self, ctx, url):
         try:
@@ -732,6 +731,16 @@ class Utility:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "<{}>".format(requests.get(url).url))
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You did not enter a valid URL.")
+            
+    @commands.command(pass_context=True, aliases=['getcolor'])
+    async def getcolour(self, ctx, colour_code):
+        await self.bot.delete_message(ctx.message)
+        if not colour_code.startswith("#"):
+            colour_code = "#" + colour_code
+        image = Image.new("RGB", (200, 200), colour_code)
+        image.save("colour_file.png")
+        await self.bot.send_file(ctx.message.channel, "colour_file.png", content="Colour with hex code {}:".format(colour_code))
+        os.remove("colour_file.png")
 
 def setup(bot):
     bot.add_cog(Utility(bot))
