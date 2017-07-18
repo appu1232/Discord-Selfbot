@@ -7,7 +7,6 @@ install:
 script:
   - python -m compileall ./appuselfbot.py
   - python -m compileall ./cogs
-  - python ./appuselfbot.py
 cache: pip
 notifications:
   email: false
