@@ -131,20 +131,16 @@ class Debugger:
                 
                 cogs = self.bot.cogs
                 cogs_folder = os.listdir('cogs')
-                cog_folder = []
                 for x in cogs_folder:
-                    if x.endswith('.py'):
-                        cog_folder.append(x)
+                    if not x.endswith('.py'):
+                        cogs_folder.remove(x)
                     
                 
                 loaded_cogs = 0
-                unloaded_cogs = 0
                 for x in cogs:
                     x = self.bot.cogs[x].__module__[5:] + '.py'
-                    if x in cog_folder:
+                    if x in cogs_folder:
                         loaded_cogs += 1
-                    else:
-                        unloaded_cogs += 1
                         
                 em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(loaded_cogs, len(cog_folder)-loaded_cogs), inline=False)
 
