@@ -769,7 +769,7 @@ class Utility:
         if len(in_text) > 2000:
             while len(in_text) > 2000:
                 closest_delim = max([in_text.rfind(d, 0, 2000)
-                                     for d in delims])
+                                     for d in ['\n']])
                 closest_delim = closest_delim if closest_delim != -1 else 2000
                 to_send = in_text[:closest_delim]
                 await self.bot.say(to_send)
