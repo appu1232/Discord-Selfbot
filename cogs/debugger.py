@@ -142,7 +142,7 @@ class Debugger:
                     if x in cogs_folder:
                         loaded_cogs += 1
                         
-                em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(loaded_cogs, len(cog_folder)-loaded_cogs), inline=False)
+                em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(loaded_cogs, len(cogs_folder)-loaded_cogs), inline=False)
 
                 user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 if sys.platform == 'linux':
