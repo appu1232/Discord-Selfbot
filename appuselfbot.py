@@ -10,6 +10,8 @@ import psutil
 import sys
 import re
 import traceback
+import argparse
+from json import load, dump
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
 from discord_webhooks import Webhook
@@ -17,9 +19,23 @@ from cogs.utils.checks import *
 from cogs.utils.config import *
 from discord.ext import commands
 
+def parse_cmd_arguments(): # allows for arguments
+    parser = argparse.ArgumentParser(description="Discord-Selfbot")
+    parser.add_argument("--test-run", # test run flag for Travis
+                        action="store_true",
+                        help="Makes the bot quit before trying to log in")
+    return parser
+
+args = parse_cmd_arguments().parse_args()
+_test_run = args.test_run
+
+if _test_run:
+    print("Quitting: test run")
+    exit(0)
 
 try:
-    open('settings/config.json')
+    with open('settings/config.json', encoding='utf-8', mode="r") as f:
+        data = load(f) # checks if the settings file is valid json file
 except IOError:
     # setup wizard
     config = {}
@@ -40,8 +56,8 @@ except IOError:
     config["bot_identifier"] = input("| ").strip()
     input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nPress Enter to start the bot....\n")
     print("Starting up...")
-    with open('settings/config.json', 'w') as f:
-        json.dump(config, f, sort_keys=True, indent=4)
+    with open('settings/config.json', encoding='utf-8', mode="w") as f:
+        dump(config, f, sort_keys=True, indent=4)
 
 samples = os.listdir('settings')
 for f in samples:
@@ -192,7 +208,7 @@ async def on_ready():
         with open('notifier.txt', 'w') as fp:
             fp.write(str(bot.subpro.pid))
 
-@bot.event            
+@bot.event
 async def on_command_error(error, ctx):
     if isinstance(error, commands.errors.CommandNotFound):
         pass
