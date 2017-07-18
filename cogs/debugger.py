@@ -126,23 +126,21 @@ class Debugger:
                         loaded_modules += 1
                     except:
                         unloaded_modules += 1
-                
+
                 em.add_field(name='Dependencies', value='{0} modules imported successfully\n {1} modules imported unsuccessfully'.format(loaded_modules, unloaded_modules), inline=False)
-                
+
                 cogs = self.bot.cogs
                 cogs_folder = os.listdir('cogs')
                 for x in cogs_folder:
                     if not x.endswith('.py'):
                         cogs_folder.remove(x)
-                    
-                
-                loaded_cogs = 0
-                for x in cogs:
-                    x = self.bot.cogs[x].__module__[5:] + '.py'
-                    if x in cogs_folder:
-                        loaded_cogs += 1
-                        
-                em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(loaded_cogs, len(cogs_folder)-loaded_cogs), inline=False)
+
+                cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
+                loaded_cogs = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
+                unloaded_cogs = [c.split(".")[1] for c in cog_list
+                                 if c.split(".")[1] not in loaded_cogs]
+
+                em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(len(loaded_cogs), len(unloaded_cogs)), inline=False)
 
                 user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 if sys.platform == 'linux':
@@ -155,6 +153,45 @@ class Debugger:
                 await self.bot.send_message(ctx.message.channel, 'No permissions to embed debug info.')
         except:
             await self.bot.send_message(ctx.message.channel, '``` %s ```'%format_exc())
+
+    @commands.command()
+    async def cogs(self):
+        """Shows loaded/unloaded cogs"""
+
+        cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
+
+        loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
+        unloaded = [c.split(".")[1] for c in cog_list
+                    if c.split(".")[1] not in loaded]
+
+        loaded_formatted = []
+        for x in loaded:
+            loaded_formatted.append('+ {}'.format(x))
+
+        unloaded_formatted = []
+        if unloaded:
+            for x in unloaded:
+                unloaded_formatted.append('- {}'.format(x))
+        else:
+            unloaded_formatted = ['']
+
+        page_length=2000
+        escape=True
+        shorten_by=8
+
+        text = in_text = "```diff\nCogs:\n" + "\n".join(loaded_formatted) + "\n\n" + "\n".join(unloaded_formatted) + "```"
+        if len(in_text) > page_length:
+            while len(in_text) > page_length:
+                closest_delim = max([in_text.rfind(d, 0, page_length)
+                                     for d in delims])
+                closest_delim = closest_delim if closest_delim != -1 else page_length
+                to_send = in_text[:closest_delim]
+                await self.bot.say(to_send)
+                in_text = in_text[closest_delim:]
+        else:
+            await self.bot.say(text)
+
+
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def py(self, ctx, *, msg):
@@ -212,11 +249,11 @@ class Debugger:
         # Like in unix, the first parameter is the script name
         parameters = msg.split()
         save_file = parameters[0] # Force scope
-        if save_file.endswith('.txt'): 
+        if save_file.endswith('.txt'):
             save_file = save_file[:-(len('.txt'))] # Temptation to put '.txt' in a constant increases
         else:
             parameters[0] += '.txt' # The script name is always full
-        
+
         if not os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), save_file)):
             return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Could not find file ``%s.txt``' % save_file)
 
@@ -353,7 +390,7 @@ class Debugger:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Unloaded module: `{}`'.format(msg))
-        
+
     @commands.command(pass_context=True, aliases=['cc', 'clear', 'cleartrace'])
     async def clearconsole(self, ctx):
         """Clear the console of any errors or other messages."""
@@ -368,7 +405,7 @@ class Debugger:
         print('User id:' + str(self.bot.user.id))
         print('------')
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Console Cleared')
-        
+
     @commands.command(pass_context=True)
     async def redirect(self, ctx):
         """Redirect STDOUT and STDERR to a channel for debugging purposes."""
@@ -376,7 +413,7 @@ class Debugger:
         sys.stderr = self.stream
         self.channel = ctx.message.channel
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully redirected STDOUT and STDERR to the current channel!")
-        
+
     @commands.command(pass_context=True)
     async def unredirect(self, ctx):
         """Redirect STDOUT and STDERR back to the console for debugging purposes."""
@@ -384,7 +421,7 @@ class Debugger:
         sys.stdout = sys.__stderr__
         self.channel = None
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully redirected STDOUT and STDERR back to the console!")
-        
+
     async def redirection_clock(self):
         await self.bot.wait_until_ready()
         await self.bot.wait_until_login()
