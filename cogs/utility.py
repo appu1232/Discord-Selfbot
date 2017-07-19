@@ -744,38 +744,23 @@ class Utility:
         await self.bot.send_file(ctx.message.channel, "colour_file.png", content="Colour with hex code {}:".format(colour_code))
         os.remove("colour_file.png")
 
-    @commands.command()
-    async def cogs(self):
+    @commands.command(pass_context=True)
+    async def cogs(self, ctx):
         """Shows loaded/unloaded cogs"""
-
-        cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
-
+        await self.bot.delete_message(ctx.message)
+        cogs = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
         loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
-        unloaded = [c.split(".")[1] for c in cog_list
+        unloaded = [c.split(".")[1] for c in cogs
                     if c.split(".")[1] not in loaded]
-
-        loaded_formatted = []
-        for x in loaded:
-            loaded_formatted.append('+ {}'.format(x))
-
-        unloaded_formatted = []
+        embed = discord.Embed(title="List of installed cogs")
+        if loaded:
+            embed.add_field(name="Loaded", value="\n".join(loaded), inline=True)
+        else:
+            embed.add_field(name="Loaded", value="None!", inline=True)
         if unloaded:
-            for x in unloaded:
-                unloaded_formatted.append('- {}'.format(x))
+            embed.add_field(name="Not Loaded", value="\n".join(unloaded), inline=True)
         else:
-            unloaded_formatted = ['']
-
-        text = in_text = "```diff\nCogs:\n" + "\n".join(loaded_formatted) + "\n\n" + "\n".join(unloaded_formatted) + "```"
-        if len(in_text) > 2000:
-            while len(in_text) > 2000:
-                closest_delim = max([in_text.rfind(d, 0, 2000)
-                                     for d in ['\n']])
-                closest_delim = closest_delim if closest_delim != -1 else 2000
-                to_send = in_text[:closest_delim]
-                await self.bot.say(to_send)
-                in_text = in_text[closest_delim:]
-        else:
-            await self.bot.say(text)
-
+            embed.add_field(name="Not Loaded", value="None!", inline=True)
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
 def setup(bot):
     bot.add_cog(Utility(bot))
