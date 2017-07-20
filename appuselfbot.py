@@ -29,7 +29,7 @@ def parse_cmd_arguments(): # allows for arguments
                         help="Forces to run the Mac checks")
     parser.add_argument("--reset-config", # Allows for Testing of mac related code
                         action="store_true",
-                        help="Forces to run the Mac checks")
+                        help="Reruns the setup")
     return parser
 
 args = parse_cmd_arguments().parse_args()
