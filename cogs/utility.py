@@ -7,6 +7,7 @@ import requests
 import json
 import discord
 import os
+import glob
 from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
@@ -614,20 +615,20 @@ class Utility:
         else:
             embed = discord.Embed(title="Number of people playing {}".format(game), description=msg)
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
-            
+
     @commands.command(pass_context=True)
     async def animate(self, ctx, animation):
         """Play an animation from a text file. >help animate for more details.
         >animate <animation> - Animate a text file.
         Animation text files are stored in the anims folder. Each frame of animation is put on a new line.
-        
+
         An example text file looks like this:
         family
         fam ily
         fam i ly
         fam i love y
         fam i love you
-        
+
         You can additionally add a number to the top of the file to denote the delay between each frame. The default is 0.2 seconds.
         1
         fam
@@ -650,7 +651,7 @@ class Utility:
                 for frame in anim:
                     await asyncio.sleep(0.2)
                     await self.bot.edit_message(ctx.message, frame)
-                    
+
     @commands.command(pass_context=True)
     async def roles(self, ctx, *, user):
         """Check the roles of a user."""
@@ -670,7 +671,7 @@ class Utility:
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "That user has no roles!")
-            
+
     @commands.command(pass_context=True)
     async def messagedump(self, ctx, limit, filename, details="yes", reverse="no"):
         """Dump messages."""
@@ -696,13 +697,13 @@ class Utility:
                     async for message in self.bot.logs_from(ctx.message.channel, int(limit), reverse=True):
                         f.write(message.content.encode() + "\n".encode())
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Finished downloading!")
-        
+
     @commands.group(pass_context=True)
     async def link(self, ctx):
         await self.bot.delete_message(ctx.message)
         if ctx.invoked_subcommand is None:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Usage: `link <shorten/lengthen> <url>`")
-            
+
     @link.command(pass_context=True)
     async def shorten(self, ctx, url):
         try:
@@ -721,7 +722,7 @@ class Utility:
                 await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "There was an error shortening your URL.")
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You did not enter a valid URL.")
-                
+
     @link.command(pass_context=True)
     async def lengthen(self, ctx, url):
         try:
@@ -732,7 +733,7 @@ class Utility:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "<{}>".format(requests.get(url).url))
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You did not enter a valid URL.")
-            
+
     @commands.command(pass_context=True, aliases=['getcolor'])
     async def getcolour(self, ctx, colour_code):
         await self.bot.delete_message(ctx.message)
@@ -742,6 +743,84 @@ class Utility:
         image.save("colour_file.png")
         await self.bot.send_file(ctx.message.channel, "colour_file.png", content="Colour with hex code {}:".format(colour_code))
         os.remove("colour_file.png")
+        
+    @commands.has_permissions(add_reactions=True)
+    @commands.command(pass_context=True)
+    async def rpoll(self, ctx, *, msg):
+        """Create a poll using reactions. >help rpoll for more information.
+        >rpoll <question> | <answer> | <answer> - Create a poll. You may use as many answers as you want, placing a pipe | symbol in between them.
+        Example:
+        >rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
+        You can also use the "time" flag to set the amount of time in seconds the poll will last for.
+        Example:
+        >rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
+        """
+        await self.bot.delete_message(ctx.message)
+        options = msg.split(" | ")
+        time = [x for x in options if x.startswith("time=")]
+        if time: 
+            time = time[0]
+        if time:
+            options.remove(time)
+        if len(options) <= 1:
+            raise commands.errors.MissingRequiredArgument
+        if len(options) >= 11:
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "You must have 9 options or less.")
+        if time:
+            time = int(time.strip("time="))
+        else:
+            time = 30
+        emoji = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣']
+        to_react = []
+        confirmation_msg = "Poll for {}:\n\n".format(options[0])
+        for idx, option in enumerate(options[1:]):
+            confirmation_msg += "{} - {}\n".format(emoji[idx], option)
+            to_react.append(emoji[idx])
+        confirmation_msg += "\n\nYou have {} seconds to vote!".format(time)
+        poll_msg = await self.bot.send_message(ctx.message.channel, confirmation_msg)
+        for emote in to_react:
+            await self.bot.add_reaction(poll_msg, emote)
+        await asyncio.sleep(time)
+        async for message in self.bot.logs_from(ctx.message.channel):
+            if message.id == poll_msg.id:
+                poll_msg = message
+        results = {}
+        for reaction in poll_msg.reactions:
+            if reaction.emoji in to_react:
+                results[reaction.emoji] = reaction.count - 1
+        end_msg = "The poll is over. The results:\n\n"
+        for result in results:
+            end_msg += "{} {} - {} votes\n".format(result, options[emoji.index(result)+1], results[result])
+        top_result = max(results, key=lambda key: results[key])
+        if len([x for x in results if results[x] == results[top_result]]) > 1:
+            top_results = []
+            for key, value in results.items():
+                if value == results[top_result]:
+                    top_results.append(options[emoji.index(key)+1])
+            end_msg += "\nThe victory is tied between: {}".format(", ".join(top_results))
+        else:
+            top_result = options[emoji.index(top_result)+1]
+            end_msg += "\n{} is the winner!".format(top_result)
+        await self.bot.send_message(ctx.message.channel, end_msg)
 
+    @commands.command(pass_context=True)
+    async def cogs(self, ctx):
+        """Shows loaded/unloaded cogs"""
+        await self.bot.delete_message(ctx.message)
+        cogs = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
+        loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
+        unloaded = [c.split(".")[1] for c in cogs
+                    if c.split(".")[1] not in loaded]
+        embed = discord.Embed(title="List of installed cogs")
+        if loaded:
+            embed.add_field(name="Loaded", value="\n".join(loaded), inline=True)
+        else:
+            embed.add_field(name="Loaded", value="None!", inline=True)
+        if unloaded:
+            embed.add_field(name="Not Loaded", value="\n".join(unloaded), inline=True)
+        else:
+            embed.add_field(name="Not Loaded", value="None!", inline=True)
+        embed.set_footer(text="Were you looking for >cog?")
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
 def setup(bot):
     bot.add_cog(Utility(bot))

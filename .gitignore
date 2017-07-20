@@ -28,3 +28,4 @@ cogs/*
 !cogs/utility.py
 settings
 !settings/*.sample
+cogs/utils/temp.txt
