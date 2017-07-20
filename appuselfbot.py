@@ -24,19 +24,33 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("--test-run", # test run flag for Travis
                         action="store_true",
                         help="Makes the bot quit before trying to log in")
+    parser.add_argument("--force-mac", # Allows for Testing of mac related code
+                        action="store_true",
+                        help="Forces to run the Mac checks")
+    parser.add_argument("--reset-config", # Allows for Testing of mac related code
+                        action="store_true",
+                        help="Forces to run the Mac checks")
     return parser
 
 args = parse_cmd_arguments().parse_args()
 _test_run = args.test_run
+_force_mac = args.force_mac
+_reset_cfg = args.reset_config
+
 
 if _test_run:
     print("Quitting: test run")
     exit(0)
 
-try:
-    with open('settings/config.json', encoding='utf-8', mode="r") as f:
-        data = load(f) # checks if the settings file is valid json file
-except IOError:
+if sys.platform == 'darwin' or _force_mac:
+    if subprocess.getstatusoutput('brew')[0] == 1:
+        print('You do not have brew installed.\nThere are known issues with out of date binaries which can be updated using brew.\nFollow https://brew.sh to install brew.\n\nEnter \'I understand!\' to continue')
+        inp = input('>')
+        if inp != 'I understand!':
+            print('Exiting...')
+            sys.exit()
+
+def Wizard():
     # setup wizard
     config = {}
     print("Welcome to Appu's Discord Selfbot!\n")
@@ -58,6 +72,15 @@ except IOError:
     print("Starting up...")
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
         dump(config, f, sort_keys=True, indent=4)
+
+if _reset_cfg:
+    Wizard()
+else:       
+    try:
+        with open('settings/config.json', encoding='utf-8', mode="r") as f:
+            data = load(f) # checks if the settings file is valid json file
+    except IOError:
+        Wizard()
 
 samples = os.listdir('settings')
 for f in samples:
