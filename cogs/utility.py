@@ -812,24 +812,18 @@ class Utility:
         loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
         unloaded = [c.split(".")[1] for c in cog_list
                     if c.split(".")[1] not in loaded]
+        if not unloaded:
+            unloaded = ['None']
+        page_length=2000
+        escape=True
+        shorten_by=8
 
-        loaded_formatted = []
-        for x in loaded:
-            loaded_formatted.append('+ {}'.format(x))
-
-        unloaded_formatted = []
-        if unloaded:
-            for x in unloaded:
-                unloaded_formatted.append('- {}'.format(x))
-        else:
-            unloaded_formatted = ['']
-
-        text = in_text = "```diff\nCogs:\n" + "\n".join(loaded_formatted) + "\n\n" + "\n".join(unloaded_formatted) + "```"
-        if len(in_text) > 2000:
-            while len(in_text) > 2000:
-                closest_delim = max([in_text.rfind(d, 0, 2000)
-                                     for d in ['\n']])
-                closest_delim = closest_delim if closest_delim != -1 else 2000
+        text = in_text = "```diff\n+ Loaded\n" + ", ".join(loaded) + "\n\n- Unloaded\n" + ", ".join(unloaded) + "```"
+        if len(in_text) > page_length:
+            while len(in_text) > page_length:
+                closest_delim = max([in_text.rfind(d, 0, page_length)
+                                     for d in delims])
+                closest_delim = closest_delim if closest_delim != -1 else page_length
                 to_send = in_text[:closest_delim]
                 await self.bot.say(to_send)
                 in_text = in_text[closest_delim:]
