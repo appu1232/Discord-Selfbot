@@ -820,6 +820,7 @@ class Utility:
             embed.add_field(name="Not Loaded", value="\n".join(unloaded), inline=True)
         else:
             embed.add_field(name="Not Loaded", value="None!", inline=True)
+        embed.set_footer(text="Were you looking for >cog?")
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
 def setup(bot):
     bot.add_cog(Utility(bot))
