@@ -1,1 +1,0 @@
-subprocess.call(['git', 'pull'])

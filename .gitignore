@@ -26,3 +26,4 @@ cogs/*
 !cogs/translate.py
 !cogs/userinfo.py
 !cogs/utility.py
+cogs/utils/temp.txt
