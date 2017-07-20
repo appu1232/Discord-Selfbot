@@ -1,5 +1,6 @@
 from json import load, dump, decoder
 from os import replace
+from random import randint
 
 class DataIO():
 
