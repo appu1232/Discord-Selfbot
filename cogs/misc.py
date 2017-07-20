@@ -352,6 +352,13 @@ class Misc:
     @commands.command(pass_context=True)
     async def embedcolor(self, ctx, *, color: str = None):
         """Set color (hex) of a embeds. Ex: >embedcolor 000000"""
+        if color == 'auto':
+            color = str(ctx.message.author.top_role.color)[1:]
+        
+        if not color.isdigit() or len(color) != 6:
+            await self.bot.send_message(ctx.message.channel, 'Color needs to be 6 numbers\ne.g. `012345`')
+            return
+            
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
             if color:

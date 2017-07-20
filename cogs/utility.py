@@ -822,5 +822,25 @@ class Utility:
             embed.add_field(name="Not Loaded", value="None!", inline=True)
         embed.set_footer(text="Were you looking for >cog?")
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
+        
+    @commands.command(pass_context=True)
+    async def cleartrace(self, ctx):
+        """Shows loaded/unloaded cogs"""
+        if os.name == 'nt':
+            os.system('cls')
+        else:
+            try:
+                os.system('clear')
+            except:
+                await self.bot.say('Could not clear console.')
+                
+        print('Logged in as')
+        try:
+            print(bot.user.name)
+        except:
+            pass
+        print('User id:' + str(bot.user.id))
+        print('------')
+        
 def setup(bot):
     bot.add_cog(Utility(bot))
