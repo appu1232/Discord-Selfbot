@@ -803,32 +803,23 @@ class Utility:
             end_msg += "\n{} is the winner!".format(top_result)
         await self.bot.send_message(ctx.message.channel, end_msg)
 
-    @commands.command()
-    async def cogs(self):
+    @commands.command(pass_context=True)
+    async def cogs(self, ctx):
         """Shows loaded/unloaded cogs"""
-
-        cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
-
+        await self.bot.delete_message(ctx.message)
+        cogs = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
         loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
-        unloaded = [c.split(".")[1] for c in cog_list
+        unloaded = [c.split(".")[1] for c in cogs
                     if c.split(".")[1] not in loaded]
-        if not unloaded:
-            unloaded = ['None']
-        page_length=2000
-        escape=True
-        shorten_by=8
-
-        text = in_text = "```diff\n+ Loaded\n" + ", ".join(loaded) + "\n\n- Unloaded\n" + ", ".join(unloaded) + "```"
-        if len(in_text) > page_length:
-            while len(in_text) > page_length:
-                closest_delim = max([in_text.rfind(d, 0, page_length)
-                                     for d in delims])
-                closest_delim = closest_delim if closest_delim != -1 else page_length
-                to_send = in_text[:closest_delim]
-                await self.bot.say(to_send)
-                in_text = in_text[closest_delim:]
+        embed = discord.Embed(title="List of installed cogs")
+        if loaded:
+            embed.add_field(name="Loaded", value="\n".join(loaded), inline=True)
         else:
-            await self.bot.say(text)
-
+            embed.add_field(name="Loaded", value="None!", inline=True)
+        if unloaded:
+            embed.add_field(name="Not Loaded", value="\n".join(unloaded), inline=True)
+        else:
+            embed.add_field(name="Not Loaded", value="None!", inline=True)
+        await self.bot.send_message(ctx.message.channel, "", embed=embed)
 def setup(bot):
     bot.add_cog(Utility(bot))
