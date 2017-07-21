@@ -13,8 +13,6 @@ import traceback
 import argparse
 import os
 import ctypes
-import logging
-import logging.handlers
 from json import load, dump
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
@@ -34,16 +32,12 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("--reset-config", # Allows for Testing of mac related code
                         action="store_true",
                         help="Reruns the setup")
-    parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
-                        action="store_true",
-                        help="Supresses all errors")
     return parser
 
 args = parse_cmd_arguments().parse_args()
 _test_run = args.test_run
 _force_mac = args.force_mac
 _reset_cfg = args.reset_config
-_silent = args.silent
 
 
 if _test_run:
@@ -60,9 +54,6 @@ if sys.platform == 'darwin' or _force_mac:
 
 def Wizard():
     # setup wizard
-    if _silent:
-        print('Not starting Wizard in silent mode.\nConfigure your config.json by hand')
-        exit(0)
     config = {}
     print("Welcome to Appu's Discord Selfbot!\n")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
@@ -114,30 +105,6 @@ if not get_config_value('config', 'run_as_superuser'):
 
 if shutdown == True:
     exit(0)
-
-
-def set_log():
-    errformat = logging.Formatter(
-        '%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: '
-        '%(message)s',
-        datefmt="[%d/%m/%Y %H:%M]")
-
-    logger = logging.getLogger("red")
-    logger.setLevel(logging.INFO)
-    stdout_handler = logging.StreamHandler(sys.stdout)
-    stdout_handler.setLevel(logging.INFO)
-
-    errhandler = logging.handlers.RotatingFileHandler(
-        filename='settings/bot.log', encoding='utf-8', mode='a',
-        maxBytes=10**7, backupCount=5)
-    errhandler.setFormatter(errformat)
-
-    logger.addHandler(errhandler)
-    logger.addHandler(stdout_handler)
-
-    return logger
-
-logger = set_log()
 
 samples = os.listdir('settings')
 for f in samples:
@@ -302,13 +269,10 @@ async def on_command_error(error, ctx):
         formatter = commands.formatter.HelpFormatter()
         await bot.send_message(ctx.message.channel, bot.bot_prefix + "You are missing required arguments.\n" + formatter.format_help_for(ctx, ctx.command)[0])
     else:
-        if _silent:
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command.".format(ctx.command.name))
-        else:
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command. Check the console for details.".format(ctx.command.name))
-            print("Ignoring exception in command {}".format(ctx.command.name))
-            trace = traceback.format_exception(type(error), error, error.__traceback__)
-            print("".join(trace))
+        await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command. Check the console for details.".format(ctx.command.name))
+        print("Ignoring exception in command {}".format(ctx.command.name))
+        trace = traceback.format_exception(type(error), error, error.__traceback__)
+        print("".join(trace))
 
 @bot.command(pass_context=True, aliases=['reboot'])
 async def restart(ctx):
