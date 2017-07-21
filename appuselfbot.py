@@ -13,6 +13,8 @@ import traceback
 import argparse
 import os
 import ctypes
+import logging
+import logging.handlers
 from json import load, dump
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
@@ -32,12 +34,16 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("--reset-config", # Allows for Testing of mac related code
                         action="store_true",
                         help="Reruns the setup")
+    parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
+                        action="store_true",
+                        help="Supresses all errors")
     return parser
 
 args = parse_cmd_arguments().parse_args()
 _test_run = args.test_run
 _force_mac = args.force_mac
 _reset_cfg = args.reset_config
+_silent = args.silent
 
 
 if _test_run:
@@ -106,11 +112,34 @@ if not get_config_value('config', 'run_as_superuser'):
 if shutdown == True:
     exit(0)
 
+def set_log():
+    errformat = logging.Formatter(
+        '%(asctime)s %(levelname)s %(module)s %(funcName)s %(lineno)d: '
+        '%(message)s',
+        datefmt="[%d/%m/%Y %H:%M]")
+
+    logger = logging.getLogger("red")
+    logger.setLevel(logging.INFO)
+    stdout_handler = logging.StreamHandler(sys.stdout)
+    stdout_handler.setLevel(logging.INFO)
+
+    errhandler = logging.handlers.RotatingFileHandler(
+        filename='settings/bot.log', encoding='utf-8', mode='a',
+        maxBytes=10**7, backupCount=5)
+    errhandler.setFormatter(errformat)
+
+    logger.addHandler(errhandler)
+    logger.addHandler(stdout_handler)
+
+    return logger
+
+logger = set_log()
+
 samples = os.listdir('settings')
 for f in samples:
     if f.endswith('sample') and f[:-7] not in samples:
-        with open('settings/%s' % f) as template:
-            with open('settings/%s' % f[:-7], 'w') as g:
+        with open('settings/%s' % f, 'r', encoding="utf8") as template:
+            with open('settings/%s' % f[:-7], 'w', encoding="utf8") as g:
                 fields = json.load(template)
                 json.dump(fields, g, sort_keys=True, indent=4)
 
@@ -118,9 +147,9 @@ for f in samples:
 bot = commands.Bot(command_prefix=get_config_value('config', 'cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
 
 if __name__ == "__main__":
-    bot._runs_in_loop = False
+    _runs_in_loop = False
 else:
-    bot._runs_in_loop = True
+    _runs_in_loop = True
 
 bot.bot_prefix = get_config_value('config', 'bot_identifier')
 if bot.bot_prefix != '':
@@ -149,13 +178,13 @@ async def on_ready():
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
     bot.notify = load_notify_config()
     if not os.path.isfile('settings/ignored.json'):
-        with open('settings/ignored.json', 'w') as fp:
+        with open('settings/ignored.json', 'w', encoding="utf8") as fp:
             json.dump({'servers': []}, fp, indent=4)
-    with open('settings/ignored.json') as fp:
+    with open('settings/ignored.json', encoding="utf8") as fp:
         bot.ignored_servers = json.load(fp)
 
     if os.path.isfile('restart.txt'):
-        with open('restart.txt', 'r') as re:
+        with open('restart.txt', 'r', encoding="utf8") as re:
             channel = bot.get_channel(re.readline())
             print('Bot has restarted.')
             await bot.send_message(channel, bot.bot_prefix + 'Bot has restarted.')
@@ -164,7 +193,7 @@ async def on_ready():
     bot.key_users = bot.log_conf['keyusers']
 
     if os.path.isfile('settings/games.json'):
-        with open('settings/games.json', 'r+') as g:
+        with open('settings/games.json', 'r+', encoding="utf8") as g:
             games = json.load(g)
             if type(games['games']) is list:
                 bot.game = games['games'][0]
@@ -181,11 +210,11 @@ async def on_ready():
 
     # Dealing with old versions updating
     if not os.path.isfile('settings/moderation.json'):
-        with open('settings/moderation.json', 'w') as m:
+        with open('settings/moderation.json', 'w', encoding="utf8") as m:
             mod = {}
             json.dump(mod, m, indent=4)
     if not os.path.isfile('settings/todo.json'):
-        with open('settings/todo.json', 'w') as t:
+        with open('settings/todo.json', 'w', encoding="utf8") as t:
             todo = {}
             json.dump(todo, t, indent=4)
 
@@ -194,9 +223,9 @@ async def on_ready():
     if not os.path.exists('avatars'):
         os.makedirs('avatars')
     if not os.path.isfile('settings/avatars.json'):
-        with open('settings/avatars.json', 'w') as avis:
+        with open('settings/avatars.json', 'w', encoding="utf8") as avis:
             json.dump({'password': '', 'interval': '0', 'type': 'random'}, avis, indent=4)
-    with open('settings/avatars.json', 'r') as g:
+    with open('settings/avatars.json', 'r', encoding="utf8") as g:
         avatars = json.load(g)
     bot.avatar_interval = avatars['interval']
     if os.listdir('avatars') and avatars['interval'] != '0':
@@ -207,9 +236,9 @@ async def on_ready():
     if not os.path.isfile('settings/optional_config.json'):
         conf = load_config()
         o_conf = {'google_api_key': conf['google_api_key'], 'custom_search_engine': conf['custom_search_engine'], 'mal_username': conf['mal_username'], 'mal_password': conf['mal_password']}
-        with open('settings/optional_config.json', 'w') as oc:
+        with open('settings/optional_config.json', 'w', encoding="utf8") as oc:
             json.dump(o_conf, oc, indent=4)
-    with open('settings/optional_config.json', 'r+') as fp:
+    with open('settings/optional_config.json', 'r+', encoding="utf8") as fp:
         opt = json.load(fp)
         if 'embed_color' not in opt:
             opt['embed_color'] = ''
@@ -230,10 +259,10 @@ async def on_ready():
         json.dump(opt, fp, indent=4)
 
     if not os.path.isfile('settings/github.json'):
-        with open('settings/github.json', 'w') as fp:
+        with open('settings/github.json', 'w', encoding="utf8") as fp:
             git = {}
             json.dump(git, fp, indent=4)
-    with open('settings/github.json', 'r+') as fp:
+    with open('settings/github.json', 'r+', encoding="utf8") as fp:
         opt = json.load(fp)
         if 'username' not in opt:
             opt['username'] = ''
@@ -248,7 +277,7 @@ async def on_ready():
     notif = load_notify_config()
     if notif['type'] == 'dm':
         if os.path.exists('notifier.txt'):
-            pid = open('notifier.txt', 'r').read()
+            pid = open('notifier.txt', 'r', encoding="utf8").read()
             try:
                 p = psutil.Process(int(pid))
                 p.kill()
@@ -256,7 +285,7 @@ async def on_ready():
                 pass
             os.remove('notifier.txt')
         bot.subpro = subprocess.Popen([sys.executable, 'cogs/utils/notify.py'])
-        with open('notifier.txt', 'w') as fp:
+        with open('notifier.txt', 'w', encoding="utf8") as fp:
             fp.write(str(bot.subpro.pid))
 
 @bot.event
@@ -269,10 +298,13 @@ async def on_command_error(error, ctx):
         formatter = commands.formatter.HelpFormatter()
         await bot.send_message(ctx.message.channel, bot.bot_prefix + "You are missing required arguments.\n" + formatter.format_help_for(ctx, ctx.command)[0])
     else:
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command. Check the console for details.".format(ctx.command.name))
-        print("Ignoring exception in command {}".format(ctx.command.name))
-        trace = traceback.format_exception(type(error), error, error.__traceback__)
-        print("".join(trace))
+        if _silent:
+            await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command.".format(ctx.command.name))
+        else:
+            await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command. Check the console for details.".format(ctx.command.name))
+            print("Ignoring exception in command {}".format(ctx.command.name))
+            trace = traceback.format_exception(type(error), error, error.__traceback__)
+            print("".join(trace))
 
 @bot.command(pass_context=True, aliases=['reboot'])
 async def restart(ctx):
@@ -287,21 +319,21 @@ async def restart(ctx):
     if latest:
         await bot.send_message(ctx.message.channel, bot.bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
         reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
-        with open('restart.txt', 'w') as re:
+        with open('restart.txt', 'w', encoding="utf8") as re:
             re.write(str(ctx.message.channel.id))
         if not reply or reply.content.lower().strip() == 'n':
             print('Restarting...')
             await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Restarting...')
         else:
             await bot.send_message(ctx.message.channel, content=None, embed=latest)
-            with open('quit.txt', 'w') as q:
+            with open('quit.txt', 'w', encoding="utf8") as q:
                 q.write('update')
             print('Downloading update and restarting...')
             await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Downloading update and restarting (check your console to see the progress)...')
 
     else:
         print('Restarting...')
-        with open('restart.txt', 'w') as re:
+        with open('restart.txt', 'w', encoding="utf8") as re:
             re.write(str(ctx.message.channel.id))
         await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Restarting...')
 
@@ -325,9 +357,9 @@ async def update(ctx, msg: str = None):
         else:
             await bot.send_message(ctx.message.channel, content=None, embed=latest)
             return
-        with open('quit.txt', 'w') as q:
+        with open('quit.txt', 'w', encoding="utf8") as q:
             q.write('update')
-        with open('restart.txt', 'w') as re:
+        with open('restart.txt', 'w', encoding="utf8") as re:
             re.write(str(ctx.message.channel.id))
         if bot.subpro:
             bot.subpro.kill()
@@ -342,7 +374,7 @@ async def quit(ctx):
     print('Bot exiting...')
     if bot.subpro:
         bot.subpro.kill()
-    open('quit.txt', 'a').close()
+    open('quit.txt', 'a', encoding="utf8").close()
     await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Bot shut down.')
     os._exit(0)
 
@@ -620,7 +652,7 @@ async def game_and_avatar(bot):
             if bot.game:
                 if bot.game_interval:
                     if game_time_check(bot, bot.game_time, bot.game_interval):
-                        with open('settings/games.json') as g:
+                        with open('settings/games.json', encoding="utf8") as g:
                             games = json.load(g)
                         if games['type'] == 'random':
                             while next_game == current_game:
@@ -648,7 +680,7 @@ async def game_and_avatar(bot):
 
                 else:
                     if game_time_check(bot, bot.game_time, 180):
-                        with open('settings/games.json') as g:
+                        with open('settings/games.json', encoding="utf8") as g:
                             games = json.load(g)
 
                         bot.game = games['games']
@@ -663,7 +695,7 @@ async def game_and_avatar(bot):
             if bot.avatar:
                 if bot.avatar_interval:
                     if avatar_time_check(bot, bot.avatar_time, bot.avatar_interval):
-                        with open('settings/avatars.json') as g:
+                        with open('settings/avatars.json', encoding="utf8") as g:
                             avi_config = json.load(g)
                         all_avis = glob.glob('avatars/*.jpg')
                         all_avis.extend(glob.glob('avatars/*.jpeg'))
@@ -675,7 +707,7 @@ async def game_and_avatar(bot):
                                 next_avatar = random.randint(0, len(all_avis) - 1)
                             current_avatar = next_avatar
                             bot.avatar = all_avis[next_avatar]
-                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
+                            with open('avatars/%s' % bot.avatar, 'rb', encoding="utf8") as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
                         else:
                             if next_avatar + 1 == len(all_avis):
@@ -683,7 +715,7 @@ async def game_and_avatar(bot):
                             else:
                                 next_avatar += 1
                             bot.avatar = all_avis[next_avatar]
-                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
+                            with open('avatars/%s' % bot.avatar, 'rb', encoding="utf8") as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
 
         # Sets status to default status when user goes offline (client status takes priority when user is online)
@@ -727,7 +759,7 @@ if __name__ == '__main__':
             print("Paste the contents of that entry below.")
             print("-------------------------------------------------------------")
             token = input("| ").strip('"')
-            with open("settings/config.json", "r+") as fp:
+            with open("settings/config.json", "r+", encoding="utf8") as fp:
                 config = json.load(fp)
                 config["token"] = token
                 fp.seek(0)
