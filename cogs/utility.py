@@ -823,7 +823,7 @@ class Utility:
         embed.set_footer(text="Were you looking for >cog?")
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['clearconsole','cc','clear'])
     async def cleartrace(self, ctx):
         """Shows loaded/unloaded cogs"""
         if os.name == 'nt':
