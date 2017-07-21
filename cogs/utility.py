@@ -743,7 +743,7 @@ class Utility:
         image.save("colour_file.png")
         await self.bot.send_file(ctx.message.channel, "colour_file.png", content="Colour with hex code {}:".format(colour_code))
         os.remove("colour_file.png")
-        
+
     @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True)
     async def rpoll(self, ctx, *, msg):
@@ -758,7 +758,7 @@ class Utility:
         await self.bot.delete_message(ctx.message)
         options = msg.split(" | ")
         time = [x for x in options if x.startswith("time=")]
-        if time: 
+        if time:
             time = time[0]
         if time:
             options.remove(time)
@@ -822,7 +822,7 @@ class Utility:
             embed.add_field(name="Not Loaded", value="None!", inline=True)
         embed.set_footer(text="Were you looking for >cog?")
         await self.bot.send_message(ctx.message.channel, "", embed=embed)
-        
+
     @commands.command(pass_context=True)
     async def cleartrace(self, ctx):
         """Shows loaded/unloaded cogs"""
@@ -832,8 +832,8 @@ class Utility:
             try:
                 os.system('clear')
             except:
-                await self.bot.say('Could not clear console.')
-                
+                await self.bot.say('Could not clear console, continuing anyways')
+
         print('Logged in as')
         try:
             print(bot.user.name)
@@ -841,6 +841,7 @@ class Utility:
             pass
         print('User id:' + str(bot.user.id))
         print('------')
-        
+        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Console Cleared')
+
 def setup(bot):
     bot.add_cog(Utility(bot))
