@@ -1,6 +1,6 @@
 # Discord Selfbot
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FFDATZ8NFFV6Y) [<img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square">](https://github.com/appu1232/Discord-Selfbot/blob/master/LICENSE.txt)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FFDATZ8NFFV6Y) [<img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square">](https://github.com/appu1232/Discord-Selfbot/blob/master/LICENSE.txt) [![Build Status](https://travis-ci.org/appu1232/Discord-Selfbot.svg?branch=master)](https://travis-ci.org/appu1232/Discord-Selfbot)
 
 Come join the dedicated server for this bot! Ask questions, give suggestions, get help, or just hang out. Don't be shy, we don't bite:
 
