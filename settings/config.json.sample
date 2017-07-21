@@ -2,5 +2,6 @@
   "token": "",
   "cmd_prefix": ">",
   "customcmd_prefix": ".",
-  "bot_identifier": ":robot:"
+  "bot_identifier": ":robot:",
+  "run_as_superuser": False
 }

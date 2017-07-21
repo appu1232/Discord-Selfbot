@@ -11,6 +11,8 @@ import sys
 import re
 import traceback
 import argparse
+import os
+import ctypes
 from json import load, dump
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
@@ -48,7 +50,7 @@ if sys.platform == 'darwin' or _force_mac:
         inp = input('>')
         if inp != 'I understand!':
             print('Exiting...')
-            sys.exit()
+            exit(0)
 
 def Wizard():
     # setup wizard
@@ -69,18 +71,40 @@ def Wizard():
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
     input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nPress Enter to start the bot....\n")
+    config["run_as_superuser"] = False
     print("Starting up...")
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
         dump(config, f, sort_keys=True, indent=4)
 
 if _reset_cfg:
     Wizard()
-else:       
+else:
     try:
         with open('settings/config.json', encoding='utf-8', mode="r") as f:
             data = load(f) # checks if the settings file is valid json file
     except IOError:
         Wizard()
+
+shutdown = False
+if not get_config_value('config', 'run_as_superuser'):
+    if os.name == 'nt':
+        try:
+            if ctypes.windll.shell32.IsUserAnAdmin() != 0:
+                print('Do not run the Bot as Administrator')
+                shutdown = True
+        except:
+            pass
+    else:
+        try:
+            if os.getuid() == 0:
+                print('Do not run the Bot with sudo or as root')
+                shutdown = True
+        except:
+            pass
+
+
+if shutdown == True:
+    exit(0)
 
 samples = os.listdir('settings')
 for f in samples:
@@ -93,6 +117,10 @@ for f in samples:
 
 bot = commands.Bot(command_prefix=get_config_value('config', 'cmd_prefix'), description='''Selfbot by appu1232''', self_bot=True)
 
+if __name__ == "__main__":
+    bot._runs_in_loop = False
+else:
+    bot._runs_in_loop = True
 
 bot.bot_prefix = get_config_value('config', 'bot_identifier')
 if bot.bot_prefix != '':
