@@ -10,7 +10,7 @@ class Replacements:
 
     def __init__(self, bot):
         self.bot = bot
-        with open("settings/replacements.json") as f:
+        with open("settings/replacements.json", encoding='utf-8') as f:
             self.replacement_dict = json.load(f)
 
     @commands.command(pass_context=True)
