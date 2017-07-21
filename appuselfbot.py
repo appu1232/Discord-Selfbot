@@ -24,10 +24,10 @@ from cogs.utils.config import *
 from discord.ext import commands
 
 def parse_cmd_arguments(): # allows for arguments
-    parser = argparse.ArgumentParser(description="Discord-Selfbot")
-    parser.add_argument("--test-run", # test run flag for Travis
-                        action="store_true",
-                        help="Makes the bot quit before trying to log in")
+parser = argparse.ArgumentParser(description="Discord-Selfbot")
+parser.add_argument("-test", "--test-run", # test run flag for Travis
+                    action="store_true",
+                    help="Makes the bot quit before trying to log in")
     parser.add_argument("--force-mac", # Allows for Testing of mac related code
                         action="store_true",
                         help="Forces to run the Mac checks")
@@ -47,6 +47,17 @@ _silent = args.silent
 
 
 if _test_run:
+    try:
+        samples = os.listdir('settings') # generating the config files from sample while building
+        for f in samples:
+            if f.endswith('sample') and f[:-7] not in samples:
+                with open('settings/%s' % f, 'r', encoding="utf8") as template:
+                    with open('settings/%s' % f[:-7], 'w', encoding="utf8") as g:
+                        fields = json.load(template)
+                        json.dump(fields, g, sort_keys=True, indent=4)
+    except:
+        pass
+
     print("Quitting: test run")
     exit(0)
 
@@ -60,6 +71,9 @@ if sys.platform == 'darwin' or _force_mac:
 
 def Wizard():
     # setup wizard
+    if _silent:
+        print('Cannot use setup Wizard becaue of silent mode')
+        exit(0)
     config = {}
     print("Welcome to Appu's Discord Selfbot!\n")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
@@ -753,6 +767,9 @@ if __name__ == '__main__':
             except (KeyError, discord.errors.LoginFailure):
                 bot.run(os.environ['TOKEN'], bot=False)
         except (KeyError, discord.errors.LoginFailure):
+            if _silent:
+                print('Cannot use setup Wizard becaue of silent mode')
+                exit(0)
             print("It seems the token you entered is incorrect or has changed. If you changed your password or enabled/disabled 2fa, your token will change. Grab your new token. Here's how you do it:\n")
             print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
             print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
