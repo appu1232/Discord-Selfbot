@@ -1,44 +1,61 @@
-from json import load, dump, decoder
-from os import replace
 from random import randint
+from json import decoder, dump, load
+from os import replace
 
 class DataIO():
 
     def save_json(self, filename, data):
         """Atomically saves json file"""
-        rnd = randint(1000, 9999)
         path, ext = splitext(filename)
-        tmp_file = "{}-{}.tmp".format(path, rnd)
-        with open(tmp_file, encoding='utf-8', mode="w") as f:
-            dump(data, f, indent=4,sort_keys=True,
-                separators=(',',' : '))
+        tmp_file = "{}.{}.tmp".format(path, randint(1000, 9999))
+        with open(tmp_file, 'w', encoding='utf-8') as f:
+            dump(data, f, indent=4,sort_keys=True,separators=(',',' : '))
         try:
-            with open(tmp_file, encoding='utf-8', mode="r") as f:
+            with open(tmp_file, 'r', encoding='utf-8') as f:
                 data = load(f)
         except decoder.JSONDecodeError:
-            self.logger.exception("Attempted to write file {} but JSON "
+            print("Attempted to write file {} but JSON "
                                   "integrity check on tmp file has failed. "
                                   "The original file is unaltered."
                                   "".format(filename))
             return False
+        except Exception as e:
+            print('A issue has occured saving the Json.\n'
+                  'If this issue continues to appear reach out to Sentry#4141\n'
+                  'Traceback:\n'
+                  '{0} {1}'.format(e.message, e.args))
+            return False
+            
         replace(tmp_file, filename)
         return True
 
     def load_json(self, filename):
         """Loads json file"""
-        with open(filename, encoding='utf-8', mode="r") as f:
-            data = load(f)
-        return data
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = load(f)
+            return data
+        except Exception as e:
+            print('A issue has occured loading the Json.\n'
+                  'If this issue continues to appear reach out to Sentry#4141\n'
+                  'Traceback:\n'
+                  '{0} {1}'.format(e.message, e.args))
+            return {}
 
     def is_valid_json(self, filename):
         """Verifies if json file exists / is readable"""
         try:
-            with open(filename, encoding='utf-8', mode="r") as f:
+            with open(filename, 'r', encoding='utf-8') as f:
                 data = load(f)
             return True
-        except FileNotFoundError:
+        except (FileNotFoundError, decoder.JSONDecodeError):
             return False
-        except decoder.JSONDecodeError:
+        except Exception as e:
+            print('A issue has occured validating the Json.\n'
+                  'If this issue continues to appear reach out to Sentry#4141\n'
+                  'Traceback:\n'
+                  '{0} {1}'.format(e.message, e.args))
             return False
 
-dataIO = DataIO()
+if __name__ != '__main__':
+    dataIO = DataIO()
