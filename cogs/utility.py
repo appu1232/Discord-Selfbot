@@ -15,6 +15,8 @@ from cogs.utils.checks import embed_perms, cmd_prefix_len, attach_perms, find_ch
 from bs4 import BeautifulSoup
 from urllib import parse
 from urllib.request import Request, urlopen
+import math
+from math import sqrt
 
 '''Module for fun/meme commands commands'''
 
