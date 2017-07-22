@@ -8,7 +8,7 @@ class DataIO():
         """Atomically saves json file"""
         path, ext = splitext(filename)
         tmp_file = "{}.{}.tmp".format(path, randint(1000, 9999))
-        with open(tmp_file, 'w' encoding='utf-8') as f:
+        with open(tmp_file, 'w', encoding='utf-8') as f:
             dump(data, f, indent=4,sort_keys=True,separators=(',',' : '))
         try:
             with open(tmp_file, 'r', encoding='utf-8') as f:
