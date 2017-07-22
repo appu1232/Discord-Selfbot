@@ -27,8 +27,7 @@ class Utility:
     def get_datetime():
         a = None
         tzerror = False
-        with open('settings/optional_config.json', 'r') as fp:
-            opt = json.load(fp)
+        opt = dataIO.load_json('settings/optional_config.json')
             try:
                 if opt['timezone']:
                     tz = opt['timezone']

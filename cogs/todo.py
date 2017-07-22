@@ -14,11 +14,10 @@ class Todo:
         self.bot = bot
         # load to-do list in from file
         try:
-            with open("settings/todo.json", "r+") as f:
-                todo_list = json.load(f)
-                for i in todo_list:
-                    if type(todo_list[i]) is str:
-                        todo_list[i] = [todo_list[i], i, 0, True, 0, 0]
+            todo_list = dataIO.load_json("settings/todo.json")
+            for i in todo_list:
+                if type(todo_list[i]) is str:
+                    todo_list[i] = [todo_list[i], i, 0, True, 0, 0]
 
                 f.seek(0)
                 f.truncate()

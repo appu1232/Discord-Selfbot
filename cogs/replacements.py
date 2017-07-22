@@ -10,8 +10,7 @@ class Replacements:
 
     def __init__(self, bot):
         self.bot = bot
-        with open("settings/replacements.json") as f:
-            self.replacement_dict = json.load(f)
+        self.replacement_dict = dataIO.load_json("settings/replacements.json")
 
     @commands.command(pass_context=True)
     async def replacements(self, ctx):
