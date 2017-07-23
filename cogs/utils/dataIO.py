@@ -24,7 +24,7 @@ class DataIO():
                   'Traceback:\n'
                   '{0} {1}'.format(e.message, e.args))
             return False
-            
+
         replace(tmp_file, filename)
         return True
 
@@ -39,9 +39,9 @@ class DataIO():
                   'Traceback:\n'
                   '{0} {1}'.format(e.message, e.args))
             return {}
-        
+
     def append_json(self, filename, data):
-		"""Appends to json file"""
+        """Appends to json file"""
         try:
             with open(filename, 'r', encoding='utf-8') as f:
                 file = load(f)
@@ -75,10 +75,10 @@ class DataIO():
                   'Traceback:\n'
                   '{0} {1}'.format(e.message, e.args))
             return False
-            
+
         replace(tmp_file, filename)
         return True
-        
+
     def is_valid_json(self, filename):
         """Verifies if json file exists / is readable"""
         try:
