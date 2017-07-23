@@ -1,17 +1,18 @@
 import discord
+import json
 import os
-from cogs.utils.dataIO import dataIO
 
-class Notify:
+description = '''Subreddit keyword notifier by appu1232'''
 
-    def __init__(bot):
-        self.bot = bot
-        self.settings = dataIO.load_json('settings/notify.json')
-        
+bot = discord.Client()
+
+
+@bot.event
 async def on_message(message):
-    if self.settings['type'] == 'dm':
-        if message.author.id == self.settings['author'] and message.channel.id == self.settings['channel']:
-            if self.settings['type'] == 'ping':
+    notif = dataIO.load_json('settings/notify.json')
+    if notif['type'] == 'dm':
+        if message.author.id == notif['author'] and message.channel.id == notif['channel']:
+            if notif['type'] == 'ping':
                 if message.content:
                     desc, context = message.content.split('Context:', 1)
                     channel = context.split('User: ')[0].strip()
@@ -22,7 +23,7 @@ async def on_message(message):
                     title = em.title
                     desc = em.description.split('Context:')[0]
                     await bot.send_message(message.channel, title + '\n' + desc.strip()[:-2] + message.author.mention)
-            elif self.settings['type'] == 'dm':
+            elif notif['type'] == 'dm':
                 if message.content:
                     await bot.send_message(message.author, message.content)
                 else:
@@ -40,8 +41,10 @@ async def on_message(message):
                     em = discord.Embed()
                     em = em.from_data(message.embeds[0])
                     await bot.send_message(message.channel, content=None, embed=em)
-                    
-def setup(bot):
-    bot.add_cog(Notify(bot))
 
 
+@bot.event
+async def on_ready():
+    pass
+
+bot.run(notif["bot_token"])
