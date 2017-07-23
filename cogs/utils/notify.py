@@ -2,8 +2,6 @@ import discord
 import json
 import os
 
-with open('settings/notify.json', 'r') as f:
-    notif = json.load(f)
 description = '''Subreddit keyword notifier by appu1232'''
 
 bot = discord.Client()
@@ -11,8 +9,7 @@ bot = discord.Client()
 
 @bot.event
 async def on_message(message):
-    with open('settings/notify.json', 'r') as f:
-        notif = json.load(f)
+    notif = dataIO.load_json('settings/notify.json')
     if notif['type'] == 'dm':
         if message.author.id == notif['author'] and message.channel.id == notif['channel']:
             if notif['type'] == 'ping':

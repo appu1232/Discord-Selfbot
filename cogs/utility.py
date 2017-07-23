@@ -17,6 +17,7 @@ from urllib import parse
 from urllib.request import Request, urlopen
 import math
 from math import sqrt
+from cogs.utils.dataIO import dataIO
 
 '''Module for fun/meme commands commands'''
 
@@ -29,17 +30,16 @@ class Utility:
     def get_datetime():
         a = None
         tzerror = False
-        with open('settings/optional_config.json', 'r') as fp:
-            opt = json.load(fp)
-            try:
-                if opt['timezone']:
-                    tz = opt['timezone']
-                    a = pytz.timezone(tz)
-            except IndexError:
-                # Timezone entry missing in configuration file
-                pass
-            except pytz.exceptions.UnknownTimeZoneError:
-                tzerror = True
+        opt = dataIO.load_json('settings/optional_config.json')
+        try:
+            if opt['timezone']:
+                tz = opt['timezone']
+                a = pytz.timezone(tz)
+        except IndexError:
+            # Timezone entry missing in configuration file
+            pass
+        except pytz.exceptions.UnknownTimeZoneError:
+            tzerror = True
         return datetime.datetime.now(a), tzerror
 
     @commands.command(pass_context=True)
@@ -818,11 +818,11 @@ class Utility:
                     if c.split(".")[1] not in loaded]
         embed = discord.Embed(title="List of installed cogs")
         if loaded:
-            embed.add_field(name="Loaded", value="\n".join(loaded), inline=True)
+            embed.add_field(name="Loaded", value="\n".join(sorted(loaded)), inline=True)
         else:
             embed.add_field(name="Loaded", value="None!", inline=True)
         if unloaded:
-            embed.add_field(name="Not Loaded", value="\n".join(unloaded), inline=True)
+            embed.add_field(name="Not Loaded", value="\n".join(sorted(unloaded)), inline=True)
         else:
             embed.add_field(name="Not Loaded", value="None!", inline=True)
         embed.set_footer(text="Were you looking for >cog?")
