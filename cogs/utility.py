@@ -219,7 +219,7 @@ class Utility:
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, msg):
         """Simple calculator. Ex: >calc 2+2"""
-        equation = msg.strip().replace('^', '**')
+        equation = msg.strip().replace('^', '**').replace('x', '*')
         try:
             if '=' in equation:
                 left = eval(equation.split('=')[0], {"__builtins__": None}, {"sqrt": sqrt})
@@ -231,7 +231,7 @@ class Utility:
             return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Invalid calculation query.")
         if embed_perms(ctx.message):
             em = discord.Embed(color=0xD3D3D3, title='Calculator')
-            em.add_field(name='Input:', value=msg.replace('**', '^'), inline=False)
+            em.add_field(name='Input:', value=msg.replace('**', '^').replace('x', '*'), inline=False)
             em.add_field(name='Output:', value=answer, inline=False)
             await self.bot.send_message(ctx.message.channel, content=None, embed=em)
             await self.bot.delete_message(ctx.message)
