@@ -57,7 +57,7 @@ class DataIO():
                   'Traceback:\n'
                   '{0} {1}'.format(e.message, e.args))
             return False
-                path, ext = splitext(filename)
+        path, ext = splitext(filename)
         tmp_file = "{}.{}.tmp".format(path, randint(1000, 9999))
         with open(tmp_file, 'w', encoding='utf-8') as f:
             dump(file, f, indent=4,sort_keys=True,separators=(',',' : '))

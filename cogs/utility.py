@@ -30,15 +30,15 @@ class Utility:
         a = None
         tzerror = False
         opt = dataIO.load_json('settings/optional_config.json')
-            try:
-                if opt['timezone']:
-                    tz = opt['timezone']
-                    a = pytz.timezone(tz)
-            except IndexError:
-                # Timezone entry missing in configuration file
-                pass
-            except pytz.exceptions.UnknownTimeZoneError:
-                tzerror = True
+        try:
+            if opt['timezone']:
+                tz = opt['timezone']
+                a = pytz.timezone(tz)
+        except IndexError:
+            # Timezone entry missing in configuration file
+            pass
+        except pytz.exceptions.UnknownTimeZoneError:
+            tzerror = True
         return datetime.datetime.now(a), tzerror
 
     @commands.command(pass_context=True)
