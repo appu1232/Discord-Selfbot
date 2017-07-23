@@ -5,11 +5,12 @@ import os
 description = '''Subreddit keyword notifier by appu1232'''
 
 bot = discord.Client()
+with open('settings/notify.json') as fp:
+    notif = json.load(fp)
 
 
 @bot.event
 async def on_message(message):
-    notif = dataIO.load_json('settings/notify.json')
     if notif['type'] == 'dm':
         if message.author.id == notif['author'] and message.channel.id == notif['channel']:
             if notif['type'] == 'ping':

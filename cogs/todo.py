@@ -20,9 +20,7 @@ class Todo:
                 if type(todo_list[i]) is str:
                     todo_list[i] = [todo_list[i], i, 0, True, 0, 0]
 
-                f.seek(0)
-                f.truncate()
-                json.dump(todo_list, f, indent=4)
+            dataIO.save_json("settings/todo.json", todo_list)
         except IOError:
             todo_list = {}
 

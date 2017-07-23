@@ -1,6 +1,7 @@
 from random import randint
 from json import decoder, dump, load
 from os import replace
+from os.path import splitext
 
 class DataIO():
 
@@ -22,7 +23,7 @@ class DataIO():
         except Exception as e:
             print('A issue has occured saving the Json.\n'
                   'Traceback:\n'
-                  '{0} {1}'.format(e.message, e.args))
+                  '{0} {1}'.format(repr(e), e.args))
             return False
 
         replace(tmp_file, filename)
@@ -37,7 +38,7 @@ class DataIO():
         except Exception as e:
             print('A issue has occured loading the Json.\n'
                   'Traceback:\n'
-                  '{0} {1}'.format(e.message, e.args))
+                  '{0} {1}'.format(repr(e), e.args))
             return {}
 
     def append_json(self, filename, data):
@@ -48,14 +49,14 @@ class DataIO():
         except Exception as e:
             print('A issue has occured loading the Json.\n'
                   'Traceback:\n'
-                  '{0} {1}'.format(e.message, e.args))
+                  '{0} {1}'.format(repr(e), e.args))
             return False
         try:
             file.append(data)
         except Exception as e:
             print('A issue has occured updating the Json.\n'
                   'Traceback:\n'
-                  '{0} {1}'.format(e.message, e.args))
+                  '{0} {1}'.format(repr(e), e.args))
             return False
         path, ext = splitext(filename)
         tmp_file = "{}.{}.tmp".format(path, randint(1000, 9999))
@@ -73,7 +74,7 @@ class DataIO():
         except Exception as e:
             print('A issue has occured saving the Json.\n'
                   'Traceback:\n'
-                  '{0} {1}'.format(e.message, e.args))
+                  '{0} {1}'.format(repr(e), e.args))
             return False
 
         replace(tmp_file, filename)
@@ -90,7 +91,7 @@ class DataIO():
         except Exception as e:
             print('A issue has occured validating the Json.\n'
                   'Traceback:\n'
-                  '{0} {1}'.format(e.message, e.args))
+                  '{0} {1}'.format(repr(e), e.args))
             return False
 
 dataIO = DataIO()
