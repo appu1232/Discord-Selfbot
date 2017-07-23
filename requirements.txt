@@ -1,4 +1,4 @@
-discord.py==0.16.7
+git+https://github.com/Rapptz/discord.py@rewrite
 prettytable==0.7.2
 requests==2.12.4
 beautifulsoup4==4.5.3
