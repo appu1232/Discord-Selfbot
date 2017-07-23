@@ -26,6 +26,7 @@ cogs/*
 !cogs/translate.py
 !cogs/userinfo.py
 !cogs/utility.py
+!cogs/replacements.py
 settings/*
 !settings/*.sample
 cogs/utils/temp.txt
