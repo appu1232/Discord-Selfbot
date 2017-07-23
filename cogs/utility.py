@@ -220,6 +220,7 @@ class Utility:
     async def calc(self, ctx, *, msg):
         """Simple calculator. Ex: >calc 2+2"""
         equation = msg.strip().replace('^', '**')
+        equation = msg.strip().replace('x', '*')
         try:
             if '=' in equation:
                 left = eval(equation.split('=')[0], {"__builtins__": None}, {"sqrt": sqrt})
