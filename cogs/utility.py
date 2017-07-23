@@ -220,12 +220,15 @@ class Utility:
     async def calc(self, ctx, *, msg):
         """Simple calculator. Ex: >calc 2+2"""
         equation = msg.strip().replace('^', '**')
-        if '=' in equation:
-            left = eval(equation.split('=')[0])
-            right = eval(equation.split('=')[1])
-            answer = str(left == right)
-        else:
-            answer = str(eval(equation))
+        try:
+            if '=' in equation:
+                left = eval(equation.split('=')[0], {"__builtins__": None}, {"sqrt": sqrt})
+                right = eval(equation.split('=')[1], {"__builtins__": None}, {"sqrt": sqrt})
+                answer = str(left == right)
+            else:
+                answer = str(eval(equation, {"__builtins__": None}, {"sqrt": sqrt}))
+        except TypeError:
+            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Invalid calculation query.")
         if embed_perms(ctx.message):
             em = discord.Embed(color=0xD3D3D3, title='Calculator')
             em.add_field(name='Input:', value=msg.replace('**', '^'), inline=False)
