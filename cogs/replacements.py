@@ -1,7 +1,7 @@
 import discord
 import json
 from discord.ext import commands
-
+from cogs.utils.dataIO import dataIO
 
 '''Manage replacements within messages.'''
 
@@ -60,7 +60,7 @@ class Replacements:
             for replacement in self.replacement_dict:
                 reply_msg += replacement + ": " + self.replacement_dict[replacement] + "\n"
             await self.bot.edit_message(menu_msg, reply_msg + "```")
-            
+
     async def on_message(self, message):
         if message.author == self.bot.user:
             replaced_message = message.content
@@ -68,6 +68,6 @@ class Replacements:
                 replaced_message = replaced_message.replace(replacement, self.replacement_dict[replacement])
             if message.content != replaced_message:
                 await self.bot.edit_message(message, replaced_message)
-            
+
 def setup(bot):
     bot.add_cog(Replacements(bot))
