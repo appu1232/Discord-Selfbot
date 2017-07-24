@@ -5,33 +5,31 @@ import asyncio
 from time import time as current_time
 from discord_webhooks import Webhook
 from discord.ext import commands
+from cogs.utils.dataIO import dataIO
 
 '''Todo list cog.'''
-  
+
 class Todo:
 
     def __init__(self, bot):
         self.bot = bot
         # load to-do list in from file
         try:
-            with open("settings/todo.json", "r+") as f:
-                todo_list = json.load(f)
-                for i in todo_list:
-                    if type(todo_list[i]) is str:
-                        todo_list[i] = [todo_list[i], i, 0, True, 0, 0]
+            todo_list = dataIO.load_json("settings/todo.json")
+            for i in todo_list:
+                if type(todo_list[i]) is str:
+                    todo_list[i] = [todo_list[i], i, 0, True, 0, 0]
 
-                f.seek(0)
-                f.truncate()
-                json.dump(todo_list, f, indent=4)
+            dataIO.save_json("settings/todo.json", todo_list)
         except IOError:
             todo_list = {}
 
         self.todo_list = todo_list
-    
+
     def save_list(self):
         with open("settings/todo.json", "w") as f:
             json.dump(self.todo_list, f)
-    
+
     # don't like to do this but the one from appuselfbot.py is slightly different to my needs
     async def webhook(self, entry, send_type):
         temp = self.bot.log_conf['webhook_url'].split('/')
@@ -44,7 +42,7 @@ class Todo:
             await request_webhook('/{}/{}'.format(channel, token), embeds=[em.to_dict()], content=self.bot.user.mention)
         else:
             await request_webhook('/{}/{}'.format(channel, token), content=None, embeds=[em.to_dict()])
-    
+
     @commands.group(pass_context=True)
     async def todo(self, ctx):
         """Manage your to-do list. >help todo for more information.
@@ -139,7 +137,7 @@ class Todo:
                     if len(all_entries) > 1:
                         embed.title = "{}'s to-do list ({}/{}):".format(ctx.message.author.name.format(), count+1, len(all_entries))
                     await self.bot.send_message(ctx.message.channel, "", embed=embed)
-            
+
     @todo.command(pass_context=True)
     async def add(self, ctx, *, msg):
         """Add to your to-do list."""
@@ -205,7 +203,7 @@ class Todo:
             self.todo_list[msg] = [seconds, text, channel, alert, repeat, time]
         self.save_list()
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully added `{}` to your to-do list!".format(msg))
-            
+
     @todo.command(pass_context=True)
     async def remove(self, ctx, *, msg):
         """Cross out entries from your to-do list."""
@@ -219,7 +217,7 @@ class Todo:
                 await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Successfully removed `{}` from your to-do list!".format(msg))
             else:
                 await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "That entry doesn't exist!")
-    
+
     @todo.command(pass_context=True)
     async def clear(self, ctx):
         """Clear your entire to-do list."""

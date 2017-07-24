@@ -275,7 +275,10 @@ class Fun:
         await self.bot.delete_message(ctx.message)
         msg = list(msg)
         regional_list = [self.regionals[x.lower()] if x.isalnum() or x == '!' or x == '?' else x for x in msg]
-        regional_output = '  '.join(regional_list)
+        # by putting zero width no-break spaces between each regional indicator,
+        # we prevent them from being joined into flags but still allow them to
+        # break on newlines normally
+        regional_output = '\u200b'.join(regional_list)
         await self.bot.send_message(ctx.message.channel, regional_output)
 
     @commands.command(pass_context=True)
