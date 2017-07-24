@@ -219,12 +219,9 @@ class Utility:
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, msg):
         """Simple calculator. Ex: >calc 2+2"""
-<<<<<<< HEAD
         equation = msg.strip().replace('^', '**')
         equation = msg.strip().replace('x', '*')
-=======
         equation = msg.strip().replace('^', '**').replace('x', '*')
->>>>>>> 95cac0a762e55e997ca1b9d1495dfe868160a447
         try:
             if '=' in equation:
                 left = eval(equation.split('=')[0], {"__builtins__": None}, {"sqrt": sqrt})
@@ -846,10 +843,10 @@ class Utility:
 
         print('Logged in as')
         try:
-            print(bot.user.name)
+            print(self.bot.user.name)
         except:
             pass
-        print('User id:' + str(bot.user.id))
+        print('User id:' + str(self.bot.user.id))
         print('------')
         await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Console Cleared')
 
