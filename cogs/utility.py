@@ -219,8 +219,6 @@ class Utility:
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, msg):
         """Simple calculator. Ex: >calc 2+2"""
-        equation = msg.strip().replace('^', '**')
-        equation = msg.strip().replace('x', '*')
         equation = msg.strip().replace('^', '**').replace('x', '*')
         try:
             if '=' in equation:
