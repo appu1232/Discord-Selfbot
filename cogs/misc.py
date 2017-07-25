@@ -174,14 +174,14 @@ class Misc:
                 for i in embed_values:
                     if i.strip().lower().startswith('field='):
                         field_inline = True
-                        field = i.strip().lstrip('field=')
+                        field = i.strip().split('field=')[1]
                         field_name, field_value = field.split('value=')
                         if 'inline=' in field_value:
                             field_value, field_inline = field_value.split('inline=')
                             if 'false' in field_inline.lower() or 'no' in field_inline.lower():
                                 field_inline = False
-                        field_name = field_name.strip().lstrip('name=')
-                        em.add_field(name=field_name, value=field_value.strip(), inline=field_inline)
+                        field_name = field_name.split('name=')[1]
+                        em.add_field(name=field_name.strip(), value=field_value.strip(), inline=field_inline)
                 if author:
                     if 'icon=' in author:
                         text, icon = author.split('icon=')
