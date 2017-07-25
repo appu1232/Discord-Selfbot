@@ -179,6 +179,7 @@ class Google:
     @commands.command(pass_context=True, aliases=['image', 'img'])
     async def i(self, ctx, *, query):
         """Google image search. >i Lillie pokemon sun and moon"""
+        await self.bot.delete_message(ctx.message)
         config = load_optional_config()
         if query[0].isdigit():
             item = int(query[0])
@@ -201,9 +202,12 @@ class Google:
                         return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
                     em = discord.Embed()
                     if embed_perms(ctx.message):
-                        await self.bot.send_message(ctx.message.channel, content=None, embed=em.set_image(url=result['items'][item]['link']))
+                        em.set_image(url=result['items'][item]['link'])
+                        em.set_footer(text="Search term: \"" + query + "\"")
+                        await self.bot.send_message(ctx.message.channel, content=None, embed=em)
                     else:
                         await self.bot.send_message(ctx.message.channel, result['items'][item]['link'])
+                        await self.bot.send_message(ctx.message.channel, "Search term: \"" + query + "\"")
 
 
 def setup(bot):
