@@ -116,6 +116,7 @@ class Misc:
         - footer=<words> **OR** footer=name=<words> icon=<url_to_image>
         - field=name=<words> value=<words> (you can add as many fields as you want)
         - ptext=<words>
+        - timestamp (no values accepted, shows current timestamp in the embed)
 
         NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it.
         PS: Hyperlink text like so: [text](https://www.whateverlink.com)
