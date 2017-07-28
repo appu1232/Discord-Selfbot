@@ -254,7 +254,7 @@ class Misc:
                 result.append("ptext={}".format(msg.content))
             await self.bot.edit_message(msg, " | ".join(result))
             info_msg = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Embed has been turned back into its command form. Make your changes, then type `done` to finish editing.")
-            confirmation_msg = await self.bot.wait_for_message(content="done")
+            confirmation_msg = await self.bot.wait_for_message(author=self.bot.user, content="done")
             await self.bot.delete_message(info_msg)
             await self.bot.delete_message(confirmation_msg)
             # not proud of this code
