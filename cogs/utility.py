@@ -620,8 +620,8 @@ class Utility:
         else:
             embed = discord.Embed(title="Number of people playing {}".format(game), description=msg)
             await self.bot.send_message(ctx.message.channel, "", embed=embed)
-
-    @commands.command(pass_context=True)
+            
+    @commands.command(pass_context=True, aliases=['anim'])
     async def animate(self, ctx, animation):
         """Play an animation from a text file. >help animate for more details.
         >animate <animation> - Animate a text file.
