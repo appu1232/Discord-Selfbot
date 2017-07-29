@@ -139,13 +139,13 @@ def get_user(message, user, bot=None):
     try:
         member = message.mentions[0]
     except:
-        member = message.server.get_member_named(user)
+        member = message.guild.get_member_named(user)
     if not member:
-        member = message.server.get_member(user)
+        member = message.guild.get_member(user)
     if not member and bot:
-        for server in bot.servers:
-            member = server.get_member(user)
-            if not member: member = server.get_member_named(user)
+        for guild in bot.guilds:
+            member = guild.get_member(user)
+            if not member: member = guild.get_member_named(user)
             if member:
                 break
     if not member:
