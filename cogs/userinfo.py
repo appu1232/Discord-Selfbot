@@ -36,6 +36,8 @@ class Userinfo:
                 avi = user.avatar_url
 
             role = user.top_role.name
+            if role == "@everyone":
+                role = "N/A"
             voice_state = None if not user.voice else user.voice.channel
             if embed_perms(ctx.message):
                 em = discord.Embed(timestamp=ctx.message.timestamp, colour=0x708DD0)
@@ -44,8 +46,6 @@ class Userinfo:
                 em.add_field(name='Status', value=user.status, inline=True)
                 em.add_field(name='In Voice', value=voice_state, inline=True)
                 em.add_field(name='Game', value=user.game, inline=True)
-                if role == "@everyone":
-                    role = "N/A"
                 em.add_field(name='Highest Role', value=role, inline=True)
                 em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
