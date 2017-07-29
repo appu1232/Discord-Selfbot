@@ -12,6 +12,7 @@ cogs/*
 !cogs/cog_download.py
 !cogs/customcmds.py
 !cogs/debugger.py
+!cogs/fc.py
 !cogs/fun.py
 !cogs/google.py
 !cogs/imagedump.py
@@ -21,12 +22,12 @@ cogs/*
 !cogs/misc.py
 !cogs/mod.py
 !cogs/repl.py
+!cogs/replacements.py
 !cogs/server.py
 !cogs/todo.py
 !cogs/translate.py
 !cogs/userinfo.py
 !cogs/utility.py
-!cogs/replacements.py
 settings/*
 !settings/*.sample
 cogs/utils/temp.txt
