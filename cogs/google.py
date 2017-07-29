@@ -150,8 +150,9 @@ class Google:
         """Google web search. Ex: >g what is discordapp?"""
         if not embed_perms(ctx.message):
             config = load_optional_config()
-            async with aiohttp.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
-                result = json.loads(await resp.text())
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+                    result = json.loads(await resp.text())
             return await self.bot.send_message(ctx.message.channel, result['items'][0]['link'])
 
         try:
