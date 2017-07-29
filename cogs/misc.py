@@ -175,14 +175,14 @@ class Misc:
                 for i in embed_values:
                     if i.strip().lower().startswith('field='):
                         field_inline = True
-                        field = i.strip().lstrip('field=')
+                        field = i.strip().split('field=')[1]
                         field_name, field_value = field.split('value=')
                         if 'inline=' in field_value:
                             field_value, field_inline = field_value.split('inline=')
                             if 'false' in field_inline.lower() or 'no' in field_inline.lower():
                                 field_inline = False
-                        field_name = field_name.strip().lstrip('name=')
-                        em.add_field(name=field_name, value=field_value.strip(), inline=field_inline)
+                        field_name = field_name.split('name=')[1]
+                        em.add_field(name=field_name.strip(), value=field_value.strip(), inline=field_inline)
                 if author:
                     if 'icon=' in author:
                         text, icon = author.split('icon=')
@@ -353,6 +353,13 @@ class Misc:
     @commands.command(pass_context=True)
     async def embedcolor(self, ctx, *, color: str = None):
         """Set color (hex) of a embeds. Ex: >embedcolor 000000"""
+        if color == 'auto':
+            color = str(ctx.message.author.top_role.color)[1:]
+        
+        if not color.isdigit() or len(color) != 6:
+            await self.bot.send_message(ctx.message.channel, 'Color needs to be 6 numbers\ne.g. `012345`')
+            return
+            
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
             if color:

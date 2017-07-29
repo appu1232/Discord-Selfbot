@@ -1,6 +1,6 @@
-import json
 import mimetypes
 from random import randint
+from cogs.utils.dataIO import dataIO
 
 quick = [('shrug', '¯\_(ツ)_/¯'), ('flip', '(╯°□°）╯︵ ┻━┻'), ('unflip', '┬─┬﻿ ノ( ゜-゜ノ)'), ('lenny', '( ͡° ͜ʖ ͡°)'), ('comeatmebro', '(ง’̀-‘́)ง')]
 
@@ -17,12 +17,10 @@ def quickcmds(message):
 def custom(message):
     success = False
 
-    with open('settings/config.json') as f:
-        config = json.load(f)
+    config = dataIO.load_json('settings/config.json')
     customcmd_prefix_len = len(config['customcmd_prefix'])
     if message.startswith(config['customcmd_prefix'][0]):
-        with open('settings/commands.json', 'r') as f:
-            commands = json.load(f)
+        commands =  dataIO.load_json('settings/commands.json')
         found_cmds = {}
         for i in commands:
             if message[customcmd_prefix_len:].lower().startswith(i.lower()):

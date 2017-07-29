@@ -154,45 +154,6 @@ class Debugger:
         except:
             await self.bot.send_message(ctx.message.channel, '``` %s ```'%format_exc())
 
-    @commands.command()
-    async def cogs(self):
-        """Shows loaded/unloaded cogs"""
-
-        cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
-
-        loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
-        unloaded = [c.split(".")[1] for c in cog_list
-                    if c.split(".")[1] not in loaded]
-
-        loaded_formatted = []
-        for x in loaded:
-            loaded_formatted.append('+ {}'.format(x))
-
-        unloaded_formatted = []
-        if unloaded:
-            for x in unloaded:
-                unloaded_formatted.append('- {}'.format(x))
-        else:
-            unloaded_formatted = ['']
-
-        page_length=2000
-        escape=True
-        shorten_by=8
-
-        text = in_text = "```diff\nCogs:\n" + "\n".join(loaded_formatted) + "\n\n" + "\n".join(unloaded_formatted) + "```"
-        if len(in_text) > page_length:
-            while len(in_text) > page_length:
-                closest_delim = max([in_text.rfind(d, 0, page_length)
-                                     for d in delims])
-                closest_delim = closest_delim if closest_delim != -1 else page_length
-                to_send = in_text[:closest_delim]
-                await self.bot.say(to_send)
-                in_text = in_text[closest_delim:]
-        else:
-            await self.bot.say(text)
-
-
-
     @commands.group(pass_context=True, invoke_without_command=True)
     async def py(self, ctx, *, msg):
         """Python interpreter. See the wiki for more info."""
@@ -390,21 +351,6 @@ class Debugger:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
             await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Unloaded module: `{}`'.format(msg))
-
-    @commands.command(pass_context=True, aliases=['cc', 'clear', 'cleartrace'])
-    async def clearconsole(self, ctx):
-        """Clear the console of any errors or other messages."""
-        await self.bot.delete_message(ctx.message)
-        for _ in range(100):
-            print("")
-        print('Logged in as')
-        try:
-            print(self.bot.user.name)
-        except:
-            pass
-        print('User id:' + str(self.bot.user.id))
-        print('------')
-        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Console Cleared')
 
     @commands.command(pass_context=True)
     async def redirect(self, ctx):
