@@ -15,63 +15,57 @@ class Lockdown:
 
     def __init__(self, bot):
         self.bot = bot
-        self.states = []
+        self.states = {}
 
     @commands.has_permissions(manage_channels=True)
     @commands.command(pass_context=True, name="lockdown")
     async def lockdown(self, ctx):
         """Lock message sending in the channel."""
         try:
-            print(self.states)
             try:
                 mod_strings = load_moderation()
-                mod_role_strings = mod_strings[ctx.message.server.name]
+                mod_role_strings = mod_strings[ctx.message.guild.name]
                 mod_roles = []
                 for m in mod_role_strings:
-                    mod_roles.append(discord.utils.get(ctx.message.server.roles, name=m))
+                    mod_roles.append(discord.utils.get(ctx.message.guild.roles, name=m))
             except:
                 mod_roles = []
-            server = ctx.message.server
+            server = ctx.message.guild
             overwrites_everyone = ctx.message.channel.overwrites_for(server.default_role)
             overwrites_owner = ctx.message.channel.overwrites_for(server.role_hierarchy[0])
-            if len(self.states) > 0:
-                await self.bot.say("🔒 Channel is already locked down. Use `unlock` to unlock.")
+            if ctx.message.channel.id in self.states:
+                await ctx.send("🔒 Channel is already locked down. Use `unlock` to unlock.")
                 return
-            for a in ctx.message.server.role_hierarchy:
-                self.states.append([a, ctx.message.channel.overwrites_for(a).send_messages])
-            print(self.states)
+            states = []
+            for a in ctx.message.guild.role_hierarchy:
+                states.append([a, ctx.message.channel.overwrites_for(a).send_messages])
+            self.states[ctx.message.channel.id] = states
             overwrites_owner.send_messages = True
             overwrites_everyone.send_messages = False
-            await self.bot.edit_channel_permissions(ctx.message.channel, server.default_role, overwrites_everyone)
+            await ctx.message.channel.set_permissions(server.default_role, overwrite=overwrites_everyone)
             for modrole in mod_roles:
-                await self.bot.edit_channel_permissions(ctx.message.channel, modrole, overwrites_owner)
-            try:
-                await self.bot.edit_channel_permissions(ctx.message.channel, server.get_member("135204578986557440"),
-                                                        overwrites_owner)
-            except:
-                print(
-                    "If you have any issues with this feature, let 'thecommondude' know about it in Appu's Discord Server")
-            await self.bot.say(
+                await ctx.message.channel.set_permissions(modrole, overwrite=overwrites_owner)
+            await ctx.send(
                 "🔒 Channel locked down. Only roles with permissions specified in `moderation.json` can speak.")
         except discord.errors.Forbidden:
-            await self.bot.say("Missing Permissions.")
+            await ctx.send(self.bot.bot_prefix + "Missing permissions.")
 
     @commands.has_permissions(manage_channels=True)
     @commands.command(pass_context=True, name="unlock")
     async def unlock(self, ctx):
         """Unlock message sending in the channel."""
         try:
-            if self.states == []:
-                await self.bot.say("🔓 Channel is already unlocked.")
+            if not ctx.message.channel.id in self.states:
+                await ctx.send("🔓 Channel is already unlocked.")
                 return
-            for a in self.states:
+            for a in self.states[ctx.message.channel.id]:
                 overwrites_a = ctx.message.channel.overwrites_for(a[0])
                 overwrites_a.send_messages = a[1]
-                await self.bot.edit_channel_permissions(ctx.message.channel, a[0], overwrites_a)
-            self.states = []
-            await self.bot.say("🔓 Channel unlocked.")
+                await ctx.message.channel.set_permissions(a[0], overwrite=overwrites_a)
+            self.states.pop(ctx.message.channel.id)
+            await ctx.send("🔓 Channel unlocked.")
         except discord.errors.Forbidden:
-            await self.bot.say("Missing Permissions.")
+            await ctx.send(self.bot.bot_prefix + "Missing permissions.")
 
     @commands.group(pass_context=True)
     async def mod(self, ctx):
@@ -82,14 +76,14 @@ class Lockdown:
         If a server or role name has spaces in it, you must enclose *both* of them in quotes, no matter which one is the one with spaces in it.
         """
         if ctx.invoked_subcommand is None:
-            await self.bot.delete_message(ctx.message)
+            await ctx.message.delete()
             mods = load_moderation()
             embed = discord.Embed(title="Moderator Roles", description="")
             for server in mods:
                 embed.description += server + ":\n"
                 for mod in mods[server]:
                     embed.description += "    {}\n".format(mod)
-            await self.bot.send_message(ctx.message.channel, "", embed=embed)
+            await ctx.send("", embed=embed)
 
     @mod.command(pass_context=True)
     async def add(self, ctx, server, role):
@@ -99,7 +93,7 @@ class Lockdown:
         mods = load_moderation()
         valid_server = False
         valid_role = False
-        for e in self.bot.servers:
+        for e in self.bot.guilds:
             if e.name == server:
                 valid_server = True
             for f in e.roles:
@@ -115,14 +109,13 @@ class Lockdown:
                     mods[server].append(role)
                 with open("settings/moderation.json", "w+") as f:
                     json.dump(mods, f)
-                await self.bot.send_message(ctx.message.channel,
-                                            self.bot.bot_prefix + "Successfully added {} to the list of mod roles on {}!".format(
-                                                role, server))
+                await ctx.send(
+                               self.bot.bot_prefix + "Successfully added {} to the list of mod roles on {}!".format(
+                                                                                                                    role, server))
             else:
-                await self.bot.send_message(ctx.message.channel,
-                                            self.bot.bot_prefix + "{} isn't a role on {}!".format(role, server))
+                await ctx.send(self.bot.bot_prefix + "{} isn't a role on {}!".format(role, server))
         else:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "{} isn't a server!".format(server))
+            await ctx.send(self.bot.bot_prefix + "{} isn't a server!".format(server))
 
     @mod.command(pass_context=True)
     async def remove(self, ctx, server, role):
@@ -134,12 +127,12 @@ class Lockdown:
             mods[server].remove(role)
             with open("settings/moderation.json", "w+") as f:
                 json.dump(mods, f)
-            await self.bot.send_message(ctx.message.channel,
-                                        self.bot.bot_prefix + "Successfully removed {} from the list of mod roles on {}!".format(
-                                            role, server))
+            await ctx.send(
+                           self.bot.bot_prefix + "Successfully removed {} from the list of mod roles on {}!".format(
+                                                                                                                    role, server))
         except (ValueError, KeyError):
-            await self.bot.send_message(ctx.message.channel,
-                                        self.bot.bot_prefix + "You can't remove something that doesn't exist!")
+            await ctx.send(
+                           self.bot.bot_prefix + "You can't remove something that doesn't exist!")
 
 
 def setup(bot):
