@@ -763,9 +763,9 @@ if __name__ == '__main__':
     while True:
         try:
             try:
-                bot.run(get_config_value('config', 'token'), bot=False)
-            except (KeyError, discord.errors.LoginFailure):
                 bot.run(os.environ['TOKEN'], bot=False)
+            except (KeyError, discord.errors.LoginFailure):
+                bot.run(get_config_value('config', 'token'), bot=False)
         except (KeyError, discord.errors.LoginFailure):
             if _silent:
                 print('Cannot use setup Wizard becaue of silent mode')
