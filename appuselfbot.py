@@ -36,9 +36,9 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
-    parser.add_argument("--run-admin", # Allows the user to run the bot as admin or sudo
-                        action="store_true",
-                        help="Allows the bot to be run as admin")
+    #parser.add_argument("--run-admin", # Allows the user to run the bot as admin or sudo
+    #                    action="store_true",
+    #                    help="Allows the bot to be run as admin")
     return parser
 
 args = parse_cmd_arguments().parse_args()
