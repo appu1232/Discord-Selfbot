@@ -36,9 +36,9 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
-    #parser.add_argument("--run-admin", # Allows the user to run the bot as admin or sudo
-    #                    action="store_true",
-    #                    help="Allows the bot to be run as admin")
+    parser.add_argument("--run-admin", # Allows the user to run the bot as admin or sudo
+                        action="store_true",
+                        help="Allows the bot to be run as admin")
     return parser
 
 args = parse_cmd_arguments().parse_args()
@@ -94,7 +94,7 @@ def Wizard():
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
     input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nPress Enter to start the bot....\n")
-    config["run_as_superuser"] = False
+  
     print("Starting up...")
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
         dump(config, f, sort_keys=True, indent=4)
@@ -109,35 +109,31 @@ else:
         Wizard()
 
 shutdown = False
-if not get_config_value('config', 'run_as_superuser'):
-    if os.name == 'nt':
-        try:
-            # only windows users with admin privileges can read the C:\windows\temp
-            temp = os.listdir(os.sep.join([os.environ.get('SystemRoot','C:\\windows'),'temp']))
-        except:
-            shutdown = False
-        else:
-            shutdown = True
+if os.name == 'nt':
+    try:
+        # only windows users with admin privileges can read the C:\windows\temp
+        temp = os.listdir(os.sep.join([os.environ.get('SystemRoot','C:\\windows'),'temp']))
+    except:
+        shutdown = False
     else:
-        if 'SUDO_USER' in os.environ and os.geteuid() == 0:
-            shutdown = True
-        else:
-            shutdown = False
-        except:
-            pass
+        shutdown = True
+else:
+    if 'SUDO_USER' in os.environ and os.geteuid() == 0:
+        shutdown = True
     else:
-        try:
-            if os.getuid() == 0:
-                shutdown = True
-        except:
-            pass
-
-
+        shutdown = False
+else:
+    try:
+        if os.getuid() == 0:
+            shutdown = True
+    except:
+        pass
+    
 if shutdown == True and not _force_admin:
     if os.name == 'nt':
         print('Its not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
     else:
-        print('Do not run the Bot with sudo or as root')
+        print('Its not advised to run the bot as sudo or root.\nRun the bot again using --run-admin to start it as Admin')
     exit(0)
 
 def set_log():
