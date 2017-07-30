@@ -116,7 +116,6 @@ class Misc:
         - footer=<words> **OR** footer=name=<words> icon=<url_to_image>
         - field=name=<words> value=<words> (you can add as many fields as you want)
         - ptext=<words>
-        - timestamp (no values accepted, shows current timestamp in the embed)
 
         NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it.
         PS: Hyperlink text like so: [text](https://www.whateverlink.com)
@@ -175,14 +174,14 @@ class Misc:
                 for i in embed_values:
                     if i.strip().lower().startswith('field='):
                         field_inline = True
-                        field = i.strip().split('field=')[1]
+                        field = i.strip().lstrip('field=')
                         field_name, field_value = field.split('value=')
                         if 'inline=' in field_value:
                             field_value, field_inline = field_value.split('inline=')
                             if 'false' in field_inline.lower() or 'no' in field_inline.lower():
                                 field_inline = False
-                        field_name = field_name.split('name=')[1]
-                        em.add_field(name=field_name.strip(), value=field_value.strip(), inline=field_inline)
+                        field_name = field_name.strip().lstrip('name=')
+                        em.add_field(name=field_name, value=field_value.strip(), inline=field_inline)
                 if author:
                     if 'icon=' in author:
                         text, icon = author.split('icon=')
@@ -254,7 +253,7 @@ class Misc:
                 result.append("ptext={}".format(msg.content))
             await self.bot.edit_message(msg, " | ".join(result))
             info_msg = await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Embed has been turned back into its command form. Make your changes, then type `done` to finish editing.")
-            confirmation_msg = await self.bot.wait_for_message(author=self.bot.user, content="done")
+            confirmation_msg = await self.bot.wait_for_message(content="done")
             await self.bot.delete_message(info_msg)
             await self.bot.delete_message(confirmation_msg)
             # not proud of this code
@@ -355,10 +354,6 @@ class Misc:
         """Set color (hex) of a embeds. Ex: >embedcolor 000000"""
         if color == 'auto':
             color = str(ctx.message.author.top_role.color)[1:]
-        
-        if not color.isdigit() or len(color) != 6:
-            await self.bot.send_message(ctx.message.channel, 'Color needs to be 6 numbers\ne.g. `012345`')
-            return
             
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
