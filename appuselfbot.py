@@ -12,7 +12,6 @@ import re
 import traceback
 import argparse
 import os
-import ctypes
 import logging
 import logging.handlers
 from json import load, dump
@@ -37,6 +36,9 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
+    parser.add_argument("--run-admin", # Allows the user to run the bot as admin or sudo
+                        action="store_true",
+                        help="Allows the bot to be run as admin")
     return parser
 
 args = parse_cmd_arguments().parse_args()
@@ -44,6 +46,7 @@ _test_run = args.test_run
 _force_mac = args.force_mac
 _reset_cfg = args.reset_config
 _silent = args.silent
+_force_admin = args.run_admin
 
 
 if _test_run:
@@ -109,21 +112,32 @@ shutdown = False
 if not get_config_value('config', 'run_as_superuser'):
     if os.name == 'nt':
         try:
-            if ctypes.windll.shell32.IsUserAnAdmin() != 0:
-                print('Do not run the Bot as Administrator')
-                shutdown = True
+            # only windows users with admin privileges can read the C:\windows\temp
+            temp = os.listdir(os.sep.join([os.environ.get('SystemRoot','C:\\windows'),'temp']))
+        except:
+            shutdown = False
+        else:
+            shutdown = True
+    else:
+        if 'SUDO_USER' in os.environ and os.geteuid() == 0:
+            shutdown = True
+        else:
+            shutdown = False
         except:
             pass
     else:
         try:
             if os.getuid() == 0:
-                print('Do not run the Bot with sudo or as root')
                 shutdown = True
         except:
             pass
 
 
-if shutdown == True:
+if shutdown == True and not _force_admin:
+    if os.name == 'nt':
+        print('Its not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
+    else:
+        print('Do not run the Bot with sudo or as root')
     exit(0)
 
 def set_log():
