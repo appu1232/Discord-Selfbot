@@ -122,13 +122,7 @@ else:
         shutdown = True
     else:
         shutdown = False
-else:
-    try:
-        if os.getuid() == 0:
-            shutdown = True
-    except:
-        pass
-    
+        
 if shutdown == True and not _force_admin:
     if os.name == 'nt':
         print('Its not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
