@@ -125,9 +125,9 @@ else:
         
 if shutdown == True and not _force_admin:
     if os.name == 'nt':
-        print('Its not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
+        print('It is not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
     else:
-        print('Its not advised to run the bot as sudo or root.\nRun the bot again using --run-admin to start it as Admin')
+        print('It is not advised to run the bot as sudo or root.\nRun the bot again using --run-admin to start it as Admin')
     exit(0)
 
 def set_log():
