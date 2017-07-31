@@ -36,9 +36,6 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
-    #parser.add_argument("-a", "--admin", # Allows the user to run the bot as admin or sudo
-    #                    action="store_true",
-    #                    help="Allows the bot to be run as admin")
     return parser
 
 args = parse_cmd_arguments().parse_args()
@@ -46,7 +43,6 @@ _test_run = args.test_run
 _force_mac = args.force_mac
 _reset_cfg = args.reset_config
 _silent = args.silent
-#_force_admin = args.admin
 _force_admin = False
 
 
@@ -60,8 +56,8 @@ if _test_run:
                         fields = json.load(template)
                         json.dump(fields, g, sort_keys=True, indent=4)
     except:
-        pass
-
+        print('Something when wrong') # only visible in Trais
+        pass # duo to some sample files sometimes missing passing it will make sure nothing goes wrong
     print("Quitting: test run")
     exit(0)
 
