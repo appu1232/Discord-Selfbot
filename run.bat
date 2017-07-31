@@ -72,8 +72,8 @@ goto run
 	echo Checking/Installing requirements (takes some time on first install)...
 	chcp 65001 >nul
 	set PYTHONIOENCODING=utf-8
-	python -m pip install --upgrade pip >nul
-	python -m pip install -r requirements.txt
+	python -m pip install --user --upgrade pip >nul
+	python -m pip install --user -r requirements.txt
 	if errorlevel 1 (
 	    echo Requirements installation failed. Perhaps some dependency is missing or access was denied? Possible solutions:
 	    echo - Run as administrator

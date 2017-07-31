@@ -106,9 +106,9 @@ run_bot() {
 		else
 			echo "Using pip as a python3 module"
 			echo "Upgrading pip"
-			if python3 -m pip install --upgrade pip; then
+			if python3 -m pip install --user --upgrade pip; then
 				echo "Upgrading requirements"
-				if python3 -m pip install -r requirements.txt >/dev/null; then
+				if python3 -m pip install --user -r requirements.txt >/dev/null; then
 					echo "Starting bot..."
 					python3 loopself.py
 					ret=$?
@@ -159,9 +159,9 @@ run_bot() {
 		else
 			echo "Using pip as a python3 module"
 			echo "Upgrading pip"
-			if python -m pip install --upgrade pip; then
+			if python -m pip install --user --upgrade pip; then
 				echo "Upgrading requirements"
-				if python -m pip install -r requirements.txt >/dev/null; then
+				if python -m pip install --user -r requirements.txt >/dev/null; then
 					echo "Starting bot..."
 					python loopself.py
 					ret=$?
