@@ -36,9 +36,6 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
-    parser.add_argument("--run-admin", # Allows the user to run the bot as admin or sudo
-                        action="store_true",
-                        help="Allows the bot to be run as admin")
     return parser
 
 args = parse_cmd_arguments().parse_args()
@@ -46,7 +43,7 @@ _test_run = args.test_run
 _force_mac = args.force_mac
 _reset_cfg = args.reset_config
 _silent = args.silent
-_force_admin = args.run_admin
+_force_admin = False
 
 
 if _test_run:
@@ -59,8 +56,8 @@ if _test_run:
                         fields = json.load(template)
                         json.dump(fields, g, sort_keys=True, indent=4)
     except:
-        pass
-
+        print('Something when wrong. Check for missing sample files') # only visible in Travis
+        pass # duo to some sample files sometimes missing passing it will make sure nothing goes wrong
     print("Quitting: test run")
     exit(0)
 
@@ -125,9 +122,9 @@ else:
         
 if shutdown == True and not _force_admin:
     if os.name == 'nt':
-        print('It is not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
+        print('It is not advised to run the bot as Admin.\nContinuing logging in...')
     else:
-        print('It is not advised to run the bot with root privileges.\nRun the bot again using --run-admin to start it as Admin')
+        print('It is not advised to run the bot with root privileges.\nContinuing logging in...')
     # exit(0)
 
 def set_log():
