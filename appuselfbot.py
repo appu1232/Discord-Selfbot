@@ -128,7 +128,7 @@ if shutdown == True and not _force_admin:
         print('It is not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
     else:
         print('It is not advised to run the bot with root privileges.\nRun the bot again using --run-admin to start it as Admin')
-    exit(0)
+    # exit(0)
 
 def set_log():
     errformat = logging.Formatter(
