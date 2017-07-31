@@ -11,3 +11,5 @@ script:
 cache: pip
 notifications:
   email: false
+dist: trusty
+os: linux
