@@ -47,6 +47,7 @@ _force_mac = args.force_mac
 _reset_cfg = args.reset_config
 _silent = args.silent
 #_force_admin = args.admin
+_force_admin = False
 
 
 if _test_run:
