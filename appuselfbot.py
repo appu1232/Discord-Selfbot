@@ -36,9 +36,9 @@ def parse_cmd_arguments(): # allows for arguments
     parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
-    parser.add_argument("-a", "--admin", # Allows the user to run the bot as admin or sudo
-                        action="store_true",
-                        help="Allows the bot to be run as admin")
+    #parser.add_argument("-a", "--admin", # Allows the user to run the bot as admin or sudo
+    #                    action="store_true",
+    #                    help="Allows the bot to be run as admin")
     return parser
 
 args = parse_cmd_arguments().parse_args()
@@ -46,7 +46,7 @@ _test_run = args.test_run
 _force_mac = args.force_mac
 _reset_cfg = args.reset_config
 _silent = args.silent
-_force_admin = args.admin
+#_force_admin = args.admin
 
 
 if _test_run:
@@ -125,9 +125,9 @@ else:
         
 if shutdown == True and not _force_admin:
     if os.name == 'nt':
-        print('It is not advised to run the bot as Admin.\nRun the bot again using --admin or -a to start it as Admin')
+        print('It is not advised to run the bot as Admin.\nContinuing logging in...')
     else:
-        print('It is not advised to run the bot with root privileges.\nRun the bot again using --admin or -a to start it as Admin')
+        print('It is not advised to run the bot with root privileges.\nContinuing logging in...')
     # exit(0)
 
 def set_log():
