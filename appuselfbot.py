@@ -118,7 +118,7 @@ if os.name == 'nt':
     else:
         shutdown = True
 else:
-    if 'SUDO_USER' in os.environ and os.geteuid() == 0:
+    if os.geteuid() == 0:
         shutdown = True
     else:
         shutdown = False
@@ -127,7 +127,7 @@ if shutdown == True and not _force_admin:
     if os.name == 'nt':
         print('It is not advised to run the bot as Admin.\nRun the bot again using --run-admin to start it as Admin')
     else:
-        print('It is not advised to run the bot as sudo or root.\nRun the bot again using --run-admin to start it as Admin')
+        print('It is not advised to run the bot with root privileges.\nRun the bot again using --run-admin to start it as Admin')
     exit(0)
 
 def set_log():
