@@ -36,7 +36,6 @@ class Server:
     async def server(self, ctx, *, msg=""):
         """Various info about the server. >help server for more info."""
         if ctx.invoked_subcommand is None:
-            pre = cmd_prefix_len()
             if msg:
                 server = None
                 try:
@@ -137,7 +136,7 @@ class Server:
                 em = discord.Embed(title='Role Info', color=role.color)
                 em.add_field(name='Name', value=role.name)
                 em.add_field(name='ID', value=role.id, inline=False)
-                em.add_field(name='Users in this role', value=len(role.members))
+                em.add_field(name='Users in this role', value=str(len(role.members)))
                 em.add_field(name='Role color hex value', value=str(role.color))
                 em.add_field(name='Role color RGB value', value=role.color.to_rgb())
                 em.add_field(name='Mentionable', value=role.mentionable)
@@ -153,6 +152,7 @@ class Server:
                 return await ctx.send(content=None, embed=em)
         await ctx.message.delete()
         await ctx.send(self.bot.bot_prefix + 'Could not find role ``%s``' % msg)
+
 
 def setup(bot):
     bot.add_cog(Server(bot))
