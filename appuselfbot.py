@@ -304,7 +304,7 @@ async def on_ready():
 
 
 @bot.event
-async def on_command_error(error, ctx):
+async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CommandNotFound):
         pass
     elif isinstance(error, commands.errors.CheckFailure):
@@ -398,7 +398,7 @@ async def quit(ctx):
 @bot.command(pass_context=True)
 async def reload(ctx, txt: str = None):
     """Reloads all modules."""
-    await bot.delete_message(ctx.message)
+    await ctx.message.delete()
     if txt:
         bot.unload_extension(txt)
         try:
@@ -451,7 +451,7 @@ async def on_message(message):
             if message.content.startswith(bot.customcmd_prefix):
                 response = custom(message.content.lower().strip())
                 if response:
-                    await bot.delete_message(message)
+                    await message.delete()
                     if get_config_value('optional_config', 'rich_embed') == 'on':
                         if response[0] == 'embed' and embed_perms(message):
                             try:
@@ -469,7 +469,7 @@ async def on_message(message):
             else:
                 response = quickcmds(message.content.lower().strip())
                 if response:
-                    await bot.delete_message(message)
+                    await message.delete()
                     await message.channel.send(response)
 
     notified = message.mentions
@@ -553,12 +553,12 @@ async def on_message(message):
                         for i in range(0, int(bot.log_conf['context_len'])):
                             temp = context[len(context)-i-1][0]
                             if temp.clean_content:
-                                msg += 'User: %s | %s\n' % (temp.author.name, temp.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
-                        msg += 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
+                                msg += 'User: %s | %s\n' % (temp.author.name, temp.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
+                        msg += 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
                         success = True
                     except:
                         success = False
-                        msg = 'User: %s | %s\n' % (message.author.name, message.timestamp.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
+                        msg = 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
 
                     part = int(math.ceil(len(msg) / 1950))
                     if user_found:
@@ -566,7 +566,7 @@ async def on_message(message):
                     else:
                         title = '%s mentioned: %s' % (message.author.name, word)
                     if part == 1 and success is True:
-                        em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.guild), str(message.channel.id), message.channel.name))
+                        em = discord.Embed(timestamp=message.created_at, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.guild), str(message.channel.id), message.channel.name))
                         for i in range(0, int(bot.log_conf['context_len'])):
                             temp = context.pop()
                             if temp[0].clean_content:
