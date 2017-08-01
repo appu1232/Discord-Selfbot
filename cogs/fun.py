@@ -295,6 +295,7 @@ class Fun:
 
     # given String react_me, return a list of emojis that can construct the string with no duplicates (for the purpose of reacting)
     # TODO make it consider reactions already applied to the message
+    @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True, aliases=['r'])
     async def react(self, ctx, msg: str, msg_id="last", channel="current", prefer_combine: bool = False):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
