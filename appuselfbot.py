@@ -431,9 +431,6 @@ async def reload(ctx, txt: str = None):
 @bot.event
 async def on_message(message):
 
-    # await bot.wait_until_ready()
-    # await bot.wait_until_login()
-
     if hasattr(bot, 'message_count'):
         bot.message_count += 1
 
@@ -770,7 +767,6 @@ if __name__ == '__main__':
         try:
             bot.run(token, bot=False)
         except discord.errors.LoginFailure:
-            bot.run(os.environ['TOKEN'], bot=False)
             if _silent:
                 print('Cannot use setup Wizard becaue of silent mode')
                 exit(0)
