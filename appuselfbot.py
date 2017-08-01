@@ -199,9 +199,9 @@ async def on_ready():
 
     if os.path.isfile('restart.txt'):
         with open('restart.txt', 'r', encoding="utf8") as re:
-            channel = bot.get_channel(re.readline())
+            channel = bot.get_channel(int(re.readline()))
             print('Bot has restarted.')
-            await bot.send_message(channel, bot.bot_prefix + 'Bot has restarted.')
+            await channel.send(bot.bot_prefix + 'Bot has restarted.')
         os.remove('restart.txt')
     bot.log_conf = load_log_config()
     bot.key_users = bot.log_conf['keyusers']
@@ -302,23 +302,25 @@ async def on_ready():
         with open('notifier.txt', 'w', encoding="utf8") as fp:
             fp.write(str(bot.subpro.pid))
 
+
 @bot.event
 async def on_command_error(error, ctx):
     if isinstance(error, commands.errors.CommandNotFound):
         pass
     elif isinstance(error, commands.errors.CheckFailure):
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + "You don't have permissions to use that command.")
+        await ctx.send(bot.bot_prefix + "You don't have permissions to use that command.")
     elif isinstance(error, commands.errors.MissingRequiredArgument):
         formatter = commands.formatter.HelpFormatter()
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + "You are missing required arguments.\n" + formatter.format_help_for(ctx, ctx.command)[0])
+        await ctx.send(bot.bot_prefix + "You are missing required arguments.\n" + formatter.format_help_for(ctx, ctx.command)[0])
     else:
         if _silent:
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command.".format(ctx.command.name))
+            await ctx.send(bot.bot_prefix + "An error occurred with the `{}` command.".format(ctx.command.name))
         else:
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + "An error occurred with the `{}` command. Check the console for details.".format(ctx.command.name))
+            await ctx.send(bot.bot_prefix + "An error occurred with the `{}` command. Check the console for details.".format(ctx.command.name))
             print("Ignoring exception in command {}".format(ctx.command.name))
             trace = traceback.format_exception(type(error), error, error.__traceback__)
             print("".join(trace))
+
 
 @bot.command(pass_context=True, aliases=['reboot'])
 async def restart(ctx):
@@ -331,25 +333,25 @@ async def restart(ctx):
 
     latest = update_bot(True)
     if latest:
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
+        await ctx.send(bot.bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
         reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
         with open('restart.txt', 'w', encoding="utf8") as re:
             re.write(str(ctx.message.channel.id))
         if not reply or reply.content.lower().strip() == 'n':
             print('Restarting...')
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Restarting...')
+            await ctx.send(bot.bot_prefix + 'Restarting...')
         else:
-            await bot.send_message(ctx.message.channel, content=None, embed=latest)
+            await ctx.send(content=None, embed=latest)
             with open('quit.txt', 'w', encoding="utf8") as q:
                 q.write('update')
             print('Downloading update and restarting...')
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Downloading update and restarting (check your console to see the progress)...')
+            await ctx.send(bot.bot_prefix + 'Downloading update and restarting (check your console to see the progress)...')
 
     else:
         print('Restarting...')
         with open('restart.txt', 'w', encoding="utf8") as re:
             re.write(str(ctx.message.channel.id))
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Restarting...')
+        await ctx.send(bot.bot_prefix + 'Restarting...')
 
     if bot.subpro:
         bot.subpro.kill()
@@ -366,10 +368,10 @@ async def update(ctx, msg: str = None):
     if latest:
         if not msg == 'show':
             if embed_perms(ctx.message):
-                await bot.send_message(ctx.message.channel, content=None, embed=latest)
-            await bot.send_message(ctx.message.channel, bot.bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
+                await ctx.send(content=None, embed=latest)
+            await ctx.send(bot.bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
         else:
-            await bot.send_message(ctx.message.channel, content=None, embed=latest)
+            await ctx.send(content=None, embed=latest)
             return
         with open('quit.txt', 'w', encoding="utf8") as q:
             q.write('update')
@@ -379,7 +381,7 @@ async def update(ctx, msg: str = None):
             bot.subpro.kill()
         os._exit(0)
     else:
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'The bot is up to date.')
+        await ctx.send(bot.bot_prefix + 'The bot is up to date.')
 
 
 @bot.command(pass_context=True, aliases=['stop', 'shutdown'])
@@ -389,7 +391,7 @@ async def quit(ctx):
     if bot.subpro:
         bot.subpro.kill()
     open('quit.txt', 'a', encoding="utf8").close()
-    await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Bot shut down.')
+    await ctx.send(bot.bot_prefix + 'Bot shut down.')
     os._exit(0)
 
 
@@ -406,7 +408,7 @@ async def reload(ctx, txt: str = None):
                 txt = 'cogs.'+txt
                 bot.load_extension(txt)
             except:
-                await bot.send_message(ctx.message.channel, '``` {}: {} ```'.format(type(e).__name__, e))
+                await ctx.send('``` {}: {} ```'.format(type(e).__name__, e))
                 return
     else:
         utils = []
@@ -419,18 +421,18 @@ async def reload(ctx, txt: str = None):
             try:
                 bot.load_extension(i)
             except Exception as e:
-                await bot.send_message(ctx.message.channel, '{}Failed to reload module `{}` ``` {}: {} ```'.format(bot.bot_prefix, i, type(e).__name__, e))
+                await ctx.send('{}Failed to reload module `{}` ``` {}: {} ```'.format(bot.bot_prefix, i, type(e).__name__, e))
                 fail = True
                 l -= 1
-        await bot.send_message(ctx.message.channel, bot.bot_prefix + 'Reloaded {} of {} modules.'.format(l, len(utils)))
+        await ctx.send(bot.bot_prefix + 'Reloaded {} of {} modules.'.format(l, len(utils)))
 
 
 # On all messages sent (for quick commands, custom commands, and logging messages)
 @bot.event
 async def on_message(message):
 
-    await bot.wait_until_ready()
-    await bot.wait_until_login()
+    # await bot.wait_until_ready()
+    # await bot.wait_until_login()
 
     if hasattr(bot, 'message_count'):
         bot.message_count += 1
@@ -441,14 +443,14 @@ async def on_message(message):
             bot.icount += 1
         try:
             if hasattr(bot, 'ignored_servers'):
-                if any(message.server.id == server_id for server_id in bot.ignored_servers['servers']):
+                if any(str(message.guild.id) == str(guild_id) for guild_id in bot.ignored_servers['servers']):
                     return
         except AttributeError:  # Happens when it's a direct message.
             pass
         if hasattr(bot, 'self_log'):
-            if message.channel.id not in bot.self_log:
-                bot.self_log[message.channel.id] = collections.deque(maxlen=100)
-            bot.self_log[message.channel.id].append(message)
+            if str(message.channel.id) not in bot.self_log:
+                bot.self_log[str(message.channel.id)] = collections.deque(maxlen=100)
+            bot.self_log[str(message.channel.id)].append(message)
             if message.content.startswith(bot.customcmd_prefix):
                 response = custom(message.content.lower().strip())
                 if response:
@@ -458,20 +460,20 @@ async def on_message(message):
                             try:
                                 if get_config_value('optional_config', 'customcmd_color'):
                                     color = int('0x' + get_config_value('optional_config', 'customcmd_color'), 16)
-                                    await bot.send_message(message.channel, content=None, embed=discord.Embed(colour=color).set_image(url=response[1]))
+                                    await message.channel.send(content=None, embed=discord.Embed(colour=color).set_image(url=response[1]))
                                 else:
-                                    await bot.send_message(message.channel, content=None, embed=discord.Embed().set_image(url=response[1]))
+                                    await message.channel.send(content=None, embed=discord.Embed().set_image(url=response[1]))
                             except:
-                                await bot.send_message(message.channel, response[1])
+                                await message.channel.send(response[1])
                         else:
-                            await bot.send_message(message.channel, response[1])
+                            await message.channel.send(response[1])
                     else:
-                        await bot.send_message(message.channel, response[1])
+                        await message.channel.send(response[1])
             else:
                 response = quickcmds(message.content.lower().strip())
                 if response:
                     await bot.delete_message(message)
-                    await bot.send_message(message.channel, response)
+                    await message.channel.send(response)
 
     notified = message.mentions
     if notified:
@@ -487,17 +489,17 @@ async def on_message(message):
 
         try:
             word_found = False
-            if (bot.log_conf['allservers'] == 'True' or str(message.server.id) in bot.log_conf['servers']) and (message.server.id not in bot.log_conf['blacklisted_servers'] and message.channel.id not in bot.log_conf['blacklisted_channels']):
-                add_alllog(message.channel.id, message.server.id, message)
-                if message.author.id != bot.user.id and (not message.author.bot and not any(x in message.author.id for x in bot.log_conf['blacklisted_users'])):
+            if (bot.log_conf['allservers'] == 'True' or str(message.guild.id) in bot.log_conf['servers']) and (str(message.guild.id) not in bot.log_conf['blacklisted_servers'] and str(message.channel.id) not in bot.log_conf['blacklisted_channels']):
+                add_alllog(str(message.channel.id), str(message.guild.id), message)
+                if message.author.id != bot.user.id and (not message.author.bot and not any(x in str(message.author.id) for x in bot.log_conf['blacklisted_users'])):
                     for word in bot.log_conf['keywords']:
                         if ' [server]' in word:
-                            word, server = word.split(' [server]')
-                            if message.server.id != server:
+                            word, guild = word.split(' [server]')
+                            if str(message.guild.id) != guild:
                                 continue
                         elif ' [channel]' in word:
                             word, channel = word.split(' [channel]')
-                            if message.channel.id != channel:
+                            if str(message.channel.id) != channel:
                                 continue
                         if word.startswith('[isolated]'):
                             word = word[10:].lower()
@@ -513,12 +515,12 @@ async def on_message(message):
                     for x in bot.log_conf['blacklisted_words']:
                         if '[server]' in x:
                             bword, id = x.split('[server]')
-                            if bword.strip().lower() in message.content.lower() and message.server.id == id:
+                            if bword.strip().lower() in message.content.lower() and str(message.guild.id) == id:
                                 word_found = False
                                 break
                         elif '[channel]' in x:
                             bword, id = x.split('[channel]')
-                            if bword.strip().lower() in message.content.lower() and message.channel.id == id:
+                            if bword.strip().lower() in message.content.lower() and str(message.channel.id) == id:
                                 word_found = False
                                 break
                         if x.lower() in message.content.lower():
@@ -527,8 +529,8 @@ async def on_message(message):
 
             user_found = False
             if bot.log_conf['user_logging'] == 'on':
-                if '{} {}'.format(str(message.author.id), str(message.server.id)) in bot.log_conf['keyusers']:
-                    if user_post(bot, '{} {}'.format(str(message.author.id), str(message.server.id))):
+                if '{} {}'.format(str(message.author.id), str(message.guild.id)) in bot.log_conf['keyusers']:
+                    if user_post(bot, '{} {}'.format(str(message.author.id), str(message.guild.id))):
                         user_found = message.author.name
 
                 elif '{} all'.format(str(message.author.id)) in bot.log_conf['keyusers']:
@@ -542,14 +544,14 @@ async def on_message(message):
                 else:
                     location = bot.log_conf['log_location'].split()
                     is_separate = False
-                server = bot.get_server(location[1])
-                if message.channel.id != location[0]:
+                guild = bot.get_guild(int(location[1]))
+                if str(message.channel.id) != location[0]:
                     msg = message.clean_content.replace('`', '')
 
                     context = []
                     try:
                         for i in range(0, int(bot.log_conf['context_len'])):
-                            context.append(bot.all_log[message.channel.id + ' ' + message.server.id][len(bot.all_log[message.channel.id + ' ' + message.server.id])-i-2])
+                            context.append(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)][len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)])-i-2])
                         msg = ''
                         for i in range(0, int(bot.log_conf['context_len'])):
                             temp = context[len(context)-i-1][0]
@@ -567,7 +569,7 @@ async def on_message(message):
                     else:
                         title = '%s mentioned: %s' % (message.author.name, word)
                     if part == 1 and success is True:
-                        em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.server), str(message.channel.id), message.channel.name))
+                        em = discord.Embed(timestamp=message.timestamp, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.guild), str(message.channel.id), message.channel.name))
                         for i in range(0, int(bot.log_conf['context_len'])):
                             temp = context.pop()
                             if temp[0].clean_content:
@@ -582,7 +584,7 @@ async def on_message(message):
                         elif bot.notify['type'] == 'ping':
                             await webhook(em, 'embed ping', is_separate)
                         else:
-                            await bot.send_message(server.get_channel(location[0]), embed=em)
+                            await guild.get_channel(int(location[0])).send(embed=em)
                     else:
                         split_list = [msg[i:i + 1950] for i in range(0, len(msg), 1950)]
                         all_words = []
@@ -599,18 +601,18 @@ async def on_message(message):
                         for b, i in enumerate(all_words):
                             if b == 0:
                                 if bot.notify['type'] == 'msg':
-                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s> | %s\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), message.channel.name, i), 'message', is_separate)
+                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s> | %s\n\n```%s```' % (logged_msg, str(message.guild), str(message.channel.id), message.channel.name, i), 'message', is_separate)
                                 elif bot.notify['type'] == 'ping':
-                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s> | %s\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), message.channel.name, i), 'message ping', is_separate)
+                                    await webhook(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s> | %s\n\n```%s```' % (logged_msg, str(message.guild), str(message.channel.id), message.channel.name, i), 'message ping', is_separate)
                                 else:
-                                    await bot.send_message(server.get_channel(location[0]), bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s>\n\n```%s```' % (logged_msg, str(message.server), str(message.channel.id), i))
+                                    await guild.get_channel(int(location[0])).send(bot.bot_prefix + '%s in server: ``%s`` Context: Channel: <#%s>\n\n```%s```' % (logged_msg, str(message.guild), str(message.channel.id), i))
                             else:
                                 if bot.notify['type'] == 'msg':
                                     await webhook('```%s```' % i, 'message', is_separate)
                                 elif bot.notify['type'] == 'ping':
                                     await webhook('```%s```' % i, 'message ping', is_separate)
                                 else:
-                                    await bot.send_message(server.get_channel(location[0]), '```%s```' % i)
+                                    await guild.get_channel(int(location[0])).send('```%s```' % i)
                     bot.keyword_log += 1
 
         # Bad habit but this is for skipping errors when dealing with Direct messages, blocked users, etc. Better to just ignore.
@@ -620,18 +622,18 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-def add_alllog(channel, server, message):
+def add_alllog(channel, guild, message):
     if not hasattr(bot, 'all_log'):
         bot.all_log = {}
-    if channel + ' ' + server in bot.all_log:
-        bot.all_log[channel + ' ' + server].append((message, message.clean_content))
+    if channel + ' ' + guild in bot.all_log:
+        bot.all_log[channel + ' ' + guild].append((message, message.clean_content))
     else:
-        bot.all_log[channel + ' ' + server] = collections.deque(maxlen=int(get_config_value('log', 'log_size', 25)))
-        bot.all_log[channel + ' ' + server].append((message, message.clean_content))
+        bot.all_log[channel + ' ' + guild] = collections.deque(maxlen=int(get_config_value('log', 'log_size', 25)))
+        bot.all_log[channel + ' ' + guild].append((message, message.clean_content))
 
 
-def remove_alllog(channel, server):
-    del bot.all_log[channel + ' ' + server]
+def remove_alllog(channel, guild):
+    del bot.all_log[channel + ' ' + guild]
 
 
 # Webhook for keyword notifications
@@ -762,11 +764,13 @@ if __name__ == '__main__':
 
     while True:
         try:
-            try:
-                bot.run(os.environ['TOKEN'], bot=False)
-            except (KeyError, discord.errors.LoginFailure):
-                bot.run(get_config_value('config', 'token'), bot=False)
-        except (KeyError, discord.errors.LoginFailure):
+            token = os.environ['TOKEN']
+        except:
+            token = get_config_value('config', 'token')
+        try:
+            bot.run(token, bot=False)
+        except discord.errors.LoginFailure:
+            bot.run(os.environ['TOKEN'], bot=False)
             if _silent:
                 print('Cannot use setup Wizard becaue of silent mode')
                 exit(0)
