@@ -10,6 +10,5 @@ while True:
             exit(15)
         break
     params = [sys.executable, 'appuselfbot.py']
-    for arg in sys.argv[1:]:
-        params.append(arg)
+    params.extend(sys.argv[1:])
     subprocess.call(params)
