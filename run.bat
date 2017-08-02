@@ -34,22 +34,17 @@ goto run
 	if exist tmp del /F /Q tmp
 	echo Backing up your settings...
 	echo d | xcopy settings tmp /E >nul
-	ren settings settings2
 	echo Latest update:
 	git --no-pager log --pretty=oneline -n1 origin/master ^master
 	git pull origin master
 	if errorlevel 1 goto force
 	echo Finished updating
-	rmdir /s /q settings >nul 2>&1
-	ren settings2 settings
 	echo Starting up...
 	goto run
 :force
 	git fetch --all
 	git reset --hard origin/master
 	echo Finished updating
-	rmdir /s /q settings >nul 2>&1
-	ren settings2 settings
 	echo Starting up...
 	goto run
 :git
