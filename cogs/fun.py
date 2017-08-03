@@ -4,6 +4,7 @@ import json
 from discord.ext import commands
 import discord
 from cogs.utils.checks import embed_perms, cmd_prefix_len, find_channel
+from cogs.utils.config import get_config_value, write_config_value
 from pyfiglet import figlet_format
 import urllib.parse
 
@@ -126,10 +127,11 @@ class Fun:
 
     # used in textflip
     text_flip = {}
-    char_list = "abcdefghijklmnpqrtuvwxyzABCDEFGHIJKLMNPQRTUVWYZ12345679!&*(),.'"
-    alt_char_list = "ɐqɔpǝɟƃɥᴉɾʞlɯudbɹʇnʌʍxʎz∀qƆpƎℲפHIſʞ˥WNԀQɹ┴∩ΛM⅄ZƖᄅƐㄣϛ9ㄥ6¡⅋*)('˙,"
+    char_list = "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}"
+    alt_char_list = "{|}zʎxʍʌnʇsɹbdouɯlʞɾᴉɥƃɟǝpɔqɐ,‾^[\]Z⅄XMΛ∩┴SɹQԀONW˥ʞſIHפℲƎpƆq∀@¿<=>;:68ㄥ9ϛㄣƐᄅƖ0/˙-'+*(),⅋%$#¡"[::-1]
     for idx, char in enumerate(char_list):
         text_flip[char] = alt_char_list[idx]
+        text_flip[alt_char_list[idx]] = char
 
     # used in >react, checks if it's possible to react with the duper string or not
     def has_dupe(duper):
@@ -177,53 +179,51 @@ class Fun:
             em = discord.Embed(color=color)
             em.add_field(name='\u2753 Question', value=msg)
             em.add_field(name='\ud83c\udfb1 8ball', value=self.ball[answer], inline=False)
-            await self.bot.send_message(ctx.message.channel, content=None, embed=em)
-            await self.bot.delete_message(ctx.message)
+            await ctx.send(content=None, embed=em)
+            await ctx.message.delete()
         else:
-            await self.bot.send_message(ctx.message.channel, '\ud83c\udfb1 ``{}``'.format(random.choice(self.ball)))
+            await ctx.send('\ud83c\udfb1 ``{}``'.format(random.choice(self.ball)))
 
     @commands.command(pass_context=True, aliases=['pick'])
     async def choose(self, ctx, *, choices: str):
         """Choose randomly from the options you give. >choose this | that"""
-        await self.bot.send_message(ctx.message.channel,
-                                    self.bot.bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
+        await ctx.send(
+                       self.bot.bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
 
     @commands.command(pass_context=True)
     async def l2g(self, ctx, *, msg: str):
         """Creates a lmgtfy link. Ex: >l2g how do i become cool."""
         lmgtfy = 'http://lmgtfy.com/?q='
-        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + lmgtfy + urllib.parse.quote_plus(msg.lower().strip()))
-        await self.bot.delete_message(ctx.message)
+        await ctx.send(self.bot.bot_prefix + lmgtfy + urllib.parse.quote_plus(msg.lower().strip()))
+        await ctx.message.delete()
 
     @commands.command(pass_context=True)
     async def vowelreplace(self, ctx, replace, *, msg):
         """Replaces all vowels in a word with a letter"""
         result = ""
         for letter in msg:
-            if letter in "aeiou":
+            if letter.lower() in "aeiou":
                 result += replace
             else:
                 result += letter
-        await self.bot.delete_message(ctx.message)
-        await self.bot.send_message(ctx.message.channel, result)
+        await ctx.message.delete()
+        await ctx.send(result)
 
-    @commands.group(pass_context=True)
-    async def ascii(self, ctx):
+    @commands.group(pass_context=True, invoke_without_command=True)
+    async def ascii(self, ctx, *, msg):
         """Convert text to ascii art. Ex: >ascii stuff >help ascii for more info."""
         if ctx.invoked_subcommand is None:
-            pre = cmd_prefix_len()
-            if ctx.message.content[pre + 5:]:
-                with open('settings/optional_config.json', 'r+') as fp:
-                    opt = json.load(fp)
-                msg = str(figlet_format(ctx.message.content[pre + 5:].strip(), font=opt['ascii_font']))
+            if msg:
+                font = get_config_value("optional_config", "ascii_font")
+                msg = str(figlet_format(msg.strip(), font=font))
                 if len(msg) > 2000:
-                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Message too long, rip.')
+                    await ctx.send(self.bot.bot_prefix + 'Message too long, RIP.')
                 else:
-                    await self.bot.delete_message(ctx.message)
-                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + '```{}```'.format(msg))
+                    await ctx.message.delete()
+                    await ctx.send(self.bot.bot_prefix + '```{}```'.format(msg))
             else:
-                await self.bot.send_message(ctx.message.channel,
-                                            self.bot.bot_prefix + 'Please input text to convert to ascii art. Ex: ``>ascii stuff``')
+                await ctx.send(
+                               self.bot.bot_prefix + 'Please input text to convert to ascii art. Ex: ``>ascii stuff``')
 
     @ascii.command(pass_context=True)
     async def font(self, ctx, *, txt: str):
@@ -231,32 +231,32 @@ class Fun:
         try:
             str(figlet_format('test', font=txt))
         except:
-            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid font type.')
-        with open('settings/optional_config.json', 'r+') as fp:
-            opt = json.load(fp)
-            opt['ascii_font'] = txt
-            fp.seek(0)
-            fp.truncate()
-            json.dump(opt, fp, indent=4)
-        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set ascii font.')
+            return await ctx.send(self.bot.bot_prefix + 'Invalid font type.')
+        write_config_value("optional_config", "ascii_font", txt)
+        await ctx.send(self.bot.bot_prefix + 'Successfully set ascii font.')
 
     @commands.command(pass_context=True)
-    async def dice(self, ctx, dice="1", sides="6"):
+    async def dice(self, ctx, *, msg="1"):
         """Roll dice. Optionally input # of dice and # of sides. Ex: >dice 5 12"""
-        await self.bot.delete_message(ctx.message)
+        await ctx.message.delete()
         invalid = 'Invalid syntax. Ex: `>dice 4` - roll four normal dice. `>dice 4 12` - roll four 12 sided dice.'
         dice_rolls = []
         dice_roll_ints = []
+        try:
+            dice, sides = re.split("[d\s]", msg)
+        except ValueError:
+            dice = msg
+            sides = "6"
         try:
             for roll in range(int(dice)):
                 result = random.randint(1, int(sides))
                 dice_rolls.append(str(result))
                 dice_roll_ints.append(result)
         except ValueError:
-            return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + invalid)
+            return await ctx.send(self.bot.bot_prefix + invalid)
         embed = discord.Embed(title="Dice rolls:", description=' '.join(dice_rolls))
         embed.add_field(name="Total:", value=sum(dice_roll_ints))
-        await self.bot.send_message(ctx.message.channel, "", embed=embed)
+        await ctx.send("", embed=embed)
 
     @commands.command(pass_context=True)
     async def textflip(self, ctx, *, msg):
@@ -267,39 +267,35 @@ class Fun:
                 result += self.text_flip[char]
             else:
                 result += char
-        await self.bot.edit_message(ctx.message, result[::-1])  # slice reverses the string
+        await ctx.message.edit(content=result[::-1])  # slice reverses the string
 
     @commands.command(pass_context=True)
     async def regional(self, ctx, *, msg):
         """Replace letters with regional indicator emojis"""
-        await self.bot.delete_message(ctx.message)
+        await ctx.message.delete()
         msg = list(msg)
-        regional_list = [self.regionals[x.lower()] if x.isalnum() or x == '!' or x == '?' else x for x in msg]
-        # by putting zero width no-break spaces between each regional indicator,
-        # we prevent them from being joined into flags but still allow them to
-        # break on newlines normally
+        regional_list = [self.regionals[x.lower()] if x.isalnum() or x in ["!", "?"] else x for x in msg]
         regional_output = '\u200b'.join(regional_list)
-        await self.bot.send_message(ctx.message.channel, regional_output)
+        await ctx.send(regional_output)
 
     @commands.command(pass_context=True)
     async def space(self, ctx, *, msg):
         """Add n spaces between each letter. Ex: >space 2 thicc"""
-        await self.bot.delete_message(ctx.message)
+        await ctx.message.delete()
         if msg.split(' ', 1)[0].isdigit():
             spaces = int(msg.split(' ', 1)[0]) * ' '
             msg = msg.split(' ', 1)[1].strip()
         else:
             spaces = ' '
-        spaced_message = '{}'.format(spaces).join(list(msg))
-        await self.bot.send_message(ctx.message.channel, spaced_message)
+        spaced_message = spaces.join(list(msg))
+        await ctx.send(spaced_message)
 
     # given String react_me, return a list of emojis that can construct the string with no duplicates (for the purpose of reacting)
     # TODO make it consider reactions already applied to the message
-    @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True, aliases=['r'])
     async def react(self, ctx, msg: str, msg_id="last", channel="current", prefer_combine: bool = False):
         """Add letter(s) as reaction to previous message. Ex: >react hot"""
-        await self.bot.delete_message(ctx.message)
+        await ctx.message.delete()
         msg = msg.lower()
 
         msg_id = None if msg_id == "last" or msg_id == "0" or msg_id == "1" else int(msg_id)
@@ -322,11 +318,11 @@ class Fun:
                         msg[name_end_colon + 3:id_end + 2])  # we add the custom emoji to the list to replace '<' later
                     char_index = id_end + 2  # jump ahead in react_me parse
                 else:
-                    raise Exception("Can't react with '<'")
+                    await ctx.send(self.bot.bot_prefix + "Can't react with '<'.")
             char_index += 1
         if Fun.has_dupe(non_unicode_emoji_list):
-            raise Exception(
-                "You requested that I react with at least two of the exact same specific emoji. I'll try to find alternatives for alphanumeric text, but if you specify a specific emoji must be used, I can't help.")
+            await ctx.send(self.bot.bot_prefix + 
+                           "You requested that I react with at least two of the exact same specific emoji. I'll try to find alternatives for alphanumeric text, but if you specify a specific emoji must be used, I can't help.")
 
         react_me_original = react_me  # we'll go back to this version of react_me if prefer_combine is false but we can't make the reaction happen unless we combine anyway.
 
@@ -341,9 +337,9 @@ class Fun:
                     react_me = Fun.replace_combos(react_me)
                     react_me = Fun.replace_letters(react_me)
                     if Fun.has_dupe(react_me):  # this failed too, so there's really nothing we can do anymore.
-                        raise Exception("Tried a lot to get rid of the dupe, but couldn't. react_me: " + react_me)
+                        await ctx.send(self.bot.bot_prefix + "Failed to fix all duplicates. Cannot react with this string.")
                 else:
-                    raise Exception("Tried a lot to get rid of the dupe, but couldn't. react_me: " + react_me)
+                    await ctx.send(self.bot.bot_prefix + "Failed to fix all duplicates. Cannot react with this string.")
 
             lt_count = 0
             for char in react_me:
@@ -369,21 +365,28 @@ class Fun:
                     lt_count += 1
 
         if channel == "current":
-            async for message in self.bot.logs_from(ctx.message.channel, limit=limit):
+            async for message in ctx.message.channel.history(limit=limit):
                 if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                     for i in reactions:
-                        await self.bot.add_reaction(message, i)
+                        try:
+                            await message.add_reaction(i)
+                        # :ok_hand: lit fam :ok_hand:
+                        except:
+                            pass
         else:
             found_channel = find_channel(ctx.message.server.channels, channel)
             if not found_channel:
                 found_channel = find_channel(self.bot.get_all_channels(), channel)
             if found_channel:
-                async for message in self.bot.logs_from(found_channel, limit=limit):
+                async for message in found_channel.history(limit=limit):
                     if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
                         for i in reactions:
-                            await self.bot.add_reaction(message, i)
+                            try:
+                                await message.add_reaction(i)
+                            except:
+                                pass
             else:
-                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + "Channel not found.")
+                await ctx.send(self.bot.bot_prefix + "Channel not found.")
 
 
 def setup(bot):
