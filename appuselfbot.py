@@ -720,7 +720,7 @@ async def game_and_avatar(bot):
                                 next_avatar = random.randint(0, len(all_avis) - 1)
                             current_avatar = next_avatar
                             bot.avatar = all_avis[next_avatar]
-                            with open('avatars/%s' % bot.avatar, 'rb', encoding="utf8") as fp:
+                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
                         else:
                             if next_avatar + 1 == len(all_avis):
