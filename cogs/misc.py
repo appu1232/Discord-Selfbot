@@ -34,8 +34,8 @@ class Misc:
             await ctx.send('https://github.com/appu1232/Selfbot-for-Discord')
         await ctx.message.delete()
 
-    @commands.group(aliases=['status'], pass_context=True)
-    async def stats(self, ctx):
+    @commands.group(aliases=['stats'], pass_context=True)
+    async def status(self, ctx):
         """Bot stats."""
         uptime = (datetime.datetime.now() - self.bot.uptime)
         hours, rem = divmod(int(uptime.total_seconds()), 3600)
@@ -58,11 +58,22 @@ class Misc:
             em.add_field(name=u'\U0001F4E5 Msgs received', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.guilds)))
-            em.add_field(name=u'\ud83d\udcd1 Channels', value=str(channel_count))
+            em.add_field(name=u'\ud83d\udcd1 Channels', value=str(channel_count)+' ('+str(len(self.bot.private_channels))+' private)')
+            em.add_field(name=u'\U0001f46a Users', value=str(len(self.bot.users)))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
             g = u'\U0001F3AE Game'
-            if '=' in game: g = '\ud83c\udfa5 Stream'
+            if '=' in game:
+                g = '\ud83c\udfa5 Stream'
+                game = game.split('=')
+                game = '[{}]({})'.format(game[0],game[1])
             em.add_field(name=g, value=game)
+            status = str(ctx.message.author.status)
+            if not status == 'offline':
+                if status == 'online': status = '\📗 '+status
+                elif status == 'idle': status = '\📙 '+status
+                elif status == 'dnd': status = '\📕 '+status
+                # elif status in ['invisible', 'offline']: status = '\📘 '+status
+                em.add_field(name='🌐 Status', value=status.title())
             mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024 ** 2)
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
             try:
