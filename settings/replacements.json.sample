@@ -1,4 +1,7 @@
 {
-    ":lennyface:": "( ͡° ͜ʖ ͡°)",
-    ":tableflip": "(╯°□°）╯︵ ┻━┻"
-} 
+    ":shrugs:" : "\u00af\\_(\u30c4)_/\u00af",
+    ":lenny:": "( \u0361\u00b0 \u035c\u0296 \u0361\u00b0)",
+    ":tableflip:": "(\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b",
+    ":doubleflip:" : "\u253b\u2501\u253b \uff90\u30fd(\u0ca0\u76ca\u0ca0)\u30ce\u5f61\u253b\u2501\u253b",
+    ":unflip:" : "\u252c\u2500\u252c\ufeff \u30ce( \u309c-\u309c\u30ce)"
+}
