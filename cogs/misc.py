@@ -69,10 +69,10 @@ class Misc:
             em.add_field(name=g, value=game)
             status = ctx.message.author.status
             if not status == discord.Status.offline:
-                if status == 'online': status = '\📗 '+str(status)
-                elif status == 'idle': status = '\📙 '+str(status)
-                elif status == 'dnd': status = '\📕 '+str(status)
-                # elif status in ['invisible', 'offline']: status = '\📘 '+status
+                if status == discord.Status.online: status = '\📗 '+str(status)
+                elif status == discord.Status.idle: status = '\📙 '+str(status)
+                elif status == discord.Status.dnd: status = '\📕 '+str(status)
+                # elif status in [discord.Status.invisible, discord.Status.offline]: status = '\📘 '+status
                 em.add_field(name='🌐 Status', value=status.title())
             mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024 ** 2)
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
