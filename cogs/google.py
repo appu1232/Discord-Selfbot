@@ -182,6 +182,7 @@ class Google:
         """Google image search. >i Lillie pokemon sun and moon"""
         await self.bot.delete_message(ctx.message)
         config = load_optional_config()
+        get_config_value("optional_config", "show_search_term", True)
         if query[0].isdigit():
             item = int(query[0])
             query = query[1:]
@@ -204,12 +205,16 @@ class Google:
                     em = discord.Embed()
                     if embed_perms(ctx.message):
                         em.set_image(url=result['items'][item]['link'])
-                        em.set_footer(text="Search term: \"" + query + "\"")
+                        if config['show_search_term'] == "True":
+                            em.set_footer(text="Search term: \"" + query + "\"")
+                        if config['show_search_term'] == "False":
+                            em.set_footer(text="Search term has been hidden. You can undo this in optional_config.json")
+                        if config['show_search_term'] != "True" and config['show_search_term'] != "False":
+                            em.set_footer(text="No setting has been set in optional_config.json. Please set it to True or False.")
                         await self.bot.send_message(ctx.message.channel, content=None, embed=em)
                     else:
                         await self.bot.send_message(ctx.message.channel, result['items'][item]['link'])
                         await self.bot.send_message(ctx.message.channel, "Search term: \"" + query + "\"")
-
 
 def setup(bot):
     bot.add_cog(Google(bot))
