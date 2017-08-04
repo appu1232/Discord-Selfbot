@@ -1,25 +1,22 @@
 import discord
 from discord.ext import commands
 import json
-import shutil
+
 
 class FriendCodes:
 
     def __init__(self, bot):
         self.bot = bot
         try:
-            with open('settings/fc.json') as data_file:
-                self.data = json.loads(data_file.read())
+            with open("settings/fc.json", encoding='utf-8') as fc:
+                self.data = json.load(fc)
         except FileNotFoundError:
-            shutil.copy2('settings/fc.json.sample', 'settings/fc.json')
-            with open('settings/fc.json') as data_file:
-                self.data = json.loads(data_file.read())
+            self.data = {}
 
     async def simple_embed(self, text, title="", color=discord.Color.default()):
         embed = discord.Embed(title=title, color=color)
         embed.description = text
         await self.bot.say("", embed=embed)
-  
 
     @commands.group(pass_context=True)
     async def fc(self, ctx):

@@ -2,8 +2,6 @@ import discord
 import json
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
-import shutil
-import os.path
 
 '''Manage replacements within messages.'''
 
@@ -12,9 +10,11 @@ class Replacements:
 
     def __init__(self, bot):
         self.bot = bot
-        if not os.path.isfile("settings/replacements.json"):
-            shutil.copy2("settings/replacements.json.sample", "settings/replacements.json")
-        self.replacement_dict = dataIO.load_json("settings/replacements.json")
+        try:
+            with open("settings/replacements.json", encoding='utf-8') as rp:
+                self.replacement_dict = json.load(rp)
+        except FileNotFoundError:
+            self.replacement_dict = {}
 
     @commands.command(pass_context=True)
     async def replacements(self, ctx):

@@ -16,6 +16,7 @@ import logging
 import logging.handlers
 from json import load, dump
 from datetime import timezone
+from cogs.utils.dataIO import dataIO
 from cogs.utils.allmsgs import custom, quickcmds
 from discord_webhooks import Webhook
 from cogs.utils.checks import *
@@ -224,6 +225,12 @@ async def on_ready():
             json.dump(games, g, indent=4)
 
     # Dealing with old versions updating
+    if not os.path.isfile('settings/fc.json'):
+        data = {"bnet_fc": "", "ds_fc": "", "psn_fc": "", "steam_fc": "", "switch_fc": "", "xbox_fc": ""}
+        dataIO.save_json("settings/fc.json", data)
+    if not os.path.isfile('settings/replacements.json'):
+        data = {":lennyface:": "( ͡° ͜ʖ ͡°)", ":tableflip": "(╯°□°）╯︵ ┻━┻"}
+        dataIO.save_json("settings/replacements.json", data)
     if not os.path.isfile('settings/moderation.json'):
         with open('settings/moderation.json', 'w', encoding="utf8") as m:
             mod = {}
