@@ -58,7 +58,7 @@ class Userinfo:
 
             await ctx.message.delete()
 
-    @info.command()
+    @userinfo.command()
     async def avi(self, ctx, txt: str = None):
         """View bigger version of user's avatar. Ex: >info avi @user"""
         if txt:

@@ -14,6 +14,7 @@ class Replacements:
 
     @commands.command(pass_context=True)
     async def replacements(self, ctx):
+        """Set text you want to automatically replace with something else."""
         await ctx.message.delete()
         menu_msg = await ctx.send("```\nWhat would you like to do? Pick a number.\n\n1. Create a new replacement\n2. Remove an existing replacement\n3. List all current replacements```")
         reply = await self.bot.wait_for("message", check=lambda m: m.channel == ctx.message.channel and m.author == self.bot.user and m.content.isdigit())
@@ -64,6 +65,7 @@ class Replacements:
                 replaced_message = replaced_message.replace(replacement, self.replacement_dict[replacement])
             if message.content != replaced_message:
                 await message.edit(content=replaced_message)
+
 
 def setup(bot):
     bot.add_cog(Replacements(bot))

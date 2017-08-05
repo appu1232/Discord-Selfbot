@@ -676,6 +676,7 @@ class Utility:
 
     @commands.group(pass_context=True)
     async def link(self, ctx):
+        """Shorten/lengthen URLs"""
         await ctx.message.delete()
         if ctx.invoked_subcommand is None:
             await ctx.send(self.bot.bot_prefix + "Usage: `link <shorten/lengthen> <url>`")
@@ -712,6 +713,7 @@ class Utility:
 
     @commands.command(pass_context=True, aliases=['getcolor'])
     async def getcolour(self, ctx, colour_code):
+        """Posts color of given hex"""
         await ctx.message.delete()
         if not colour_code.startswith("#"):
             colour_code = "#" + colour_code

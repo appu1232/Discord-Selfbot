@@ -1,6 +1,8 @@
 import prettytable
 import discord
 import os
+import re
+from urllib.parse import urlparse
 from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.checks import embed_perms, cmd_prefix_len
@@ -12,6 +14,8 @@ class Server:
 
     def __init__(self, bot):
         self.bot = bot
+        self.invites = ['discord.gg/', 'discordapp.com/invite/']
+        self.invite_domains = ['discord.gg', 'discordapp.com']
 
     def find_server(self, msg):
         server = None
@@ -152,6 +156,114 @@ class Server:
                 return await ctx.send(content=None, embed=em)
         await ctx.message.delete()
         await ctx.send(self.bot.bot_prefix + 'Could not find role ``%s``' % msg)
+
+    @commands.command(aliases=['channel', 'cinfo', 'ci'], pass_context=True, no_pm=True)
+    async def channelinfo(self, ctx, *, channel: discord.channel=None):
+        """Shows channel informations"""
+        if not channel:
+            channel = ctx.message.channel
+        # else:
+            # channel = ctx.message.guild.get_channel(int(chan))
+            # if not channel: channel = self.bot.get_channel(int(chan))
+        data = discord.Embed()
+        content = None
+        if hasattr(channel, 'mention'):
+            content = self.bot.bot_prefix+"**Informations about Channel:** "+channel.mention
+        if hasattr(channel, 'changed_roles'):
+            if len(channel.changed_roles) > 0:
+                data.color = discord.Colour.green() if channel.changed_roles[0].permissions.read_messages else discord.Colour.red()
+        if isinstance(channel, discord.TextChannel): _type = "Text"
+        elif isinstance(channel, discord.VoiceChannel): _type = "Voice"
+        else: _type = "Unknown"
+        data.add_field(name="Type", value=_type)
+        data.add_field(name="ID", value=channel.id, inline=False)
+        if hasattr(channel, 'position'):
+            data.add_field(name="Position", value=channel.position)
+        if isinstance(channel, discord.VoiceChannel):
+            if channel.user_limit != 0:
+                data.add_field(name="User Number", value="{}/{}".format(len(channel.voice_members), channel.user_limit))
+            else:
+                data.add_field(name="User Number", value="{}".format(len(channel.voice_members)))
+            userlist = [r.display_name for r in channel.members]
+            if not userlist:
+                userlist = "None"
+            else:
+                userlist = "\n".join(userlist)
+            data.add_field(name="Users", value=userlist)
+            data.add_field(name="Bitrate", value=channel.bitrate)
+        elif isinstance(channel, discord.TextChannel):
+            if channel.members:
+                data.add_field(name="Members", value="%s"%len(channel.members))
+            if channel.topic:
+                data.add_field(name="Topic", value=channel.topic, inline=False)
+            _hidden = []; _allowed = []
+            for role in channel.changed_roles:
+                if role.permissions.read_messages: _allowed.append(role.mention)
+                else: _hidden.append(role.mention)
+            if len(_allowed) > 0: data.add_field(name='Allowed Roles (%s)'%len(_allowed), value=', '.join(_allowed), inline=False)
+            if len(_hidden) > 0: data.add_field(name='Restricted Roles (%s)'%len(_hidden), value=', '.join(_hidden), inline=False)
+        if channel.created_at:
+            data.set_footer(text=("Created on {} ({} days ago)".format(channel.created_at.strftime("%d %b %Y %H:%M"), (ctx.message.created_at - channel.created_at).days)))
+        # try:
+            await ctx.send(content if content else None, embed=data)
+        # except:
+            # await ctx.send(self.bot.bot_prefix+"I need the `Embed links` permission to send this")
+
+    @commands.command(aliases=['invitei', 'ii'], pass_context=True)
+    async def inviteinfo(self, ctx, *, invite: str = None):
+        """Shows invite informations."""
+        if invite:
+            for url in re.findall(r'(https?://\S+)', invite):
+                invite = await self.bot.get_invite(urlparse(url).path.replace('/', '').replace('<', '').replace('>', ''))
+                break
+        else:
+            async for msg in ctx.message.channel.history():
+                if any(x in msg.content for x in self.invites):
+                    for url in re.findall(r'(https?://\S+)', msg.content):
+                        url = urlparse(url)
+                        if any(x in url for x in self.invite_domains):
+                            print(url)
+                            url = url.path.replace('/', '').replace('<', '').replace('>', '').replace('\'', '').replace(')', '')
+                            print(url)
+                            invite = await self.bot.get_invite(url)
+                            break
+        if not invite:
+            await ctx.send(content="Could not find any invite in the last 100 messages. Please specify invite manually.")
+
+        data = discord.Embed()
+        content = None
+        if invite.id is not None:
+            content = self.bot.bot_prefix + "**Informations about Invite:** %s" % invite.id
+        if invite.revoked is not None:
+            data.colour = discord.Colour.red() if invite.revoked else discord.Colour.green()
+        if invite.created_at is not None:
+            data.set_footer(text="Created on {} ({} days ago)".format(invite.created_at.strftime("%d %b %Y %H:%M"), (invite.created_at - invite.created_at).days))
+        if invite.max_age is not None:
+            if invite.max_age > 0:
+                expires = '%s s' % invite.max_age
+            else:
+                expires = "Never"
+            data.add_field(name="Expires in", value=expires)
+        if invite.temporary is not None:
+            data.add_field(name="Temp membership", value="Yes" if invite.temporary else "No")
+        if invite.uses is not None:
+            data.add_field(name="Uses", value="%s / %s" % (invite.uses, invite.max_uses))
+        if invite.inviter.name is not None:
+            data.set_author(name=invite.inviter.name + '#' + invite.inviter.discriminator + " (%s)" % invite.inviter.id, icon_url=invite.inviter.avatar_url)
+
+        if invite.guild.name is not None:
+            data.add_field(name="Guild", value="Name: " + invite.guild.name + "\nID: %s" % invite.guild.id, inline=False)
+        if invite.guild.icon_url is not None:
+            data.set_thumbnail(url=invite.guild.icon_url)
+
+        if invite.channel.name is not None:
+            channel = "%s\n#%s" % (invite.channel.mention, invite.channel.name) if isinstance(invite.channel, discord.TextChannel) else invite.channel.name
+            data.add_field(name="Channel", value="Name: " + channel + "\nID: %s" % invite.channel.id, inline=False)
+
+        try:
+            await ctx.send(content=content, embed=data)
+        except:
+            await ctx.send(content="I need the `Embed links` permission to send this")
 
 
 def setup(bot):
