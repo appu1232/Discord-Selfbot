@@ -784,6 +784,7 @@ class Utility:
         """Shows loaded/unloaded cogs"""
         await ctx.message.delete()
         cogs = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
+        cogs.extend(["custom_cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("custom_cogs/*.py")]])
         loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
         unloaded = [c.split(".")[1] for c in cogs
                     if c.split(".")[1] not in loaded]

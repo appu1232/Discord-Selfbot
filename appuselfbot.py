@@ -14,7 +14,9 @@ import argparse
 import os
 import ctypes
 import logging
+import requests
 import logging.handlers
+from bs4 import BeautifulSoup
 from json import load, dump
 from datetime import timezone
 from cogs.utils.allmsgs import custom, quickcmds
@@ -755,6 +757,29 @@ if __name__ == '__main__':
         if extension.endswith('.py'):
             try:
                 bot.load_extension("cogs." + extension[:-3])
+            except Exception as e:
+                print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
+    if not os.path.exists("custom_cogs"):
+        os.makedirs("custom_cogs")
+    if not os.path.exists("cogs/utils/first_time"):
+        open("cogs/utils/first_time", "w+")
+        site = requests.get('https://github.com/LyricLy/ASCII/tree/master/cogs').text
+        soup = BeautifulSoup(site, "lxml")
+        data = soup.find_all(attrs={"class": "js-navigation-open"})
+        list = []
+        for a in data:
+            list.append(a.get("title"))
+        for cog in list[2:]:
+            for entry in list[2:]:
+                response = requests.get("http://appucogs.tk/cogs/{}".format(entry))
+                found_cog = response.json()
+                filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
+                if os.path.isfile("cogs/" + filename + ".py"):
+                    os.rename("cogs/" + filename + ".py", "custom_cogs/" + filename + ".py")
+    for extension in os.listdir("custom_cogs"):
+        if extension.endswith('.py'):
+            try:
+                bot.load_extension("custom_cogs." + extension[:-3])
             except Exception as e:
                 print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
