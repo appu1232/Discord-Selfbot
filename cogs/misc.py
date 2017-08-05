@@ -642,6 +642,7 @@ class Misc:
         if msg:
             if " | channel=" in msg:
                 channel = next((ch for ch in self.bot.get_all_channels() if ch.name == msg.split("| channel=")[1]), None)
+                msg = msg.split(" | channel=")[0]
             try:
                 length = len(self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)])
             except:
