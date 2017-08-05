@@ -7,6 +7,8 @@ import git
 import os
 from PythonGists import PythonGists
 from discord.ext import commands
+from cogs.utils.config import get_config_value
+from cogs.utils.dataIO import dataIO
 from cogs.utils.checks import embed_perms, cmd_prefix_len, parse_prefix
 
 '''Module for miscellaneous commands'''
@@ -186,13 +188,11 @@ class Misc:
                     if 'icon=' in author:
                         text, icon = author.split('icon=')
                         if 'url=' in icon:
-                            print("here")
                             em.set_author(name=text.strip()[5:], icon_url=icon.split('url=')[0].strip(), url=icon.split('url=')[1].strip())
                         else:
                             em.set_author(name=text.strip()[5:], icon_url=icon)
                     else:
                         if 'url=' in author:
-                            print("here")
                             em.set_author(name=author.split('url=')[0].strip()[5:], url=author.split('url=')[1].strip())
                         else:
                             em.set_author(name=author)
@@ -635,16 +635,19 @@ class Misc:
         >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids).
         >quote <words> | channel=<channel_name> - quotes the message with the given words from the channel name specified in the second argument
         >quote <message_id> | channel=<channel_name> - quotes the message with the given message id in the given channel name"""
-        result = channel = None
-        pre = cmd_prefix_len()
         await ctx.message.delete()
+        result = None
+        pre = cmd_prefix_len()
+        channel = ctx.channel
         if msg:
+            if " | channel=" in msg:
+                channel = next((ch for ch in self.bot.get_all_channels() if ch.name == msg.split("| channel=")[1]), None)
             try:
                 length = len(self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)])
-                if length < 201:
-                    size = length
-                else:
-                    size = 200
+            except:
+                pass
+            else:
+                size = length if length < 201 else 200
                 for channel in ctx.message.guild.channels:
                     if str(channel.type) == 'text':
                         if str(channel.id) + ' ' + str(ctx.message.guild.id) in self.bot.all_log:
@@ -660,77 +663,38 @@ class Misc:
                                     break
                             if result:
                                 break
-            except KeyError:
-                pass
 
             if not result:
-                if " | channel=" in msg:
-                    channelList = []
-                    for channels in self.bot.get_all_channels():
-                        if channels.name == msg.split("| channel=")[1]:
-                            channelList.append(channels)
-                    msg = msg.split(" | channel=")[0]
-                    for channel in channelList:
-                        if str(channel.type) == 'text':
-                            if str(channel.id) + ' ' + str(ctx.message.guild.id) in self.bot.all_log:
-                                for i in range(length - 2, length - size, -1):
-                                    try:
-                                        search = self.bot.all_log[str(channel.id) + ' ' + str(ctx.message.guild.id)][i]
-                                    except:
-                                        continue
-                                    if (msg.lower().strip() in search[0].content.lower() and (
-                                            search[0].author != ctx.message.author or search[0].content[
-                                                                                      pre:7] != 'quote ')) or (
-                                        ctx.message.content[6:].strip() == str(search[0].id)):
-                                        result = search[0]
-                                        break
-                                if result:
-                                    break
-                    if not result:
-                        for channel in channelList:
-                            try:
-                                async for sent_message in self.bot.logs_from(channel, limit=500):
-                                    if (msg.lower().strip() in sent_message.content and (
-                                            sent_message.author != ctx.message.author or sent_message.content[
-                                                                                         pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)):
-                                        result = sent_message
-                                        break
-                            except:
-                                pass
-                            if result:
-                                break
-            if not result:
-                for channel in ctx.message.guild.channels:
-                    try:
-                        async for sent_message in self.bot.logs_from(channel, limit=500):
-                            if (msg.lower().strip() in sent_message.content and (
-                                    sent_message.author != ctx.message.author or sent_message.content[
-                                                                                 pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)):
-                                result = sent_message
-                                break
-                    except:
-                        pass
-                    if result:
-                        break
-
+                try:
+                    async for sent_message in channel.history(limit=500):
+                        if (msg.lower().strip() in sent_message.content and (
+                                sent_message.author != ctx.message.author or sent_message.content[pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)):
+                            result = sent_message
+                            break
+                except:
+                    pass
         else:
-            channel = ctx.message.channel
-            search = self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)][-2]
-            result = search[0]
+            try:
+                search = self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)][-2]
+                result = search[0]
+            except KeyError:
+                try:
+                    messages = await channel.history(limit=2).flatten()
+                    result = messages[0]
+                except:
+                    pass
+
         if result:
             sender = result.author.nick if result.author.nick else result.author.name
             if embed_perms(ctx.message) and result.content:
-                em = discord.Embed(description=result.content, timestamp=result.created_at)
-                with open('settings/optional_config.json') as fp:
-                    opt = json.load(fp)
-                try:
-                    embed_color = opt['quoteembed_color']
-                    if embed_color == "auto":
-                        em.color = result.author.top_role.color
-                    else:
-                        em.color = int('0x' + embed_color, 16)
-                except:
-                    em.color = 0xbc0b0b
+                color = get_config_value("optional_config", "quoteembed_color")
+                if color == "auto":
+                    color = result.author.top_role.color
+                elif color == "":
+                    color = 0xbc0b0b
+                else:
+                    color = int('0x' + color, 16)
+                em = discord.Embed(color=color, description=result.content, timestamp=result.created_at)
                 em.set_author(name=sender, icon_url=result.author.avatar_url)
                 if channel != ctx.message.channel:
                     em.set_footer(text='#{} | {} '.format(channel.name, channel.guild.name))

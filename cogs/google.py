@@ -2,6 +2,7 @@ import discord
 import json
 from discord.ext import commands
 from cogs.utils.checks import load_optional_config, embed_perms, get_google_entries
+from cogs.utils.config import get_config_value
 import aiohttp
 import urllib.parse
 
@@ -204,7 +205,9 @@ class Google:
                     em = discord.Embed()
                     if embed_perms(ctx.message):
                         em.set_image(url=result['items'][item]['link'])
-                        em.set_footer(text="Search term: \"" + query + "\"")
+                        show_search = get_config_value("optional_config", "show_search_term")
+                        if show_search == "True":
+                            em.set_footer(text="Search term: \"" + query + "\"")
                         await ctx.send(content=None, embed=em)
                     else:
                         await ctx.send(result['items'][item]['link'])
