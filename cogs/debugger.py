@@ -54,9 +54,7 @@ class Debugger:
                 try:
                     old = sys.stdout
                     sys.stdout = StringIO()
-                    result = exec(code, env)
-                    if inspect.isawaitable(result):
-                        result = await result
+                    exec(code, env)
                     result = sys.stdout.getvalue()
                     sys.stdout = old
                 except Exception as g:
@@ -65,9 +63,7 @@ class Debugger:
             try:
                 old = sys.stdout
                 sys.stdout = StringIO()
-                result = exec(code, env)
-                if inspect.isawaitable(result):
-                    result = await result
+                exec(code, env)
                 result = sys.stdout.getvalue()
                 sys.stdout = old
             except Exception as g:

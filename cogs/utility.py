@@ -92,16 +92,16 @@ class Utility:
             copy_emote_bool = False
         if msg.startswith('s '):
             msg = msg[2:]
-            get_server = True
+            get_guild = True
         else:
-            get_server = False
+            get_guild = False
         msg = msg.strip(':')
         if msg.startswith('<'):
             msg = msg[2:].split(':', 1)[0].strip()
-        url = emoji = server = None
+        url = emoji = guild = None
         exact_match = False
-        for server in self.bot.guilds:
-            for emoji in server.emojis:
+        for guild in self.bot.guilds:
+            for emoji in guild.emojis:
                 if msg.strip().lower() in str(emoji):
                     url = emoji.url
                     emote_name = emoji.name
@@ -123,9 +123,9 @@ class Utility:
                 img.write(block)
 
         if attach_perms(ctx.message) and url:
-            if get_server:
+            if get_guild:
                 ctx.send(
-                        '**ID:** {}\n**Server:** {}'.format(emoji.id, server.name))
+                        '**ID:** {}\n**Server:** {}'.format(str(emoji.id), guild.name))
             with open(name, 'rb') as fp:
                 if copy_emote_bool:
                     e = fp.read()
@@ -289,8 +289,8 @@ class Utility:
                     if deleted == txt: 
                         break
         else: # If no number specified, delete last message immediately
-            await self.bot.self_log[ctx.message.channel.id].pop().delete()
-            await self.bot.self_log[ctx.message.channel.id].pop().delete()
+            await self.bot.self_log[str(ctx.message.channel.id)].pop().delete()
+            await self.bot.self_log[str(ctx.message.channel.id)].pop().delete()
 
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg: str):
@@ -580,8 +580,8 @@ class Utility:
     async def whoisplaying(self, ctx, *, game):
         """Check how many people are playing a certain game."""
         msg = ""
-        for server in self.bot.guilds:
-            for user in server.members:
+        for guild in self.bot.guilds:
+            for user in guild.members:
                 if user.game is not None:
                     if user.game.name is not None:
                         if user.game.name.lower() == game.lower():

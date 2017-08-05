@@ -1,6 +1,7 @@
 import sys
 import asyncio
 import tokage
+import sys
 
 list_of_ids = sys.argv[1:]
 
@@ -13,5 +14,8 @@ async def find_chars(all_ids):
             print(character.name + ' | ' + str(character.favorites) + '\n')
 
 loop = asyncio.get_event_loop()
-loop.run_until_complete(find_chars(list_of_ids))
+try:
+    loop.run_until_complete(find_chars(list_of_ids))
+except:
+    pass
 loop.close()

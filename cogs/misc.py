@@ -251,7 +251,7 @@ class Misc:
                 result.append("color={}".format(hex(color)))
             if msg.content:
                 result.append("ptext={}".format(msg.content))
-            await ctx.message.edit(" | ".join(result))
+            await ctx.message.edit(content=" | ".join(result))
             info_msg = await ctx.send(self.bot.bot_prefix + "Embed has been turned back into its command form. Make your changes, then type `done` to finish editing.")
             confirmation_msg = await self.bot.wait_for_message(content="done")
             await self.bot.delete_message(info_msg)
@@ -345,9 +345,9 @@ class Misc:
                     em.set_footer(text=footer)
             print(ptext)
             if not ptext:
-                await ctx.message.edit("ᅠ", embed=em)
+                await ctx.message.edit(content="ᅠ", embed=em)
             else:
-                await ctx.message.edit(ptext, embed=em)
+                await ctx.message.edit(content=ptext, embed=em)
 
     @commands.command(pass_context=True)
     async def embedcolor(self, ctx, *, color: str = None):

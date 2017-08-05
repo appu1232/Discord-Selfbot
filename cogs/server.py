@@ -18,7 +18,7 @@ class Server:
         if msg:
             try:
                 float(msg)
-                server = self.bot.get_server(int(msg))
+                server = self.bot.get_guild(int(msg))
                 if not server:
                     return self.bot.bot_prefix + 'Server not found.', False
             except:

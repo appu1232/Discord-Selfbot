@@ -103,11 +103,11 @@ class Todo:
                             if self.todo_list[entry][2] != 0:
                                 channels = []
                                 if type(self.todo_list[entry][2]) is str:
-                                    channel = self.bot.get_channel(self.todo_list[entry][2])
+                                    channel = self.bot.get_channel(int(self.todo_list[entry][2]))
                                     channels.append(channel)
                                 else:
                                     for channel in self.todo_list[entry][2]:
-                                        chnl = self.bot.get_channel(channel.strip())
+                                        chnl = self.bot.get_channel(int(channel.strip()))
                                         channels.append(chnl)
                                 for channel in channels:
                                     if channel:
@@ -191,7 +191,7 @@ class Todo:
                     seconds += current_time()
 
                 if text and channel == 0:
-                    channel = ctx.message.channel.id
+                    channel = str(ctx.message.channel.id)
                 if channel and text == 0:
                     text = msg[0]
                 if alert == 'off' or alert == 'false':
@@ -245,11 +245,11 @@ class Todo:
                             if self.todo_list[entry][2] != 0:
                                 if type(self.todo_list[entry][2]) is list:
                                     for channel in self.todo_list[entry][2]:
-                                        chnl = self.bot.get_channel(channel.strip())
-                                        await self.bot.send_message(chnl, self.todo_list[entry][1])
+                                        chnl = self.bot.get_channel(int(channel.strip()))
+                                        await chnl.send(self.todo_list[entry][1])
                                 else:
-                                    channel = self.bot.get_channel(self.todo_list[entry][2])
-                                    await self.bot.send_message(channel, self.todo_list[entry][1])
+                                    channel = self.bot.get_channel(int(self.todo_list[entry][2]))
+                                    await channel.send(self.todo_list[entry][1])
                         except:
                             print('Unable to send message for todo list entry: %s' % entry)
 
@@ -262,10 +262,10 @@ class Todo:
                                 await self.webhook(entry, 'ping')
                             else:
                                 location = self.bot.log_conf['log_location'].split()
-                                server = self.bot.get_server(location[1])
+                                guild = self.bot.get_guild(int(location[1]))
                                 em = discord.Embed(title='Timer Alert', color=0x4e42f4,
                                                    description='Timer for item: **%s** just ran out.' % entry)
-                                await self.bot.send_message(server.get_channel(location[0]), content=None, embed=em)
+                                await guild.get_channel(int(location[0])).send(content=None, embed=em)
             await asyncio.sleep(2)
 
 

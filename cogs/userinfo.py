@@ -22,7 +22,7 @@ class Userinfo:
                 except:
                     user = ctx.guild.get_member_named(name)
                 if not user:
-                    user = ctx.guild.get_member(name)
+                    user = ctx.guild.get_member(int(name))
                 if not user:
                     await ctx.send(self.bot.bot_prefix + 'Could not find user.')
                     return
@@ -67,7 +67,7 @@ class Userinfo:
             except:
                 user = ctx.guild.get_member_named(txt)
             if not user:
-                user = ctx.guild.get_member(txt)
+                user = ctx.guild.get_member(int(txt))
             if not user:
                 await ctx.send(self.bot.bot_prefix + 'Could not find user.')
                 return

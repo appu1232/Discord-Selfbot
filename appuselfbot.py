@@ -48,7 +48,7 @@ _silent = args.silent
 
 if _test_run:
     try:
-        samples = os.listdir('settings') # generating the config files from sample while building
+        samples = os.listdir('settings')  # generating the config files from sample while building
         for f in samples:
             if f.endswith('sample') and f[:-7] not in samples:
                 with open('settings/%s' % f, 'r', encoding="utf8") as template:
@@ -123,8 +123,9 @@ if not get_config_value('config', 'run_as_superuser'):
             pass
 
 
-if shutdown == True:
+if shutdown is True:
     exit(0)
+
 
 def set_log():
     errformat = logging.Formatter(
@@ -482,7 +483,7 @@ async def on_message(message):
         bot.log_conf = load_log_config()
 
     # Keyword logging.
-    if bot.log_conf['keyword_logging'] == 'on':
+    if bot.log_conf['keyword_logging'] == 'on' and isinstance(message.channel, discord.abc.GuildChannel):
 
         try:
             word_found = False
