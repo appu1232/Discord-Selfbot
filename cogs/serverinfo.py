@@ -32,8 +32,8 @@ class Server:
         return server, True
 
     # Stats about server
-    @commands.group(pass_context=True, invoke_without_command=True)
-    async def server(self, ctx, *, msg=""):
+    @commands.group(aliases=['server', 'sinfo', 'si'], pass_context=True, invoke_without_command=True)
+    async def serverinfo(self, ctx, *, msg=""):
         """Various info about the server. >help server for more info."""
         if ctx.invoked_subcommand is None:
             if msg:

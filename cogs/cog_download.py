@@ -15,7 +15,7 @@ class CogDownloading:
     def __init__(self, bot):
         self.bot = bot
 
-    async def githubUpload(self, username, password, repo_name, link, file_name):
+    async def github_upload(self, username, password, repo_name, link, file_name):
         g = Github(username, password)
         repo = g.get_user().get_repo(repo_name)
         req = requests.get(link)
@@ -23,8 +23,8 @@ class CogDownloading:
             filecontent = req.text.encode("utf-8")
         else:
             filecontent = req.text
-        await self.bot.say("Uploading to GitHub. Heroku users, wait for the bot to restart")
-        repo.create_file('/cogs/' + file_name, 'Commiting file: ' + file_name + ' to GitHub', filecontent)
+        await self.bot.say(self.bot.bot_prefix + "Uploading to GitHub. Heroku users, wait for the bot to restart.")
+        repo.create_file('/custom_cogs/' + file_name, 'Commiting file: ' + file_name + ' to GitHub', filecontent)
         
     @commands.group(pass_context=True)
     async def cog(self, ctx):
@@ -69,16 +69,16 @@ class CogDownloading:
                     opt = json.load(fp)
                     if opt['username'] != "":
                         try:
-                            await self.githubUpload(opt['username'], opt['password'], opt['reponame'], coglink, filename)
+                            await self.github_upload(opt['username'], opt['password'], opt['reponame'], coglink, filename)
                         except:
-                            await ctx.send("Wrong GitHub account credentials")
-                with open("cogs/" + filename, "wb+") as f:
+                            await ctx.send(self.bot.bot_prefix + "Wrong GitHub account credentials.")
+                with open("custom_cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
                 try:
-                    self.bot.load_extension("cogs." + filename.rsplit(".", 1)[0])
+                    self.bot.load_extension("custom_cogs." + filename.rsplit(".", 1)[0])
                     await ctx.send(self.bot.bot_prefix + "Successfully downloaded the `{}` cog.".format(cog["title"]))
                 except Exception as e:
-                    os.remove("cogs/" + filename)
+                    os.remove("custom_cogs/" + filename)
                     await ctx.send(self.bot.bot_prefix + "There was an error loading your cog: `{}: {}` You may want to report this error to the author of the cog.".format(type(e).__name__, str(e)))
             else:
                 await ctx.send(self.bot.bot_prefix + "Didn't download `{}`: user cancelled.".format(cog["title"]))
@@ -99,14 +99,14 @@ class CogDownloading:
         else:
             found_cog = response.json()
             filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
-            if os.path.isfile("cogs/" + filename + ".py"):
+            if os.path.isfile("custom_cogs/" + filename + ".py"):
                 embed = discord.Embed(title=found_cog["title"], description=found_cog["description"])
                 embed.set_author(name=found_cog["author"])
                 await ctx.send(self.bot.bot_prefix + "Are you sure you want to delete this cog? (y/n)", embed=embed)
                 reply = await self.bot.wait_for("message", check=check)
                 if reply.content.lower() == "y":
-                    os.remove("cogs/" + filename + ".py")
-                    self.bot.unload_extension("cogs." + filename)
+                    os.remove("custom_cogs/" + filename + ".py")
+                    self.bot.unload_extension("custom_cogs." + filename)
                     await ctx.send(self.bot.bot_prefix + "Successfully deleted the `{}` cog.".format(found_cog["title"]))
                 else:
                     await ctx.send(self.bot.bot_prefix + "Didn't delete `{}`: user cancelled.".format(found_cog["title"]))
@@ -129,7 +129,7 @@ class CogDownloading:
             response = requests.get("http://appucogs.tk/cogs/{}".format(entry))
             found_cog = response.json()
             filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
-            if os.path.isfile("cogs/" + filename + ".py"):
+            if os.path.isfile("custom_cogs/" + filename + ".py"):
                 installed.append(entry.rsplit(".",1)[0])
             else:
                 uninstalled.append(entry.rsplit(".",1)[0])
@@ -174,19 +174,19 @@ class CogDownloading:
         failures = 0
         for entry in list[2:]:
             entry = entry.rsplit(".")[0]
-            if os.path.isfile("cogs/" + entry + ".py"):
+            if os.path.isfile("custom_cogs/" + entry + ".py"):
                 cog = requests.get("http://appucogs.tk/cogs/{}.json".format(entry)).json()
                 link = cog["link"]
                 download = requests.get(link).text
                 filename = link.rsplit("/", 1)[1]
-                with open("cogs/" + filename, "wb+") as f:
+                with open("custom_cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
                 try:
-                    self.bot.load_extension("cogs." + filename.rsplit(".", 1)[0])
+                    self.bot.load_extension("custom_cogs." + filename.rsplit(".", 1)[0])
                     successful += 1
                 except Exception as e:
                     failures += 1
-                    os.remove("cogs/" + filename)
+                    os.remove("custom_cogs/" + filename)
                     await ctx.send(self.bot.bot_prefix + "There was an error updating the `{}` cog: `{}: {}` You may want to report this error to the author of the cog.".format(cog["title"], type(e).__name__, str(e)))
         if failures == 0:
             await msg.edit(content=self.bot.bot_prefix + "Updated all cogs successfully.")
