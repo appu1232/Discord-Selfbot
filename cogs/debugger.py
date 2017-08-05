@@ -310,7 +310,7 @@ class Debugger:
         try:
             self.bot.load_extension(msg)
         except Exception as e:
-            if type(e) == ModuleNotFoundError:
+            if type(e) == ImportError:
                 try:
                     self.bot.load_extension("cogs." + msg)
                     await ctx.send(self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))

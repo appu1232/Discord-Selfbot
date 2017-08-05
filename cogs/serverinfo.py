@@ -95,7 +95,7 @@ class Server:
                 await ctx.send(self.bot.bot_prefix + msg)
             await ctx.message.delete()
 
-    @server.command(pass_context=True)
+    @serverinfo.command(pass_context=True)
     async def emojis(self, ctx, msg: str = None):
         """List all emojis in this server. Ex: >server emojis"""
         if msg:
@@ -108,7 +108,7 @@ class Server:
         await ctx.send("".join(emojis))
         await ctx.message.delete()
 
-    @server.command(pass_context=True)
+    @serverinfo.command(pass_context=True)
     async def avi(self, ctx, msg: str = None):
         """Get server avatar image link."""
         if msg:
@@ -125,7 +125,7 @@ class Server:
             await ctx.send(self.bot.bot_prefix + server.icon_url)
         await ctx.message.delete()
 
-    @server.command(pass_context=True)
+    @serverinfo.command(pass_context=True)
     async def role(self, ctx, *, msg):
         """Get more info about a specific role. Ex: >server role Admins"""
         for role in ctx.message.guild.roles:

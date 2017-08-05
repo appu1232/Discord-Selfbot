@@ -643,6 +643,10 @@ class Misc:
             if " | channel=" in msg:
                 channel = next((ch for ch in self.bot.get_all_channels() if ch.name == msg.split("| channel=")[1]), None)
                 msg = msg.split(" | channel=")[0]
+                if not channel:
+                    return await ctx.send(self.bot.bot_prefix + "Could not find specified channel.")
+            if not isinstance(channel, discord.TextChannel):
+                return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
             try:
                 length = len(self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)])
             except:
@@ -675,6 +679,8 @@ class Misc:
                 except:
                     pass
         else:
+            if not isinstance(channel, discord.TextChannel):
+                return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
             try:
                 search = self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)][-2]
                 result = search[0]
