@@ -10,8 +10,8 @@ class Userinfo:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group()
-    async def info(self, ctx):
+    @commands.group(aliases=['user', 'uinfo', 'info', 'ui'])
+    async def userinfo(self, ctx):
         """Get user info. Ex: >info @user"""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
