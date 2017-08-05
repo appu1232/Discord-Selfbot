@@ -547,6 +547,8 @@ class Misc:
                         json.dump(avi_config, avi, indent=4)
                     self.bot.avatar_interval = interval.content
                     self.bot.avatar = random.choice(os.listdir('avatars'))
+                    with open('avatars/%s' % self.bot.avatar, 'rb') as fp:
+                        await self.bot.edit_profile(password=avi_config['password'], avatar=fp.read())
 
                 else:
                     await self.bot.send_message(ctx.message.channel,
