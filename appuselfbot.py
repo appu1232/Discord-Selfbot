@@ -729,7 +729,7 @@ async def game_and_avatar(bot):
                                 next_avatar = random.randint(0, len(all_avis) - 1)
                             current_avatar = next_avatar
                             bot.avatar = all_avis[next_avatar]
-                            with open('avatars/%s' % bot.avatar, 'rb', encoding="utf8") as fp:
+                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
                         else:
                             if next_avatar + 1 == len(all_avis):
@@ -737,7 +737,7 @@ async def game_and_avatar(bot):
                             else:
                                 next_avatar += 1
                             bot.avatar = all_avis[next_avatar]
-                            with open('avatars/%s' % bot.avatar, 'rb', encoding="utf8") as fp:
+                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
                                 await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
 
         # Sets status to default status when user goes offline (client status takes priority when user is online)
