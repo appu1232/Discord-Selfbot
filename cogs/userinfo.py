@@ -10,7 +10,7 @@ class Userinfo:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(aliases=['user', 'uinfo', 'ui'])
+    @commands.group(aliases=['user', 'uinfo', 'info', 'ui'])
     async def userinfo(self, ctx):
         """Get user info. Ex: >info @user"""
         if ctx.invoked_subcommand is None:
