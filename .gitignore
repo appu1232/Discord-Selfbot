@@ -23,7 +23,7 @@ cogs/*
 !cogs/mod.py
 !cogs/repl.py
 !cogs/replacements.py
-!cogs/server.py
+!cogs/serverinfo.py
 !cogs/todo.py
 !cogs/translate.py
 !cogs/userinfo.py
