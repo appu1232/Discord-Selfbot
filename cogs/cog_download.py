@@ -40,8 +40,7 @@ class CogDownloading:
         if ctx.invoked_subcommand is None:
             await ctx.message.delete()
             await ctx.send(self.bot.bot_prefix + "Invalid usage. Valid subcommands: `list`, `install`, `uninstall`, `view`, `update`\nDo `help cog` for more information.")
-        
-                
+
     @cog.command(pass_context=True)
     async def install(self, ctx, cog):
         """Install a custom cog from ASCII."""
