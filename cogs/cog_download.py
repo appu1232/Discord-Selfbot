@@ -39,7 +39,7 @@ class CogDownloading:
         """
         if ctx.invoked_subcommand is None:
             await ctx.message.delete()
-            await ctx.send(self.bot.bot_prefix + "Invalid usage. Valid subcommands: `install`, `uninstall`, `view`, `update`\nDo `help cog` for more information.")
+            await ctx.send(self.bot.bot_prefix + "Invalid usage. Valid subcommands: `list`, `install`, `uninstall`, `view`, `update`\nDo `help cog` for more information.")
         
                 
     @cog.command(pass_context=True)
