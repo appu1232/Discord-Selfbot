@@ -322,7 +322,8 @@ async def on_command_error(ctx, error):
         await ctx.send(bot.bot_prefix + "You don't have permissions to use that command.")
     elif isinstance(error, commands.errors.MissingRequiredArgument):
         formatter = commands.formatter.HelpFormatter()
-        await ctx.send(bot.bot_prefix + "You are missing required arguments.\n" + formatter.format_help_for(ctx, ctx.command)[0])
+        help = await formatter.format_help_for(ctx, ctx.command)
+        await ctx.send(bot.bot_prefix + "You are missing required arguments.\n" + help[0])
     else:
         if _silent:
             await ctx.send(bot.bot_prefix + "An error occurred with the `{}` command.".format(ctx.command.name))
