@@ -768,12 +768,6 @@ async def game_and_avatar(bot):
         await asyncio.sleep(5)
 
 if __name__ == '__main__':
-    for extension in os.listdir("cogs"):
-        if extension.endswith('.py'):
-            try:
-                bot.load_extension("cogs." + extension[:-3])
-            except Exception as e:
-                print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
     if not os.path.exists("custom_cogs"):
         try:
             os.makedirs("custom_cogs")
@@ -797,6 +791,12 @@ if __name__ == '__main__':
                         os.rename("cogs/" + filename + ".py", "custom_cogs/" + filename + ".py")
         except Exception as e:
             print("Failed to transfer custom cogs to custom_cogs folder. Error: %s" % str(e))
+    for extension in os.listdir("cogs"):
+        if extension.endswith('.py'):
+            try:
+                bot.load_extension("cogs." + extension[:-3])
+            except Exception as e:
+                print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
     for extension in os.listdir("custom_cogs"):
         if extension.endswith('.py'):
             try:
