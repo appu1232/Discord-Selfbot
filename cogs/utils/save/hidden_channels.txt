@@ -1,0 +1,20 @@
+owner = 0
+admin = 0
+ban = 0
+kick = 0
+managenick = 0
+changenick = 0
+for guild in bot.guilds:
+    if guild.me == guild.owner: owner += 1
+    if guild.me.guild_permissions.administrator:
+        admin += 1
+    if guild.me.guild_permissions.ban_members:
+        ban += 1
+        print(guild.name)
+    if guild.me.guild_permissions.kick_members:
+        kick += 1
+    if guild.me.guild_permissions.manage_nicknames:
+        managenick += 1
+    if guild.me.guild_permissions.change_nickname:
+        changenick += 1
+print('Owner of %s server(s).\nAdmin in %s server(s).\nCan ban members from %s servers.\nCan kick members from %s servers.\nCan manage nicks in %s servers.\nCan change nick in %s servers.'%(owner, admin, ban, kick, managenick, changenick))

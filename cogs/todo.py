@@ -15,8 +15,6 @@ class Todo:
 
     def __init__(self, bot):
         self.bot = bot
-        if not os.path.isfile("settings/todo.json"):
-            shutil.copy2("settings/todo.json.sample", "settings/todo.json")
         # load to-do list in from file
         todo_list = dataIO.load_json("settings/todo.json")
         for i in todo_list:

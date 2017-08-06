@@ -179,7 +179,7 @@ class Debugger:
             os.makedirs('%s/cogs/utils/save/' % os.getcwd())
         if os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg)):
             await ctx.send(self.bot.bot_prefix + '``%s.txt`` already exists. Overwrite? ``y/n``.' % msg)
-            reply = await self.bot.wait_for_message(author=ctx.message.author)
+            reply = await self.bot.wait_for('message', check=lambda m: m.author == ctx.message.author and m.content.lower() == 'y' or m.content.lower() == 'n')
             if reply.content.lower().strip() != 'y':
                 return await ctx.send(self.bot.bot_prefix + 'Cancelled.')
             if os.path.exists('%s/cogs/utils/save/%s.txt' % (os.getcwd(), msg)):
