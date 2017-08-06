@@ -209,17 +209,6 @@ class KeywordLogger:
 
             await ctx.message.delete()
             pre = ctx.message.content.split('log')[0]
-            val = 0
-
-            # def check(msg):
-            #     if msg.content.isdigit():
-            #         return 0 < int(msg.content) < val
-            #     elif msg.content.startswith(pre):
-            #         return True
-            #     return False
-
-            # def not_block(msg):
-            #     return '```' not in msg.content
 
             log_loc = 'Set log location.' if self.bot.log_conf['log_location'] == '' else 'Change log location.'
             notifier = 'Set up notifier to ping you for keywords logged.' if self.bot.log_conf['webhook_url'] == '' and self.bot.log_conf['notifier_bot_token'] == '' else 'Change settings for keyword notifier.'
