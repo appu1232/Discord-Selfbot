@@ -39,7 +39,7 @@ class CogDownloading:
         """
         if ctx.invoked_subcommand is None:
             await ctx.message.delete()
-            await ctx.send(self.bot.bot_prefix + "Invalid usage. Valid subcommands: `list`, `install`, `uninstall`, `view`, `update`\nDo `help cog` for more information.")
+            await ctx.send(self.bot.bot_prefix + "Invalid usage. Valid subcommands: `install`, `uninstall`, `view`, `update`\nDo `help cog` for more information.")
         
                 
     @cog.command(pass_context=True)
@@ -75,6 +75,7 @@ class CogDownloading:
                 with open("custom_cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
                 try:
+                    self.bot.unload_extension("custom_cogs." + filename.rsplit(".", 1)[0])
                     self.bot.load_extension("custom_cogs." + filename.rsplit(".", 1)[0])
                     await ctx.send(self.bot.bot_prefix + "Successfully downloaded the `{}` cog.".format(cog["title"]))
                 except Exception as e:
@@ -182,6 +183,7 @@ class CogDownloading:
                 with open("custom_cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
                 try:
+                    self.bot.unload_extension("custom_cogs." + filename.rsplit(".", 1)[0])
                     self.bot.load_extension("custom_cogs." + filename.rsplit(".", 1)[0])
                     successful += 1
                 except Exception as e:

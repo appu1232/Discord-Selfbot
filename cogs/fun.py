@@ -298,7 +298,7 @@ class Fun:
         await ctx.message.delete()
         msg = msg.lower()
 
-        msg_id = None if msg_id == "last" or msg_id == "0" or msg_id == "1" else int(msg_id)
+        msg_id = None if not msg_id.isdigit() else int(msg_id)
 
         limit = 25 if msg_id else 1
 
@@ -321,8 +321,8 @@ class Fun:
                     await ctx.send(self.bot.bot_prefix + "Can't react with '<'.")
             char_index += 1
         if Fun.has_dupe(non_unicode_emoji_list):
-            await ctx.send(self.bot.bot_prefix + 
-                           "You requested that I react with at least two of the exact same specific emoji. I'll try to find alternatives for alphanumeric text, but if you specify a specific emoji must be used, I can't help.")
+            return await ctx.send(self.bot.bot_prefix + 
+                                  "You requested that I react with at least two of the exact same specific emoji. I'll try to find alternatives for alphanumeric text, but if you specify a specific emoji must be used, I can't help.")
 
         react_me_original = react_me  # we'll go back to this version of react_me if prefer_combine is false but we can't make the reaction happen unless we combine anyway.
 
@@ -337,9 +337,10 @@ class Fun:
                     react_me = Fun.replace_combos(react_me)
                     react_me = Fun.replace_letters(react_me)
                     if Fun.has_dupe(react_me):  # this failed too, so there's really nothing we can do anymore.
-                        await ctx.send(self.bot.bot_prefix + "Failed to fix all duplicates. Cannot react with this string.")
+                        return await ctx.send(self.bot.bot_prefix + "Failed to fix all duplicates. Cannot react with this string.")
                 else:
-                    await ctx.send(self.bot.bot_prefix + "Failed to fix all duplicates. Cannot react with this string.")
+                    return await ctx.send(self.bot.bot_prefix + "Failed to fix all duplicates. Cannot react with this string.")
+                    
 
             lt_count = 0
             for char in react_me:
@@ -366,7 +367,7 @@ class Fun:
 
         if channel == "current":
             async for message in ctx.message.channel.history(limit=limit):
-                if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
+                if (not msg_id and message.id != ctx.message.id) or (msg_id == message.id):
                     for i in reactions:
                         try:
                             await message.add_reaction(i)
@@ -379,7 +380,7 @@ class Fun:
                 found_channel = find_channel(self.bot.get_all_channels(), channel)
             if found_channel:
                 async for message in found_channel.history(limit=limit):
-                    if (not msg_id and message.id != ctx.message.id) or (str(msg_id) == message.id):
+                    if (not msg_id and message.id != ctx.message.id) or (msg_id == message.id):
                         for i in reactions:
                             try:
                                 await message.add_reaction(i)
