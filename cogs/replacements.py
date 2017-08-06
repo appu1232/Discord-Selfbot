@@ -10,7 +10,11 @@ class Replacements:
 
     def __init__(self, bot):
         self.bot = bot
-        self.replacement_dict = dataIO.load_json("settings/replacements.json")
+        try:
+            with open("settings/replacements.json", encoding='utf-8') as rp:
+                self.replacement_dict = json.load(rp)
+        except FileNotFoundError:
+            self.replacement_dict = {}
 
     @commands.command(pass_context=True)
     async def replacements(self, ctx):

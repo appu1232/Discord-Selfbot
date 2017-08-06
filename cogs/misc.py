@@ -535,6 +535,8 @@ class Misc:
                         json.dump(avi_config, avi, indent=4)
                     self.bot.avatar_interval = interval.content
                     self.bot.avatar = random.choice(os.listdir('avatars'))
+                    with open('avatars/%s' % self.bot.avatar, 'rb') as fp:
+                        await self.bot.edit_profile(password=avi_config['password'], avatar=fp.read())
 
                 else:
                     await ctx.send(self.bot.bot_prefix + 'No images found under ``avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')

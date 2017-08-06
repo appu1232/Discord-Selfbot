@@ -6,6 +6,8 @@ from time import time as current_time
 from discord_webhooks import Webhook
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
+import shutil
+import os.path
 
 '''Todo list cog.'''
 
@@ -13,17 +15,15 @@ class Todo:
 
     def __init__(self, bot):
         self.bot = bot
+        if not os.path.isfile("settings/todo.json"):
+            shutil.copy2("settings/todo.json.sample", "settings/todo.json")
         # load to-do list in from file
-        try:
-            todo_list = dataIO.load_json("settings/todo.json")
-            for i in todo_list:
-                if type(todo_list[i]) is str:
-                    todo_list[i] = [todo_list[i], i, 0, True, 0, 0]
+        todo_list = dataIO.load_json("settings/todo.json")
+        for i in todo_list:
+            if type(todo_list[i]) is str:
+                todo_list[i] = [todo_list[i], i, 0, True, 0, 0]
 
-            dataIO.save_json("settings/todo.json", todo_list)
-        except IOError:
-            todo_list = {}
-
+        dataIO.save_json("settings/todo.json", todo_list)
         self.todo_list = todo_list
 
     def save_list(self):

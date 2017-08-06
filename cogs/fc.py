@@ -1,12 +1,19 @@
 import discord
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
+import json
 from requests.structures import CaseInsensitiveDict
+
 
 class FriendCodes:
 
     def __init__(self, bot):
         self.bot = bot
+        try:
+            with open("settings/fc.json", encoding='utf-8') as fc:
+                self.data = json.load(fc)
+        except FileNotFoundError:
+            self.data = {}
 
     @commands.group(pass_context=True, aliases=["friendcodes"])
     async def fc(self, ctx, friend_code="all"):
@@ -37,6 +44,7 @@ class FriendCodes:
             embed = discord.Embed()
             embed.add_field(name=friend_code, value=fc[friend_code])
             await ctx.send("", embed=embed)
-        
+
+
 def setup(bot):
     bot.add_cog(FriendCodes(bot))
