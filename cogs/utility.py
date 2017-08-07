@@ -557,7 +557,7 @@ class Utility:
         """Search for videos on YouTube."""
         search = parse.quote(msg)
         response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
-        result = BeautifulSoup(response, "lxml")
+        result = BeautifulSoup(response, "html.parser")
         await self.bot.delete_message(ctx.message)
         await self.bot.send_message(ctx.message.channel, "https://www.youtube.com{}".format(result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')))
 
@@ -573,7 +573,7 @@ class Utility:
             found = None
             search = parse.quote(comic)
             result = requests.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)).text
-            soup = BeautifulSoup(result, "lxml")
+            soup = BeautifulSoup(result, "html.parser")
             links = soup.find_all("cite")
             for link in links:
                 if link.text.startswith("https://xkcd.com/"):
