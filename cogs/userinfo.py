@@ -22,34 +22,44 @@ class Userinfo:
                 except:
                     user = ctx.guild.get_member_named(name)
                 if not user:
-                    user = ctx.guild.get_member(int(name))
+                    try: user = ctx.guild.get_member(int(name))
+                    except: pass
                 if not user:
                     await ctx.send(self.bot.bot_prefix + 'Could not find user.')
                     return
             else:
                 user = ctx.message.author
 
-            # Thanks to IgneelDxD for help on this
-            if user.avatar_url[54:].startswith('a_'):
-                avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
-            else:
-                avi = user.avatar_url
-
-            role = user.top_role.name
-            if role == "@everyone":
-                role = "N/A"
-            voice_state = None if not user.voice else user.voice.channel
             if embed_perms(ctx.message):
                 em = discord.Embed(timestamp=ctx.message.created_at, colour=0x708DD0)
-                em.add_field(name='User ID', value=user.id, inline=True)
-                em.add_field(name='Nick', value=user.nick, inline=True)
-                em.add_field(name='Status', value=user.status, inline=True)
-                em.add_field(name='In Voice', value=voice_state, inline=True)
-                em.add_field(name='Game', value=user.game, inline=True)
-                em.add_field(name='Highest Role', value=role, inline=True)
-                em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-                em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-                em.set_thumbnail(url=avi)
+                em.add_field(name='💳 User ID', value=user.id, inline=True)
+                if user.nick: em.add_field(name='✏ Nick', value='`{}`'.format(user.nick), inline=True)
+                if user.status == discord.Status.online: stat = '\uD83D\uDCD7'
+                elif user.status == discord.Status.idle: stat = '\uD83D\uDCD9'
+                elif user.status == discord.Status.dnd: stat = '\uD83D\uDCD5'
+                elif user.status == discord.Status.invisible: stat = '\u2716'
+                elif user.status == discord.Status.offline: stat = '\u274C'
+                em.add_field(name='🌐 Status', value='\{} {}'.format(stat, user.status).title())
+                if user.voice:
+                    em.add_field(name='🔈 Voice Channel', value=user.voice.channel.name, inline=True)
+                g = u'\U0001F3AE Game'
+                game = user.game
+                if game:
+                    if '=' in game:
+                        g = '\ud83c\udfa5 Stream'
+                        game = user.game.split('=')
+                        game = '[{}]({})'.format(game[0],game[1])
+                    em.add_field(name=g, value=str(game), inline=True)
+                profile = await self.bot.get_user_profile(user.id)
+                if profile:
+                    if profile.premium: em.add_field(name='Nitro', value='Since {} ({} days ago)'.format(profile.premium_since.__format__('%A, %d. %B %Y @ %H:%M:%S'), (ctx.message.created_at - profile.premium_since).days))
+                    if profile.hypesquad: em.add_field(name='HypeSquad', value='Yes')
+                    if profile.partner: em.add_field(name='Partner', value='Yes')
+                    if profile.staff: em.add_field(name='Staff', value='Yes')
+                em.add_field(name='🕙 Account Created', value='{} ({} days ago)'.format(user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), (ctx.message.created_at - user.created_at).days), inline=False)
+                em.add_field(name='\U0001F4E5 Join Date', value='{} ({} days ago)'.format(user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), (ctx.message.created_at - user.joined_at).days), inline=False)
+                em.add_field(name='Roles', value=', '.join([role.mention for role in user.roles]), inline=False)
+                em.set_thumbnail(url=user.avatar_url)
                 em.set_author(name=user, icon_url='https://i.imgur.com/RHagTDg.png')
                 await ctx.send(embed=em)
             else:
