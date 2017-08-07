@@ -249,8 +249,6 @@ async def on_ready():
             todo = {}
             json.dump(todo, t, indent=4)
 
-    if os.path.isfile('cogs/online_users.py'):
-        os.remove('cogs/online_users.py')
     if not os.path.exists('avatars'):
         os.makedirs('avatars')
     if not os.path.isfile('settings/avatars.json'):
@@ -283,8 +281,8 @@ async def on_ready():
             opt['default_status'] = 'idle'
         if 'ascii_font' not in opt:
             opt['ascii_font'] = 'big'
-        if 'online_stats' not in opt:
-            opt['online_stats'] = 'on'
+        if 'timezone' not in opt:
+            opt['timezone'] = 'on'
         fp.seek(0)
         fp.truncate()
         json.dump(opt, fp, indent=4)
