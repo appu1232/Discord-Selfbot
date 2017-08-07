@@ -282,7 +282,7 @@ async def on_ready():
         if 'ascii_font' not in opt:
             opt['ascii_font'] = 'big'
         if 'timezone' not in opt:
-            opt['timezone'] = 'on'
+            opt['timezone'] = ''
         fp.seek(0)
         fp.truncate()
         json.dump(opt, fp, indent=4)
