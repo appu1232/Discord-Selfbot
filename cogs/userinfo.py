@@ -40,7 +40,7 @@ class Userinfo:
                 role = "N/A"
             voice_state = None if not user.voice else user.voice.channel
             if embed_perms(ctx.message):
-                em = discord.Embed(timestamp=ctx.message.timestamp, colour=0x708DD0)
+                em = discord.Embed(timestamp=ctx.message.created_at, colour=0x708DD0)
                 em.add_field(name='User ID', value=user.id, inline=True)
                 em.add_field(name='Nick', value=user.nick, inline=True)
                 em.add_field(name='Status', value=user.status, inline=True)
