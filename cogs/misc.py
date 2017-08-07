@@ -478,7 +478,7 @@ class Misc:
                 os.remove('settings/games.json')
 
     @commands.group(aliases=['avatars'], pass_context=True)
-    async def avatar(self, ctx):
+    async def setavatar(self, ctx):
         """Rotate avatars. See wiki for more info."""
 
         if ctx.invoked_subcommand is None:
@@ -541,7 +541,7 @@ class Misc:
                 else:
                     await ctx.send(self.bot.bot_prefix + 'No images found under ``avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')
 
-    @avatar.command(aliases=['pass', 'pw'], pass_context=True)
+    @setavatar.command(aliases=['pass', 'pw'], pass_context=True)
     async def password(self, ctx, *, msg):
         """Set your discord acc password to rotate avatars. See wiki for more info."""
         with open('settings/avatars.json', 'r+') as a:
