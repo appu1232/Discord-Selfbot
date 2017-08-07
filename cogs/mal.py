@@ -101,7 +101,7 @@ class Mal:
 
             # Formatting embed
             selection = results
-            synopsis = BeautifulSoup(selection.synopsis, 'lxml')
+            synopsis = BeautifulSoup(selection.synopsis, 'html.parser')
 
             em = discord.Embed(description='{}'.format('https://myanimelist.net/anime/%s' % selection.id),
                                colour=0x0066CC)
@@ -174,7 +174,7 @@ class Mal:
 
             # Formatting embed
             selection = results
-            synopsis = BeautifulSoup(selection.synopsis, 'lxml')
+            synopsis = BeautifulSoup(selection.synopsis, 'html.parser')
 
             em = discord.Embed(description='{}'.format('https://myanimelist.net/manga/%s' % selection.id),
                                colour=0x0066CC)
