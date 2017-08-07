@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
-from cogs.utils.checks import embed_perms, cmd_prefix_len
-
+from cogs.utils.checks import embed_perms, cmd_prefix_len, get_user
 '''Module for the >info command.'''
 
 
@@ -10,46 +9,43 @@ class Userinfo:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.group(aliases=['user', 'uinfo', 'info', 'ui'])
-    async def userinfo(self, ctx):
+    @commands.command(aliases=['user', 'uinfo', 'info', 'ui'])
+    async def userinfo(self, ctx, user: str=None):
         """Get user info. Ex: >info @user"""
         if ctx.invoked_subcommand is None:
-            pre = cmd_prefix_len()
-            name = ctx.message.content[4 + pre:].strip()
-            if name:
-                try:
-                    user = ctx.message.mentions[0]
-                except:
-                    user = ctx.guild.get_member_named(name)
-                if not user:
-                    user = ctx.guild.get_member(int(name))
-                if not user:
-                    await ctx.send(self.bot.bot_prefix + 'Could not find user.')
-                    return
-            else:
-                user = ctx.message.author
+            if user: user = get_user(user, ctx.message, self.bot)
+            else: user = ctx.message.author
 
-            # Thanks to IgneelDxD for help on this
-            if user.avatar_url[54:].startswith('a_'):
-                avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
-            else:
-                avi = user.avatar_url
-
-            role = user.top_role.name
-            if role == "@everyone":
-                role = "N/A"
-            voice_state = None if not user.voice else user.voice.channel
             if embed_perms(ctx.message):
-                em = discord.Embed(timestamp=ctx.message.created_at, colour=0x708DD0)
-                em.add_field(name='User ID', value=user.id, inline=True)
-                em.add_field(name='Nick', value=user.nick, inline=True)
-                em.add_field(name='Status', value=user.status, inline=True)
-                em.add_field(name='In Voice', value=voice_state, inline=True)
-                em.add_field(name='Game', value=user.game, inline=True)
-                em.add_field(name='Highest Role', value=role, inline=True)
-                em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-                em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-                em.set_thumbnail(url=avi)
+                em = discord.Embed(timestamp=ctx.message.created_at, colour=user.top_role.color)
+                em.add_field(name='💳 User ID', value=user.id, inline=True)
+                if hasattr(user, 'nick') and user.nick: em.add_field(name='✏ Nick', value='`{}`'.format(user.nick), inline=True)
+                if user.status == discord.Status.online: stat = '\uD83D\uDCD7'
+                elif user.status == discord.Status.idle: stat = '\uD83D\uDCD9'
+                elif user.status == discord.Status.dnd: stat = '\uD83D\uDCD5'
+                elif user.status == discord.Status.invisible: stat = '\u2716'
+                elif user.status == discord.Status.offline: stat = '\u274C'
+                em.add_field(name='🌐 Status', value='\{} {}'.format(stat, user.status).title())
+                if user.voice: em.add_field(name='🔈 Voice Channel', value=user.voice.channel.name, inline=True)
+                game = user.game
+                if game:
+                    g = u'\U0001F3AE Game'
+                    if game.type == 1:
+                        g = '\ud83c\udfa5 Stream'
+                        game = '[{}]({})'.format(game.name,game.url)
+                    else: game = game.name
+                    em.add_field(name=g, value=game, inline=True)
+                try:
+                    profile = await self.bot.get_user_profile(user.id)
+                    if profile.premium: em.add_field(name='Nitro', value='Since {} ({} days ago)'.format(profile.premium_since.__format__('%A, %d. %B %Y @ %H:%M:%S'), (ctx.message.created_at - profile.premium_since).days))
+                    if profile.hypesquad: em.add_field(name='HypeSquad', value='Yes')
+                    if profile.partner: em.add_field(name='Partner', value='Yes')
+                    if profile.staff: em.add_field(name='Staff', value='Yes')
+                except: pass
+                em.add_field(name='🕙 Account Created', value='{} ({} days ago)'.format(user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), (ctx.message.created_at - user.created_at).days), inline=False)
+                em.add_field(name='\U0001F4E5 Join Date', value='{} ({} days ago)'.format(user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), (ctx.message.created_at - user.joined_at).days), inline=False)
+                if len(user.roles) > 1: em.add_field(name='Roles ({})'.format(len(user.roles)-1), value=', '.join([role.mention for role in user.roles]), inline=False)
+                em.set_thumbnail(url=user.avatar_url)
                 em.set_author(name=user, icon_url='https://i.imgur.com/RHagTDg.png')
                 await ctx.send(embed=em)
             else:
@@ -58,33 +54,17 @@ class Userinfo:
 
             await ctx.message.delete()
 
-    @userinfo.command()
-    async def avi(self, ctx, txt: str = None):
+    @commands.command(aliases=['avi'])
+    async def avatar(self, ctx, user: str=None):
         """View bigger version of user's avatar. Ex: >info avi @user"""
-        if txt:
-            try:
-                user = ctx.message.mentions[0]
-            except:
-                user = ctx.guild.get_member_named(txt)
-            if not user:
-                user = ctx.guild.get_member(int(txt))
-            if not user:
-                await ctx.send(self.bot.bot_prefix + 'Could not find user.')
-                return
-        else:
-            user = ctx.message.author
-
-        # Thanks to IgneelDxD for help on this
-        if user.avatar_url[54:].startswith('a_'):
-            avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
-        else:
-            avi = user.avatar_url
+        if user: user = get_user(user, ctx.message, self.bot)
+        else: user = ctx.message.author
         if embed_perms(ctx.message):
-            em = discord.Embed(colour=0x708DD0)
-            em.set_image(url=avi)
+            em = discord.Embed(colour=user.top_role.color)
+            em.set_image(url=user.avatar_url)
             await ctx.send(embed=em)
         else:
-            await ctx.send(self.bot.bot_prefix + avi)
+            await ctx.send(self.bot.bot_prefix + user.avatar_url)
         await ctx.message.delete()
 
 
