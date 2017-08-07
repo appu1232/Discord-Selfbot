@@ -7,7 +7,7 @@ from cogs.utils.dataIO import dataIO
 
 
 class Replacements:
-
+    autoroles = False
     def __init__(self, bot):
         self.bot = bot
         try:
@@ -20,7 +20,7 @@ class Replacements:
     async def replacements(self, ctx):
         """Set text you want to automatically replace with something else."""
         await ctx.message.delete()
-        menu_msg = await ctx.send("```\nWhat would you like to do? Pick a number.\n\n1. Create a new replacement\n2. Remove an existing replacement\n3. List all current replacements```")
+        menu_msg = await ctx.send("```\nWhat would you like to do? Pick a number.\n\n1. Create a new replacement\n2. Remove an existing replacement\n3. List all current replacements\n4. Toggle Auto Role Mentions```")
         reply = await self.bot.wait_for("message", check=lambda m: m.channel == ctx.message.channel and m.author == self.bot.user and m.content.isdigit())
         await reply.delete()
         if int(reply.content) == 1:
@@ -61,12 +61,20 @@ class Replacements:
             for replacement in self.replacement_dict:
                 reply_msg += replacement + ": " + self.replacement_dict[replacement] + "\n"
             await menu_msg.edit(content=reply_msg + "```")
+        elif int(reply.content) == 4:
+            self.autoroles = not self.autoroles
+            await menu_msg.edit(content="Auto Role Mention set to {}".format(self.autoroles))
 
     async def on_message(self, message):
-        if message.author == self.bot.user:
+        if message.author.id == self.bot.user.id:
             replaced_message = message.content
             for replacement in self.replacement_dict:
                 replaced_message = replaced_message.replace(replacement, self.replacement_dict[replacement])
+            if self.autoroles and isinstance(message.channel, discord.abc.GuildChannel):
+                for role in message.guild.roles:
+                    replaced_message = replaced_message.replace('@'+role.name, '<@&{}>'.format(role.id))
+                    replaced_message = replaced_message.replace('@'+role.name.lower(), '<@&{}>'.format(role.id))
+                    replaced_message = replaced_message.replace('@'+role.name.upper(), '<@&{}>'.format(role.id))
             if message.content != replaced_message:
                 await message.edit(content=replaced_message)
 
