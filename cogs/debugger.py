@@ -82,7 +82,7 @@ class Debugger:
                 return result
 
     @commands.command(pass_context=True)
-    async def debug(self, ctx, option: str = None):
+    async def debug(self, ctx, *, option: str = None):
         """Shows useful informations to people that try to help you."""
         try:
             if embed_perms(ctx.message):
@@ -100,34 +100,56 @@ class Debugger:
                     # os = subprocess.run('systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"', stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 else:
                     system = sys.platform
-                em.add_field(name='Operating System', value='%s' % system)
-                em.add_field(name='Discord.py Version', value='%s'%discord.__version__)
+                em.add_field(name='Operating System', value='%s' % system, inline=False)
+                try:
+                    foo = subprocess.run("pip show discord.py", stdout=subprocess.PIPE)
+                    _ver = re.search(r'Version: (\d+.\d+.\w+)', str(foo.stdout)).group(1)
+                except: _ver = discord.__version__
+                em.add_field(name='Discord.py Version', value='%s'%_ver)
+                em.add_field(name='PIP Version', value='%s'%pkg_resources.get_distribution('pip').version)
+                if os.path.exists('.git'):
+                    try: em.add_field(name='Bot version', value='%s' % os.popen('git rev-parse --verify HEAD').read()[:7])
+                    except: pass
                 em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version), inline=False)
-                em.add_field(name='PIP Version', value='%s'%pkg_resources.get_distribution('pip').version, inline=False)
-                dependencys = ['discord','prettytable','requests','spice_api','bs4','strawpy','lxml','discord_webhooks','psutil','PythonGists','PIL','pyfiglet','tokage','pytz','github']
-                loaded_modules = 0
-                unloaded_modules = 0
-                for x in dependencys:
-                    try:
-                        __import__(x.strip())
-                        loaded_modules += 1
-                    except:
-                        unloaded_modules += 1
-
-                em.add_field(name='Dependencies', value='{0} modules imported successfully\n {1} modules imported unsuccessfully'.format(loaded_modules, unloaded_modules), inline=False)
-
-                cogs = self.bot.cogs
-                cogs_folder = os.listdir('cogs')
-                for x in cogs_folder:
-                    if not x.endswith('.py'):
-                        cogs_folder.remove(x)
-
+                if option and 'deps' in option.lower():
+                    dependencies = ''
+                    dep_file = sorted(open('%s/requirements.txt' % os.getcwd()).read().split("\n"), key=str.lower)
+                    # [] + dep_file
+                    for dep in dep_file:
+                        if not '==' in dep: continue
+                        dep = dep.split('==')
+                        cur = pkg_resources.get_distribution(dep[0]).version
+                        if cur == dep[1]: dependencies += '\✅ %s: %s\n'%(dep[0], cur)
+                        else: dependencies += '\❌ %s: %s / %s\n'%(dep[0], cur, dep[1])
+                    em.add_field(name='Dependencies', value='%s' % dependencies)
+                else:
+                    dependencys = ['discord','prettytable','requests','spice_api','bs4','strawpy','lxml','discord_webhooks','psutil','PythonGists','PIL','pyfiglet','tokage','pytz','github']
+                    loaded_modules = 0
+                    unloaded_modules = 0
+                    for x in dependencys:
+                        try:
+                            __import__(x.strip())
+                            loaded_modules += 1
+                        except: unloaded_modules += 1
+                    em.add_field(name='Dependencies', value='{0} modules imported successfully\n {1} modules imported unsuccessfully'.format(loaded_modules, unloaded_modules), inline=False)
                 cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
                 loaded_cogs = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
-                unloaded_cogs = [c.split(".")[1] for c in cog_list
-                                 if c.split(".")[1] not in loaded_cogs]
-
-                em.add_field(name='Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(len(loaded_cogs), len(unloaded_cogs)), inline=False)
+                unloaded_cogs = [c.split(".")[1] for c in cog_list if c.split(".")[1] not in loaded_cogs]
+                # custom_cog_list = ["custom_cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("custom_cogs/*.py")]]
+                # custom_loaded_cogs = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
+                # custom_unloaded_cogs = [c.split(".")[1] for c in custom_cog_list if c.split(".")[1] not in custom_loaded_cogs]
+                if option and 'cogs' in option.lower():
+                    if len(loaded_cogs) > 0: em.add_field(name='Loaded Cogs ({})'.format(len(loaded_cogs)), value='\n'.join(sorted(loaded_cogs)), inline=True)
+                    if len(unloaded_cogs) > 0: em.add_field(name='Unloaded Cogs ({})'.format(len(unloaded_cogs)), value='\n'.join(sorted(unloaded_cogs)), inline=True)
+                    # em.add_field(name='Custom Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(len(custom_loaded_cogs), len(custom_unloaded_cogs)), inline=True)
+                else: em.add_field(name='Cogs', value='{} loaded.\n{} unloaded'.format(len(loaded_cogs), len(unloaded_cogs)), inline=True)
+                if option and 'path' in option.lower():
+                    paths = "\n".join(sys.path).strip()
+                    if len(paths) > 300:
+                        url = PythonGists.Gist(description='sys.path', content=str(paths), name='syspath.txt')
+                        em.add_field(name='Import Paths', value=paths[:300]+' [(Show more)](%s)'%url)
+                    else:
+                        em.add_field(name='Import Paths', value=paths)
 
                 user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 if sys.platform == 'linux':
