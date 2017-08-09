@@ -66,17 +66,19 @@ class Mod:
             user = get_user(ctx.message, user)
             if user and user != self.bot.user:
                 failed = []
+                channel_length = 0
                 for channel in ctx.message.guild.channels:
                     if type(channel) != discord.channel.TextChannel:
                         continue
                     overwrites = channel.overwrites_for(user)
                     overwrites.send_messages = False
+                    channel_length += 1
                     try:
                         await channel.set_permissions(user, overwrite=overwrites)
                     except discord.Forbidden:
                         failed.append(channel)
-                if failed and len(failed) < len(ctx.message.guild.channels):
-                    await ctx.message.edit(content=self.bot.bot_prefix + "Muted user in {}/{} channels: {}".format(len(ctx.message.guild.channels)-len(failed), len(ctx.message.guild.channels), user.mention))
+                if failed and len(failed) < channel_length:
+                    await ctx.message.edit(content=self.bot.bot_prefix + "Muted user in {}/{} channels: {}".format(channel_length - len(failed), channel_length, user.mention))
                 elif failed:
                     await ctx.message.edit(content=self.bot.bot_prefix + "Failed to mute user. Not enough permissions.")
                 else:
