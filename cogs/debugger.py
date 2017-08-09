@@ -116,7 +116,8 @@ class Debugger:
                 em.add_field(name='Operating System', value='%s' % system)
                 em.add_field(name='Discord.py Version', value='%s'%discord.__version__)
                 em.add_field(name='Python Version', value='%s (%s)'%(sys.version,sys.api_version), inline=False)
-                em.add_field(name='PIP Version', value='%s'%pkg_resources.get_distribution('pip').version, inline=False)
+                try: em.add_field(name='PIP Version', value='%s'%pkg_resources.get_distribution('pip').version)
+                except: pass
                 dependencys = ['discord','prettytable','requests','spice_api','bs4','strawpy','lxml','discord_webhooks','psutil','PythonGists','PIL','pyfiglet','tokage','pytz','github']
                 loaded_modules = 0
                 unloaded_modules = 0
