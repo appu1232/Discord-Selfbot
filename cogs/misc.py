@@ -9,7 +9,7 @@ from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.config import get_config_value
 from cogs.utils.dataIO import dataIO
-from cogs.utils.checks import embed_perms, cmd_prefix_len, parse_prefix
+from cogs.utils.checks import embed_perms, cmd_prefix_len, parse_prefix, get_user
 
 '''Module for miscellaneous commands'''
 
@@ -636,18 +636,21 @@ class Misc:
         >quote <words> - tries to search for a message in the server that contains the given words and quotes it.
         >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids).
         >quote <words> | channel=<channel_name> - quotes the message with the given words from the channel name specified in the second argument
-        >quote <message_id> | channel=<channel_name> - quotes the message with the given message id in the given channel name"""
+        >quote <message_id> | channel=<channel_name> - quotes the message with the given message id in the given channel name
+        >quote <user_mention_name_or_id> - quotes the last member sent by a specific user"""
+        
         await ctx.message.delete()
         result = None
         pre = cmd_prefix_len()
         channel = ctx.channel
         if msg:
+            user = get_user(ctx.message, msg)
             if " | channel=" in msg:
                 channel = next((ch for ch in self.bot.get_all_channels() if ch.name == msg.split("| channel=")[1]), None)
                 msg = msg.split(" | channel=")[0]
                 if not channel:
                     return await ctx.send(self.bot.bot_prefix + "Could not find specified channel.")
-            if not isinstance(channel, discord.TextChannel):
+            if not isinstance(channel, discord.channel.TextChannel):
                 return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
             try:
                 length = len(self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)])
@@ -656,7 +659,7 @@ class Misc:
             else:
                 size = length if length < 201 else 200
                 for channel in ctx.message.guild.channels:
-                    if str(channel.type) == 'text':
+                    if type(channel) == discord.channel.TextChannel:
                         if str(channel.id) + ' ' + str(ctx.message.guild.id) in self.bot.all_log:
                             for i in range(length - 2, length - size, -1):
                                 try:
@@ -665,7 +668,7 @@ class Misc:
                                     continue
                                 if (msg.lower().strip() in search[0].content.lower() and (
                                         search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
-                                    ctx.message.content[6:].strip() == str(search[0].id)):
+                                    ctx.message.content[6:].strip() == str(search[0].id)) or (search[0].author == user and search[0].channel == ctx.message.channel):
                                     result = search[0]
                                     break
                             if result:
@@ -675,13 +678,13 @@ class Misc:
                 try:
                     async for sent_message in channel.history(limit=500):
                         if (msg.lower().strip() in sent_message.content and (
-                                sent_message.author != ctx.message.author or sent_message.content[pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)):
+                                sent_message.author != ctx.message.author or sent_message.content[pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)) or (msg.author == user):
                             result = sent_message
                             break
                 except:
                     pass
         else:
-            if not isinstance(channel, discord.TextChannel):
+            if not isinstance(channel, discord.channel.TextChannel):
                 return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
             try:
                 search = self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)][-2]
