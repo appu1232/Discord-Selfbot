@@ -542,12 +542,17 @@ async def on_message(message):
 
             user_found = False
             if bot.log_conf['user_logging'] == 'on':
+                user = '{} {}'.format(str(message.author.id), str(message.guild.id))
                 if '{} {}'.format(str(message.author.id), str(message.guild.id)) in bot.log_conf['keyusers']:
-                    if user_post(bot, '{} {}'.format(str(message.author.id), str(message.guild.id))):
+                    user_p = user_post(bot, user)
+                    if user_p[0]:
+                        bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p[1]
                         user_found = message.author.name
 
                 elif '{} all'.format(str(message.author.id)) in bot.log_conf['keyusers']:
-                    if user_post(bot, '{} all'.format(str(message.author.id))):
+                    user_p = user_post(bot, user)
+                    if user_p[0]:
+                        bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p[1]
                         user_found = message.author.name
 
             if word_found is True or user_found:
@@ -674,13 +679,15 @@ async def webhook(keyword_content, send_type, is_separate):
 async def game_and_avatar(bot):
     await bot.wait_until_ready()
     current_game = next_game = current_avatar = next_avatar = 0
-    while not bot.is_closed:
 
+    while not bot.is_closed():
         # Cycles game if game cycling is enabled.
         if hasattr(bot, 'game_time') and hasattr(bot, 'game'):
             if bot.game:
                 if bot.game_interval:
-                    if game_time_check(bot, bot.game_time, bot.game_interval):
+                    game_check = game_time_check(bot.game_time, bot.game_interval)
+                    if game_check:
+                        bot.game_time = game_check
                         with open('settings/games.json', encoding="utf8") as g:
                             games = json.load(g)
                         if games['type'] == 'random':
@@ -708,7 +715,9 @@ async def game_and_avatar(bot):
                                 await bot.change_presence(game=discord.Game(name=games['games'][next_game]), status=set_status(bot), afk=True)
 
                 else:
-                    if game_time_check(bot, bot.game_time, 180):
+                    game_check = game_time_check(bot.game_time, 180)
+                    if game_check:
+                        bot.game_time = game_check
                         with open('settings/games.json', encoding="utf8") as g:
                             games = json.load(g)
 
@@ -723,7 +732,9 @@ async def game_and_avatar(bot):
         if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
             if bot.avatar:
                 if bot.avatar_interval:
-                    if avatar_time_check(bot, bot.avatar_time, bot.avatar_interval):
+                    avi_check = avatar_time_check(bot.avatar_time, bot.avatar_interval)
+                    if avi_check:
+                        bot.avatar_time = avi_check
                         with open('settings/avatars.json', encoding="utf8") as g:
                             avi_config = json.load(g)
                         all_avis = glob.glob('avatars/*.jpg')
@@ -749,7 +760,9 @@ async def game_and_avatar(bot):
 
         # Sets status to default status when user goes offline (client status takes priority when user is online)
         if hasattr(bot, 'refresh_time'):
-            if has_passed(bot, bot.refresh_time):
+            refresh_time = has_passed(bot.refresh_time)
+            if refresh_time:
+                bot.refresh_time = refresh_time
                 if bot.game and bot.is_stream and '=' in bot.game:
                     g, url = bot.game.split('=')
                     await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
@@ -760,8 +773,10 @@ async def game_and_avatar(bot):
                     await bot.change_presence(status=set_status(bot), afk=True)
 
         if hasattr(bot, 'gc_time'):
-            if gc_clear(bot, bot.gc_time):
+            gc = gc_clear(bot.gc_time)
+            if gc:
                 gc.collect()
+                bot.gc_time = gc
 
         await asyncio.sleep(5)
 

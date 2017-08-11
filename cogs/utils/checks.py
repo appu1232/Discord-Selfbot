@@ -42,11 +42,10 @@ def load_log_config():
         return json.load(f)
 
 
-def has_passed(bot, oldtime):
+def has_passed(oldtime):
     if time.time() - 20 < oldtime:
         return False
-    bot.refresh_time = time.time()
-    return True
+    return time.time()
 
 
 def set_status(bot):
@@ -60,37 +59,33 @@ def set_status(bot):
 
 def user_post(bot, user):
     if time.time() - float(bot.key_users[user][0]) < float(bot.key_users[user][1]):
-        bot.key_users[user] = [time.time(), bot.key_users[user][1]]
-        return False
-    with open('settings/log.json', 'r+') as log:
+        return False, [time.time(), bot.key_users[user][1]]
+    with open('settings/log.json', 'r+') as l:
+        log = json.load(l)
         now = time.time()
-        bot.log_conf['keyusers'][user] = [now, bot.key_users[user][1]]
+        log['keyusers'][user] = [now, bot.key_users[user][1]]
         log.seek(0)
         log.truncate()
-        json.dump(bot.log_conf, log, indent=4)
-    bot.key_users[user] = [now, bot.key_users[user][1]]
-    return True
+        json.dump(log, l, indent=4)
+    return True, [now, bot.key_users[user][1]]
 
 
-def gc_clear(bot, gc_time):
+def gc_clear(gc_time):
     if time.time() - 1800 < gc_time:
         return False
-    bot.gc_time = time.time()
-    return True
+    return time.time()
 
 
-def game_time_check(bot, oldtime, interval):
+def game_time_check(oldtime, interval):
     if time.time() - float(interval) < oldtime:
         return False
-    bot.game_time = time.time()
-    return True
+    return time.time()
 
 
-def avatar_time_check(bot, oldtime, interval):
+def avatar_time_check(oldtime, interval):
     if time.time() - float(interval) < oldtime:
         return False
-    bot.avatar_time = time.time()
-    return True
+    return time.time()
 
 
 def update_bot(message):
