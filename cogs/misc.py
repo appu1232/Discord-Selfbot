@@ -104,7 +104,7 @@ class Misc:
     async def embed(self, ctx, *, msg: str = None):
         """Embed given text. Ex: Do >embed for more help
 
-        Example: >embed title=test this | description=some words | color=3AB35E | field=name=test value=test
+        Example: >embed text title=title | description=description | color=3AB35E  | thumbnail=http://i.imgur.com/EgeOwqF.gif | author=name=author icon=http://i.imgur.com/EgeOwqF.gif | footer=name=footer icon=http://i.imgur.com/EgeOwqF.gif | field=name=field 1 name value=field 1 value | field=name=field 2 name value=field 2 value | field=name=field 3 not inline name value=field 3 not inline value inline=False | ptext=ptext | image=http://i.imgur.com/EgeOwqF.gif
 
         You do NOT need to specify every property, only the ones you want.
 
