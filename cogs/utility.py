@@ -361,8 +361,7 @@ class Utility:
     async def sauce(self, ctx, *, txt: str = None):
         """Find source of image. Ex: >sauce http://i.imgur.com/NIq2U67.png"""
         if not txt:
-            return await self.bot.send_message(ctx.message.channel,
-                                               self.bot.bot_prefix + 'Input a link to check the source. Ex: ``>sauce http://i.imgur.com/NIq2U67.png``')
+            return await ctx.send(self.bot.bot_prefix + 'Input a link to check the source. Ex: ``>sauce http://i.imgur.com/NIq2U67.png``')
         await ctx.message.delete()
         sauce_nao = 'http://saucenao.com/search.php?db=999&url='
         request_headers = {
@@ -377,8 +376,7 @@ class Utility:
             req = Request(sauce_nao + txt, headers=request_headers)
             webpage = await loop.run_in_executor(None, urlopen, req)
         except:
-            return await self.bot.send_message(ctx.message.channel,
-                                               self.bot.bot_prefix + 'Exceeded daily request limit. Try again tomorrow, sorry!')
+            return await ctx.send(self.bot.bot_prefix + 'Exceeded daily request limit. Try again tomorrow, sorry!')
         soup = BeautifulSoup(webpage, 'html.parser')
         pretty_soup = soup.prettify()
         em = discord.Embed(color=0xaa550f, description='**Input:**\n{}\n\n**Results:**'.format(txt))
@@ -506,8 +504,7 @@ class Utility:
         response = requests.get("http://api.urbandictionary.com/v0/define?term={}".format(search)).text
         result = json.loads(response)
         if result["result_type"] == "no_results":
-            await self.bot.send_message(ctx.message.channel,
-                                        self.bot.bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
+            await ctx.send(self.bot.bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
         else:
             try:
                 top_result = result["list"][int(number) - 1]
@@ -524,8 +521,7 @@ class Utility:
                     len(result["list"]), msg, number))
                 await ctx.send("", embed=embed)
             except IndexError:
-                await self.bot.send_message(ctx.message.channel,
-                                            self.bot.bot_prefix + "That result doesn't exist! Try >ud {}.".format(msg))
+                await ctx.send(self.bot.bot_prefix + "That result doesn't exist! Try >ud {}.".format(msg))
 
     @commands.command(pass_context=True, aliases=['yt', 'vid', 'video'])
     async def youtube(self, ctx, *, msg):
@@ -533,8 +529,8 @@ class Utility:
         search = parse.quote(msg)
         response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
         result = BeautifulSoup(response, "html.parser")
-        await self.bot.delete_message(ctx.message)
-        await self.bot.send_message(ctx.message.channel, "https://www.youtube.com{}".format(result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')))
+        await ctx.message.delete()
+        await ctx.send("https://www.youtube.com{}".format(result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')))
 
     @commands.command(pass_context=True)
     async def xkcd(self, ctx, *, comic=""):
