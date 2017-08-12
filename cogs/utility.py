@@ -727,23 +727,27 @@ class Utility:
         >rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
         You can also use the "time" flag to set the amount of time in seconds the poll will last for.
         Example:
-        >rpoll What time is it | HAMMER TIME! | SHOWTIME! | time=10
+        >rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
         You can also omit the options then you get a yes/no vote
         Example:
         >rpoll Should i buy a new T-Shirt?
         """
+
         await ctx.message.delete()
         options = msg.split(" | ")
         time = [x for x in options if x.startswith("time=")]
+        edit = [x for x in options if x == ("edit")]
         if time:
             time = time[0]
         if time:
             options.remove(time)
+        if edit:
+            options.remove(edit[0])
         if len(options) <= 1:
             emoji = ['👍', '👎']
             options.extend(["Yes", "No"])
         elif len(options) == 2:
-            raise commands.errors.MissingRequiredArgument
+            return await ctx.send(self.bot.bot_prefix + "You need to specify atleast 2 options.")
         elif len(options) >= 11:
             return await ctx.send(self.bot.bot_prefix + "You must have 9 options or less.")
         else:
@@ -761,7 +765,6 @@ class Utility:
         poll_msg = await ctx.send(confirmation_msg)
         for emote in to_react:
             await poll_msg.add_reaction(emote)
-        self.inpoll = True
         await asyncio.sleep(time)
         async for message in ctx.message.channel.history():
             if message.id == poll_msg.id:
@@ -785,8 +788,13 @@ class Utility:
         else:
             top_result = options[emoji.index(top_result)+1]
             end_msg += "\n:first_place: {} is the winner!".format(top_result)
-        await ctx.send(end_msg)
-
+        if edit:
+            await poll_msg.edit(content=end_msg)
+            for emote in to_react:
+                await poll_msg.remove_reaction(emote, ctx.message.author)
+        else:
+            await poll_msg.delete()
+            await ctx.send(end_msg)
 
     @commands.command(pass_context=True)
     async def cogs(self, ctx):
