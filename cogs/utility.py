@@ -820,11 +820,11 @@ class Utility:
         
     @commands.command(aliases=['ra'])
     async def readall(self, ctx):
-        """Marks all guilds as read."""
+        """Marks everything as read."""
+        await ctx.message.delete()
         for guild in self.bot.guilds:
             await guild.ack()
-        await ctx.message.delete()
-        await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds))      
+        await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds))) 
 
 def setup(bot):
     bot.add_cog(Utility(bot))
