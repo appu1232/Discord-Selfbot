@@ -71,7 +71,7 @@ def user_post(bot, user):
 
 
 def gc_clear(gc_time):
-    if time.time() - 1800 < gc_time:
+    if time.time() - 3600 < gc_time:
         return False
     return time.time()
 
