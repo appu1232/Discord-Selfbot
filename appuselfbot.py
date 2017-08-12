@@ -773,8 +773,8 @@ async def game_and_avatar(bot):
                     await bot.change_presence(status=set_status(bot), afk=True)
 
         if hasattr(bot, 'gc_time'):
-            gc_time = gc_clear(bot.gc_time)
-            if gc_time:
+            gc_t = gc_clear(bot.gc_time)
+            if gc_t:
                 gc.collect()
                 bot.gc_time = gc
 

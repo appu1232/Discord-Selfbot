@@ -43,7 +43,7 @@ def load_log_config():
 
 
 def has_passed(oldtime):
-    if time.time() - 20 < oldtime:
+    if time.time() - 20.0 < oldtime:
         return False
     return time.time()
 
@@ -71,7 +71,7 @@ def user_post(bot, user):
 
 
 def gc_clear(gc_time):
-    if time.time() - 3600 < gc_time:
+    if time.time() - 3600.0 < gc_time:
         return False
     return time.time()
 
