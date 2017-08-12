@@ -727,7 +727,10 @@ class Utility:
         >rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
         You can also use the "time" flag to set the amount of time in seconds the poll will last for.
         Example:
-        >rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
+        >rpoll What time is it | HAMMER TIME! | SHOWTIME! | time=10
+        You can also omit the options then you get a yes/no vote
+        Example:
+        >rpoll Should i buy a new T-Shirt?
         """
         await ctx.message.delete()
         options = msg.split(" | ")
@@ -737,23 +740,28 @@ class Utility:
         if time:
             options.remove(time)
         if len(options) <= 1:
+            emoji = ['👍', '👎']
+            options.extend(["Yes", "No"])
+        elif len(options) == 2:
             raise commands.errors.MissingRequiredArgument
-        if len(options) >= 11:
+        elif len(options) >= 11:
             return await ctx.send(self.bot.bot_prefix + "You must have 9 options or less.")
+        else:
+            emoji = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣']
         if time:
             time = int(time.strip("time="))
         else:
             time = 30
-        emoji = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣']
         to_react = []
-        confirmation_msg = "Poll for {}:\n\n".format(options[0])
+        confirmation_msg = "**{}** :question:\n\n".format(options[0])
         for idx, option in enumerate(options[1:]):
             confirmation_msg += "{} - {}\n".format(emoji[idx], option)
             to_react.append(emoji[idx])
-        confirmation_msg += "\n\nYou have {} seconds to vote!".format(time)
+        confirmation_msg += "\n\nYou have {!s:0>8} to vote!".format(datetime.timedelta(seconds=time))
         poll_msg = await ctx.send(confirmation_msg)
         for emote in to_react:
             await poll_msg.add_reaction(emote)
+        self.inpoll = True
         await asyncio.sleep(time)
         async for message in ctx.message.channel.history():
             if message.id == poll_msg.id:
@@ -762,10 +770,12 @@ class Utility:
         for reaction in poll_msg.reactions:
             if reaction.emoji in to_react:
                 results[reaction.emoji] = reaction.count - 1
-        end_msg = "The poll is over. The results:\n\n"
+        end_msg = "The poll for **{}** is over. The results:\n\n".format(options[0])
         for result in results:
             end_msg += "{} {} - {} votes\n".format(result, options[emoji.index(result)+1], results[result])
-        top_result = max(results, key=lambda key: results[key])
+        try: top_result = max(results, key=lambda key: results[key])
+        except:
+            return await ctx.send(self.bot.bot_prefix+'Unable to get results for poll **{}**! Maybe one of the reactions was removed?'.format(options[0]))
         if len([x for x in results if results[x] == results[top_result]]) > 1:
             top_results = []
             for key, value in results.items():
@@ -774,8 +784,9 @@ class Utility:
             end_msg += "\nThe victory is tied between: {}".format(", ".join(top_results))
         else:
             top_result = options[emoji.index(top_result)+1]
-            end_msg += "\n{} is the winner!".format(top_result)
+            end_msg += "\n:first_place: {} is the winner!".format(top_result)
         await ctx.send(end_msg)
+
 
     @commands.command(pass_context=True)
     async def cogs(self, ctx):
