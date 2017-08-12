@@ -220,7 +220,7 @@ class Fun:
                     await ctx.send(self.bot.bot_prefix + 'Message too long, RIP.')
                 else:
                     await ctx.message.delete()
-                    await ctx.send(self.bot.bot_prefix + '```{}```'.format(msg))
+                    await ctx.send(self.bot.bot_prefix + '```\n{}\n```'.format(msg))
             else:
                 await ctx.send(
                                self.bot.bot_prefix + 'Please input text to convert to ascii art. Ex: ``>ascii stuff``')
