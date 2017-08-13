@@ -261,32 +261,38 @@ class Utility:
         await killmsg.delete()
 
     @commands.command(aliases=['d'], pass_context=True)
-    async def delete(self, ctx, txt=None, channel=None):
+    async def delete(self, ctx, txt=None, chan=None):
         """Deletes the last message sent or n messages sent. Ex: >d 5"""
         if txt: # If number of seconds/messages are specified
             await ctx.message.delete()
+            channel = None
             deleted = 0
             if txt == "all":
                 limit = 1000
             else:
                 txt = int(txt)
                 limit = 200
-                if txt > 200: 
+                if txt > 200:
                     txt = 200
-            if channel:
-                channel = find_channel(ctx.message.guild.channels, channel)
-                if not channel: 
-                    channel = find_channel(self.bot.get_all_channels(), channel)
-            else: 
+            if chan:
+                try: channel = find_channel(ctx.message.guild.channels, chan)
+                except AttributeError:
+                    channel = find_channel(self.bot.private_channels, chan)
+                    if not channel:
+                        try: channel = self.bot.get_user(int(chan)).dm_channel
+                        except: pass
+                if not channel: channel = find_channel(self.bot.get_all_channels(), chan)
+            else:
                 channel = ctx.message.channel
+            if not channel: return await ctx.send(self.bot.bot_prefix + "Unable to find channel {}.".format(chan))
             async for sent_message in channel.history():
                 if sent_message.author == ctx.message.author:
                     try:
                         await sent_message.delete()
                         deleted += 1
-                    except: 
+                    except:
                         pass
-                    if deleted == txt: 
+                    if deleted == txt:
                         break
         else: # If no number specified, delete last message immediately
             await self.bot.self_log[str(ctx.message.channel.id)].pop().delete()
@@ -591,7 +597,7 @@ class Utility:
         else:
             embed = discord.Embed(title="Number of people playing {}".format(game), description=msg)
             await ctx.send("", embed=embed)
-            
+
     @commands.command(pass_context=True, aliases=['anim'])
     async def animate(self, ctx, animation):
         """Play an animation from a text file. >help animate for more details.
