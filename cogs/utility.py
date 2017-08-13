@@ -817,6 +817,14 @@ class Utility:
         print('User id:' + str(self.bot.user.id))
         print('------')
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
+        
+    @commands.command(aliases=['ra'])
+    async def readall(self, ctx):
+        """Marks everything as read."""
+        await ctx.message.delete()
+        for guild in self.bot.guilds:
+            await guild.ack()
+        await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds))) 
 
 def setup(bot):
     bot.add_cog(Utility(bot))
