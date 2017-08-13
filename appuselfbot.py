@@ -143,18 +143,19 @@ def set_log():
         '%(message)s',
         datefmt="[%d/%m/%Y %H:%M]")
 
-    logger = logging.getLogger("red")
+    logger = logging.getLogger("discord")
     logger.setLevel(logging.INFO)
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setLevel(logging.INFO)
 
+    if not os.path.exists('settings/logs'):
+        os.makedirs('settings/logs')
     errhandler = logging.handlers.RotatingFileHandler(
-        filename='settings/bot.log', encoding='utf-8', mode='a',
+        filename='settings/logs/bot.log', encoding='utf-8', mode='a',
         maxBytes=10**7, backupCount=5)
     errhandler.setFormatter(errformat)
 
     logger.addHandler(errhandler)
-    logger.addHandler(stdout_handler)
 
     return logger
 
@@ -182,6 +183,7 @@ if bot.bot_prefix != '':
 
 bot.cmd_prefix = get_config_value('config', 'cmd_prefix')
 bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
+
 
 # Startup
 @bot.event
