@@ -197,7 +197,6 @@ async def on_ready():
     bot.icount = bot.message_count = bot.mention_count = bot.keyword_log = 0
     bot.self_log = bot.all_log = {}
     bot.imagedumps = []
-    bot.default_status = ''
     bot.is_stream = False
     bot.game = bot.game_interval = bot.avatar = bot.avatar_interval = bot.subpro = bot.keyword_found = None
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
@@ -283,6 +282,7 @@ async def on_ready():
             opt['ascii_font'] = 'big'
         if 'timezone' not in opt:
             opt['timezone'] = ''
+        bot.default_status = opt['default_status']
         fp.seek(0)
         fp.truncate()
         json.dump(opt, fp, indent=4)
@@ -776,7 +776,7 @@ async def game_and_avatar(bot):
             gc_t = gc_clear(bot.gc_time)
             if gc_t:
                 gc.collect()
-                bot.gc_time = gc
+                bot.gc_time = gc_t
 
         await asyncio.sleep(5)
 
