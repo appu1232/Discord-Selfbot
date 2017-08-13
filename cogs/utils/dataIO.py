@@ -21,7 +21,7 @@ class DataIO():
                                   "".format(filename))
             return False
         except Exception as e:
-            print('A issue has occured saving the JSON file.\n'
+            print('A issue has occured saving ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
@@ -36,7 +36,7 @@ class DataIO():
                 data = load(f)
             return data
         except Exception as e:
-            print('A issue has occured loading the JSON file.\n'
+            print('A issue has occured loading ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return {}
@@ -47,14 +47,14 @@ class DataIO():
             with open(filename, 'r', encoding='utf-8') as f:
                 file = load(f)
         except Exception as e:
-            print('A issue has occured loading the JSON file.\n'
+            print('A issue has occured loading ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
         try:
             file.append(data)
         except Exception as e:
-            print('A issue has occured updating the JSON file.\n'
+            print('A issue has occured updating ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
@@ -72,7 +72,7 @@ class DataIO():
                                   "".format(filename))
             return False
         except Exception as e:
-            print('A issue has occured saving the JSON file.\n'
+            print('A issue has occured saving ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
@@ -89,7 +89,7 @@ class DataIO():
         except (FileNotFoundError, decoder.JSONDecodeError):
             return False
         except Exception as e:
-            print('A issue has occured validating the JSON file.\n'
+            print('A issue has occured validating ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
