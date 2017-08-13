@@ -327,16 +327,15 @@ class Debugger:
 
     @commands.command(pass_context=True)
     async def load(self, ctx, *, msg):
-        """Load a module"""
+        """Load a module."""
         await ctx.message.delete()
         try:
             self.bot.load_extension(msg)
         except Exception as e:
             if type(e) == ImportError:
                 try:
-                    self.bot.load_extension("cogs." + msg)
-                    await ctx.send(self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))
-                    return
+                    self.bot.load_extension(msg)
+                    return await ctx.send(self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))
                 except:
                     pass
             await ctx.send(self.bot.bot_prefix + 'Failed to load module: `{}`'.format(msg))
@@ -351,8 +350,6 @@ class Debugger:
         try:
             if os.path.exists(msg.replace(".", "/") + ".py"):
                 self.bot.unload_extension(msg)
-            elif os.path.exists("cogs/" + msg + ".py"):
-                self.bot.unload_extension("cogs." + msg)
             else:
                 raise ModuleNotFoundError("No module named '{}'".format(msg))
         except Exception as e:

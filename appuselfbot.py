@@ -421,7 +421,6 @@ async def reload(ctx, txt: str = None):
             bot.load_extension(txt)
         except Exception as e:
             try:
-                txt = 'cogs.'+txt
                 bot.load_extension(txt)
             except:
                 await ctx.send('``` {}: {} ```'.format(type(e).__name__, e))
@@ -430,7 +429,6 @@ async def reload(ctx, txt: str = None):
         utils = []
         for i in bot.extensions:
             utils.append(i)
-        fail = False
         l = len(utils)
         for i in utils:
             bot.unload_extension(i)
@@ -438,7 +436,6 @@ async def reload(ctx, txt: str = None):
                 bot.load_extension(i)
             except Exception as e:
                 await ctx.send('{}Failed to reload module `{}` ``` {}: {} ```'.format(bot.bot_prefix, i, type(e).__name__, e))
-                fail = True
                 l -= 1
         await ctx.send(bot.bot_prefix + 'Reloaded {} of {} modules.'.format(l, len(utils)))
 
