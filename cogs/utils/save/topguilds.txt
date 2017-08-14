@@ -1,0 +1,29 @@
+[m] from heapq import heappush, nlargest
+guilds = []
+try:filter = argv[2]
+except: filter = ""
+if filter == "help":
+    print('Syntax: `>py run topguilds <top N> <help|mod|admin|owner>`')
+else:
+    for guild in bot.guilds:
+        if filter == "owner" and guild.owner != bot.user: continue
+        elif filter == "admin" and not guild.me.guild_permissions.administrator: continue
+        elif filter == "mod":
+            if guild.me.guild_permissions.ban_members:
+                heappush(guilds, (guild.member_count, guild.name))
+            elif guild.me.guild_permissions.kick_members:
+                heappush(guilds, (guild.member_count, guild.name))
+            continue
+        heappush(guilds, (guild.member_count, guild.name))
+    try:
+        rep = int(argv[1])
+        if rep > len(guild) or rep == 0: raise AttributeError
+    except: rep = len(guilds)
+    l = nlargest(rep, guilds)
+    print('__My {} largest {}guilds__:'.format(rep, "" if filter == "" else filter+" "))
+    for i in range(rep):
+        if i == 0: u = ":first_place:"
+        elif i == 1: u = ":second_place:"
+        elif i == 2: u = ":third_place:"
+        else: u = ""
+        print('**{}**. `{}`: {} {}'.format(str(i+1).zfill(len(str((rep)))),l[i][1],l[i][0],u))
