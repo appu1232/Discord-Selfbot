@@ -280,94 +280,95 @@ class Mal:
         await fetch.delete()
         await ctx.message.delete()
 
-    @mal.command(pass_context=True, alias=['actor', 'voiceactor', 'person', 'voice'])
-    async def va(self, ctx, *, query):
-        """Finds specified voice actor on MyAnimeList"""
-        if query.startswith('[more] '):
-            query = query[7:]
-            more_info = True
-        else:
-            more_info = False
-        fetch = await ctx.send(self.bot.bot_prefix + 'Searching...')
-        found, result = await self.google_results('people', query)
-        if found:
-            va_id = re.findall('/people/(.*)/', result)
-        else:
-            await fetch.delete()
-            await ctx.message.delete()
-            return await ctx.send(self.bot.bot_prefix + 'No results.')
+    #### Temporarily removed b/c of known issue with mal api
+    # @mal.command(pass_context=True, alias=['actor', 'voiceactor', 'person', 'voice'])
+    # async def va(self, ctx, *, query):
+    #     """Finds specified voice actor on MyAnimeList"""
+    #     if query.startswith('[more] '):
+    #         query = query[7:]
+    #         more_info = True
+    #     else:
+    #         more_info = False
+    #     fetch = await ctx.send(self.bot.bot_prefix + 'Searching...')
+    #     found, result = await self.google_results('people', query)
+    #     if found:
+    #         va_id = re.findall('/people/(.*)/', result)
+    #     else:
+    #         await fetch.delete()
+    #         await ctx.message.delete()
+    #         return await ctx.send(self.bot.bot_prefix + 'No results.')
 
-        # No way to get va name so must parse html and grab name from title -_-
-        request_headers = {
-            "Accept-Language": "en-US,en;q=0.5",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Referer": "http://thewebsite.com",
-            "Connection": "keep-alive"
-        }
-        loop = asyncio.get_event_loop()
-        try:
-            req = Request(result, headers=request_headers)
-            webpage = await loop.run_in_executor(None, urlopen, req)
-        except:
-            return await ctx.send(self.bot.bot_prefix + 'Exceeded daily request limit. Try again tomorrow, sorry!')
-        soup = BeautifulSoup(webpage, 'html.parser')
-        va_name = soup.title.string.split(' - MyAnimeList')[0]
+    #     # No way to get va name so must parse html and grab name from title -_-
+    #     request_headers = {
+    #         "Accept-Language": "en-US,en;q=0.5",
+    #         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
+    #         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    #         "Referer": "http://thewebsite.com",
+    #         "Connection": "keep-alive"
+    #     }
+    #     loop = asyncio.get_event_loop()
+    #     try:
+    #         req = Request(result, headers=request_headers)
+    #         webpage = await loop.run_in_executor(None, urlopen, req)
+    #     except:
+    #         return await ctx.send(self.bot.bot_prefix + 'Exceeded daily request limit. Try again tomorrow, sorry!')
+    #     soup = BeautifulSoup(webpage, 'html.parser')
+    #     va_name = soup.title.string.split(' - MyAnimeList')[0]
 
-        try:
-            selection = await self.t_client.get_person(va_id[0])
-        except IndexError:
-            return await ctx.send(self.bot.bot_prefix + 'No results.')
-        em = discord.Embed(description='{}'.format('https://myanimelist.net/people/%s' % selection.id),
-                           colour=0x0066CC)
-        em.add_field(name='Favorites', value=selection.favorites)
-        if more_info:
-            em.add_field(name='Total Roles', value='Fetching...')
-            em.add_field(name='Most Popular Role', value='Fetching...', inline=False)
-        em.set_image(url=selection.image)
-        em.set_author(name=va_name,
-                      icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
-        em.set_footer(text='MyAnimeList Voice Actor Search')
-        va_info = await ctx.send(content=None, embed=em)
-        await fetch.delete()
-        await ctx.message.delete()
+    #     try:
+    #         selection = await self.t_client.get_person(va_id[0])
+    #     except IndexError:
+    #         return await ctx.send(self.bot.bot_prefix + 'No results.')
+    #     em = discord.Embed(description='{}'.format('https://myanimelist.net/people/%s' % selection.id),
+    #                        colour=0x0066CC)
+    #     em.add_field(name='Favorites', value=selection.favorites)
+    #     if more_info:
+    #         em.add_field(name='Total Roles', value='Fetching...')
+    #         em.add_field(name='Most Popular Role', value='Fetching...', inline=False)
+    #     em.set_image(url=selection.image)
+    #     em.set_author(name=va_name,
+    #                   icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
+    #     em.set_footer(text='MyAnimeList Voice Actor Search')
+    #     va_info = await ctx.send(content=None, embed=em)
+    #     await fetch.delete()
+    #     await ctx.message.delete()
 
-        # get_char on each character in the va role list
-        if more_info:
-            all_chars = []
-            for character in selection.voice_acting:
-                id = character['character']['link'].split('/')[2]
-                all_chars.append(id)
-            print(all_chars)
-            try:
-                chunk_generator = self.partition(all_chars, int(len(all_chars)/5))
-                chunk_list = [chunk for chunk in chunk_generator]
-                args = [sys.executable, 'cogs/utils/mal_char_find.py']
-                self.bot.mal_finder = []
-                for chunk in chunk_list:
-                    p = subprocess.Popen(args + chunk, stdout=subprocess.PIPE)
-                    self.bot.mal_finder.append(p)
+    #     # get_char on each character in the va role list
+    #     if more_info:
+    #         all_chars = []
+    #         for character in selection.voice_acting:
+    #             id = character['character']['link'].split('/')[2]
+    #             all_chars.append(id)
+    #         print(all_chars)
+    #         try:
+    #             chunk_generator = self.partition(all_chars, int(len(all_chars)/5))
+    #             chunk_list = [chunk for chunk in chunk_generator]
+    #             args = [sys.executable, 'cogs/utils/mal_char_find.py']
+    #             self.bot.mal_finder = []
+    #             for chunk in chunk_list:
+    #                 p = subprocess.Popen(args + chunk, stdout=subprocess.PIPE)
+    #                 self.bot.mal_finder.append(p)
 
-                while all(None is p.poll() for p in self.bot.mal_finder):
-                    await asyncio.sleep(1)
+    #             while all(None is p.poll() for p in self.bot.mal_finder):
+    #                 await asyncio.sleep(1)
 
-                txt = ''
-                for p in self.bot.mal_finder:
-                    txt += p.communicate()[0].decode('utf-8')
-                all_roles = []
-                role_list = txt.split('\n')
-                for role in role_list:
-                    if ' | ' in role:
-                        char, favs = role.split(' | ')
-                        all_roles.append((char.strip(), int(favs.strip())))
-                all_roles = sorted(all_roles, key=lambda x: x[1], reverse=True)
-                unique_roles = set(tup[0] for tup in all_roles)
-                em.set_field_at(index=1, name='Roles', value=str(len(unique_roles)))
-                em.set_field_at(index=2, name='Most Popular Role', value=all_roles[0][0] + '\nFavorites: ' + str(all_roles[0][1]), inline=False)
-            except ZeroDivisionError:
-                em.set_field_at(index=1, name='Roles', value='None')
-                em.set_field_at(index=2, name='Most Popular Role', value='None', inline=False)
-            await va_info.edit(content=None, embed=em)
+    #             txt = ''
+    #             for p in self.bot.mal_finder:
+    #                 txt += p.communicate()[0].decode('utf-8')
+    #             all_roles = []
+    #             role_list = txt.split('\n')
+    #             for role in role_list:
+    #                 if ' | ' in role:
+    #                     char, favs = role.split(' | ')
+    #                     all_roles.append((char.strip(), int(favs.strip())))
+    #             all_roles = sorted(all_roles, key=lambda x: x[1], reverse=True)
+    #             unique_roles = set(tup[0] for tup in all_roles)
+    #             em.set_field_at(index=1, name='Roles', value=str(len(unique_roles)))
+    #             em.set_field_at(index=2, name='Most Popular Role', value=all_roles[0][0] + '\nFavorites: ' + str(all_roles[0][1]), inline=False)
+    #         except ZeroDivisionError:
+    #             em.set_field_at(index=1, name='Roles', value='None')
+    #             em.set_field_at(index=2, name='Most Popular Role', value='None', inline=False)
+    #         await va_info.edit(content=None, embed=em)
 
     @mal.command(pass_context=True, name="next")
     async def next_(self, ctx, *, query):
