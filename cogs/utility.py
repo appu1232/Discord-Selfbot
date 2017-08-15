@@ -124,8 +124,7 @@ class Utility:
 
         if attach_perms(ctx.message) and url:
             if get_guild:
-                ctx.send(
-                        '**ID:** {}\n**Server:** {}'.format(str(emoji.id), guild.name))
+                await ctx.send('**ID:** {}\n**Server:** {}'.format(str(emoji.id), guild.name))
             with open(name, 'rb') as fp:
                 if copy_emote_bool:
                     e = fp.read()
@@ -297,7 +296,7 @@ class Utility:
         """Spoiler tag. Ex: >spoiler Some book | They get married."""
         try:
             if " | " in msg:
-                spoiled_work, spoiler = msg.split(" | ", 1)
+                spoiled_work, spoiler = msg.lower().split(" | ", 1)
             else:
                 spoiled_work = msg
                 spoiler = msg
@@ -486,7 +485,7 @@ class Utility:
     async def nickname(self, ctx, *, txt=None):
         """Change your nickname on a server. Leave empty to remove nick."""
         await ctx.message.delete()
-        ctx.message.author.edit(nick=txt)
+        await ctx.message.author.edit(nick=txt)
         await ctx.send(self.bot.bot_prefix + 'Changed nickname to: `%s`' % txt)
 
     @commands.command(pass_context=True)

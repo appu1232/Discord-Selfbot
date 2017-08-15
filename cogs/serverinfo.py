@@ -133,7 +133,7 @@ class Server:
     async def role(self, ctx, *, msg):
         """Get more info about a specific role. Ex: >server role Admins"""
         for role in ctx.message.guild.roles:
-            if msg == role.name or msg == role.id:
+            if msg.lower() == role.name.lower() or msg == role.id:
                 all_users = [str(x) for x in role.members]
                 all_users.sort()
                 all_users = ', '.join(all_users)
