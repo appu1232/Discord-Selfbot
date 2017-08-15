@@ -26,7 +26,7 @@ class Server:
                 if not server:
                     return self.bot.bot_prefix + 'Server not found.', False
             except:
-                for i in self.bot.servers:
+                for i in self.bot.guilds:
                     if i.name.lower() == msg.lower().strip():
                         server = i
                         break
