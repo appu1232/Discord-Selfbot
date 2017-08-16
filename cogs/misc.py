@@ -637,7 +637,7 @@ class Misc:
         >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids).
         >quote <words> | channel=<channel_name> - quotes the message with the given words from the channel name specified in the second argument
         >quote <message_id> | channel=<channel_name> - quotes the message with the given message id in the given channel name
-        >quote <user_mention_name_or_id> - quotes the last member sent by a specific user"""
+        >quote <user_mention_name_or_id> - quotes the last message sent by a specific user"""
         
         await ctx.message.delete()
         result = None
@@ -652,33 +652,39 @@ class Misc:
                     return await ctx.send(self.bot.bot_prefix + "Could not find specified channel.")
             if not isinstance(channel, discord.channel.TextChannel):
                 return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
+            if user:
+                for message in ctx.message.channel.history(500):
+                    if message.author == user:
+                        result = message
+                        break
             try:
                 length = len(self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)])
             except:
                 pass
             else:
-                size = length if length < 201 else 200
-                for channel in ctx.message.guild.channels:
-                    if type(channel) == discord.channel.TextChannel:
-                        if str(channel.id) + ' ' + str(ctx.message.guild.id) in self.bot.all_log:
-                            for i in range(length - 2, length - size, -1):
-                                try:
-                                    search = self.bot.all_log[str(channel.id) + ' ' + str(ctx.message.guild.id)][i]
-                                except:
-                                    continue
-                                if (msg.lower().strip() in search[0].content.lower() and (
-                                        search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
-                                    ctx.message.content[6:].strip() == str(search[0].id)) or (search[0].author == user and search[0].channel == ctx.message.channel):
-                                    result = search[0]
+                if not result:
+                    size = length if length < 201 else 200
+                    for channel in ctx.message.guild.channels:
+                        if type(channel) == discord.channel.TextChannel:
+                            if str(channel.id) + ' ' + str(ctx.message.guild.id) in self.bot.all_log:
+                                for i in range(length - 2, length - size, -1):
+                                    try:
+                                        search = self.bot.all_log[str(channel.id) + ' ' + str(ctx.message.guild.id)][i]
+                                    except:
+                                        continue
+                                    if (msg.lower().strip() in search[0].content.lower() and (
+                                            search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
+                                        ctx.message.content[6:].strip() == str(search[0].id)):
+                                        result = search[0]
+                                        break
+                                if result:
                                     break
-                            if result:
-                                break
 
             if not result:
                 try:
                     async for sent_message in channel.history(limit=500):
                         if (msg.lower().strip() in sent_message.content and (
-                                sent_message.author != ctx.message.author or sent_message.content[pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)) or (msg.author == user):
+                                sent_message.author != ctx.message.author or sent_message.content[pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)):
                             result = sent_message
                             break
                 except:

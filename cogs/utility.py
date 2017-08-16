@@ -797,9 +797,9 @@ class Utility:
         embed.set_footer(text="Were you looking for >cog?")
         await ctx.send("", embed=embed)
 
-    @commands.command(pass_context=True, aliases=['clearconsole','cc','clear'])
+    @commands.command(pass_context=True, aliases=['clearconsole', 'cc', 'clear'])
     async def cleartrace(self, ctx):
-        """Shows loaded/unloaded cogs"""
+        """Clear the console."""
         if os.name == 'nt':
             os.system('cls')
         else:
