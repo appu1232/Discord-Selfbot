@@ -345,14 +345,14 @@ async def restart(ctx):
     """Restarts the bot."""
     def check(msg):
         if msg:
-            return msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n'
+            return (msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n') and msg.author == bot.user
         else:
             return False
 
     latest = update_bot(True)
     if latest:
         await ctx.send(bot.bot_prefix + 'There is an update available for the bot. Download and apply the update on restart? (y/n)')
-        reply = await bot.wait_for_message(timeout=10, author=ctx.message.author, check=check)
+        reply = await bot.wait_for("message", check=check)
         with open('restart.txt', 'w', encoding="utf8") as re:
             re.write(str(ctx.message.channel.id))
         if not reply or reply.content.lower().strip() == 'n':
@@ -747,7 +747,7 @@ async def game_and_avatar(bot):
                             current_avatar = next_avatar
                             bot.avatar = all_avis[next_avatar]
                             with open('avatars/%s' % bot.avatar, 'rb') as fp:
-                                await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
+                                await bot.user.edit(password=avi_config['password'], avatar=fp.read())
                         else:
                             if next_avatar + 1 == len(all_avis):
                                 next_avatar = 0
@@ -755,7 +755,7 @@ async def game_and_avatar(bot):
                                 next_avatar += 1
                             bot.avatar = all_avis[next_avatar]
                             with open('avatars/%s' % bot.avatar, 'rb') as fp:
-                                await bot.edit_profile(password=avi_config['password'], avatar=fp.read())
+                                await bot.user.edit(password=avi_config['password'], avatar=fp.read())
 
         # Sets status to default status when user goes offline (client status takes priority when user is online)
         if hasattr(bot, 'refresh_time'):
