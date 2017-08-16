@@ -253,7 +253,10 @@ class Misc:
                 result.append("ptext={}".format(msg.content))
             await ctx.message.edit(content=" | ".join(result))
             info_msg = await ctx.send(self.bot.bot_prefix + "Embed has been turned back into its command form. Make your changes, then type `done` to finish editing.")
-            confirmation_msg = await self.bot.wait_for_message(content="done")
+            def check(msg):
+                return msg.content == "done" and msg.author == self.bot.user
+
+            confirmation_msg = await self.bot.wait_for("message", check=check)
             await self.bot.delete_message(info_msg)
             await self.bot.delete_message(confirmation_msg)
             # not proud of this code
@@ -407,12 +410,12 @@ class Misc:
                                                 status_type.lower()))
 
                 def check(msg):
-                    return msg.content.isdigit() or msg.content.lower().strip() == 'n'
+                    return (msg.content.isdigit() or msg.content.lower().strip() == 'n') and msg.author == self.bot.user
 
                 def check2(msg):
-                    return msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o'
+                    return (msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o') and msg.author == self.bot.user
 
-                reply = await self.bot.wait_for_message(author=ctx.message.author, check=check, timeout=60)
+                reply = await self.bot.wait_for("message,", check=check)
                 if not reply:
                     return
                 if reply.content.lower().strip() == 'n':
@@ -425,7 +428,7 @@ class Misc:
                         if len(games) != 2:
                             await ctx.send(self.bot.bot_prefix + 'Change {} in order or randomly? Input ``o`` for order or ``r`` for random:'.format(
                                                             status_type.lower()))
-                            s = await self.bot.wait_for_message(author=ctx.message.author, check=check2, timeout=60)
+                            s = await self.bot.wait_for("message", check=check2)
                             if not s:
                                 return
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
@@ -499,12 +502,12 @@ class Misc:
                     await ctx.send(self.bot.bot_prefix + 'Enabled cycling of avatars. Input interval in seconds to wait before changing avatars (``n`` to cancel):')
 
                     def check(msg):
-                        return msg.content.isdigit() or msg.content.lower().strip() == 'n'
+                        return (msg.content.isdigit() or msg.content.lower().strip() == 'n') and msg.author == self.bot.user
 
                     def check2(msg):
-                        return msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o'
+                        return (msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o') and msg.author == self.bot.user
 
-                    interval = await self.bot.wait_for_message(author=ctx.message.author, check=check, timeout=60)
+                    interval = await self.bot.wait_for("message", check=check)
                     if not interval:
                         return
                     if interval.content.lower().strip() == 'n':
@@ -515,8 +518,7 @@ class Misc:
                         avi_config['interval'] = int(interval.content)
                     if len(os.listdir('avatars')) != 2:
                         await ctx.send(self.bot.bot_prefix + 'Change avatars in order or randomly? Input ``o`` for order or ``r`` for random:')
-                        cycle_type = await self.bot.wait_for_message(author=ctx.message.author, check=check2,
-                                                                     timeout=60)
+                        cycle_type = await self.bot.wait_for("message", check=check2)
                         if not cycle_type:
                             return
                         if cycle_type.content.strip() == 'r' or cycle_type.content.strip() == 'random':
@@ -536,7 +538,7 @@ class Misc:
                     self.bot.avatar_interval = interval.content
                     self.bot.avatar = random.choice(os.listdir('avatars'))
                     with open('avatars/%s' % self.bot.avatar, 'rb') as fp:
-                        await self.bot.edit_profile(password=avi_config['password'], avatar=fp.read())
+                        await self.bot.user.edit(password=avi_config['password'], avatar=fp.read())
 
                 else:
                     await ctx.send(self.bot.bot_prefix + 'No images found under ``avatars``. Please add images (.jpg .jpeg and .png types only) to that folder and try again.')
