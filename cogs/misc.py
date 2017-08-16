@@ -653,7 +653,7 @@ class Misc:
             if not isinstance(channel, discord.channel.TextChannel):
                 return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
             if user:
-                for message in ctx.message.channel.history(limit=500):
+                async for message in ctx.message.channel.history(limit=500):
                     if message.author == user:
                         result = message
                         break
