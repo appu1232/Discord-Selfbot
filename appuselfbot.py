@@ -100,7 +100,7 @@ def wizard():
     print("\nEnter something that will precede every response from the bot. This is to identify messages that came from the bot vs. just you talking. Ex: Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends. Recommended but if you don't want anything, press enter to skip.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
-    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nPress Enter to start the bot....\n")
+    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nInvoke commands with: {}  Ex: {}ping\nInvoke custom commands with: {}  Ex: {}get good\n\nPress Enter to start the bot....\n")
   
     print("Starting up...")
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
@@ -541,16 +541,17 @@ async def on_message(message):
 
             user_found = False
             if bot.log_conf['user_logging'] == 'on':
-                user = '{} {}'.format(str(message.author.id), str(message.guild.id))
                 if '{} {}'.format(str(message.author.id), str(message.guild.id)) in bot.log_conf['keyusers']:
-                    user_p = user_post(bot, user)
-                    if user_p[0]:
+                    user = '{} {}'.format(str(message.author.id), str(message.guild.id))
+                    cd_active, user_p = user_post(bot.key_users, user)
+                    if cd_active:
                         bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p[1]
                         user_found = message.author.name
 
                 elif '{} all'.format(str(message.author.id)) in bot.log_conf['keyusers']:
-                    user_p = user_post(bot, user)
-                    if user_p[0]:
+                    user = '{} all'.format(str(message.author.id), str(message.guild.id))
+                    cd_active, user_p = user_post(bot.key_users, user)
+                    if cd_active:
                         bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p[1]
                         user_found = message.author.name
 

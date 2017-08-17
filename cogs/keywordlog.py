@@ -788,9 +788,10 @@ class KeywordLogger:
                             reply = await self.block_check(ctx)
                             if reply and not reply.content.startswith(pre):
                                 await reply.delete()
-                                if reply.content.isdigit():
+                                try:
+                                    float(reply.content)
                                     self.bot.log_conf['keyusers']['{} all'.format(str(user.id))] = [0.0, float(reply.content) * 60.0]
-                                else:
+                                except ValueError:
                                     return await menu.edit(content=self.bot.bot_prefix + 'Error, not a number.')
                                 with open('settings/log.json', 'r+') as log:
                                     log.seek(0)

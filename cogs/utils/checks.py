@@ -4,6 +4,7 @@ import git
 import discord
 import os
 import aiohttp
+from cogs.utils.dataIO import dataIO
 try:
     from lxml import etree
 except ImportError:
@@ -57,17 +58,15 @@ def set_status(bot):
         return discord.Status.invisible
 
 
-def user_post(bot, user):
-    if time.time() - float(bot.key_users[user][0]) < float(bot.key_users[user][1]):
-        return False, [time.time(), bot.key_users[user][1]]
-    with open('settings/log.json', 'r+') as l:
-        log = json.load(l)
+def user_post(key_users, user):
+    if time.time() - float(key_users[user][0]) < float(key_users[user][1]):
+        return False, [time.time(), key_users[user][1]]
+    else:
+        log = dataIO.load_json("settings/log.json")
         now = time.time()
-        log['keyusers'][user] = [now, bot.key_users[user][1]]
-        log.seek(0)
-        log.truncate()
-        json.dump(log, l, indent=4)
-    return True, [now, bot.key_users[user][1]]
+        log["keyusers"][user] = [now, key_users[user][1]]
+        dataIO.save_json("settings/log.json", log)
+        return True, [now, key_users[user][1]]
 
 
 def gc_clear(gc_time):
