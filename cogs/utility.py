@@ -288,8 +288,12 @@ class Utility:
                     if deleted == txt: 
                         break
         else: # If no number specified, delete last message immediately
-            await self.bot.self_log[str(ctx.message.channel.id)].pop().delete()
-            await self.bot.self_log[str(ctx.message.channel.id)].pop().delete()
+            await ctx.message.delete()
+            async for message in ctx.message.channel.history().get(author=ctx.message.author):
+                try:
+                    message.delete()
+                except:
+                    pass
 
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg: str):
