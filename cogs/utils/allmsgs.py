@@ -19,7 +19,7 @@ def custom(message):
 
     config = dataIO.load_json('settings/config.json')
     customcmd_prefix_len = len(config['customcmd_prefix'])
-    if message.startswith(config['customcmd_prefix'][0]):
+    if message.startswith(config['customcmd_prefix']):
         commands =  dataIO.load_json('settings/commands.json')
         found_cmds = {}
         for i in commands:
