@@ -8,6 +8,7 @@ settings/*.json
 *.pyc
 *.dll
 cogs/*
+custom_cogs/*
 !cogs/utils
 !cogs/cog_download.py
 !cogs/customcmds.py
