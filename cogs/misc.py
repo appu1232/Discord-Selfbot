@@ -415,7 +415,7 @@ class Misc:
                 def check2(msg):
                     return (msg.content == 'random' or msg.content.lower().strip() == 'r' or msg.content.lower().strip() == 'order' or msg.content.lower().strip() == 'o') and msg.author == self.bot.user
 
-                reply = await self.bot.wait_for("message,", check=check)
+                reply = await self.bot.wait_for("message", check=check)
                 if not reply:
                     return
                 if reply.content.lower().strip() == 'n':
@@ -468,7 +468,7 @@ class Misc:
                     await self.bot.change_presence(game=discord.Game(name=g, type=1, url=url))
                 else:
                     await ctx.send(self.bot.bot_prefix + 'Game set as: ``Playing %s``' % game)
-                    await self.bot.change_presence(game=discord.Game(name=game))
+                    await self.bot.change_presence(game=discord.Game(name=game, type=0))
 
         # Remove game status.
         else:
