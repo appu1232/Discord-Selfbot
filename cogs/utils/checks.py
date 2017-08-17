@@ -129,21 +129,18 @@ def embed_perms(message):
     return check
 
 
-def get_user(message, user, bot=None):
+def get_user(message, user):
     try:
         member = message.mentions[0]
     except:
         member = message.guild.get_member_named(user)
     if not member:
-        member = message.guild.get_member(user)
-    if not member and bot:
-        for guild in bot.guilds:
-            member = guild.get_member(user)
-            if not member: member = guild.get_member_named(user)
-            if member:
-                break
+        try:
+            member = message.guild.get_member(int(user))
+        except ValueError:
+            pass
     if not member:
-        return False
+        return None
     return member
 
 

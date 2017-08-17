@@ -676,7 +676,7 @@ class Misc:
                                         continue
                                     if (msg.lower().strip() in search[0].content.lower() and (
                                             search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
-                                        ctx.message.content[6:].strip() == str(search[0].id)):
+                                        msg.strip() == str(search[0].id)):
                                         result = search[0]
                                         break
                                 if result:
@@ -705,7 +705,10 @@ class Misc:
                     pass
 
         if result:
-            sender = result.author.nick if result.author.nick else result.author.name
+            if type(result.author) == discord.User:
+                sender = result.author.name
+            else:
+                sender = result.author.nick if result.author.nick else result.author.name
             if embed_perms(ctx.message) and result.content:
                 color = get_config_value("optional_config", "quoteembed_color")
                 if color == "auto":
@@ -719,8 +722,10 @@ class Misc:
                 if channel != ctx.message.channel:
                     em.set_footer(text='#{} | {} '.format(channel.name, channel.guild.name))
                 await ctx.send(embed=em)
-            else:
+            elif result.content:
                 await ctx.send('%s - %s```%s```' % (sender, result.created_at, result.content))
+            else:
+                await ctx.send(self.bot.bot_prefix + "Embeds cannot be quoted.")
         else:
             await ctx.send(self.bot.bot_prefix + 'No quote found.')
 
