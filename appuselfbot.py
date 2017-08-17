@@ -545,14 +545,14 @@ async def on_message(message):
                     user = '{} {}'.format(str(message.author.id), str(message.guild.id))
                     cd_active, user_p = user_post(bot.key_users, user)
                     if cd_active:
-                        bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p[1]
+                        bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p
                         user_found = message.author.name
 
                 elif '{} all'.format(str(message.author.id)) in bot.log_conf['keyusers']:
                     user = '{} all'.format(str(message.author.id), str(message.guild.id))
                     cd_active, user_p = user_post(bot.key_users, user)
                     if cd_active:
-                        bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p[1]
+                        bot.log_conf['keyusers'][user] = bot.key_users[user] = user_p
                         user_found = message.author.name
 
             if word_found is True or user_found:
