@@ -100,7 +100,7 @@ def wizard():
     print("\nEnter something that will precede every response from the bot. This is to identify messages that came from the bot vs. just you talking. Ex: Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends. Recommended but if you don't want anything, press enter to skip.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
-    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nInvoke commands with: {}  Ex: {}ping\nInvoke custom commands with: {}  Ex: {}get good\n\nPress Enter to start the bot....\n")
+    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nRerun this wizard by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
   
     print("Starting up...")
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
