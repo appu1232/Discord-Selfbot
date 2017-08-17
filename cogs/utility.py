@@ -288,10 +288,10 @@ class Utility:
                     if deleted == txt: 
                         break
         else: # If no number specified, delete last message immediately
+            msg = await ctx.message.channel.history(before=ctx.message).get(author=ctx.message.author)
             await ctx.message.delete()
-            msg = await ctx.message.channel.history().get(author=ctx.message.author)
             try:
-                msg.delete()
+                await msg.delete()
             except:
                 pass
 
