@@ -289,11 +289,11 @@ class Utility:
                         break
         else: # If no number specified, delete last message immediately
             await ctx.message.delete()
-            async for message in ctx.message.channel.history().get(author=ctx.message.author):
-                try:
-                    message.delete()
-                except:
-                    pass
+            msg = await ctx.message.channel.history().get(author=ctx.message.author)
+            try:
+                msg.delete()
+            except:
+                pass
 
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg: str):
