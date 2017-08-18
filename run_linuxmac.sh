@@ -77,7 +77,7 @@ run_bot() {
 	if hash python3 2>/dev/null; then # TODO abstracify all this which mirrors above an also look up boolean operators in sh
 		if hash pip3 2>/dev/null; then
 			echo "Using global pip3 executable"
-			if pip3 install --user -r requirements.txt >/dev/null; then
+			if pip3 install --user -r requirements.txt; then
 				echo "Starting bot..."
 				python3 loopself.py
 				ret=$?
@@ -96,7 +96,7 @@ run_bot() {
 			echo "Upgrading pip"
 			if python3 -m pip install --user --upgrade pip; then
 				echo "Upgrading requirements"
-				if python3 -m pip install --user -r requirements.txt >/dev/null; then
+				if python3 -m pip install --user -r requirements.txt; then
 					echo "Starting bot..."
 					python3 loopself.py
 					ret=$?
@@ -129,7 +129,7 @@ run_bot() {
 		esac
 		if hash pip 2>/dev/null; then
 			echo "Using global pip executable"
-			if pip install --user -r requirements.txt >/dev/null; then
+			if pip install --user -r requirements.txt; then
 				echo "Starting bot..."
 				python loopself.py
 				ret=$?
@@ -149,7 +149,7 @@ run_bot() {
 			echo "Upgrading pip"
 			if python -m pip install --user --upgrade pip; then
 				echo "Upgrading requirements"
-				if python -m pip install --user -r requirements.txt >/dev/null; then
+				if python -m pip install --user -r requirements.txt; then
 					echo "Starting bot..."
 					python loopself.py
 					ret=$?
