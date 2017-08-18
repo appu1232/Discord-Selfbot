@@ -31,9 +31,8 @@ goto run
 	goto run
 :update
 	echo Starting update...
-	if exist tmp del /F /Q tmp
 	echo Backing up your settings...
-	echo d | xcopy settings tmp /E >nul
+	echo d | xcopy settings settings_backup /E >nul
 	echo Latest update:
 	git --no-pager log --pretty=oneline -n1 origin/master ^master
 	git pull origin master

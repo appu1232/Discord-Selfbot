@@ -10,7 +10,7 @@ updater () {
 		git remote add origin https://github.com/appu1232/Discord-Selfbot.git >/dev/null 2>&1
 		git fetch origin master
 		if [ -d "settings" ]; then
-			cp -r settings tmp
+			cp -r settings settings_backup
 		fi
 		new=$(git remote show origin)
 		if [[ "${new}" =~ "up" ]] || [[ "${new}" =~ "fast-forwardable" ]] ; then
@@ -48,7 +48,7 @@ updater () {
 min_updater() {
 	if hash git 2>/dev/null; then
 		if [ -d "settings" ]; then
-			cp -r settings tmp
+			cp -r settings settings_backup
 		fi
 		git fetch origin master
 		echo ""
