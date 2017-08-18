@@ -632,78 +632,66 @@ class Misc:
             json.dump(opt, fp, indent=4)
 
     @commands.command(aliases=['q'], pass_context=True)
-    async def quote(self, ctx, *, msg: str = None):
+    async def quote(self, ctx, *, msg: str = ""):
         """Quote a message. >help quote for more info.
         >quote - quotes the last message sent in the channel.
         >quote <words> - tries to search for a message in the server that contains the given words and quotes it.
-        >quote <message_id> - quotes the message with the given message id. Ex: >quote 302355374524644290(Enable developer mode to copy message ids).
-        >quote <words> | channel=<channel_name> - quotes the message with the given words from the channel name specified in the second argument
-        >quote <message_id> | channel=<channel_name> - quotes the message with the given message id in the given channel name
-        >quote <user_mention_name_or_id> - quotes the last message sent by a specific user"""
+        >quote <message_id> - quotes the message with the given message ID. Ex: >quote 302355374524644290 (enable developer mode to copy message IDs)
+        >quote <user_mention_name_or_id> - quotes the last message sent by a specific user
+        >quote <words> | channel=<channel_name> - quotes the message with the given words in a specified channel
+        >quote <message_id> | channel=<channel_name> - quotes the message with the given message ID in a specified channel
+        >quote <user_mention_name_or_id> | channel=<channel_name> - quotes the last message sent by a specific user in a specified channel
+        """
         
         await ctx.message.delete()
         result = None
-        pre = cmd_prefix_len()
-        channel = ctx.channel
-        if msg:
-            user = get_user(ctx.message, msg)
-            if " | channel=" in msg:
-                channel = next((ch for ch in self.bot.get_all_channels() if ch.name == msg.split("| channel=")[1]), None)
-                msg = msg.split(" | channel=")[0]
-                if not channel:
-                    return await ctx.send(self.bot.bot_prefix + "Could not find specified channel.")
-            if not isinstance(channel, discord.channel.TextChannel):
-                return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
-            if user:
-                async for message in ctx.message.channel.history(limit=500):
-                    if message.author == user:
-                        result = message
-                        break
-            try:
-                length = len(self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)])
-            except:
-                pass
+        channels = [ctx.channel] + [x for x in ctx.guild.channels if x != ctx.channel and type(x) == discord.channel.TextChannel]
+        
+        args = msg.split(" | ")
+        msg = args[0]
+        if len(args) > 1:
+            channel = args[1].split("channel=")[1]
+            channels = []
+            for chan in ctx.guild.channels:
+                if chan.name == channel or str(chan.id) == channel:
+                    channels.append(chan)
+                    break
             else:
-                if not result:
-                    size = length if length < 201 else 200
-                    for channel in ctx.message.guild.channels:
-                        if type(channel) == discord.channel.TextChannel:
-                            if str(channel.id) + ' ' + str(ctx.message.guild.id) in self.bot.all_log:
-                                for i in range(length - 2, length - size, -1):
-                                    try:
-                                        search = self.bot.all_log[str(channel.id) + ' ' + str(ctx.message.guild.id)][i]
-                                    except:
-                                        continue
-                                    if (msg.lower().strip() in search[0].content.lower() and (
-                                            search[0].author != ctx.message.author or search[0].content[pre:7] != 'quote ')) or (
-                                        msg.strip() == str(search[0].id)):
-                                        result = search[0]
-                                        break
-                                if result:
-                                    break
-
-            if not result:
-                try:
-                    async for sent_message in channel.history(limit=500):
-                        if (msg.lower().strip() in sent_message.content and (
-                                sent_message.author != ctx.message.author or sent_message.content[pre:7] != 'quote ')) or (msg.strip() == str(sent_message.id)):
-                            result = sent_message
+                for guild in self.bot.guilds:
+                    for chan in guild.channels:
+                        if chan.name == channel or str(chan.id) == channel and type(chan) == discord.channel.TextChannel:
+                            channels.append(chan)
                             break
-                except:
-                    pass
-        else:
-            if not isinstance(channel, discord.channel.TextChannel):
-                return await ctx.send(self.bot.bot_prefix + "This command is only supported in server text channels.")
-            try:
-                search = self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)][-2]
-                result = search[0]
-            except KeyError:
-                try:
-                    messages = await channel.history(limit=2).flatten()
-                    result = messages[0]
-                except:
-                    pass
+            if not channels:
+                return await ctx.send(self.bot.bot_prefix + "The specified channel could not be found.")
+            
+        user = get_user(ctx.message, msg)
 
+        async def get_quote(msg, channels, user):
+            for channel in channels:
+                try:
+                    if user:
+                        async for message in channel.history(limit=500):
+                            if message.author == user:
+                                return message
+                    if len(msg) > 15 and msg.isdigit():
+                        async for message in channel.history(limit=500):
+                            if str(message.id) == msg:
+                                return message
+                    else:
+                        async for message in channel.history(limit=500):
+                            if msg in message.content:
+                                return message
+                except discord.Forbidden:
+                    continue
+            return None
+            
+        if msg:
+            result = await get_quote(msg, channels, user)
+        else:
+            async for message in ctx.channel.history(limit=1):
+                result = message
+        
         if result:
             if type(result.author) == discord.User:
                 sender = result.author.name
@@ -719,8 +707,15 @@ class Misc:
                     color = int('0x' + color, 16)
                 em = discord.Embed(color=color, description=result.content, timestamp=result.created_at)
                 em.set_author(name=sender, icon_url=result.author.avatar_url)
-                if channel != ctx.message.channel:
-                    em.set_footer(text='#{} | {} '.format(channel.name, channel.guild.name))
+                footer = ""
+                if result.channel != ctx.channel:
+                    footer += "#" + result.channel.name
+                    
+                if result.guild != ctx.guild:
+                    footer += " | " + result.guild.name
+                    
+                if footer:
+                    em.set_footer(text=footer)
                 await ctx.send(embed=em)
             elif result.content:
                 await ctx.send('%s - %s```%s```' % (sender, result.created_at, result.content))
