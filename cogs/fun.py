@@ -351,7 +351,7 @@ class Fun:
                     else:
                         reactions.append(self.emoji_dict[char][0])
                 else:
-                    reactions.append(discord.utils.get(self.bot.emojis, id=non_unicode_emoji_list[lt_count]))
+                    reactions.append(discord.utils.get(self.bot.emojis, id=int(non_unicode_emoji_list[lt_count])))
                     lt_count += 1
         else:  # probably doesn't matter, but by treating the case without dupes seperately, we can save some time
             lt_count = 0
@@ -362,7 +362,7 @@ class Fun:
                     else:
                         reactions.append(char)
                 else:
-                    reactions.append(discord.utils.get(self.bot.emojis, id=non_unicode_emoji_list[lt_count]))
+                    reactions.append(discord.utils.get(self.bot.emojis, id=int(non_unicode_emoji_list[lt_count])))
                     lt_count += 1
 
         if channel == "current":
