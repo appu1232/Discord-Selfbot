@@ -6,6 +6,7 @@ import asyncio
 import random
 import glob
 import gc
+import git
 import psutil
 import sys
 import re
@@ -188,12 +189,16 @@ bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
 # Startup
 @bot.event
 async def on_ready():
+    global git
     print('Logged in as')
     try:
         print(bot.user.name)
     except:
         pass
-    print('User id:' + str(bot.user.id))
+    print('User id: ' + str(bot.user.id))
+    g = git.cmd.Git(working_dir=os.getcwd())
+    branch = g.execute(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+    print('Current branch is: ' + branch)
     print('------')
     bot.uptime = datetime.datetime.now()
     bot.icount = bot.message_count = bot.mention_count = bot.keyword_log = 0
