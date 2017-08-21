@@ -8,6 +8,7 @@ import json
 import discord
 import os
 import glob
+import git
 from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
@@ -803,6 +804,7 @@ class Utility:
 
     @commands.command(pass_context=True, aliases=['clearconsole', 'cc', 'clear'])
     async def cleartrace(self, ctx):
+        global git
         """Clear the console."""
         if os.name == 'nt':
             os.system('cls')
@@ -817,7 +819,10 @@ class Utility:
             print(self.bot.user.name)
         except:
             pass
-        print('User id:' + str(self.bot.user.id))
+        print('User id: ' + str(self.bot.user.id))
+        g = git.cmd.Git(working_dir=os.getcwd())
+        branch = g.execute(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        print('Current branch is: ' + branch)
         print('------')
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
         
