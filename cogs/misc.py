@@ -536,7 +536,7 @@ class Misc:
                         avi.truncate()
                         json.dump(avi_config, avi, indent=4)
                     self.bot.avatar_interval = interval.content
-                    self.bot.avatar = random.choice(os.listdir('avatars'))
+                    self.bot.avatar = random.choice(os.listdir('avatars')) if loop_type == "random" else sorted(os.listdir('avatars'))[0]
                     with open('avatars/%s' % self.bot.avatar, 'rb') as fp:
                         await self.bot.user.edit(password=avi_config['password'], avatar=fp.read())
 
