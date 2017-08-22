@@ -464,7 +464,7 @@ async def on_message(message):
                 if str(message.channel.id) not in bot.self_log:
                     bot.self_log[str(message.channel.id)] = collections.deque(maxlen=100)
             except AttributeError:
-                pass
+                return
             bot.self_log[str(message.channel.id)].append(message)
             if message.content.startswith(bot.customcmd_prefix):
                 response = custom(message.content.lower().strip())
