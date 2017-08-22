@@ -781,6 +781,8 @@ async def game_and_avatar(bot):
         await asyncio.sleep(5)
 
 if __name__ == '__main__':
+    err = sys.stderr
+    sys.stderr = open(os.devnull, 'w')
     if not os.path.exists("custom_cogs"):
         try:
             os.makedirs("custom_cogs")
@@ -817,6 +819,7 @@ if __name__ == '__main__':
             except Exception as e:
                 print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
 
+    sys.stderr = err
     bot.loop.create_task(game_and_avatar(bot))
 
     while True:
