@@ -373,7 +373,7 @@ class Mal:
     @mal.command(pass_context=True, name="next")
     async def next_(self, ctx, *, query):
         """Time till next episode air date for specified anime"""
-        search = await self.bot.say(self.bot.bot_prefix + "Searching...")
+        search = await ctx.send(self.bot.bot_prefix + "Searching...")
         found, result = await self.google_results('anime', query)
         if found:
             anime_id = re.findall('/anime/(.*)/', result)[0]

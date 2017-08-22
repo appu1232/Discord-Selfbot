@@ -460,8 +460,11 @@ async def on_message(message):
         except AttributeError:  # Happens when it's a direct message.
             pass
         if hasattr(bot, 'self_log'):
-            if str(message.channel.id) not in bot.self_log:
-                bot.self_log[str(message.channel.id)] = collections.deque(maxlen=100)
+            try:
+                if str(message.channel.id) not in bot.self_log:
+                    bot.self_log[str(message.channel.id)] = collections.deque(maxlen=100)
+            except AttributeError:
+                pass
             bot.self_log[str(message.channel.id)].append(message)
             if message.content.startswith(bot.customcmd_prefix):
                 response = custom(message.content.lower().strip())
@@ -737,9 +740,6 @@ async def game_and_avatar(bot):
                         bot.avatar_time = avi_check
                         with open('settings/avatars.json', encoding="utf8") as g:
                             avi_config = json.load(g)
-                        all_avis = glob.glob('avatars/*.jpg')
-                        all_avis.extend(glob.glob('avatars/*.jpeg'))
-                        all_avis.extend(glob.glob('avatars/*.png'))
                         all_avis = os.listdir('avatars')
                         all_avis.sort()
                         if avi_config['type'] == 'random':
