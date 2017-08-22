@@ -23,7 +23,6 @@ class CogDownloading:
             filecontent = req.text.encode("utf-8")
         else:
             filecontent = req.text
-        await self.bot.say(self.bot.bot_prefix + "Uploading to GitHub. Heroku users, wait for the bot to restart.")
         repo.create_file('/custom_cogs/' + file_name, 'Commiting file: ' + file_name + ' to GitHub', filecontent)
         
     @commands.group(pass_context=True)
@@ -68,6 +67,7 @@ class CogDownloading:
                     opt = json.load(fp)
                     if opt['username'] != "":
                         try:
+                            await ctx.send(self.bot.bot_prefix + "Uploading to GitHub. Heroku users, wait for the bot to restart.")
                             await self.github_upload(opt['username'], opt['password'], opt['reponame'], coglink, filename)
                         except:
                             await ctx.send(self.bot.bot_prefix + "Wrong GitHub account credentials.")
