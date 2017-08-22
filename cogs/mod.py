@@ -45,6 +45,27 @@ class Mod:
         else:
             return await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user.')
 
+        @commands.command(aliases=['hban', 'hb'], pass_context=True)
+    async def hackban(self, ctx, user_id: int):
+        """Bans a user outside of the server."""
+        user_id = str(user_id)
+        author = ctx.message.author
+        guild = author.guild
+
+        user = guild.get_member(user_id)
+        if user is not None:
+            await ctx.invoke(self.ban, user=user)
+            return
+
+        try:
+            await self.bot.http.ban(user_id, guild.id, 0)
+            await ctx.message.edit(content=self.bot.bot_prefix + 'Banned user: %s' % user_id)
+        except discord.NotFound:
+            await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user. '
+                               'Invalid user ID was provided.')
+        except discord.errors.Forbidden:
+            await ctx.message.edit(content=self.bot.bot_prefix + 'Could not ban user. Not enough permissions.')
+
     @commands.command(aliases=['sban'], pass_context=True)
     async def softban(self, ctx, *, user: str):
         """Softbans a user (if you have the permission)."""
