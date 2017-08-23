@@ -86,6 +86,7 @@ class Utility:
         2) >emoji copy :smug: [Will add the emoji as a custom emote for the server]
         3) >emoji s :smug: [Will display the smug emoji as an image with additional info]
         """
+        await ctx.message.delete()
         if msg.startswith("copy "):
             msg = msg.split("copy ")[1]
             copy_emote_bool = True
@@ -144,8 +145,6 @@ class Utility:
             await ctx.send(url)
         else:
             await ctx.send(self.bot.bot_prefix + 'Could not find emoji.')
-
-        return await ctx.message.delete()
 
     @commands.command(pass_context=True)
     async def code(self, ctx, *, msg):
