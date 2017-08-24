@@ -167,7 +167,7 @@ class Utility:
         await ctx.send("", embed=embed)
 
     @commands.command(pass_context=True)
-    async def cmdprefix(self, ctx, *, msg: str = None):
+    async def cmdprefix(self, ctx, *, msg):
         """Set your command prefix for normal commands. Requires a reboot."""
         write_config_value("config", "cmd_prefix", msg)
         await ctx.send(self.bot.bot_prefix + 'Prefix changed. Use `restart` to reboot the bot for the updated prefix.')
