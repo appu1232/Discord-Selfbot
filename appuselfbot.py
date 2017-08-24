@@ -389,10 +389,16 @@ async def update(ctx, msg: str = None):
     if latest:
         if not msg == 'show':
             if embed_perms(ctx.message):
-                await ctx.send(content=None, embed=latest)
+                try:
+                    await ctx.send(content=None, embed=latest)
+                except HTTPException:
+                    pass
             await ctx.send(bot.bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
         else:
-            await ctx.send(content=None, embed=latest)
+            try:
+                await ctx.send(content=None, embed=latest)
+            except HTTPException:
+                pass
             return
         with open('quit.txt', 'w', encoding="utf8") as q:
             q.write('update')
