@@ -13,8 +13,9 @@ class Replacements:
         self.bot = bot
         self.replacement_dict = dataIO.load_json("settings/replacements.json")
 
-    @commands.command(pass_context=True)
+    @commands.command(aliases=['replace'], pass_context=True)
     async def replacements(self, ctx):
+        """Replace A with B"""
         await ctx.message.delete()
         menu = Menu("What would you like to do?")
         
