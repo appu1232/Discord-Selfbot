@@ -489,7 +489,7 @@ class Misc:
             with open('settings/avatars.json', 'r+') as a:
                 avi_config = json.load(a)
             if avi_config['password'] == '':
-                return await self.bot.send_message(self.bot.bot_prefix + 'Cycling avatars requires you to input your password. Your password will not be sent anywhere and no one will have access to it. '
+                return await ctx.send(self.bot.bot_prefix + 'Cycling avatars requires you to input your password. Your password will not be sent anywhere and no one will have access to it. '
                                                                 'Enter your password with``>avatar password <password>`` Make sure you are in a private channel where no one can see!')
             if avi_config['interval'] != '0':
                 self.bot.avatar = None
