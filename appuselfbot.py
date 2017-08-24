@@ -792,7 +792,7 @@ if __name__ == '__main__':
             with open("custom_cogs/what_is_this.txt", 'w') as fp:
                 fp.write(text)
             site = requests.get('https://github.com/LyricLy/ASCII/tree/master/cogs').text
-            soup = BeautifulSoup(site, "lxml")
+            soup = BeautifulSoup(site, "html.parser")
             data = soup.find_all(attrs={"class": "js-navigation-open"})
             list = []
             for a in data:
