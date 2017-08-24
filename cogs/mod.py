@@ -45,10 +45,10 @@ class Mod:
         else:
             return await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user.')
 
-        @commands.command(aliases=['hban', 'hb'], pass_context=True)
+    @commands.command(aliases=['hban'], pass_context=True)
     async def hackban(self, ctx, user_id: int):
         """Bans a user outside of the server."""
-        user_id = str(user_id)
+        user_id = int(user_id)
         author = ctx.message.author
         guild = author.guild
 
