@@ -359,7 +359,10 @@ async def restart(ctx):
             print('Restarting...')
             await ctx.send(bot.bot_prefix + 'Restarting...')
         else:
-            await ctx.send(content=None, embed=latest)
+            try:
+                await ctx.send(content=None, embed=latest)
+            except HTTPException:
+                pass
             with open('quit.txt', 'w', encoding="utf8") as q:
                 q.write('update')
             print('Downloading update and restarting...')
