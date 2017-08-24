@@ -48,7 +48,7 @@ class Mod:
     @commands.command(aliases=['hban'], pass_context=True)
     async def hackban(self, ctx, user_id: int):
         """Bans a user outside of the server."""
-        user_id = int(user_id)
+        user_id = str(user_id)
         author = ctx.message.author
         guild = author.guild
 
