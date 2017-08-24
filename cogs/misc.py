@@ -584,7 +584,6 @@ class Misc:
                                 await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
                             else:
                                 pw = opt['password']
-                                await self.bot.edit_profile(password=pw, avatar=e)
                                 await self.bot.user.edit(password=pw, avatar=e)
                                 await ctx.send("Your avatar has been set to the specified image")
                         else:
