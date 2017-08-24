@@ -585,6 +585,7 @@ class Misc:
                             else:
                                 pw = opt['password']
                                 await self.bot.edit_profile(password=pw, avatar=e)
+                                await self.bot.user.edit(password=pw, avatar=e)
                                 await ctx.send("Your avatar has been set to the specified image")
                         else:
                             opt['password'] = ""
