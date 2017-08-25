@@ -330,14 +330,11 @@ class Debugger:
         """Load a module."""
         await ctx.message.delete()
         try:
-            self.bot.load_extension(msg)
+            if os.path.exists("custom_cogs/{}.py".format(msg)):
+                self.bot.load_extension("custom_cogs.{}".format(msg))
+            else:
+                self.bot.load_extension(msg)
         except Exception as e:
-            if type(e) == ImportError:
-                try:
-                    self.bot.load_extension(msg)
-                    return await ctx.send(self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))
-                except:
-                    pass
             await ctx.send(self.bot.bot_prefix + 'Failed to load module: `{}`'.format(msg))
             await ctx.send(self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
@@ -350,6 +347,8 @@ class Debugger:
         try:
             if os.path.exists(msg.replace(".", "/") + ".py"):
                 self.bot.unload_extension(msg)
+            elif os.path.exists("custom_cogs/{}.py".format(msg)):
+                self.bot.load_extension("custom_cogs.{}".format(msg))
             else:
                 raise ModuleNotFoundError("No module named '{}'".format(msg))
         except Exception as e:
