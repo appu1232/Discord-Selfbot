@@ -158,13 +158,12 @@ class Server:
         await ctx.send(self.bot.bot_prefix + 'Could not find role ``%s``' % msg)
 
     @commands.command(aliases=['channel', 'cinfo', 'ci'], pass_context=True, no_pm=True)
-    async def channelinfo(self, ctx, *, channel: discord.channel=None):
+    async def channelinfo(self, ctx, *, channel: int = None):
         """Shows channel information"""
         if not channel:
             channel = ctx.message.channel
-        # else:
-            # channel = ctx.message.guild.get_channel(int(chan))
-            # if not channel: channel = self.bot.get_channel(int(chan))
+        else:
+            channel = self.bot.get_channel(channel)
         data = discord.Embed()
         content = None
         if hasattr(channel, 'mention'):
