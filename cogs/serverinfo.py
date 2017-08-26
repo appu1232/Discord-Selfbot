@@ -159,7 +159,7 @@ class Server:
 
     @commands.command(aliases=['channel', 'cinfo', 'ci'], pass_context=True, no_pm=True)
     async def channelinfo(self, ctx, *, channel: discord.channel=None):
-        """Shows channel informations"""
+        """Shows channel information"""
         if not channel:
             channel = ctx.message.channel
         # else:
@@ -168,7 +168,7 @@ class Server:
         data = discord.Embed()
         content = None
         if hasattr(channel, 'mention'):
-            content = self.bot.bot_prefix+"**Informations about Channel:** "+channel.mention
+            content = self.bot.bot_prefix+"**Information about Channel:** "+channel.mention
         if hasattr(channel, 'changed_roles'):
             if len(channel.changed_roles) > 0:
                 data.color = discord.Colour.green() if channel.changed_roles[0].permissions.read_messages else discord.Colour.red()
