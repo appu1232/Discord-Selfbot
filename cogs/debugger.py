@@ -87,7 +87,6 @@ class Debugger:
         try:
             if embed_perms(ctx.message):
                 em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot Debug Infos')
-                # em.add_field(name='Selfbot Version', value='%s'%self.bot.version)
                 system = ''
                 if sys.platform == 'linux':
                     system = subprocess.run(['uname', '-a'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
@@ -97,7 +96,6 @@ class Debugger:
                     try: platform
                     except: import platform
                     system = '%s %s (%s)'%(platform.system(),platform.version(),sys.platform)
-                    # os = subprocess.run('systeminfo | findstr /B /C:\"OS Name\" /C:\"OS Version\"', stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 else:
                     system = sys.platform
                 em.add_field(name='Operating System', value='%s' % system, inline=False)
@@ -114,7 +112,6 @@ class Debugger:
                 if option and 'deps' in option.lower():
                     dependencies = ''
                     dep_file = sorted(open('%s/requirements.txt' % os.getcwd()).read().split("\n"), key=str.lower)
-                    # [] + dep_file
                     for dep in dep_file:
                         if not '==' in dep: continue
                         dep = dep.split('==')
@@ -135,13 +132,9 @@ class Debugger:
                 cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
                 loaded_cogs = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
                 unloaded_cogs = [c.split(".")[1] for c in cog_list if c.split(".")[1] not in loaded_cogs]
-                # custom_cog_list = ["custom_cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("custom_cogs/*.py")]]
-                # custom_loaded_cogs = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
-                # custom_unloaded_cogs = [c.split(".")[1] for c in custom_cog_list if c.split(".")[1] not in custom_loaded_cogs]
                 if option and 'cogs' in option.lower():
                     if len(loaded_cogs) > 0: em.add_field(name='Loaded Cogs ({})'.format(len(loaded_cogs)), value='\n'.join(sorted(loaded_cogs)), inline=True)
                     if len(unloaded_cogs) > 0: em.add_field(name='Unloaded Cogs ({})'.format(len(unloaded_cogs)), value='\n'.join(sorted(unloaded_cogs)), inline=True)
-                    # em.add_field(name='Custom Cogs', value='{0} cogs loaded\n {1} cogs unloaded'.format(len(custom_loaded_cogs), len(custom_unloaded_cogs)), inline=True)
                 else: em.add_field(name='Cogs', value='{} loaded.\n{} unloaded'.format(len(loaded_cogs), len(unloaded_cogs)), inline=True)
                 if option and 'path' in option.lower():
                     paths = "\n".join(sys.path).strip()
