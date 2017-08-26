@@ -210,7 +210,7 @@ class Server:
 
     @commands.command(aliases=['invitei', 'ii'], pass_context=True)
     async def inviteinfo(self, ctx, *, invite: str = None):
-        """Shows invite informations."""
+        """Shows invite information."""
         if invite:
             for url in re.findall(r'(https?://\S+)', invite):
                 invite = await self.bot.get_invite(urlparse(url).path.replace('/', '').replace('<', '').replace('>', ''))
@@ -232,7 +232,7 @@ class Server:
         data = discord.Embed()
         content = None
         if invite.id is not None:
-            content = self.bot.bot_prefix + "**Informations about Invite:** %s" % invite.id
+            content = self.bot.bot_prefix + "**Information about Invite:** %s" % invite.id
         if invite.revoked is not None:
             data.colour = discord.Colour.red() if invite.revoked else discord.Colour.green()
         if invite.created_at is not None:
