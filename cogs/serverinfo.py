@@ -167,13 +167,16 @@ class Server:
         data = discord.Embed()
         content = None
         if hasattr(channel, 'mention'):
-            content = self.bot.bot_prefix+"**Information about Channel:** "+channel.mention
+            content = self.bot.bot_prefix + "**Information about Channel:** " + channel.mention
         if hasattr(channel, 'changed_roles'):
             if len(channel.changed_roles) > 0:
                 data.color = discord.Colour.green() if channel.changed_roles[0].permissions.read_messages else discord.Colour.red()
-        if isinstance(channel, discord.TextChannel): _type = "Text"
-        elif isinstance(channel, discord.VoiceChannel): _type = "Voice"
-        else: _type = "Unknown"
+        if isinstance(channel, discord.TextChannel): 
+            _type = "Text"
+        elif isinstance(channel, discord.VoiceChannel): 
+            _type = "Voice"
+        else: 
+            _type = "Unknown"
         data.add_field(name="Type", value=_type)
         data.add_field(name="ID", value=channel.id, inline=False)
         if hasattr(channel, 'position'):
@@ -195,18 +198,26 @@ class Server:
                 data.add_field(name="Members", value="%s"%len(channel.members))
             if channel.topic:
                 data.add_field(name="Topic", value=channel.topic, inline=False)
-            _hidden = []; _allowed = []
+            hidden = []
+            allowed = []
             for role in channel.changed_roles:
-                if role.permissions.read_messages: _allowed.append(role.mention)
-                else: _hidden.append(role.mention)
-            if len(_allowed) > 0: data.add_field(name='Allowed Roles (%s)'%len(_allowed), value=', '.join(_allowed), inline=False)
-            if len(_hidden) > 0: data.add_field(name='Restricted Roles (%s)'%len(_hidden), value=', '.join(_hidden), inline=False)
+                if role.permissions.read_messages is True:
+                    if role.is_default():
+                        allowed.append("@everyone")
+                    else:
+                        allowed.append(role.mention)
+                elif role.permissions.read_messages is False:
+                    if role.is_default():
+                        hidden.append("@everyone")
+                    else:
+                        hidden.append(role.mention)
+            if len(allowed) > 0: 
+                data.add_field(name='Allowed Roles ({})'.format(len(allowed)), value=', '.join(allowed), inline=False)
+            if len(hidden) > 0:
+                data.add_field(name='Restricted Roles ({})'.format(len(hidden)), value=', '.join(hidden), inline=False)
         if channel.created_at:
             data.set_footer(text=("Created on {} ({} days ago)".format(channel.created_at.strftime("%d %b %Y %H:%M"), (ctx.message.created_at - channel.created_at).days)))
-        # try:
-            await ctx.send(content if content else None, embed=data)
-        # except:
-            # await ctx.send(self.bot.bot_prefix+"I need the `Embed links` permission to send this")
+        await ctx.send(content, embed=data)
 
     @commands.command(aliases=['invitei', 'ii'], pass_context=True)
     async def inviteinfo(self, ctx, *, invite: str = None):
