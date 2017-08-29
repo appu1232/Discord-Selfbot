@@ -284,6 +284,10 @@ async def on_ready():
             opt['ascii_font'] = 'big'
         if 'timezone' not in opt:
             opt['timezone'] = ''
+        if 'password' not in opt:
+            opt['password'] = ''
+        if avatars['password'] != '' and opt['password'] == '':
+            opt['password'] = avatars['password']
         bot.default_status = opt['default_status']
         fp.seek(0)
         fp.truncate()
@@ -361,7 +365,7 @@ async def restart(ctx):
         else:
             try:
                 await ctx.send(content=None, embed=latest)
-            except HTTPException:
+            except:
                 pass
             with open('quit.txt', 'w', encoding="utf8") as q:
                 q.write('update')
@@ -391,13 +395,13 @@ async def update(ctx, msg: str = None):
             if embed_perms(ctx.message):
                 try:
                     await ctx.send(content=None, embed=latest)
-                except HTTPException:
+                except:
                     pass
             await ctx.send(bot.bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
         else:
             try:
                 await ctx.send(content=None, embed=latest)
-            except HTTPException:
+            except:
                 pass
             return
         with open('quit.txt', 'w', encoding="utf8") as q:
@@ -692,100 +696,104 @@ async def game_and_avatar(bot):
     await bot.wait_until_ready()
     current_game = next_game = current_avatar = next_avatar = 0
 
-    while not bot.is_closed():
+    while True:
         # Cycles game if game cycling is enabled.
-        if hasattr(bot, 'game_time') and hasattr(bot, 'game'):
-            if bot.game:
-                if bot.game_interval:
-                    game_check = game_time_check(bot.game_time, bot.game_interval)
-                    if game_check:
-                        bot.game_time = game_check
-                        with open('settings/games.json', encoding="utf8") as g:
-                            games = json.load(g)
-                        if games['type'] == 'random':
-                            while next_game == current_game:
-                                next_game = random.randint(0, len(games['games']) - 1)
-                            current_game = next_game
-                            bot.game = games['games'][next_game]
-                            if bot.is_stream and '=' in games['games'][next_game]:
-                                g, url = games['games'][next_game].split('=')
-                                await bot.change_presence(game=discord.Game(name=g, type=1,
-                                                                            url=url),
-                                                          status=set_status(bot), afk=True)
+        try:
+            if hasattr(bot, 'game_time') and hasattr(bot, 'game'):
+                if bot.game:
+                    if bot.game_interval:
+                        game_check = game_time_check(bot.game_time, bot.game_interval)
+                        if game_check:
+                            bot.game_time = game_check
+                            with open('settings/games.json', encoding="utf8") as g:
+                                games = json.load(g)
+                            if games['type'] == 'random':
+                                while next_game == current_game:
+                                    next_game = random.randint(0, len(games['games']) - 1)
+                                current_game = next_game
+                                bot.game = games['games'][next_game]
+                                if bot.is_stream and '=' in games['games'][next_game]:
+                                    g, url = games['games'][next_game].split('=')
+                                    await bot.change_presence(game=discord.Game(name=g, type=1,
+                                                                                url=url),
+                                                              status=set_status(bot), afk=True)
+                                else:
+                                    await bot.change_presence(game=discord.Game(name=games['games'][next_game], type=0), status=set_status(bot), afk=True)
                             else:
-                                await bot.change_presence(game=discord.Game(name=games['games'][next_game], type=0), status=set_status(bot), afk=True)
-                        else:
-                            if next_game+1 == len(games['games']):
-                                next_game = 0
-                            else:
-                                next_game += 1
-                            bot.game = games['games'][next_game]
-                            if bot.is_stream and '=' in games['games'][next_game]:
-                                g, url = games['games'][next_game].split('=')
+                                if next_game+1 == len(games['games']):
+                                    next_game = 0
+                                else:
+                                    next_game += 1
+                                bot.game = games['games'][next_game]
+                                if bot.is_stream and '=' in games['games'][next_game]:
+                                    g, url = games['games'][next_game].split('=')
+                                    await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
+                                else:
+                                    await bot.change_presence(game=discord.Game(name=games['games'][next_game], type=0), status=set_status(bot), afk=True)
+
+                    else:
+                        game_check = game_time_check(bot.game_time, 180)
+                        if game_check:
+                            bot.game_time = game_check
+                            with open('settings/games.json', encoding="utf8") as g:
+                                games = json.load(g)
+
+                            bot.game = games['games']
+                            if bot.is_stream and '=' in games['games']:
+                                g, url = games['games'].split('=')
                                 await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
                             else:
-                                await bot.change_presence(game=discord.Game(name=games['games'][next_game], type=0), status=set_status(bot), afk=True)
+                                await bot.change_presence(game=discord.Game(name=games['games'], type=0), status=set_status(bot), afk=True)
 
-                else:
-                    game_check = game_time_check(bot.game_time, 180)
-                    if game_check:
-                        bot.game_time = game_check
-                        with open('settings/games.json', encoding="utf8") as g:
-                            games = json.load(g)
-
-                        bot.game = games['games']
-                        if bot.is_stream and '=' in games['games']:
-                            g, url = games['games'].split('=')
-                            await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
-                        else:
-                            await bot.change_presence(game=discord.Game(name=games['games'], type=0), status=set_status(bot), afk=True)
-
-        # Cycles avatar if avatar cycling is enabled.
-        if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
-            if bot.avatar:
-                if bot.avatar_interval:
-                    avi_check = avatar_time_check(bot.avatar_time, bot.avatar_interval)
-                    if avi_check:
-                        bot.avatar_time = avi_check
-                        with open('settings/avatars.json', encoding="utf8") as g:
-                            avi_config = json.load(g)
-                        all_avis = os.listdir('avatars')
-                        all_avis.sort()
-                        if avi_config['type'] == 'random':
-                            while next_avatar == current_avatar:
-                                next_avatar = random.randint(0, len(all_avis) - 1)
-                            current_avatar = next_avatar
-                            bot.avatar = all_avis[next_avatar]
-                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
-                                await bot.user.edit(password=avi_config['password'], avatar=fp.read())
-                        else:
-                            if next_avatar + 1 == len(all_avis):
-                                next_avatar = 0
+            # Cycles avatar if avatar cycling is enabled.
+            if hasattr(bot, 'avatar_time') and hasattr(bot, 'avatar'):
+                if bot.avatar:
+                    if bot.avatar_interval:
+                        avi_check = avatar_time_check(bot.avatar_time, bot.avatar_interval)
+                        if avi_check:
+                            bot.avatar_time = avi_check
+                            with open('settings/avatars.json', encoding="utf8") as g:
+                                avi_config = json.load(g)
+                            all_avis = os.listdir('avatars')
+                            all_avis.sort()
+                            if avi_config['type'] == 'random':
+                                while next_avatar == current_avatar:
+                                    next_avatar = random.randint(0, len(all_avis) - 1)
+                                current_avatar = next_avatar
+                                bot.avatar = all_avis[next_avatar]
+                                with open('avatars/%s' % bot.avatar, 'rb') as fp:
+                                    await bot.user.edit(password=avi_config['password'], avatar=fp.read())
                             else:
-                                next_avatar += 1
-                            bot.avatar = all_avis[next_avatar]
-                            with open('avatars/%s' % bot.avatar, 'rb') as fp:
-                                await bot.user.edit(password=avi_config['password'], avatar=fp.read())
+                                if next_avatar + 1 == len(all_avis):
+                                    next_avatar = 0
+                                else:
+                                    next_avatar += 1
+                                bot.avatar = all_avis[next_avatar]
+                                with open('avatars/%s' % bot.avatar, 'rb') as fp:
+                                    await bot.user.edit(password=avi_config['password'], avatar=fp.read())
 
-        # Sets status to default status when user goes offline (client status takes priority when user is online)
-        if hasattr(bot, 'refresh_time'):
-            refresh_time = has_passed(bot.refresh_time)
-            if refresh_time:
-                bot.refresh_time = refresh_time
-                if bot.game and bot.is_stream and '=' in bot.game:
-                    g, url = bot.game.split('=')
-                    await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
-                elif bot.game and not bot.is_stream:
-                    await bot.change_presence(game=discord.Game(name=bot.game, type=0),
-                                              status=set_status(bot), afk=True)
-                else:
-                    await bot.change_presence(status=set_status(bot), afk=True)
+            # Sets status to default status when user goes offline (client status takes priority when user is online)
+            if hasattr(bot, 'refresh_time'):
+                refresh_time = has_passed(bot.refresh_time)
+                if refresh_time:
+                    bot.refresh_time = refresh_time
+                    if bot.game and bot.is_stream and '=' in bot.game:
+                        g, url = bot.game.split('=')
+                        await bot.change_presence(game=discord.Game(name=g, type=1, url=url), status=set_status(bot), afk=True)
+                    elif bot.game and not bot.is_stream:
+                        await bot.change_presence(game=discord.Game(name=bot.game, type=0),
+                                                  status=set_status(bot), afk=True)
+                    else:
+                        await bot.change_presence(status=set_status(bot), afk=True)
 
-        if hasattr(bot, 'gc_time'):
-            gc_t = gc_clear(bot.gc_time)
-            if gc_t:
-                gc.collect()
-                bot.gc_time = gc_t
+            if hasattr(bot, 'gc_time'):
+                gc_t = gc_clear(bot.gc_time)
+                if gc_t:
+                    gc.collect()
+                    bot.gc_time = gc_t
+
+        except Exception as e:
+            print('Something went wrong: %s' % e)
 
         await asyncio.sleep(5)
 

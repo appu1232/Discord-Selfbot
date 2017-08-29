@@ -8,5 +8,6 @@
     "ascii_font": "big",
     "quoteembed_color": "auto",
     "embed_color": "",
-    "timezone": ""
+    "timezone": "",
+	"password": ""
 }

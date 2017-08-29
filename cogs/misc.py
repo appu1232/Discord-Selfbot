@@ -548,12 +548,12 @@ class Misc:
     @avatar.command(aliases=['pass', 'pw'], pass_context=True)
     async def password(self, ctx, *, msg):
         """Set your discord acc password to rotate avatars. See wiki for more info."""
-        with open('settings/avatars.json', 'r+') as a:
-            avi_config = json.load(a)
-            avi_config['password'] = msg.strip().strip('"').lstrip('<').rstrip('>')
-            a.seek(0)
-            a.truncate()
-            json.dump(avi_config, a, indent=4)
+        avi_config = dataIO.load_json('settings/avatars.json')
+        avi_config['password'] = msg.strip().strip('"').lstrip('<').rstrip('>')
+        dataIO.save_json('settings/avatars.json', avi_config)
+        opt = dataIO.load_json('settings/optional_config.json')
+        opt['password'] = avi_config['password']
+        dataIO.save_json('settings/optional_config.json', opt)
         await ctx.message.delete()
         return await ctx.send(self.bot.bot_prefix + 'Password set. Do ``>avatar`` to toggle cycling avatars.')
 
