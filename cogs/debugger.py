@@ -47,18 +47,17 @@ class Debugger:
         else:
             code_block = True
         try:
+            old = sys.stdout
+            sys.stdout = StringIO()
             result = eval(code, env)
+            if result is None:
+                result = ""
+            else:
+                result = repr(result)
+            result = sys.stdout.getvalue() + result
+            sys.stdout = old
             if inspect.isawaitable(result):
                 result = await result
-            if not result:
-                try:
-                    old = sys.stdout
-                    sys.stdout = StringIO()
-                    exec(code, env)
-                    result = sys.stdout.getvalue()
-                    sys.stdout = old
-                except Exception as g:
-                    return self.bot.bot_prefix + '```{}```'.format(type(g).__name__ + ': ' + str(g))
         except SyntaxError:
             try:
                 old = sys.stdout
@@ -77,7 +76,7 @@ class Debugger:
             return self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
         else:
             if code_block:
-                return self.bot.bot_prefix + '```py\n{}\n```'.format(result)
+                return self.bot.bot_prefix + '```\n{}\n```'.format(result)
             else:
                 return result
 
