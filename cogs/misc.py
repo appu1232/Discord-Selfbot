@@ -66,7 +66,11 @@ class Misc:
             g = u'\U0001F3AE Game'
             if '=' in game: g = '\ud83c\udfa5 Stream'
             em.add_field(name=g, value=game)
-            mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024 ** 2)
+            try:
+                mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024 ** 2)
+            except AttributeError:
+                # OS doesn't support retrieval of USS (probably BSD or Solaris)
+                mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().rss / 1024 ** 2)
             em.add_field(name=u'\U0001F4BE Memory usage:', value=mem_usage)
             try:
                 g = git.cmd.Git(working_dir=os.getcwd())
