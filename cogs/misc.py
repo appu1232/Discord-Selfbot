@@ -230,10 +230,7 @@ class Misc:
     async def editembed(self, ctx, msg_id):
         """Edit an embedded message."""
         await ctx.message.delete()
-        async for message in self.bot.logs_from(ctx.message.channel, 100):
-            if message.id == msg_id:
-                msg = message
-                break
+        msg = await ctx.history(limit=100).get(id=msg_id)
         if not msg:
             await ctx.send(self.bot.bot_prefix + "That message couldn't be found.")
         else:
