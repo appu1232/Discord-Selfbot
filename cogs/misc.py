@@ -227,40 +227,37 @@ class Misc:
             pass
 
     @commands.command(pass_context=True)
-    async def editembed(self, ctx, msg_id):
+    async def editembed(self, ctx, msg_id : int):
         """Edit an embedded message."""
-        await ctx.message.delete()
         msg = await ctx.history(limit=100).get(id=msg_id)
         if not msg:
             await ctx.send(self.bot.bot_prefix + "That message couldn't be found.")
         else:
             try:
-                fields = msg.embeds[0].pop("fields")
-            except KeyError:
-                fields = False
-            msg.embeds[0].pop("type")
-            try:
-                color = msg.embeds[0].pop("color")
-            except KeyError:
-                color = False
+                old_embed = msg.embeds[0]
+            except IndexError:
+                return await ctx.send("The message does not contain an embed.")
+            fields = old_embed.fields
             result = []
-            for field in msg.embeds[0]:
-                result.append("{}={}".format(field, msg.embeds[0][field]))
+            if old_embed.description:
+                result.append("description={}".format(old_embed.description))
+            if old_embed.color:
+                result.append("color={}".format(hex(old_embed.color.value)))
+            if old_embed.url:
+                result.append("url={}".format(old_embed.url))
             if fields:
                 for field in fields:
-                    result.append("field=name={} value={} inline={}".format(field["name"], field["value"], field["inline"]))
-            if color:
-                result.append("color={}".format(hex(color)))
+                    result.append("field=name={} value={} inline={}".format(field.name, field.value, field.inline))
             if msg.content:
                 result.append("ptext={}".format(msg.content))
             await ctx.message.edit(content=" | ".join(result))
             info_msg = await ctx.send(self.bot.bot_prefix + "Embed has been turned back into its command form. Make your changes, then type `done` to finish editing.")
-            def check(msg):
-                return msg.content == "done" and msg.author == self.bot.user
+            def check(event_msg):
+                return event_msg.content == "done" and event_msg.author == self.bot.user
 
             confirmation_msg = await self.bot.wait_for("message", check=check)
-            await self.bot.delete_message(info_msg)
-            await self.bot.delete_message(confirmation_msg)
+            await info_msg.delete()
+            await confirmation_msg.delete()
             # not proud of this code
             ptext = ""
             title = ""
@@ -271,12 +268,8 @@ class Misc:
             footer = ""
             author = ""
             timestamp = discord.Embed().Empty
-            # need to get the edited message again
-            async for message in self.bot.logs_from(ctx.message.channel, 100):
-                if message.id == msg_id:
-                    msg = message
-                    break
-            embed_values = msg.content.split('|')
+
+            embed_values = ctx.message.content.split('|')
             for i in embed_values:
                 with open('settings/optional_config.json', 'r+') as fp:
                     opt = json.load(fp)
