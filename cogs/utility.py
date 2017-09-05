@@ -355,7 +355,7 @@ class Utility:
             else:
                 title = 'Poll by %s' % ctx.message.author.name
         except:
-            return ctx.send(self.bot.bot_prefix + 'Invalid Syntax. Example use: ``>poll Favorite color = Blue | Red | Green | Purple``')
+            return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. Example use: ``>poll Favorite color = Blue | Red | Green | Purple``')
 
         poll = await loop.run_in_executor(None, strawpy.create_poll, title.strip(), options)
         await ctx.send(self.bot.bot_prefix + poll.url)
