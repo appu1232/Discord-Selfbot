@@ -749,7 +749,7 @@ class Utility:
             time = 30
         emoji = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣']
         to_react = []
-        confirmation_msg = "Poll for {}:\n\n".format(options[0])
+        confirmation_msg = "**{}?**:\n\n".format(options[0].rstrip("?"))
         for idx, option in enumerate(options[1:]):
             confirmation_msg += "{} - {}\n".format(emoji[idx], option)
             to_react.append(emoji[idx])
