@@ -239,6 +239,8 @@ class Misc:
                 return await ctx.send("The message does not contain an embed.")
             fields = old_embed.fields
             result = []
+            if old_embed.title:
+                result.append("title={}".format(old_embed.title))
             if old_embed.description:
                 result.append("description={}".format(old_embed.description))
             if old_embed.color:
