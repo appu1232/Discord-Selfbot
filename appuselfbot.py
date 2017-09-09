@@ -70,14 +70,6 @@ if _test_run:
     print("Quitting: test run")
     exit(0)
 
-if sys.platform == 'darwin' or _force_mac:
-    if subprocess.getstatusoutput('brew')[0] == 1:
-        print('You do not have brew installed.\nThere are known issues with out of date binaries which can be updated using brew.\nFollow https://brew.sh to install brew.\n\nEnter \'I understand!\' to continue')
-        inp = input('>')
-        if inp != 'I understand!':
-            print('Exiting...')
-            exit(0)
-
 
 def wizard():
     # setup wizard
