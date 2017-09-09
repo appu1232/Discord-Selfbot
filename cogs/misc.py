@@ -343,11 +343,11 @@ class Misc:
                     em.set_footer(text=text.strip()[5:], icon_url=icon)
                 else:
                     em.set_footer(text=footer)
-            print(ptext)
+            await ctx.message.delete()
             if not ptext:
-                await ctx.message.edit(content="ᅠ", embed=em)
+                await msg.edit(content=None, embed=em)
             else:
-                await ctx.message.edit(content=ptext, embed=em)
+                await msg.edit(content=ptext, embed=em)
 
     @commands.command(pass_context=True)
     async def embedcolor(self, ctx, *, color: str = None):
