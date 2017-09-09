@@ -244,7 +244,7 @@ class Misc:
             if old_embed.description:
                 result.append("description={}".format(old_embed.description))
             if old_embed.color:
-                result.append("color={}".format(hex(old_embed.color.value)))
+                result.append("color={}".format(str(old_embed.color)[1:]))
             if old_embed.url:
                 result.append("url={}".format(old_embed.url))
             if fields:
