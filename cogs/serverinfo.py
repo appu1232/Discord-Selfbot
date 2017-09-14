@@ -148,8 +148,10 @@ class Server:
                     all_users = all_users.replace(', ', '\n')
                     url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, ctx.message.guild.name), content=str(all_users), name='role.txt')
                     em.add_field(name='All users', value='{} users. [List of users posted to Gist.]({})'.format(len(role.members), url), inline=False)
-                else:
+                elif len(role.members) >= 1:
                     em.add_field(name='All users', value=all_users, inline=False)
+                else:
+                    em.add_field(name='All users', value='There are no users in this role!', inline=False)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
                 em.set_thumbnail(url='http://www.colorhexa.com/%s.png' % str(role.color).strip("#"))
                 await ctx.message.delete()
