@@ -143,8 +143,12 @@ class Utility:
     @commands.command(aliases=['sd'],pass_context=True)
     async def selfdestruct(self, ctx, *, amount: str = None):
         """Builds a self-destructing message. Ex: >sd 5"""
-        killmsg = await ctx.message.channel.history().flatten()
-        killmsg = killmsg[1]
+        async for message in ctx.message.channel.history():
+            if message.id == ctx.message.id:
+                continue
+            if message.author == ctx.message.author:
+                killmsg = message
+                break
         timer = int(amount.strip())
         # Animated countdown because screw rate limit amirite
         destroy = ctx.message
