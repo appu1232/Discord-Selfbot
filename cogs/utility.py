@@ -64,9 +64,23 @@ class Utility:
     @commands.command(pass_context=True)
     async def time(self, ctx):
         """Show current time"""
+        opt = dataIO.load_json('settings/optional_config.json')
+        thebool = True
+        try:
+            if opt['24hours'] == "true":
+                thebool = True
+            else:
+                thebool = False
+        except IndexError:
+            # No 24 hour bool given so default to true
+            pass
         await ctx.message.delete()
         dandt, tzerror = self.get_datetime()
-        msg = '{:Time: `%H:%M:%S`}'.format(dandt)
+        if thebool:
+            returnstring = '{:Time: `%H:%M:%S`}'.format(dandt)
+        else:
+            returnstring = '{:Time: `%I:%M:%S %p`}'.format(dandt)
+        msg = returnstring
         await ctx.send(self.bot.bot_prefix + msg)
 
     @commands.command(pass_context=True)
@@ -82,6 +96,22 @@ class Utility:
         """Write text in code format."""
         await ctx.message.delete()
         await ctx.send("```" + msg.replace("`", "") + "```")
+    
+    @commands.command(pass_context=True)
+    async def toggletime(self, ctx):
+        """Toggle between 24 hours time and 12 hours time"""
+        opt = dataIO.load_json('settings/optional_config.json')
+        try:
+            if opt['24hours'] == "true":
+                write_config_value("optional_config", "24hours", "false")
+                await ctx.send(self.bot.bot_prefix + "Set time to `12 hour` clock")
+            else:
+                write_config_value("optional_config", "24hours", "true")
+                await ctx.send(self.bot.bot_prefix + "Set time to `24 hour` clock")
+        except:
+            # Nothing was set, so changing the default to 12hrs
+            write_config_value("optional_config", "24hours", "false")
+            await ctx.send(self.bot.bot_prefix + "Set time to `12 hour` clock")
 
     @commands.command(pass_context=True)
     async def timezone(self, ctx, *, msg):
@@ -143,8 +173,12 @@ class Utility:
     @commands.command(aliases=['sd'],pass_context=True)
     async def selfdestruct(self, ctx, *, amount: str = None):
         """Builds a self-destructing message. Ex: >sd 5"""
-        killmsg = await ctx.message.channel.history().flatten()
-        killmsg = killmsg[1]
+        async for message in ctx.message.channel.history():
+            if message.id == ctx.message.id:
+                continue
+            if message.author == ctx.message.author:
+                killmsg = message
+                break
         timer = int(amount.strip())
         # Animated countdown because screw rate limit amirite
         destroy = ctx.message
