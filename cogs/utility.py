@@ -47,10 +47,23 @@ class Utility:
     @commands.command(pass_context=True)
     async def now(self, ctx):
         """Date time module."""
+        opt = dataIO.load_json('settings/optional_config.json')
+        thebool = True
+        try:
+            if opt['24hours'] == "true":
+                thebool = True
+            else:
+                thebool = False
+        except IndexError:
+            # No 24 hour bool given so default to true
+            pass
         dandt, tzerror = self.get_datetime()
         if embed_perms(ctx.message):
             em = discord.Embed(color=discord.Color.blue())
-            em.add_field(name=u'\u23F0 Time', value="{:%H:%M:%S}".format(dandt), inline=False)
+            if thebool:
+                em.add_field(name=u'\u23F0 Time', value="{:%H:%M:%S}".format(dandt), inline=False)
+            else:
+                em.add_field(name=u'\u23F0 Time', value="{:%I:%M:%S %p}".format(dandt), inline=False)
             em.add_field(name=u'\U0001F4C5 Date', value="{:%d %B %Y}".format(dandt), inline=False)
             if tzerror:
                 em.add_field(name=u'\u26A0 Warning', value="Invalid timezone specified, system timezone was used instead.", inline=False)
