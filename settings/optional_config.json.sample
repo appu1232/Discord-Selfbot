@@ -9,5 +9,6 @@
     "quoteembed_color": "auto",
     "embed_color": "",
     "timezone": "",
+    "24hours": "true",
 	"password": ""
 }

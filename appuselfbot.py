@@ -276,6 +276,8 @@ async def on_ready():
             opt['ascii_font'] = 'big'
         if 'timezone' not in opt:
             opt['timezone'] = ''
+        if '24hours' not in opt:
+            opt['24hours'] = 'true'
         if 'password' not in opt:
             opt['password'] = ''
         if avatars['password'] != '' and opt['password'] == '':
