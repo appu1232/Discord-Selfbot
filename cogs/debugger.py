@@ -197,7 +197,7 @@ class Debugger:
             try:
                 exec(to_compile, env)
             except Exception as e:
-                return await ctx.send('```py\n{}: {}\n```'.format(e.__class__.__name__, e))
+                return await ctx.send('```\n{}: {}\n```'.format(e.__class__.__name__, e))
 
             func = env['func']
             try:
@@ -205,16 +205,16 @@ class Debugger:
                     ret = await func()
             except Exception as e:
                 value = stdout.getvalue()
-                await ctx.send('```py\n{}{}\n```'.format(value, traceback.format_exc()))
+                await ctx.send('```\n{}{}\n```'.format(value, traceback.format_exc()))
             else:
                 value = stdout.getvalue()
 
                 if ret is None:
                     if value:
-                        await ctx.send('```py\n{}\n```'.format(value))
+                        await ctx.send('```\n{}\n```'.format(value))
                 else:
                     self._last_result = ret
-                    await ctx.send('```py\n{}{}\n```'.format(value, ret))
+                    await ctx.send('```\n{}{}\n```'.format(value, ret))
 
     # Save last >py cmd/script.
     @py.command(pass_context=True)
