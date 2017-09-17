@@ -5,6 +5,8 @@ import discord
 import os
 import aiohttp
 from cogs.utils.dataIO import dataIO
+from urllib.parse import quote as uriquote
+
 try:
     from lxml import etree
 except ImportError:
@@ -156,16 +158,18 @@ def find_channel(channel_list, text):
 
 
 async def get_google_entries(query):
+    url = 'https://www.google.com/search?q={}'.format(uriquote(query))
     params = {
-        'q': query,
-        'safe': 'off'
+        'safe': 'off',
+        'lr': 'lang_en',
+        'h1': 'en'
     }
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64)'
     }
     entries = []
     async with aiohttp.ClientSession() as session:
-        async with session.get('https://www.google.com/search', params=params, headers=headers) as resp:
+        async with session.get(url, params=params, headers=headers) as resp:
             if resp.status != 200:
                 config = load_optional_config()
                 async with session.get("https://www.googleapis.com/customsearch/v1?q=" + quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:

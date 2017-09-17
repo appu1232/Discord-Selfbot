@@ -6,11 +6,13 @@ import os
 import shutil
 import glob
 import math
+import textwrap
 from PythonGists import PythonGists
 from discord.ext import commands
 from io import StringIO
 from traceback import format_exc
 from cogs.utils.checks import *
+from contextlib import redirect_stdout
 
 # Common imports that can be used by the debugger.
 import requests
@@ -38,6 +40,16 @@ class Debugger:
         self.bot = bot
         self.stream = io.StringIO()
         self.channel = None
+        self._last_result = None
+
+    def cleanup_code(self, content):
+        """Automatically removes code blocks from the code."""
+        # remove ```py\n```
+        if content.startswith('```') and content.endswith('```'):
+            return '\n'.join(content.split('\n')[1:-1])
+
+        # remove `foo`
+        return content.strip('` \n')
 
     # Executes/evaluates code. Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
     async def interpreter(self, env, code):
@@ -160,26 +172,49 @@ class Debugger:
         """Python interpreter. See the wiki for more info."""
 
         if ctx.invoked_subcommand is None:
-            code = msg.strip().strip('` ')
-
             env = {
                 'bot': self.bot,
                 'ctx': ctx,
+                'channel': ctx.channel,
+                'author': ctx.author,
+                'guild': ctx.guild,
+                'server': ctx.guild,
                 'message': ctx.message,
-                'guild': ctx.message.guild,
-                'server': ctx.message.guild,
-                'channel': ctx.message.channel,
-                'author': ctx.message.author
+                '_': self._last_result
             }
+
             env.update(globals())
 
-            result = await self.interpreter(env, code)
+            body = self.cleanup_code(msg)
+            stdout = io.StringIO()
 
             os.chdir(os.getcwd())
             with open('%s/cogs/utils/temp.txt' % os.getcwd(), 'w') as temp:
-                temp.write(msg.strip())
+                temp.write(body)
 
-            await ctx.send(result)
+            to_compile = 'async def func():\n{}'.format(textwrap.indent(body, "  "))
+
+            try:
+                exec(to_compile, env)
+            except Exception as e:
+                return await ctx.send('```py\n{}: {}\n```'.format(e.__class__.__name__, e))
+
+            func = env['func']
+            try:
+                with redirect_stdout(stdout):
+                    ret = await func()
+            except Exception as e:
+                value = stdout.getvalue()
+                await ctx.send('```py\n{}{}\n```'.format(value, traceback.format_exc()))
+            else:
+                value = stdout.getvalue()
+
+                if ret is None:
+                    if value:
+                        await ctx.send('```py\n{}\n```'.format(value))
+                else:
+                    self._last_result = ret
+                    await ctx.send('```py\n{}{}\n```'.format(value, ret))
 
     # Save last >py cmd/script.
     @py.command(pass_context=True)
