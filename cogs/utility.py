@@ -78,22 +78,9 @@ class Utility:
     async def time(self, ctx):
         """Show current time"""
         opt = dataIO.load_json('settings/optional_config.json')
-        thebool = True
-        try:
-            if opt['24hours'] == "true":
-                thebool = True
-            else:
-                thebool = False
-        except IndexError:
-            # No 24 hour bool given so default to true
-            pass
         await ctx.message.delete()
         dandt, tzerror = self.get_datetime()
-        if thebool:
-            returnstring = '{:Time: `%H:%M:%S`}'.format(dandt)
-        else:
-            returnstring = '{:Time: `%I:%M:%S %p`}'.format(dandt)
-        msg = returnstring
+        msg = "{:Time: `%H:%M:%S`}".format(dandt) if opt["24hours"] == "true" else "{:Time: `%I:%M:%S %p`}".format(dandt)
         await ctx.send(self.bot.bot_prefix + msg)
 
     @commands.command(pass_context=True)
