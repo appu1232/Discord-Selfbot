@@ -69,12 +69,7 @@ class Emoji:
     @commands.has_permissions(manage_emojis=True)
     async def copy(self, ctx, *, msg):
         await ctx.message.delete()
-        if msg.startswith('s '):
-            msg = msg[2:]
-            get_guild = True
-        else:
-            get_guild = False
-        msg = msg.strip(':')
+        msg, get_guild = msg[2:].strip(":"), True if msg.startswith("s ") else False
         if msg.startswith('<'):
             msg = msg[2:].split(':', 1)[0].strip()
         url = emoji = guild = None
