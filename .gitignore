@@ -13,6 +13,7 @@ custom_cogs/*
 !cogs/cog_download.py
 !cogs/customcmds.py
 !cogs/debugger.py
+!cogs/emoji.py
 !cogs/fc.py
 !cogs/fun.py
 !cogs/google.py
