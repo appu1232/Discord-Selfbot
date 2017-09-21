@@ -1054,7 +1054,7 @@ class KeywordLogger:
                     if comments[i][0].clean_content.replace('`', '') == comments[i][1].replace('`', ''):
                         if comments[i][0].attachments != [] or comments[i][0].embeds != []:
                             for j in comments[i][0].attachments:
-                                attachments += 'Attachment: ' + j['url'] + '\r\n'
+                                attachments += 'Attachment: ' + j.url + '\r\n'
                             for j in comments[i][0].embeds:
                                 embed = re.findall("'url': '(.*?)'", str(j))
                                 attachments += 'Embed: ' + str(j) + '\r\n'
