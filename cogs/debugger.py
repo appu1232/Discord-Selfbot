@@ -51,6 +51,7 @@ class Debugger:
         # remove `foo`
         return content.strip('` \n')
 
+    # TODO: Replace this with current >py code so >py run also works correctly.
     # Executes/evaluates code. Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
     async def interpreter(self, env, code):
         if code.startswith('[m]'):
@@ -209,12 +210,28 @@ class Debugger:
             else:
                 value = stdout.getvalue()
 
+               	result = None
                 if ret is None:
                     if value:
-                        await ctx.send('```\n{}\n```'.format(value))
+                        result = '```\n{}\n```'.format(value)
+                    else:
+                        try:
+                            result = '```\n{}\n```'.format(eval(body, env))
+                        except:
+                            pass
                 else:
                     self._last_result = ret
-                    await ctx.send('```\n{}{}\n```'.format(value, ret))
+                    result = '```\n{}{}\n```'.format(value, ret)
+
+                if result:
+                    if len(str(result)) > 1950:
+                        url = PythonGists.Gist(description='Py output', content=str(result), name='output.txt')
+                        result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
+                        await ctx.send(result)
+
+                    else:
+                        await ctx.send(result)
+
 
     # Save last >py cmd/script.
     @py.command(pass_context=True)
