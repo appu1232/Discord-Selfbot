@@ -225,7 +225,7 @@ class Debugger:
 
                 if result:
                     if len(str(result)) > 1950:
-                        url = PythonGists.Gist(description='Py output', content=str(result), name='output.txt')
+                        url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
                         result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
                         await ctx.send(result)
 
@@ -286,9 +286,49 @@ class Debugger:
         }
         env.update(globals())
 
-        result = await self.interpreter(env, script.strip('` '))
+        body = script
+        stdout = io.StringIO()
 
-        await ctx.send(result)
+        os.chdir(os.getcwd())
+
+        to_compile = 'async def func():\n{}'.format(textwrap.indent(body, "  "))
+
+        try:
+            exec(to_compile, env)
+        except Exception as e:
+            return await ctx.send('```\n{}: {}\n```'.format(e.__class__.__name__, e))
+
+        func = env['func']
+        try:
+            with redirect_stdout(stdout):
+                ret = await func()
+        except Exception as e:
+            value = stdout.getvalue()
+            await ctx.send('```\n{}{}\n```'.format(value, traceback.format_exc()))
+        else:
+            value = stdout.getvalue()
+
+            result = None
+            if ret is None:
+                if value:
+                    result = '```\n{}\n```'.format(value)
+                else:
+                    try:
+                        result = '```\n{}\n```'.format(eval(body, env))
+                    except:
+                        pass
+            else:
+                self._last_result = ret
+                result = '```\n{}{}\n```'.format(value, ret)
+
+            if result:
+                if len(str(result)) > 1950:
+                    url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
+                    result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
+                    await ctx.send(result)
+
+                else:
+                    await ctx.send(result)
 
     # List saved cmd/scripts
     @py.command(aliases=['ls'], pass_context=True)
