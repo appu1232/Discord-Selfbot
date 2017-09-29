@@ -184,7 +184,7 @@ class Utility:
 
 
     @commands.command(aliases=['sd'],pass_context=True)
-    async def selfdestruct(self, ctx, *, amount: str = None):
+    async def selfdestruct(self, ctx, *, amount):
         """Builds a self-destructing message. Ex: >sd 5"""
         async for message in ctx.message.channel.history():
             if message.id == ctx.message.id:
