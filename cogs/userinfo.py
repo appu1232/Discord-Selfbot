@@ -11,7 +11,7 @@ class Userinfo:
         self.bot = bot
 
     @commands.group(aliases=['user', 'uinfo', 'info', 'ui'])
-    async def userinfo(self, ctx, *, name):
+    async def userinfo(self, ctx, *, name=""):
         """Get user info. Ex: >info @user"""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
