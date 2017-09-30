@@ -67,7 +67,7 @@ class CogDownloading:
                 if "dependencies" in cog:
                     for dep in cog["dependencies"]:
                         try:
-                            pip.main(["inatall","--user",dep])
+                            pip.main(["install","--user",dep])
                         except:
                             await ctx.send("{}Warning: dependency {} could not be resolved. Cog may not function as intended".format(self.bot.bot_prefix, dep))
                 with open("settings/github.json", "r+") as fp:
