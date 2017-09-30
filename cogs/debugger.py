@@ -51,47 +51,53 @@ class Debugger:
         # remove `foo`
         return content.strip('` \n')
 
-    # TODO: Replace this with current >py code so >py run also works correctly.
-    # Executes/evaluates code. Got the idea from RoboDanny bot by Rapptz. RoboDanny uses eval() but I use exec() to cover a wider scope of possible inputs.
-    async def interpreter(self, env, code):
-        if code.startswith('[m]'):
-            code = code[3:].strip()
-            code_block = False
-        else:
-            code_block = True
+    # Executes/evaluates code.Pretty much the same as Rapptz implementation for RoboDanny with slight variations.
+    async def interpreter(self, env, code, ctx):
+        body = self.cleanup_code(code)
+        stdout = io.StringIO()
+
+        os.chdir(os.getcwd())
+        with open('%s/cogs/utils/temp.txt' % os.getcwd(), 'w') as temp:
+            temp.write(body)
+
+        to_compile = 'async def func():\n{}'.format(textwrap.indent(body, "  "))
+
         try:
-            old = sys.stdout
-            sys.stdout = StringIO()
-            result = eval(code, env)
-            if result is None:
-                result = ""
-            else:
-                result = repr(result)
-            result = sys.stdout.getvalue() + result
-            sys.stdout = old
-            if inspect.isawaitable(result):
-                result = await result
-        except SyntaxError:
-            try:
-                old = sys.stdout
-                sys.stdout = StringIO()
-                exec(code, env)
-                result = sys.stdout.getvalue()
-                sys.stdout = old
-            except Exception as g:
-                return self.bot.bot_prefix + '```{}```'.format(type(g).__name__ + ': ' + str(g))
-
+            exec(to_compile, env)
         except Exception as e:
-            return self.bot.bot_prefix + '```{}```'.format(type(e).__name__ + ': ' + str(e))
+            return await ctx.send('```\n{}: {}\n```'.format(e.__class__.__name__, e))
 
-        if len(str(result)) > 1950:
-            url = PythonGists.Gist(description='Py output', content=str(result), name='output.txt')
-            return self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
+        func = env['func']
+        try:
+            with redirect_stdout(stdout):
+                ret = await func()
+        except Exception as e:
+            value = stdout.getvalue()
+            await ctx.send('```\n{}{}\n```'.format(value, traceback.format_exc()))
         else:
-            if code_block:
-                return self.bot.bot_prefix + '```\n{}\n```'.format(result)
+            value = stdout.getvalue()
+
+            result = None
+            if ret is None:
+                if value:
+                    result = '```\n{}\n```'.format(value)
+                else:
+                    try:
+                        result = '```\n{}\n```'.format(eval(body, env))
+                    except:
+                        pass
             else:
-                return result
+                self._last_result = ret
+                result = '```\n{}{}\n```'.format(value, ret)
+
+            if result:
+                if len(str(result)) > 1950:
+                    url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
+                    result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
+                    await ctx.send(result)
+
+                else:
+                    await ctx.send(result)
 
     @commands.command(pass_context=True)
     async def debug(self, ctx, *, option: str = None):
@@ -186,51 +192,7 @@ class Debugger:
 
             env.update(globals())
 
-            body = self.cleanup_code(msg)
-            stdout = io.StringIO()
-
-            os.chdir(os.getcwd())
-            with open('%s/cogs/utils/temp.txt' % os.getcwd(), 'w') as temp:
-                temp.write(body)
-
-            to_compile = 'async def func():\n{}'.format(textwrap.indent(body, "  "))
-
-            try:
-                exec(to_compile, env)
-            except Exception as e:
-                return await ctx.send('```\n{}: {}\n```'.format(e.__class__.__name__, e))
-
-            func = env['func']
-            try:
-                with redirect_stdout(stdout):
-                    ret = await func()
-            except Exception as e:
-                value = stdout.getvalue()
-                await ctx.send('```\n{}{}\n```'.format(value, traceback.format_exc()))
-            else:
-                value = stdout.getvalue()
-
-               	result = None
-                if ret is None:
-                    if value:
-                        result = '```\n{}\n```'.format(value)
-                    else:
-                        try:
-                            result = '```\n{}\n```'.format(eval(body, env))
-                        except:
-                            pass
-                else:
-                    self._last_result = ret
-                    result = '```\n{}{}\n```'.format(value, ret)
-
-                if result:
-                    if len(str(result)) > 1950:
-                        url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
-                        result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
-                        await ctx.send(result)
-
-                    else:
-                        await ctx.send(result)
+            await self.interpreter(env, msg, ctx)
 
 
     # Save last >py cmd/script.
@@ -277,58 +239,18 @@ class Debugger:
         env = {
             'bot': self.bot,
             'ctx': ctx,
+            'channel': ctx.channel,
+            'author': ctx.author,
+            'guild': ctx.guild,
+            'server': ctx.guild,
             'message': ctx.message,
-            'guild': ctx.message.guild,
-            'server': ctx.message.guild,
-            'channel': ctx.message.channel,
-            'author': ctx.message.author,
+            '_': self._last_result,
             'argv': parameters
         }
+
         env.update(globals())
 
-        body = script
-        stdout = io.StringIO()
-
-        os.chdir(os.getcwd())
-
-        to_compile = 'async def func():\n{}'.format(textwrap.indent(body, "  "))
-
-        try:
-            exec(to_compile, env)
-        except Exception as e:
-            return await ctx.send('```\n{}: {}\n```'.format(e.__class__.__name__, e))
-
-        func = env['func']
-        try:
-            with redirect_stdout(stdout):
-                ret = await func()
-        except Exception as e:
-            value = stdout.getvalue()
-            await ctx.send('```\n{}{}\n```'.format(value, traceback.format_exc()))
-        else:
-            value = stdout.getvalue()
-
-            result = None
-            if ret is None:
-                if value:
-                    result = '```\n{}\n```'.format(value)
-                else:
-                    try:
-                        result = '```\n{}\n```'.format(eval(body, env))
-                    except:
-                        pass
-            else:
-                self._last_result = ret
-                result = '```\n{}{}\n```'.format(value, ret)
-
-            if result:
-                if len(str(result)) > 1950:
-                    url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
-                    result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
-                    await ctx.send(result)
-
-                else:
-                    await ctx.send(result)
+        await self.interpreter(env, script, ctx)
 
     # List saved cmd/scripts
     @py.command(aliases=['ls'], pass_context=True)
