@@ -1,6 +1,7 @@
 ﻿import discord
 import os
 import requests
+import pip
 from github import Github
 import json
 from discord.ext import commands
@@ -11,7 +12,7 @@ from cogs.utils.checks import parse_prefix
 
 
 class CogDownloading:
-    
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -24,7 +25,7 @@ class CogDownloading:
         else:
             filecontent = req.text
         repo.create_file('/custom_cogs/' + file_name, 'Commiting file: ' + file_name + ' to GitHub', filecontent)
-        
+
     @commands.group(pass_context=True)
     async def cog(self, ctx):
         """Manage custom cogs from ASCII. >help cog for more information.
@@ -48,7 +49,7 @@ class CogDownloading:
                 return (msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n') and msg.author == self.bot.user
             else:
                 return False
-                
+
         await ctx.message.delete()
         response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
         if response.status_code == 404:
@@ -63,6 +64,12 @@ class CogDownloading:
                 coglink = cog["link"]
                 download = requests.get(cog["link"]).text
                 filename = cog["link"].rsplit("/", 1)[1]
+                if "dependencies" in cog:
+                    for dep in cog["dependencies"]:
+                        try:
+                            pip.main(["inatall","--user",dep])
+                        except:
+                            await ctx.send("{}Warning: dependency {} could not be resolved. Cog may not function as intended".format(self.bot.bot_prefix, dep))
                 with open("settings/github.json", "r+") as fp:
                     opt = json.load(fp)
                     if opt['username'] != "":
@@ -82,7 +89,7 @@ class CogDownloading:
                     await ctx.send(self.bot.bot_prefix + "There was an error loading your cog: `{}: {}` You may want to report this error to the author of the cog.".format(type(e).__name__, str(e)))
             else:
                 await ctx.send(self.bot.bot_prefix + "Didn't download `{}`: user cancelled.".format(cog["title"]))
-    
+
     @cog.command(pass_context=True)
     async def uninstall(self, ctx, cog):
         """Uninstall one of your custom ASCII cogs."""
@@ -91,7 +98,7 @@ class CogDownloading:
                 return (msg.content.lower().strip() == 'y' or msg.content.lower().strip() == 'n') and msg.author == self.bot.user
             else:
                 return False
-                
+
         await ctx.message.delete()
         response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
         if response.status_code == 404:
@@ -112,7 +119,7 @@ class CogDownloading:
                     await ctx.send(self.bot.bot_prefix + "Didn't delete `{}`: user cancelled.".format(found_cog["title"]))
             else:
                 await ctx.send(self.bot.bot_prefix + "You don't have `{}` installed!".format(found_cog["title"]))
-    
+
     @cog.command(pass_context=True)
     async def list(self, ctx):
         """List all cogs on ASCII."""
@@ -144,7 +151,7 @@ class CogDownloading:
             embed.add_field(name="Not installed", value="None!", inline=True)
         embed.set_footer(text=">help cog for more information.")
         await ctx.send("", embed=embed)
-        
+
     @cog.command(pass_context=True)
     async def view(self, ctx, cog):
         """View information about a cog on ASCII."""
@@ -157,7 +164,7 @@ class CogDownloading:
             embed = discord.Embed(title=cog["title"], description=cog["description"])
             embed.set_author(name=cog["author"])
             await ctx.send(embed=embed)
-            
+
     @cog.command(pass_context=True)
     async def update(self, ctx):
         """Update all of your installed ASCII cogs."""
@@ -193,7 +200,6 @@ class CogDownloading:
             await msg.edit(content=self.bot.bot_prefix + "Updated all cogs successfully.")
         else:
             await ctx.send(self.bot.bot_prefix + "Updated {}/{} cogs successfully.".format(successful, successful + failures))
-
 
 def setup(bot):
     bot.add_cog(CogDownloading(bot))
