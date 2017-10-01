@@ -148,7 +148,7 @@ def get_user(message, user):
 
 def find_channel(channel_list, text):
     if text.isdigit():
-        found_channel = discord.utils.get(channel_list, id=text)
+        found_channel = discord.utils.get(channel_list, id=int(text))
     elif text.startswith("<#") and text.endswith(">"):
         found_channel = discord.utils.get(channel_list,
                                           id=text.replace("<", "").replace(">", "").replace("#", ""))

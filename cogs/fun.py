@@ -375,7 +375,7 @@ class Fun:
                         except:
                             pass
         else:
-            found_channel = find_channel(ctx.message.server.channels, channel)
+            found_channel = find_channel(ctx.guild.channels, channel)
             if not found_channel:
                 found_channel = find_channel(self.bot.get_all_channels(), channel)
             if found_channel:
