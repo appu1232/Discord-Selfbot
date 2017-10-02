@@ -1,6 +1,7 @@
 import discord
 import requests
 import os
+import re
 from discord.ext import commands
 
 '''Tools relating to custom emoji manipulation and viewing.'''
@@ -27,23 +28,22 @@ class Emoji:
             get_guild = True
         else:
             get_guild = False
-        msg = msg.strip(':')
-        if msg.startswith('<'):
-            msg = msg[2:].split(':', 1)[0].strip()
-        url = emoji = guild = None
+        msg = re.sub("<:(.+):([0-9]+)>", "\\2", msg)
+            
+        match = None
         exact_match = False
         for guild in self.bot.guilds:
             for emoji in guild.emojis:
-                if msg.strip().lower() in str(emoji):
+                if msg.strip().lower() in emoji.name:
                     url = emoji.url
                     emote_name = emoji.name
-                if msg.strip() == str(emoji).split(':')[1]:
-                    url = emoji.url
-                    emote_name = emoji.name
+                if msg.strip() in (str(emoji.id), emoji.name):
+                    match = emoji
                     exact_match = True
                     break
             if exact_match:
                 break
+                
         response = requests.get(emoji.url, stream=True)
         name = emoji.url.split('/')[-1]
         with open(name, 'wb') as img:
@@ -54,42 +54,44 @@ class Emoji:
 
                 img.write(block)
 
-        if ctx.channel.permissions_for(ctx.author).attach_files and url:
+        if not match:
+            return await ctx.send(self.bot.bot_prefix + 'Could not find emoji.')
+            
+        if ctx.channel.permissions_for(ctx.author).attach_files:
             if get_guild:
                 await ctx.send('**ID:** {}\n**Server:** {}'.format(str(emoji.id), guild.name))
             with open(name, 'rb') as fp:
                 await ctx.send(file=discord.File(fp))
             os.remove(name)
-        elif not ctx.channel.permissions_for(ctx.author).embed_links and url:
-            await ctx.send(url)
+        elif ctx.channel.permissions_for(ctx.author).embed_links:
+            await ctx.send(emoji.url)
         else:
-            await ctx.send(self.bot.bot_prefix + 'Could not find emoji.')
+            await ctx.send(self.bot.bot_prefix + "Cannot send emoji.")
             
     @emoji.command(pass_context=True, aliases=["steal"])
     @commands.has_permissions(manage_emojis=True)
     async def copy(self, ctx, *, msg):
         await ctx.message.delete()
-        msg, get_guild = msg[2:].strip(":"), True if msg.startswith("s ") else False
-        if msg.startswith('<'):
-            msg = msg[2:].split(':', 1)[0].strip()
-        url = emoji = guild = None
+        msg = re.sub("<:(.+):([0-9]+)>", "\\2", msg)
+        
+        match = None
         exact_match = False
         for guild in self.bot.guilds:
             for emoji in guild.emojis:
                 if msg.strip().lower() in str(emoji):
-                    url = emoji.url
-                    emote_name = emoji.name
-                if msg.strip() == str(emoji).split(':')[1]:
-                    url = emoji.url
-                    emote_name = emoji.name
+                    match = emoji
+                if msg.strip() in (str(emoji.id), emoji.name):
+                    match = emoji
                     exact_match = True
                     break
             if exact_match:
                 break
-        if not url:
+                
+        if not match:
             return await ctx.send(self.bot.bot_prefix + 'Could not find emoji.')
-        response = requests.get(emoji.url)
-        emoji = await ctx.guild.create_custom_emoji(name=emoji.name, image=response.content)
+            
+        response = requests.get(match.url)
+        emoji = await ctx.guild.create_custom_emoji(name=match.name, image=response.content)
         await ctx.send(self.bot.bot_prefix + "Successfully added the emoji {0.name} <:{0.name}:{0.id}>!".format(emoji))
         
     @emoji.command(pass_context=True)

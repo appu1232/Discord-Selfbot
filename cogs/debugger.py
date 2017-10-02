@@ -137,16 +137,6 @@ class Debugger:
                         if cur == dep[1]: dependencies += '\✅ %s: %s\n'%(dep[0], cur)
                         else: dependencies += '\❌ %s: %s / %s\n'%(dep[0], cur, dep[1])
                     em.add_field(name='Dependencies', value='%s' % dependencies)
-                else:
-                    dependencys = ['discord','prettytable','requests','spice_api','bs4','strawpy','lxml','discord_webhooks','psutil','PythonGists','PIL','pyfiglet','tokage','pytz','github']
-                    loaded_modules = 0
-                    unloaded_modules = 0
-                    for x in dependencys:
-                        try:
-                            __import__(x.strip())
-                            loaded_modules += 1
-                        except: unloaded_modules += 1
-                    em.add_field(name='Dependencies', value='{0} modules imported successfully\n {1} modules imported unsuccessfully'.format(loaded_modules, unloaded_modules), inline=False)
                 cog_list = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
                 loaded_cogs = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
                 unloaded_cogs = [c.split(".")[1] for c in cog_list if c.split(".")[1] not in loaded_cogs]

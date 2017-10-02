@@ -20,60 +20,52 @@ class Mod:
         return original == empty
 
     @commands.command(pass_context=True)
-    async def kick(self, ctx, user: str, ):
+    async def kick(self, ctx, user, *, reason=""):
         """Kicks a user (if you have the permission)."""
         user = get_user(ctx.message, user)
         if user:
             try:
-                await user.kick()
-                await ctx.message.edit(content=self.bot.bot_prefix + 'Kicked user: %s' % user.mention)
+                await user.kick(reason=reason)
+                return_msg = "Kicked user `{}`".format(user.mention)
+                if reason:
+                    return_msg += " for reason `{}`".format(reason)
+                return_msg += "."
+                await ctx.message.edit(content=self.bot.bot_prefix + return_msg)
             except discord.Forbidden:
                 await ctx.message.edit(content=self.bot.bot_prefix + 'Could not kick user. Not enough permissions.')
         else:
             return await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user.')
 
     @commands.command(pass_context=True)
-    async def ban(self, ctx, *, user: str):
+    async def ban(self, ctx, user, *, reason=""):
         """Bans a user (if you have the permission)."""
         user = get_user(ctx.message, user)
         if user:
             try:
-                await user.ban()
-                await ctx.message.edit(content=self.bot.bot_prefix + 'Banned user: %s' % user.mention)
+                await user.ban(reason=reason)
+                return_msg = "Banned user `{}`".format(user.mention)
+                if reason:
+                    return_msg += " for reason `{}`".format(reason)
+                return_msg += "."
+                await ctx.message.edit(content=self.bot.bot_prefix + return_msg)
             except discord.Forbidden:
                 await ctx.message.edit(content=self.bot.bot_prefix + 'Could not ban user. Not enough permissions.')
         else:
             return await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user.')
 
-    @commands.command(aliases=['hban'], pass_context=True)
-    async def hackban(self, ctx, user_id: int):
-        """Bans a user outside of the server."""
-        author = ctx.message.author
-        guild = author.guild
-
-        user = guild.get_member(user_id)
-        if user is not None:
-            await ctx.invoke(self.ban, user=user)
-            return
-
-        try:
-            await self.bot.http.ban(user_id, guild.id, 0)
-            await ctx.message.edit(content=self.bot.bot_prefix + 'Banned user: %s' % user_id)
-        except discord.NotFound:
-            await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user. '
-                               'Invalid user ID was provided.')
-        except discord.errors.Forbidden:
-            await ctx.message.edit(content=self.bot.bot_prefix + 'Could not ban user. Not enough permissions.')
-
     @commands.command(aliases=['sban'], pass_context=True)
-    async def softban(self, ctx, *, user: str):
-        """Softbans a user (if you have the permission)."""
+    async def softban(self, ctx, user, *, reason=""):
+        """Bans and unbans a user (if you have the permission)."""
         user = get_user(ctx.message, user)
         if user:
             try:
-                await user.ban()
-                await ctx.message.guild.unban(user)
-                await ctx.message.edit(content=self.bot.bot_prefix + 'Softbanned user: %s' % user.mention)
+                await user.ban(reason=reason)
+                await ctx.guild.unban(user)
+                return_msg = "Banned and unbanned user `{}`".format(user.mention)
+                if reason:
+                    return_msg += " for reason `{}`".format(reason)
+                return_msg += "."
+                await ctx.message.edit(content=self.bot.bot_prefix + return_msg)
             except discord.Forbidden:
                 await ctx.message.edit(content=self.bot.bot_prefix + 'Could not softban user. Not enough permissions.')
         else:
