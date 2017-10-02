@@ -25,8 +25,17 @@ class Todo:
         self.todo_list = todo_list
 
     def save_list(self):
-        with open("settings/todo.json", "w") as f:
-            json.dump(self.todo_list, f)
+        try:
+            with open("settings/todo.json.temp", "w") as f: # As a temporary name, we can also use temp = '%s-%s.tmp' % (uuid.uuid4(), self.name)
+                json.dump(self.todo_list, f)
+                
+            # atomically move the file
+            os.replace(temp, self.name)
+        
+        except:
+            # We could print an error message or something, but something is definitly wrong here (No disk space left, no inodes, malformed stuctures in the list...) 
+            raise
+            
 
     # don't like to do this but the one from appuselfbot.py is slightly different to my needs
     async def webhook(self, entry, send_type):
