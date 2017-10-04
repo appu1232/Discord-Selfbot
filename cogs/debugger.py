@@ -344,7 +344,7 @@ class Debugger:
         await ctx.message.delete()
         try:
             if os.path.exists("cogs/{}.py".format(msg)):
-                self.bot.unload_extension("cogs.{}.py".format(msg))
+                self.bot.unload_extension("cogs.{}".format(msg))
             elif os.path.exists("custom_cogs/{}.py".format(msg)):
                 self.bot.unload_extension("custom_cogs.{}".format(msg))
             else:
@@ -355,6 +355,23 @@ class Debugger:
         else:
             await ctx.send(self.bot.bot_prefix + 'Unloaded module: `{}.py`'.format(msg))
 
+    @commands.command(pass_context=True)
+    async def loadall(self, ctx):
+        """Loads all core modules"""
+        await ctx.message.delete()
+        errors = ""
+        for cog in os.listdir("cogs"):
+            if ".py" in cog:
+                cog = cog.replace('.py', '')
+                try:
+                    self.bot.load_extension("cogs.{}".format(cog))
+                except Exception as e:
+                    errors += 'Failed to load module: `{}.py` due to `{}: {}`\n'.format(cog, type(e).__name__, e)
+        if not errors:
+            await ctx.send(self.bot.bot_prefix + "All core modules loaded")
+        else:
+            await ctx.send(self.bot.bot_prefix + errors)
+            
     @commands.command(pass_context=True)
     async def redirect(self, ctx):
         """Redirect STDOUT and STDERR to a channel for debugging purposes."""

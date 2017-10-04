@@ -1,0 +1,16 @@
+<LyricLy at 28 Jul 2017> <:blobuwu:304884517129158656>
+<LyricLy at 28 Jul 2017> the level of nested loop is insane
+<Griffin at 28 Jul 2017> hmmm
+<pokecraft98 at 30 Jul 2017> does appu messagedump also dump deleted messages? just out of curiosity
+<Griffin at 30 Jul 2017> lets test
+<LyricLy at 30 Jul 2017> it should
+<Griffin at 30 Jul 2017> >messagedump 4
+<Griffin at 30 Jul 2017> <:ThonkingButCool:325807776561496064> You are missing required arguments.
+```
+>messagedump <limit> <filename> [details=yes] [reverse=no]
+
+Dump messages.
+
+```
+<Griffin at 30 Jul 2017> oh right
+<Griffin at 30 Jul 2017> <:ThonkingButCool:325807776561496064> Downloading messages...

@@ -1,0 +1,6 @@
+[m] msg = "Hidden channels in server \"{}\"\n\n".format(ctx.message.channel.server)
+for channel in ctx.message.server.channels:
+    if not channel.type == discord.ChannelType.text: continue
+    if not channel.permissions_for(ctx.message.author).read_messages:
+        msg += "#{} ({}) - {}\n".format(channel.name, channel.id, channel.topic)
+print('```'+msg+'```')

@@ -1,0 +1,99 @@
+Various ThaumCraft additions
+<http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1289299-thaumic-tinkerer-thaumcraft-addon-evolve-knowledge>
+<http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/wip-mods/1445786-1-6-4-1-7-10-thaumic-exploration-0-6-0-thaumcraft>
+<http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/wip-mods/2150151-1-7-10-tc4-ae2-thaumic-energistics>
+
+Translocators
+<http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1279956-chickenbones-mods>
+
+EnderStorage (way better ender chests)
+<http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1279956-chickenbones-mods>
+
+Chisel
+<https://mods.curse.com/mc-mods/minecraft/225236-chisel-3-the-cricket-strikes-back>
+
+BloodMagic
+<https://ftbwiki.org/Blood_Magic>
+
+Project Red
+<https://projectredwiki.com/wiki/Main_Page>
+
+https://minecraft.curseforge.com/projects/betterfps
+
+http://www.bibliocraftmod.com/
+
+http://ichun.me/mods/sync/
+
+http://ichun.me/mods/morph/
+
+https://ftbwiki.org/Extra_Utilities
+
+cosmetic mod http://ichun.me/mods/hats/
+
+https://minecraft.curseforge.com/projects/draconic-evolution/files/2313451
+
+https://www.mod-buildcraft.com/pages/download.html
+
+http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1286162-biomes-o-plenty-over-50-new-biomes-with-new-trees
+
+https://minecraft.curseforge.com/projects/forestry
+
+https://mods.curse.com/mc-mods/minecraft/minefactory-reloaded
+
+https://minecraft.curseforge.com/projects/iron-chests
+
+http://www.9minecraft.net/carpenters-blocks-mod/
+
+now this looks interesting 
+http://www.9minecraft.net/cavebiomes-mod/
+
+https://mods.curse.com/mc-mods/minecraft/223852-storage-drawers
+
+http://www.9minecraft.net/portal-gun-mod/
+
+computercraft is the best
+https://minecraft.curseforge.com/projects/computercraft/files
+
+https://mods.curse.com/mc-mods/minecraft/236448-usefulfood
+
+im indifferent about this one but some people loves it(so im not going to thumbsup it)
+<http://www.radix-shock.com/mca--download.html> Minecraft comes alive, a mod to the villagers to make them more alive(?) and actually be somewhat useful and kill themselves less
+
+Additionally if someone wants minimap, this is the best one i have seen
+<https://mods.curse.com/mc-mods/minecraft/journeymap> This is client side
+
+and various plugins
+<https://minecraft.curseforge.com/projects/waila-harvestability> Cant you get what are you looking?
+<https://github.com/squeek502/TiC-Tooltips/releases/tag/v1.2.5> add on for tooltips for tinkers construct
+<http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2169830-wawla-what-are-we-looking-at> Improves waila (various extra info on the tooltip)
+those are all client side
+
+<https://minecraft.curseforge.com/projects/waila>
+
+NEI and accompanying addons
+<https://minecraft.curseforge.com/projects/notenoughitems/files?filter-game-version=2020709689%3A4449>
+<https://minecraft.curseforge.com/projects/nei-addons/files?filter-game-version=2020709689%3A4449>
+
+Thaumcraft
+http://www.9minecraft.net/thaumcraft-mod/
+
+https://minecraft.curseforge.com/projects/projecte
+
+https://minecraft.curseforge.com/projects/industrial-craft
+
+http://www.9minecraft.net/galacticraft-mod/
+
+Applied Energistics
+http://ae-mod.info/Downloads/ rv2 is latest stable for 1.7.10
+
+http://www.9minecraft.net/grappling-hook-mod/
+
+Tinkers's construct
+
+```Thermal series:
+-COFH Core
+-Thermal Foundation
+-Thermal Expansion
+-Thermal Dynamics
+http://teamcofh.com/downloads/
+```

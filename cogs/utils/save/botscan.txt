@@ -1,0 +1,2 @@
+for member in server.members:
+	if member.bot: print(member.name + ' (' + member.id + ')')
