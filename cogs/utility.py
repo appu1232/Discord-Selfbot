@@ -9,6 +9,7 @@ import discord
 import os
 import glob
 import git
+import io
 from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
@@ -689,15 +690,22 @@ class Utility:
             await ctx.send(self.bot.bot_prefix + "You did not enter a valid URL.")
 
     @commands.command(pass_context=True, aliases=['getcolor'])
-    async def getcolour(self, ctx, colour_code):
+    async def getcolour(self, ctx, *, colour_codes):
         """Posts color of given hex"""
         await ctx.message.delete()
-        if not colour_code.startswith("#"):
-            colour_code = "#" + colour_code
-        image = Image.new("RGB", (200, 200), colour_code)
-        image.save("colour_file.png")
-        await ctx.send("Colour with hex code {}:".format(colour_code), file=discord.File("colour_file.png"))
-        os.remove("colour_file.png")
+        colour_codes = colour_codes.split()
+        size = (60, 80) if len(colour_codes) > 1 else (200, 200)
+        if len(colour_codes) > 5:
+            return await ctx.send(self.bot.bot_prefix + "Sorry, 5 colour codes maximum")
+        for colour_code in colour_codes:
+            if not colour_code.startswith("#"):
+                colour_code = "#" + colour_code
+            image = Image.new("RGB", size, colour_code)
+            with io.BytesIO() as file:
+                image.save(file, "PNG")
+                file.seek(0)
+                await ctx.send("Colour with hex code {}:".format(colour_code), file=discord.File(file, "colour_file.png"))
+            await asyncio.sleep(1) # Prevent spaminess
 
     @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True)
