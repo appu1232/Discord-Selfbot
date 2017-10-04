@@ -154,7 +154,7 @@ class Debugger:
 
                 user = subprocess.run(['whoami'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 if sys.platform == 'linux':
-                    user += user+'@'+subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+                    user += '@'+subprocess.run(['hostname'], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
                 em.set_footer(text='Generated at {:%Y-%m-%d %H:%M:%S} by {}'.format(datetime.datetime.now(), user))
                 try: await ctx.send(content=None, embed=em)
                 except discord.HTTPException as e:
