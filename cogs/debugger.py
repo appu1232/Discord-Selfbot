@@ -346,7 +346,7 @@ class Debugger:
             if os.path.exists("cogs/{}.py".format(msg)):
                 self.bot.unload_extension("cogs/{}.py".format(msg))
             elif os.path.exists("custom_cogs/{}.py".format(msg)):
-                self.bot.load_extension("custom_cogs.{}".format(msg))
+                self.bot.unload_extension("custom_cogs.{}".format(msg))
             else:
                 raise ModuleNotFoundError("No module named '{}'".format(msg))
         except Exception as e:
