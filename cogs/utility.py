@@ -509,10 +509,11 @@ class Utility:
     async def youtube(self, ctx, *, msg):
         """Search for videos on YouTube."""
         search = parse.quote(msg)
+        youtube_regex = re.compile('\/watch\?v=[\d\w\-]*')
         response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
-        result = BeautifulSoup(response, "html.parser")
         await ctx.message.delete()
-        await ctx.send("https://www.youtube.com{}".format(result.find_all(attrs={'class': 'yt-uix-tile-link'})[0].get('href')))
+        url = youtube_regex.findall(response)[0]
+        await ctx.send("https://www.youtube.com{}".format(url))
 
     @commands.command(pass_context=True)
     async def xkcd(self, ctx, *, comic=""):
