@@ -1,7 +1,7 @@
-```max = 0
-Largest_server = None
-for server in bot.servers:
+max = 0
+largest_server = None
+for server in bot.guilds:
     if server.member_count > max:
         max = server.member_count
         largest_server = server.name
-print('Largest server: {}\nUsers: {}'.format(largest_server, max))```
+print('Largest server: {}\nUsers: {}'.format(largest_server, max))

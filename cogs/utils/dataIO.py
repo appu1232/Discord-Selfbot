@@ -6,7 +6,7 @@ from os.path import splitext
 class DataIO():
 
     def save_json(self, filename, data):
-        """Atomically saves json file"""
+        """Atomically save a JSON file given a filename and a dictionary."""
         path, ext = splitext(filename)
         tmp_file = "{}.{}.tmp".format(path, randint(1000, 9999))
         with open(tmp_file, 'w', encoding='utf-8') as f:
@@ -21,7 +21,7 @@ class DataIO():
                                   "".format(filename))
             return False
         except Exception as e:
-            print('A issue has occured saving the Json.\n'
+            print('A issue has occured saving ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
@@ -30,31 +30,31 @@ class DataIO():
         return True
 
     def load_json(self, filename):
-        """Loads json file"""
+        """Load a JSON file and return a dictionary."""
         try:
             with open(filename, 'r', encoding='utf-8') as f:
                 data = load(f)
             return data
         except Exception as e:
-            print('A issue has occured loading the Json.\n'
+            print('A issue has occured loading ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return {}
 
     def append_json(self, filename, data):
-        """Appends to json file"""
+        """Append a value to a JSON file."""
         try:
             with open(filename, 'r', encoding='utf-8') as f:
                 file = load(f)
         except Exception as e:
-            print('A issue has occured loading the Json.\n'
+            print('A issue has occured loading ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
         try:
             file.append(data)
         except Exception as e:
-            print('A issue has occured updating the Json.\n'
+            print('A issue has occured updating ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
@@ -72,7 +72,7 @@ class DataIO():
                                   "".format(filename))
             return False
         except Exception as e:
-            print('A issue has occured saving the Json.\n'
+            print('A issue has occured saving ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False
@@ -81,7 +81,7 @@ class DataIO():
         return True
 
     def is_valid_json(self, filename):
-        """Verifies if json file exists / is readable"""
+        """Verify that a JSON file exists and is readable. Take in a filename and return a boolean."""
         try:
             with open(filename, 'r', encoding='utf-8') as f:
                 data = load(f)
@@ -89,7 +89,7 @@ class DataIO():
         except (FileNotFoundError, decoder.JSONDecodeError):
             return False
         except Exception as e:
-            print('A issue has occured validating the Json.\n'
+            print('A issue has occured validating ' + filename + '.\n'
                   'Traceback:\n'
                   '{0} {1}'.format(str(e), e.args))
             return False

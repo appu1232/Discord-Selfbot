@@ -1,6 +1,6 @@
 ```count = 0
-for user in server.members:
-    for guild in bot.servers:
+for user in guild.members:
+    for guild in bot.guilds:
         if guild.get_member(user.id) and guild.id != server.id and not user.bot:
             count += 1
             break

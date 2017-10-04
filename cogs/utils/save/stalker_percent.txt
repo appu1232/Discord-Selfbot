@@ -1,0 +1,4 @@
+try:
+    print("{0:.2f}%".format(100.0 * len(list(filter(lambda g: guild.get_member(int(argv[1])) in g.members, bot.guilds)))/len(bot.guilds)))
+except NameError:
+    print("This script requires a user id as an argument! Add the user id when running the script like so: `py run stalker_percent 1265245128565425092`")

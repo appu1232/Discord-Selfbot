@@ -31,25 +31,19 @@ goto run
 	goto run
 :update
 	echo Starting update...
-	if exist tmp del /F /Q tmp
 	echo Backing up your settings...
-	echo d | xcopy settings tmp /E >nul
-	ren settings settings2
+	echo d | xcopy settings settings_backup /E >nul
 	echo Latest update:
 	git --no-pager log --pretty=oneline -n1 origin/master ^master
 	git pull origin master
 	if errorlevel 1 goto force
 	echo Finished updating
-	rmdir /s /q settings >nul 2>&1
-	ren settings2 settings
 	echo Starting up...
 	goto run
 :force
 	git fetch --all
 	git reset --hard origin/master
 	echo Finished updating
-	rmdir /s /q settings >nul 2>&1
-	ren settings2 settings
 	echo Starting up...
 	goto run
 :git
@@ -72,8 +66,8 @@ goto run
 	echo Checking/Installing requirements (takes some time on first install)...
 	chcp 65001 >nul
 	set PYTHONIOENCODING=utf-8
-	python -m pip install --upgrade pip >nul
-	python -m pip install -r requirements.txt
+	python -m pip install --user --upgrade pip >nul
+	python -m pip install --user -r requirements.txt
 	if errorlevel 1 (
 	    echo Requirements installation failed. Perhaps some dependency is missing or access was denied? Possible solutions:
 	    echo - Run as administrator

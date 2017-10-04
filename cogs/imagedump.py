@@ -20,11 +20,12 @@ class Imagedump:
 
     def check_images(self, message, images, type_of_items):
         if message.attachments:
-            yield from (item['url'] for item in message.attachments if item['url'] != '' and item['url'] not in images
-                        for i in type_of_items if item['url'].endswith(i.strip()))
+            yield from (item.url for item in message.attachments if item.url != '' and item.url not in images
+                        for i in type_of_items if item.url.endswith(i.strip()))
 
         if message.embeds:
-            for data in message.embeds:
+            for embed in message.embeds:
+                data = embed.to_dict()
                 try:
                     url = data['image']['url']
                 except KeyError:
@@ -38,7 +39,6 @@ class Imagedump:
                     for i in type_of_items:
                         if url.endswith(i.strip()):
                             yield url
-
 
         urls = []
         try:
@@ -111,14 +111,14 @@ class Imagedump:
                     if msg.isdigit():
                         limit = int(msg) + 1
                     else:
-                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + error)
+                        return await ctx.send(self.bot.bot_prefix + error)
                 else:
                     simple = False
                     msg = msg.split(' | ')
                     if msg[0].strip().isdigit():
                         limit = int(msg[0].strip()) + 1
                     else:
-                        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + error)
+                        return await ctx.send(self.bot.bot_prefix + error)
                     for i in msg:
                         if i.strip().lower().startswith('items='):
                             limit_images = i.strip()[6:].strip()
@@ -126,14 +126,14 @@ class Imagedump:
                                 limit_images_msg = 'Up to {} items. '.format(limit_images)
                                 limit_images = int(limit_images)
                             else:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``items=`` should be the number of images. Ex: ``>imagedump 500 | items=10``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``items=`` should be the number of images. Ex: ``>imagedump 500 | items=10``')
                         if i.strip().lower().startswith('dim='):
                             dimensions = i.strip()[4:].strip()
                             if 'x' not in dimensions:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``dim=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim=1920x1080``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``dim=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim=1920x1080``')
                             x, y = dimensions.split('x')
                             if not x.strip().isdigit() or not y.strip().isdigit():
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``dim=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim=1920x1080``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``dim=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim=1920x1080``')
                             else:
                                 x, y = x.strip(), y.strip()
                                 fixed = 'yes'
@@ -142,10 +142,10 @@ class Imagedump:
                         if i.strip().lower().startswith('dim>='):
                             dimensions = i.strip()[5:].strip()
                             if 'x' not in dimensions:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``dim>=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim>=1920x1080``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``dim>=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim>=1920x1080``')
                             x, y = dimensions.split('x')
                             if not x.strip().isdigit() or not y.strip().isdigit():
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``dim>=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim>=1920x1080``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``dim>=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim>=1920x1080``')
                             else:
                                 x, y = x.strip(), y.strip()
                                 fixed = 'more'
@@ -154,10 +154,10 @@ class Imagedump:
                         if i.strip().lower().startswith('dim<='):
                             dimensions = i.strip()[5:].strip()
                             if 'x' not in dimensions:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``dim<=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim<=1920x1080``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``dim<=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim<=1920x1080``')
                             x, y = dimensions.split('x')
                             if not x.strip().isdigit() or not y.strip().isdigit():
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``dim<=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim<=1920x1080``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``dim<=`` should be the dimensions of the image in the form WidthxHeight. Ex: ``>imagedump 500 | dim<=1920x1080``')
                             else:
                                 x, y = x.strip(), y.strip()
                                 fixed = 'less'
@@ -166,10 +166,10 @@ class Imagedump:
                         if i.strip().lower().startswith('ratio='):
                             ratio = i.strip()[6:].strip()
                             if ':' not in ratio:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``ratio=`` should be the ratio of the image in the form w:h. Ex: ``>imagedump 500 | ratio=16:9``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``ratio=`` should be the ratio of the image in the form w:h. Ex: ``>imagedump 500 | ratio=16:9``')
                             dimx, dimy = ratio.split(':')
                             if not dimx.strip().isdigit() or not dimy.strip().isdigit():
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``ratio=`` should be the ratio of the image in the form w:h. Ex: ``>imagedump 500 | ratio=16:9``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``ratio=`` should be the ratio of the image in the form w:h. Ex: ``>imagedump 500 | ratio=16:9``')
                             else:
                                 dimx, dimy = dimx.strip(), dimy.strip()
                                 ratio_msg = 'Ratio: {}.'.format(ratio)
@@ -180,7 +180,7 @@ class Imagedump:
                                 before = datetime.strptime(date, '%Y-%m-%d')
                                 before_msg = 'Before: {} '.format(date)
                             except:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``before=`` should be a date in the format YYYY-MM-DD. Ex: ``>imagedump 500 | before=2017-02-15``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``before=`` should be a date in the format YYYY-MM-DD. Ex: ``>imagedump 500 | before=2017-02-15``')
 
                         if i.strip().lower().startswith('after='):
                             try:
@@ -188,7 +188,7 @@ class Imagedump:
                                 after = datetime.strptime(date, '%Y-%m-%d')
                                 after_msg = 'After: {} '.format(date)
                             except:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid Syntax. ``after=`` should be a date in the format YYYY-MM-DD. Ex: ``>imagedump 500 | after=2017-02-15``')
+                                return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``after=`` should be a date in the format YYYY-MM-DD. Ex: ``>imagedump 500 | after=2017-02-15``')
 
                         if i.strip().lower().startswith('type='):
                             type = i.strip()[5:].strip()
@@ -200,34 +200,31 @@ class Imagedump:
                                 if 'png' in i or 'jpg' in i or 'gif' in i or 'webm' in i:
                                     pass
                                 else:
-                                    return await self.bot.send_message(ctx.message.channel,
-                                                                       self.bot.bot_prefix + 'Invalid Syntax. ``type=`` should be tye type(s) of items to download. Ex: ``>imagedump 500 | type=png`` or ``>imagedump 500 | type=png, gif``')
+                                    return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. ``type=`` should be tye type(s) of items to download. Ex: ``>imagedump 500 | type=png`` or ``>imagedump 500 | type=png, gif``')
                             if 'jpg' in type_of_items or '.jpg' in type_of_items:
                                 type_of_items.append('.jpeg')
                             type_of_items_msg = 'Types: {} '.format(type)
 
                         if i.strip().lower().startswith('channel='):
                             channel = i.strip()[8:].strip()
-                            channel = self.bot.get_channel(channel)
+                            channel = self.bot.get_channel(int(channel))
                             if not channel:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Channel not found. Are you using the right syntax? ``channel=`` should be the channel id. '
+                                return await ctx.send(self.bot.bot_prefix + 'Channel not found. Are you using the right syntax? ``channel=`` should be the channel id. '
                                                                                                      'Ex: ``>imagedump 500 | channel=299431230984683520``')
                             channel_msg = 'Channel: {} '.format(channel.name)
 
                         if i.strip().lower().startswith('user='):
                             user_id = i.strip()[5:].strip()
-                            print(user_id)
-                            for j in self.bot.servers:
-                                user = j.get_member(user_id)
-                                print(user)
+                            for j in self.bot.guilds:
+                                user = j.get_member(int(user_id))
                                 if user:
                                     break
                             if not user:
-                                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'User not found. Are you using the right syntax? ``user=`` should be the user\'s id. '
+                                return await ctx.send(self.bot.bot_prefix + 'User not found. Are you using the right syntax? ``user=`` should be the user\'s id. '
                                                                                                      'Ex: ``>imagedump 500 | user=124910128582361092``')
                             user_msg = 'User: {}'.format(user.name)
 
-                await self.bot.delete_message(ctx.message)
+                await ctx.message.delete()
                 with open('settings/optional_config.json', 'r+') as fp:
                     opt = json.load(fp)
                     if 'image_dump_delay' not in opt:
@@ -242,7 +239,7 @@ class Imagedump:
                 if not os.path.exists('{}image_dump'.format(path)):
                     os.makedirs('{}image_dump'.format(path))
                 try:
-                    new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + channel.name + '_' + channel.server.name
+                    new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_") + channel.name + '_' + channel.guild.name
                 except:
                     new_dump = time.strftime("%Y-%m-%dT%H_%M_%S_")
                 new_dump = "".join([x if x.isalnum() else "_" for x in new_dump])
@@ -256,14 +253,14 @@ class Imagedump:
                         params = 'Parameters: ``{}{}{}{}{}{}{}{}``'.format(limit_images_msg, before_msg, after_msg, dimensions_msg, ratio_msg, type_of_items_msg, channel_msg, user_msg)
                     else:
                         params = ''
-                    await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Downloading all images/gifs/webms from the last {} messages {}\nSaving to ``image_dump/{}`` Check console for progress.\n{}'.format(str(limit-1), which_channel, new_dump, params))
+                    await ctx.send(self.bot.bot_prefix + 'Downloading all images/gifs/webms from the last {} messages {}\nSaving to ``image_dump/{}`` Check console for progress.\n{}'.format(str(limit-1), which_channel, new_dump, params))
                 start = time.time()
                 images = []
                 if limit > 100000:
                     print('Fetching last %s messages (this may take a few minutes)...' % str(limit - 1))
                 else:
                     print('Fetching last %s messages...' % str(limit-1))
-                async for message in self.bot.logs_from(channel, limit=limit, before=before, after=after):
+                async for message in channel.history(limit=limit, before=before, after=after):
                     if message.author == user or not user:
                         for url in self.check_images(message, images, type_of_items):
                             if url:
@@ -300,18 +297,18 @@ class Imagedump:
                     pass
                 if int(failures) != 0:
                     if not silent:
-                        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` However, ``{}`` items failed to download. Check your console for more info on which ones were missed. '
+                        await ctx.send(self.bot.bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` However, ``{}`` items failed to download. Check your console for more info on which ones were missed. '
                                                                                       'Finished in: ``{} seconds.``'.format(str(total), size, str(failures), str(round(stop - start, 2))))
                     else:
                         print('{} items failed to download. See above for missed links. '
                               'Finished in: {} seconds.'.format(str(failures), str(round(stop - start, 2))))
                 else:
                     if not silent:
-                        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` Finished in: ``{} seconds.``'.format(str(total), size, str(round(stop-start, 2))))
+                        await ctx.send(self.bot.bot_prefix + 'Done! ``{}`` items downloaded. ``{}`` Finished in: ``{} seconds.``'.format(str(total), size, str(round(stop-start, 2))))
                     else:
                         print('Finished in: {} seconds'.format(str(round(stop-start, 2))))
             else:
-                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
+                await ctx.send(self.bot.bot_prefix + 'Invalid syntax. ``>imagedump <n>`` where n is the number of messages to search in this channel. '
                                                                               'Ex: ``>imagedump 100``\n``>imagedump dir path/to/directory`` if you want to change where images are saved.')
 
     @imagedump.command(pass_context=True)
@@ -328,9 +325,9 @@ class Imagedump:
                     fp.seek(0)
                     fp.truncate()
                     json.dump(opt, fp, indent=4)
-                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Successfully set path. Images will be saved to: ``{}image_dump/``'.format(msg))
+                await ctx.send(self.bot.bot_prefix + 'Successfully set path. Images will be saved to: ``{}image_dump/``'.format(msg))
             else:
-                await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Invalid path. Try again. Example: ``>imagedump dir C:/Users/Bill/Desktop``')
+                await ctx.send(self.bot.bot_prefix + 'Invalid path. Try again. Example: ``>imagedump dir C:/Users/Bill/Desktop``')
         else:
             with open('settings/optional_config.json', 'r') as fp:
                 opt = json.load(fp)
@@ -338,7 +335,7 @@ class Imagedump:
                     path = os.path.abspath("settings")[:-8] + 'image_dump'
                 else:
                     path = opt['image_dump_location'] + 'image_dump'
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Current imagedump download location: ``{}``'.format(path.replace('\\', '/')))
+            await ctx.send(self.bot.bot_prefix + 'Current imagedump download location: ``{}``'.format(path.replace('\\', '/')))
 
     @imagedump.command(pass_context=True, aliases=['stop'])
     async def cancel(self, ctx):
@@ -352,7 +349,7 @@ class Imagedump:
             for i in paused_dls:
                 if i.startswith('paused') or i.startswith('urls'):
                     os.remove('cogs/utils/{}'.format(i))
-        await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Cancelled all imagedump processes currently running.')
+        await ctx.send(self.bot.bot_prefix + 'Cancelled all imagedump processes currently running.')
         print('\nImagedump forcibily cancelled.')
 
     @imagedump.command(pass_context=True)
@@ -364,8 +361,8 @@ class Imagedump:
             else:
                 open('pause.txt', 'a').close()
                 self.bot.imagedumps = []
-                return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Paused download. ``>imagedump resume`` to resume. Imagedumps can be resumed even after a restart.')
-        return await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No imagedumps processes are running currently.')
+                return await ctx.send(self.bot.bot_prefix + 'Paused download. ``>imagedump resume`` to resume. Imagedumps can be resumed even after a restart.')
+        return await ctx.send(self.bot.bot_prefix + 'No imagedumps processes are running currently.')
 
     @imagedump.command(pass_context=True, aliases=['unpause'])
     async def resume(self, ctx):
@@ -395,10 +392,10 @@ class Imagedump:
                 p = subprocess.Popen(args)
                 self.bot.imagedumps.append(p)
 
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'Resumed imagedump. Check console for progress.')
+            await ctx.send(self.bot.bot_prefix + 'Resumed imagedump. Check console for progress.')
 
         else:
-            await self.bot.send_message(ctx.message.channel, self.bot.bot_prefix + 'No imagedump processes are paused.')
+            await ctx.send(self.bot.bot_prefix + 'No imagedump processes are paused.')
 
 
 def setup(bot):

@@ -1,0 +1,1 @@
+", ".join(["#" + x.name for x in ctx.message.guild.channels if not x.permissions_for(ctx.message.author).read_messages])

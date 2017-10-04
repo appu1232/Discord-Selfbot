@@ -42,7 +42,7 @@ class EmbedShell():
         # TODO Minimize local variables
         # TODO Minimize branches
 
-        session = ctx.message.channel.id
+        session = str(ctx.message.channel.id)
 
         embed = discord.Embed(
             description="_Enter code to execute or evaluate. "
@@ -63,7 +63,7 @@ class EmbedShell():
             'ctx': ctx,
             'bot': self.bot,
             'message': ctx.message,
-            'server': ctx.message.server,
+            'guild': ctx.message.guild,
             'channel': ctx.message.channel,
             'author': ctx.message.author,
             'discord': discord,
@@ -78,30 +78,24 @@ class EmbedShell():
                 color=15746887,
                 description="**Error**: "
                             "_Shell is already running in channel._")
-            await self.bot.say(embed=error_embed)
+            await ctx.send(embed=error_embed)
             return
 
-        shell = await self.bot.say(embed=embed)
+        shell = await ctx.send(embed=embed)
 
         self.repl_sessions[session] = shell
         self.repl_embeds[shell] = embed
 
         while True:
-            response = await self.bot.wait_for_message(
-                author=ctx.message.author,
-                channel=ctx.message.channel,
-                check=lambda m: m.content.startswith('`'))
+            response = await self.bot.wait_for('message',
+                check=lambda m: m.content.startswith('`') and m.author == ctx.message.author and m.channel == ctx.message.channel)
 
             cleaned = self.cleanup_code(response.content)
             shell = self.repl_sessions[session]
 
-            shell_check = discord.utils.get(
-                self.bot.messages,
-                id=self.repl_sessions[session].id)
-
             # Self Bot Method
-            if shell_check is None:
-                new_shell = await self.bot.say(embed=self.repl_embeds[shell])
+            if shell is None:
+                new_shell = await ctx.send(embed=self.repl_embeds[shell])
 
                 self.repl_sessions[session] = new_shell
 
@@ -111,10 +105,8 @@ class EmbedShell():
 
                 shell = self.repl_sessions[session]
 
-            del shell_check
-
             try:
-                await self.bot.delete_message(response)
+                await response.delete()
             except discord.Forbidden:
                 pass
 
@@ -146,9 +138,7 @@ class EmbedShell():
                     inline=False)
 
                 try:
-                    await self.bot.edit_message(
-                        self.repl_sessions[session],
-                        embed=self.repl_embeds[shell])
+                    await self.repl_sessions[session].edit(embed=self.repl_embeds[shell])
                 except:
                     pass
 
@@ -190,9 +180,7 @@ class EmbedShell():
                         inline=False)
 
                 try:
-                    await self.bot.edit_message(
-                        self.repl_sessions[session],
-                        embed=self.repl_embeds[shell])
+                    await self.repl_sessions[session].edit(embed=self.repl_embeds[shell])
                 except:
                     pass
                     continue
@@ -243,27 +231,21 @@ class EmbedShell():
                                 gist_url),
                             inline=False)
 
-                        await self.bot.edit_message(
-                            self.repl_sessions[session],
-                            embed=self.repl_embeds[shell])
+                        await self.repl_sessions[session].edit(embed=self.repl_embeds[shell])
                     else:
                         self.repl_embeds[shell].add_field(
                             name="`>>> {}`".format(cleaned),
                             value=fmt,
                             inline=False)
 
-                        await self.bot.edit_message(
-                            self.repl_sessions[session],
-                            embed=self.repl_embeds[shell])
+                        await self.repl_sessions[session].edit(embed=self.repl_embeds[shell])
                 else:
                     self.repl_embeds[shell].add_field(
                         name="`>>> {}`".format(cleaned),
                         value="`Empty response, assumed successful.`",
                         inline=False)
 
-                    await self.bot.edit_message(
-                        self.repl_sessions[session],
-                        embed=self.repl_embeds[shell])
+                    await self.repl_sessions[session].edit(embed=self.repl_embeds[shell])
 
             except discord.Forbidden:
                 pass
@@ -273,7 +255,7 @@ class EmbedShell():
                     error_embed = discord.Embed(
                         color=15746887,
                         description='**Error**: _{}_'.format(err))
-                    await self.bot.say(embed=error_embed)
+                    await ctx.send(embed=error_embed)
                 except:
                     pass
 
@@ -283,14 +265,14 @@ class EmbedShell():
     async def _repljump(self, ctx):
         """Brings the shell back down so you can see it again."""
 
-        session = ctx.message.channel.id
+        session = str(ctx.message.channel.id)
 
         if session not in self.repl_sessions:
             try:
                 error_embed = discord.Embed(
                     color=15746887,
                     description="**Error**: _No shell running in channel._")
-                await self.bot.say(embed=error_embed)
+                await ctx.send(embed=error_embed)
             except:
                 pass
             return
@@ -298,13 +280,13 @@ class EmbedShell():
         shell = self.repl_sessions[session]
         embed = self.repl_embeds[shell]
 
-        await self.bot.delete_message(ctx.message)
+        await ctx.message.delete()
         try:
-            await self.bot.delete_message(shell)
+            await shell.delete()
         except discord.errors.NotFound:
             pass
         try:
-            new_shell = await self.bot.say(embed=embed)
+            new_shell = await ctx.send(embed=embed)
         except:
             pass
 
@@ -320,14 +302,14 @@ class EmbedShell():
     async def _replclear(self, ctx):
         """Clears the fields of the shell and resets the color."""
 
-        session = ctx.message.channel.id
+        session = str(ctx.message.channel.id)
 
         if session not in self.repl_sessions:
             try:
                 error_embed = discord.Embed(
                     color=15746887,
                     description="**Error**: _No shell running in channel._")
-                await self.bot.say(embed=error_embed)
+                await ctx.send(embed=error_embed)
             except:
                 pass
             return
@@ -337,11 +319,9 @@ class EmbedShell():
         self.repl_embeds[shell].color = discord.Color.default()
         self.repl_embeds[shell].clear_fields()
 
-        await self.bot.delete_message(ctx.message)
+        await ctx.message.delete()
         try:
-            await self.bot.edit_message(
-                shell,
-                embed=self.repl_embeds[shell])
+            await shell.edit(embed=self.repl_embeds[shell])
         except:
             pass
 
