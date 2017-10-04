@@ -328,30 +328,32 @@ class Debugger:
         try:
             if os.path.exists("custom_cogs/{}.py".format(msg)):
                 self.bot.load_extension("custom_cogs.{}".format(msg))
+            elif os.path.exists("cogs/{}.py".format(msg)):
+                self.bot.load_extension("cogs.{}".format(msg))
             else:
-                self.bot.load_extension(msg)
+                raise ModuleNotFoundError("No module named '{}'".format(msg))
         except Exception as e:
-            await ctx.send(self.bot.bot_prefix + 'Failed to load module: `{}`'.format(msg))
+            await ctx.send(self.bot.bot_prefix + 'Failed to load module: `{}.py`'.format(msg))
             await ctx.send(self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
-            await ctx.send(self.bot.bot_prefix + 'Loaded module: `{}`'.format(msg))
+            await ctx.send(self.bot.bot_prefix + 'Loaded module: `{}.py`'.format(msg))
 
     @commands.command(pass_context=True)
     async def unload(self, ctx, *, msg):
         """Unload a module"""
         await ctx.message.delete()
         try:
-            if os.path.exists(msg.replace(".", "/") + ".py"):
-                self.bot.unload_extension(msg)
+            if os.path.exists("cogs/{}.py".format(msg)):
+                self.bot.unload_extension("cogs.{}.py".format(msg))
             elif os.path.exists("custom_cogs/{}.py".format(msg)):
-                self.bot.load_extension("custom_cogs.{}".format(msg))
+                self.bot.unload_extension("custom_cogs.{}".format(msg))
             else:
                 raise ModuleNotFoundError("No module named '{}'".format(msg))
         except Exception as e:
-            await ctx.send(self.bot.bot_prefix + 'Failed to unload module: `{}`'.format(msg))
+            await ctx.send(self.bot.bot_prefix + 'Failed to unload module: `{}.py`'.format(msg))
             await ctx.send(self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
         else:
-            await ctx.send(self.bot.bot_prefix + 'Unloaded module: `{}`'.format(msg))
+            await ctx.send(self.bot.bot_prefix + 'Unloaded module: `{}.py`'.format(msg))
 
     @commands.command(pass_context=True)
     async def redirect(self, ctx):
