@@ -705,7 +705,7 @@ class Utility:
                 image.save(file, "PNG")
                 file.seek(0)
                 await ctx.send("Colour with hex code {}:".format(colour_code), file=discord.File(file, "colour_file.png"))
-            asyncio.sleep(1) # Prevent spaminess
+            await asyncio.sleep(1) # Prevent spaminess
 
     @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True)
