@@ -344,7 +344,7 @@ class Debugger:
         await ctx.message.delete()
         try:
             if os.path.exists("cogs/{}.py".format(msg)):
-                self.bot.unload_extension("cogs/{}.py".format(msg))
+                self.bot.unload_extension("cogs.{}.py".format(msg))
             elif os.path.exists("custom_cogs/{}.py".format(msg)):
                 self.bot.unload_extension("custom_cogs.{}".format(msg))
             else:
