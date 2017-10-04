@@ -290,7 +290,7 @@ class Debugger:
         try:
             if os.path.exists('%s.txt' % msg):
                 f = open('%s.txt' % msg, 'r').read()
-                await ctx.send(self.bot.bot_prefix + 'Viewing ``%s.txt``: ```%s```' % (msg, f.strip('` ')))
+                await ctx.send(self.bot.bot_prefix + 'Viewing ``%s.txt``: ```py\n%s```' % (msg, f.strip('` ')))
             else:
                 await ctx.send(self.bot.bot_prefix + '``%s.txt`` does not exist.' % msg)
 
