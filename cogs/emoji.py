@@ -49,12 +49,14 @@ class Emoji:
 
         if not match:
             # Here we check for a stock emoji before returning a failure
-            codepoint_regex = re.compile('(\d)?[xuU]0*([a-f\d]*)')
+            codepoint_regex = re.compile('([\d#])?[xuU]0*([a-f\d]*)')
             unicode_raw = msg.encode('unicode-escape').decode('ascii').replace('\\', '')
             codepoints = codepoint_regex.findall(unicode_raw)
             if codepoints == []:
                 return await ctx.send(self.bot.bot_prefix + 'Could not find emoji.')
-            if codepoints[0][0] == '':
+            if codepoints[0][0] == '#':
+                emoji_code = '23-20e3'
+            elif codepoints[0][0] == '':
                 codepoints = [x[1] for x in codepoints]
                 emoji_code = '-'.join(codepoints)
             else:
