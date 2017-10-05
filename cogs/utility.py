@@ -4,6 +4,7 @@ import strawpy
 import pytz
 import re
 import requests
+import aiohttp
 import json
 import discord
 import os
@@ -28,6 +29,7 @@ from cogs.utils.config import write_config_value
 class Utility:
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession(loop=self.bot.loop)
 
     @staticmethod
     def get_datetime():
@@ -483,8 +485,8 @@ class Utility:
         if " | " in msg:
             msg, number = msg.rsplit(" | ", 1)
         search = parse.quote(msg)
-        response = requests.get("http://api.urbandictionary.com/v0/define?term={}".format(search)).text
-        result = json.loads(response)
+        async with self.session.get("http://api.urbandictionary.com/v0/define", params={"term":search}) as resp:
+            result = await resp.json()
         if result["result_type"] == "no_results":
             await ctx.send(self.bot.bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
         else:
@@ -510,7 +512,8 @@ class Utility:
         """Search for videos on YouTube."""
         search = parse.quote(msg)
         youtube_regex = re.compile('\/watch\?v=[\d\w\-]*')
-        response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
+        async with self.session.get("https://www.youtube.com/results", params={"search_query": search}) as resp:
+            response = await resp.text()
         await ctx.message.delete()
         url = youtube_regex.findall(response)[0]
         await ctx.send("https://www.youtube.com{}".format(url))
@@ -526,7 +529,8 @@ class Utility:
             site = None
             found = None
             search = parse.quote(comic)
-            result = requests.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)).text
+            async with self.session.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)) as resp:
+                result = await resp.text()
             soup = BeautifulSoup(result, "html.parser")
             links = soup.find_all("cite")
             for link in links:
@@ -549,9 +553,11 @@ class Utility:
     async def hastebin(self, ctx, *, data):
         """Post to Hastebin."""
         await ctx.message.delete()
+        async with self.session.post("https://hastebin.com/documents", data=data) as resp:
+            post = await resp.text()
         post = requests.post("https://hastebin.com/documents", data=data)
         try:
-            await ctx.send(self.bot.bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(post.json()["key"]))
+            await ctx.send(self.bot.bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(json.loads(post)["key"]))
         except json.JSONDecodeError:
             await ctx.send(self.bot.bot_prefix + "Failed to post to Hastebin. The API may be down right now.")
 
