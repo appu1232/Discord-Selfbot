@@ -49,8 +49,8 @@ class Emoji:
 
         if not match:
             # Here we check for a stock emoji before returning a failure
-            codepoint_regex = re.compile('([\d#])?[xuU]0*([a-f\d]*)')
-            unicode_raw = msg.encode('unicode-escape').decode('ascii').replace('\\', '')
+            codepoint_regex = re.compile('([\d#])?\\\\[xuU]0*([a-f\d]*)')
+            unicode_raw = msg.encode('unicode-escape').decode('ascii')
             codepoints = codepoint_regex.findall(unicode_raw)
             if codepoints == []:
                 return await ctx.send(self.bot.bot_prefix + 'Could not find emoji.')
