@@ -1,19 +1,17 @@
-import requests
-import discord
-import json
 import codecs
-from urllib import parse
+
+import aiohttp
+import discord
 from bs4 import BeautifulSoup
 from discord.ext import commands
-
 
 '''Translator cog - Love Archit & Lyric'''
 
 
 class Translate:
-
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession(loop=self.bot.loop)
 
     # Thanks to lyric for helping me in making this possible. You are not so bad afterall :] ~~jk~~
     @commands.command(pass_context=True)
@@ -29,8 +27,8 @@ class Translate:
             embed.add_field(name="Original", value=msg, inline=False)
             embed.add_field(name="ROT13", value=codecs.encode(msg, "rot_13"), inline=False)
             return await ctx.send("", embed=embed)
-        codes = requests.get("http://lyricly.tk/langs.json").text
-        lang_codes = json.loads(codes)
+        async with self.session.get("http://lyricly.tk/langs.json") as resp:
+            lang_codes = await resp.json()
         real_language = False
         to_language = to_language.lower()
         for entry in lang_codes:
@@ -39,7 +37,9 @@ class Translate:
                 to_language = entry
                 real_language = True
         if real_language:
-            translate = requests.get("https://translate.google.com/m?hl={}&sl=auto&q={}".format(to_language, msg)).text
+            async with self.session.get("https://translate.google.com/m",
+                                        params={"hl": to_language, "sl": "auto", "q": msg}) as resp:
+                translate = await resp.text()
             result = str(translate).split('class="t0">')[1].split("</div>")[0]
             result = BeautifulSoup(result, "lxml").text
             embed = discord.Embed(color=discord.Color.blue())
