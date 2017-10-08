@@ -1,4 +1,4 @@
-```data = {}
+data = {}
 for user in guild.members:
     for gl in bot.guilds:
         if gl.get_member(user.id) and gl.id != guild.id and not user.bot:
@@ -11,4 +11,4 @@ print('Users I share a server with:\nUser - Servers\n')
 for user in data:
     guilds = ', '.join(data[user])
     print(user.name + ' - ' + guilds + '\n')
-print('\nTotal members: {} \n\nMembers I share another server with: {}'.format(server.member_count, len(data)))```
+print('\nTotal members: {} \n\nMembers I share another server with: {}'.format(server.member_count, len(data)))
