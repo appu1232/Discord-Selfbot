@@ -78,21 +78,35 @@ def wizard():
         exit(0)
     config = {}
     print("Welcome to Appu's Discord Selfbot!\nThis setup wizard will guide you through the initial configuration required to get the bot working.\nThe choices you make in this wizard can be changed at any time by editing the settings/config.json file.\n")
+    
+    print("The first step is to set up your token.")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
     print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
     print("Paste the contents of that entry below.")
     print("-------------------------------------------------------------")
     config["token"] = input("| ").strip().strip('"')
-    print("\nEnter the command prefix you want to use for main commands (eg. if you enter > you will use commands like so: >about).")
-    print("-------------------------------------------------------------")
-    config["cmd_prefix"] = input("| ").strip()
-    print("\nEnter the command prefix you want to use for custom commands (commands that you add to the bot yourself with custom replies). Using the same prefix as the main command prefix is allowed but not recommended.")
-    print("-------------------------------------------------------------")
-    config["customcmd_prefix"] = input("| ").strip()
-    print("\nEnter something that will precede every response from the bot. This is to identify messages that came from the bot vs. just you talking. Ex: Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends. Recommended but if you don't want anything, press enter to skip.")
+    
+    config["cmd_prefix"] = False
+    while not config["cmd_prefix"]:
+        print("\nEnter the command prefix you want to use for main commands (e.g. if you enter > you will use commands like so: >about).")
+        print("-------------------------------------------------------------")
+        config["cmd_prefix"] = input("| ").strip()
+        if not config["cmd_prefix"]:
+            print("Empty command prefixes are invalid.")
+            
+    config["customcmd_prefix"] = False
+    while not config["customcmd_prefix"]:
+        print("\nEnter the command prefix you want to use for custom commands (commands that you add to the bot yourself with custom replies). Using the same prefix as the main command prefix is allowed, but not recommended.")
+        print("-------------------------------------------------------------")
+        config["customcmd_prefix"] = input("| ").strip()
+        if not config["customcmd_prefix"]:
+            print("Empty command prefixes are invalid.")
+    
+    print("\nEnter something that will precede every response from the bot. This is to distinguish bot responses from normal user chatter i.e. Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
-    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nRerun this wizard by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
+    
+    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nYou may restart this wizard at any time by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
   
     print("Starting up...")
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
