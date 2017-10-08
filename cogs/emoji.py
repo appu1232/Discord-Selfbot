@@ -15,6 +15,7 @@ class Emoji:
 
     def find_emoji(self, msg):
         msg = re.sub("<:(.+):([0-9]+)>", "\\2", msg)
+        color_modifiers = ["1f3fb", "1f3fc", "1f3fd", "1f44c", "1f3fe", "1f3ff"] # These color modifiers aren't in Twemoji
 
         for guild in self.bot.guilds:
             for emoji in guild.emojis:
@@ -32,7 +33,11 @@ class Emoji:
         codepoints = codepoint_regex.findall(unicode_raw)
         if codepoints == []:
             return "", "", "", ""
-        elif codepoints[0][0] == '#':
+
+        if len(codepoints) > 1 and codepoints[1][1] in color_modifiers:
+            codepoints.pop(1)
+
+        if codepoints[0][0] == '#':
             emoji_code = '23-20e3'
         elif codepoints[0][0] == '':
             codepoints = [x[1] for x in codepoints]
@@ -70,10 +75,10 @@ class Emoji:
             if url == "":
                 await ctx.send(self.bot.bot_prefix + "Could not find {} emoji. Skipping.".format(emoji))
                 continue
-
             response = requests.get(url, stream=True)
             if response.status_code == 404:
-                return await ctx.send(self.bot.bot_prefix + "Emoji not available. Open an issue on <https://github.com/astronautlevel2/twemoji> with the name of the missing emoji")
+                await ctx.send(self.bot.bot_prefix + "Emoji {} not available. Open an issue on <https://github.com/astronautlevel2/twemoji> with the name of the missing emoji".format(emoji))
+                continue
 
             img = io.BytesIO()
             for block in response.iter_content(1024):
