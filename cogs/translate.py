@@ -11,7 +11,7 @@ from discord.ext import commands
 class Translate:
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession(loop=self.bot.loop)
+        self.session = aiohttp.ClientSession(loop=self.bot.loop, headers={"User-Agent": "AppuSelfBot"})
 
     # Thanks to lyric for helping me in making this possible. You are not so bad afterall :] ~~jk~~
     @commands.command(pass_context=True)
@@ -38,8 +38,7 @@ class Translate:
                 real_language = True
         if real_language:
             async with self.session.get("https://translate.google.com/m",
-                                        params={"hl": to_language, "sl": "auto", "q": msg},
-                                        headers={"User-Agent": "AppuSelfBot"}) as resp:
+                                        params={"hl": to_language, "sl": "auto", "q": msg}) as resp:
                 translate = await resp.text()
             result = str(translate).split('class="t0">')[1].split("</div>")[0]
             result = BeautifulSoup(result, "lxml").text
