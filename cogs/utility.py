@@ -529,7 +529,8 @@ class Utility:
             site = None
             found = None
             search = parse.quote(comic)
-            async with self.session.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)) as resp:
+            async with self.session.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search),
+                                        headers={"User-Agent": "AppuSelfBot"}) as resp:
                 result = await resp.text()
             soup = BeautifulSoup(result, "html.parser")
             links = soup.find_all("cite")
@@ -555,7 +556,6 @@ class Utility:
         await ctx.message.delete()
         async with self.session.post("https://hastebin.com/documents", data=data) as resp:
             post = await resp.text()
-        post = requests.post("https://hastebin.com/documents", data=data)
         try:
             await ctx.send(self.bot.bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(json.loads(post)["key"]))
         except json.JSONDecodeError:
