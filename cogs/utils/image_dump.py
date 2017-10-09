@@ -37,15 +37,20 @@ for i, image in enumerate(images):
             fp.write('{}%'.format(int((i / len(images)) * 100)))
             fp.write('\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(path, new_dump, delay, x, y, dimx, dimy, fixed))
         os._exit(0)
-    try:
-        response = requests.get(image, stream=True)
-        data = response.content
-    except:
-        sys.stdout.write('\rFailed to save: %s                       ' % image)
-        sys.stdout.flush()
-        print('\nContinuing...')
-        failures += 1
-        continue
+
+    for i in range(3):
+        try:
+            with requests.get(image, stream=True) as response:
+                data = response.content
+            break
+        except:
+            time.sleep(2)
+            if i == 2:
+                sys.stdout.write('\rFailed to retrieve: %s                       ' % image)
+                sys.stdout.flush()
+                print('\nContinuing...')
+                failures += 1
+            continue
 
     if (x != 'None' or dimx != 'None') and (image.endswith(('.jpg', '.jpeg', '.png'))):
         try:
@@ -100,6 +105,9 @@ for i, image in enumerate(images):
         total += 1
         finished_status[i] = '+{} {}'.format(image_hash, finished_status[i])
     except:
+        sys.stdout.write('\rUnable to save image to folder: %s                       ' % image)
+        sys.stdout.flush()
+        print('\nContinuing...')
         try:
             os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
         except:
