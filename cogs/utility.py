@@ -529,7 +529,8 @@ class Utility:
             site = None
             found = None
             search = parse.quote(comic)
-            async with self.session.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)) as resp:
+            async with self.session.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search),
+                                        headers={"User-Agent": "AppuSelfBot"}) as resp:
                 result = await resp.text()
             soup = BeautifulSoup(result, "html.parser")
             links = soup.find_all("cite")
