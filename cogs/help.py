@@ -100,7 +100,7 @@ class Help(formatter.HelpFormatter):
                 await help_msg.edit(content=content, embed=embeds[page_number])
             except ValueError:
                 print('done')
-                await page_msg.edit(content="Quit Help menu.")
+                await page_msg.edit(content=self.bot.bot_prefix + "Quit Help menu.")
                 break
 
 
