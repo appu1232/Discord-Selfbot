@@ -3,7 +3,7 @@ from discord.ext import commands
 from cogs.utils.dataIO import dataIO
 import json
 from requests.structures import CaseInsensitiveDict
-
+from cogs.utils.checks import embed_perms
 
 class FriendCodes:
 
@@ -34,16 +34,25 @@ class FriendCodes:
         if friend_code == "all":
             if not fc:
                 return await ctx.send(self.bot.bot_prefix + "You have no friend codes to show!")
-            embed = discord.Embed()
-            for code in fc:
-                embed.add_field(name=code, value=fc[code], inline=False)
-            return await ctx.send("", embed=embed)
+            if embed_perms(ctx.message):
+                embed = discord.Embed()
+                for code in fc:
+                    embed.add_field(name=code, value=fc[code], inline=False)
+                return await ctx.send("", embed=embed)
+            else:
+                message = ""
+                for code in fc:
+                    message += "**{}**\n{}\n".format(code, fc[code])
+                return await ctx.send(message)
         else:
             if not friend_code in fc:
                 return await ctx.send(self.bot.bot_prefix + "You don't have a value set for that friend code!")
-            embed = discord.Embed()
-            embed.add_field(name=friend_code, value=fc[friend_code])
-            await ctx.send("", embed=embed)
+            if embed_perms(ctx.message):
+                embed = discord.Embed()
+                embed.add_field(name=friend_code, value=fc[friend_code])
+                await ctx.send("", embed=embed)
+            else:
+                await ctx.send("**{}**\n{}".format(friend_code, fc[friend_code]))
 
 
 def setup(bot):
