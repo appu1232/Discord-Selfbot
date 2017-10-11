@@ -131,13 +131,15 @@ class Help(formatter.HelpFormatter):
                 # skip aliases
                 continue
 
+            new_short_doc = command.short_doc.replace('[p]', self.clean_prefix)
+
             if self.is_cog() or self.is_bot():
                 name = '{0}{1}'.format(self.clean_prefix, name)
 
-            if len(entries + '**{0}**  -  {1}\n'.format(name, command.short_doc.replace('[p]', self.clean_prefix))) > 1000:
+            if len(entries + '**{0}**  -  {1}\n'.format(name, new_short_doc)) > 1000:
                 list_entries.append(entries)
                 entries = ''
-            entries += '**{0}**  -  {1}\n'.format(name, command.short_doc.replace('[p]', self.clean_prefix))
+            entries += '**{0}**  -  {1}\n'.format(name, new_short_doc)
         list_entries.append(entries)
         return list_entries
 
@@ -294,7 +296,7 @@ class Help(formatter.HelpFormatter):
 
     @commands.command(name='help', pass_context=True)
     async def help(self, ctx, *cmds: str):
-        if not self.bot.user.permissions_in(ctx.channel).embed_links:
+        if not ctx.message.author.permissions_in(ctx.channel).embed_links:
             return await ctx.send(content=self.bot.bot_prefix + "You don't have permissions to send embeds here. Find a different server/channel where you can embed links and try the help command there.")
 
         """Shows help documentation.
