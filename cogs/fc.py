@@ -17,9 +17,9 @@ class FriendCodes:
 
     @commands.group(pass_context=True, aliases=["friendcodes"])
     async def fc(self, ctx, friend_code="all"):
-        """List friend codes. Do >help fc for more information.
-        >fc - List all of your friend codes.
-        >fc <friend_code> - Show one of your friend codes.
+        """List friend codes. Do [p]help fc for more information.
+        [p]fc - List all of your friend codes.
+        [p]fc <friend_code> - Show one of your friend codes.
         Friend codes are stored in the settings/fc.json file and look similar to this:
         {
             "3DS": "435-233",

@@ -42,14 +42,14 @@ class Todo:
 
     @commands.group(pass_context=True)
     async def todo(self, ctx):
-        """Manage your to-do list. >help todo for more information.
+        """Manage your to-do list. [p]help todo for more information.
 
-        >todo - List all of the entries in your to-do list.
+        [p]todo - List all of the entries in your to-do list.
 
-        >todo add <item> - Add an item to your to-do list. Example: >todo add buy bacon
+        [p]todo add <item> - Add an item to your to-do list. Example: [p]todo add buy bacon
 
         ---- ADD A TIMER ----
-        >todo add <item> | <time> - Add an item to your to-do list with a timer. See below for more information.
+        [p]todo add <item> | <time> - Add an item to your to-do list with a timer. See below for more information.
           - When a timed to-do list item is completed, you will be notified via the webhook you set up for keyword logging.
 
           - Other possible parameters you can add when you set a timer:
@@ -61,11 +61,11 @@ class Todo:
             +  alert=off - add this if you don't want to get notified when the timer runs out.
 
         Example:
-        >todo add Get Daily Tatsumaki Credits | 24h1m | text=t!daily | channel=299431230984683520 | repeat=yes | alert=off
+        [p]todo add Get Daily Tatsumaki Credits | 24h1m | text=t!daily | channel=299431230984683520 | repeat=yes | alert=off
 
 
-        >todo remove <item> - Remove an item from your to-do list.
-        >todo clear - Clear your entire to-do list.
+        [p]todo remove <item> - Remove an item from your to-do list.
+        [p]todo clear - Clear your entire to-do list.
 
         If you do not have keyword logging set up, go to https://github.com/appu1232/Discord-Selfbot/wiki/Keyword-Notifier---User-Following-Info-and-Setup
 

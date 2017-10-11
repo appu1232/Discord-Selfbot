@@ -165,12 +165,12 @@ class Mod:
     @commands.has_permissions(manage_messages=True)
     @commands.command(aliases=['p'], pass_context=True, no_pm=True)
     async def purge(self, ctx, msgs: int, *, txt=None):
-        """Purge last n msgs or n msgs with a word. >help purge for more info.
+        """Purge last n msgs or n msgs with a word. [p]help purge for more info.
         
         Ex:
         
-        >purge 20 - deletes the last 20 messages in a channel sent by anyone.
-        >purge 20 stuff - deletes any messages in the last 20 messages that contains the word 'stuff'."""
+        [p]purge 20 - deletes the last 20 messages in a channel sent by anyone.
+        [p]purge 20 stuff - deletes any messages in the last 20 messages that contains the word 'stuff'."""
         await ctx.message.delete()
         if msgs < 10000:
             async for message in ctx.message.channel.history(limit=msgs):

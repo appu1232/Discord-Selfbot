@@ -185,10 +185,10 @@ class Debugger:
             await self.interpreter(env, msg, ctx)
 
 
-    # Save last >py cmd/script.
+    # Save last [p]py cmd/script.
     @py.command(pass_context=True)
     async def save(self, ctx, *, msg):
-        """Save the code you last ran. Ex: >py save stuff"""
+        """Save the code you last ran. Ex: [p]py save stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir(os.getcwd())
         if not os.path.exists('%s/cogs/utils/temp.txt' % os.getcwd()):
@@ -209,10 +209,10 @@ class Debugger:
         except:
             await ctx.send(self.bot.bot_prefix + 'Error saving file as ``%s.txt``' % msg)
 
-    # Load a cmd/script saved with the >save cmd
+    # Load a cmd/script saved with the [p]save cmd
     @py.command(aliases=['start'], pass_context=True)
     async def run(self, ctx, *, msg):
-        """Run code that you saved with the save commmand. Ex: >py run stuff parameter1 parameter2"""
+        """Run code that you saved with the save commmand. Ex: [p]py run stuff parameter1 parameter2"""
         # Like in unix, the first parameter is the script name
         parameters = msg.split()
         save_file = parameters[0] # Force scope
@@ -245,7 +245,7 @@ class Debugger:
     # List saved cmd/scripts
     @py.command(aliases=['ls'], pass_context=True)
     async def list(self, ctx, txt: str = None):
-        """List all saved scripts. Ex: >py list or >py ls"""
+        """List all saved scripts. Ex: [p]py list or [p]py ls"""
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
             if txt:
@@ -284,7 +284,7 @@ class Debugger:
     # View a saved cmd/script
     @py.group(aliases=['vi', 'vim'], pass_context=True)
     async def view(self, ctx, *, msg: str):
-        """View a saved script's contents. Ex: >py view stuff"""
+        """View a saved script's contents. Ex: [p]py view stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
@@ -304,7 +304,7 @@ class Debugger:
     # Delete a saved cmd/script
     @py.group(aliases=['rm'], pass_context=True)
     async def delete(self, ctx, *, msg: str):
-        """Delete a saved script. Ex: >py delete stuff"""
+        """Delete a saved script. Ex: [p]py delete stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:

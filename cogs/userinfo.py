@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from cogs.utils.checks import embed_perms, cmd_prefix_len
 
-'''Module for the >info command.'''
+'''Module for the info command.'''
 
 
 class Userinfo:
@@ -12,7 +12,7 @@ class Userinfo:
 
     @commands.group(invoke_without_command=True, aliases=['user', 'uinfo', 'info', 'ui'])
     async def userinfo(self, ctx, *, name=""):
-        """Get user info. Ex: >info @user"""
+        """Get user info. Ex: [p]info @user"""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
             if name:
@@ -59,7 +59,7 @@ class Userinfo:
 
     @userinfo.command()
     async def avi(self, ctx, txt: str = None):
-        """View bigger version of user's avatar. Ex: >info avi @user"""
+        """View bigger version of user's avatar. Ex: [p]info avi @user"""
         if txt:
             try:
                 user = ctx.message.mentions[0]

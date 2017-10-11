@@ -133,20 +133,20 @@ class Fun:
         text_flip[char] = alt_char_list[idx]
         text_flip[alt_char_list[idx]] = char
 
-    # used in >react, checks if it's possible to react with the duper string or not
+    # used in [p]react, checks if it's possible to react with the duper string or not
     def has_dupe(duper):
         collect_my_duper = list(filter(lambda x: x != '<' and x != '⃣',
                                        duper))  # remove < because those are used to denote a written out emoji, and there might be more than one of those requested that are not necessarily the same one.  ⃣ appears twice in the number unicode thing, so that must be stripped too...
         return len(set(collect_my_duper)) != len(collect_my_duper)
 
-    # used in >react, replaces e.g. 'ng' with '🆖'
+    # used in [p]react, replaces e.g. 'ng' with '🆖'
     def replace_combos(react_me):
         for combo in Fun.emoji_dict['combination']:
             if combo[0] in react_me:
                 react_me = react_me.replace(combo[0], combo[1], 1)
         return react_me
 
-    # used in >react, replaces e.g. 'aaaa' with '🇦🅰🍙🔼'
+    # used in [p]react, replaces e.g. 'aaaa' with '🇦🅰🍙🔼'
     def replace_letters(react_me):
         for char in "abcdefghijklmnopqrstuvwxyz0123456789!?":
             char_count = react_me.count(char)
@@ -167,7 +167,7 @@ class Fun:
 
     @commands.command(pass_context=True, aliases=['8ball'])
     async def ball8(self, ctx, *, msg: str):
-        """Let the 8ball decide your fate. Ex: >8ball Will I get good?"""
+        """Let the 8ball decide your fate. Ex: [p]8ball Will I get good?"""
         answer = random.randint(0, 19)
         if embed_perms(ctx.message):
             if answer < 10:
@@ -186,13 +186,13 @@ class Fun:
 
     @commands.command(pass_context=True, aliases=['pick'])
     async def choose(self, ctx, *, choices: str):
-        """Choose randomly from the options you give. >choose this | that"""
+        """Choose randomly from the options you give. [p]choose this | that"""
         await ctx.send(
                        self.bot.bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
 
     @commands.command(pass_context=True)
     async def l2g(self, ctx, *, msg: str):
-        """Creates a lmgtfy link. Ex: >l2g how do i become cool."""
+        """Creates a lmgtfy link. Ex: [p]l2g how do i become cool."""
         lmgtfy = 'http://lmgtfy.com/?q='
         await ctx.send(self.bot.bot_prefix + lmgtfy + urllib.parse.quote_plus(msg.lower().strip()))
         await ctx.message.delete()
@@ -211,7 +211,7 @@ class Fun:
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def ascii(self, ctx, *, msg):
-        """Convert text to ascii art. Ex: >ascii stuff >help ascii for more info."""
+        """Convert text to ascii art. Ex: [p]ascii stuff [p]help ascii for more info."""
         if ctx.invoked_subcommand is None:
             if msg:
                 font = get_config_value("optional_config", "ascii_font")
@@ -237,7 +237,7 @@ class Fun:
 
     @commands.command(pass_context=True)
     async def dice(self, ctx, *, msg="1"):
-        """Roll dice. Optionally input # of dice and # of sides. Ex: >dice 5 12"""
+        """Roll dice. Optionally input # of dice and # of sides. Ex: [p]dice 5 12"""
         await ctx.message.delete()
         invalid = 'Invalid syntax. Ex: `>dice 4` - roll four normal dice. `>dice 4 12` - roll four 12 sided dice.'
         dice_rolls = []
@@ -280,7 +280,7 @@ class Fun:
 
     @commands.command(pass_context=True)
     async def space(self, ctx, *, msg):
-        """Add n spaces between each letter. Ex: >space 2 thicc"""
+        """Add n spaces between each letter. Ex: [p]space 2 thicc"""
         await ctx.message.delete()
         if msg.split(' ', 1)[0].isdigit():
             spaces = int(msg.split(' ', 1)[0]) * ' '
@@ -294,7 +294,7 @@ class Fun:
     # TODO make it consider reactions already applied to the message
     @commands.command(pass_context=True, aliases=['r'])
     async def react(self, ctx, msg: str, msg_id="last", channel="current", prefer_combine: bool = False):
-        """Add letter(s) as reaction to previous message. Ex: >react hot"""
+        """Add letter(s) as reaction to previous message. Ex: [p]react hot"""
         await ctx.message.delete()
         msg = msg.lower()
 

@@ -38,7 +38,7 @@ class Server:
     # Stats about server
     @commands.group(aliases=['server', 'sinfo', 'si'], pass_context=True, invoke_without_command=True)
     async def serverinfo(self, ctx, *, msg=""):
-        """Various info about the server. >help server for more info."""
+        """Various info about the server. [p]help server for more info."""
         if ctx.invoked_subcommand is None:
             if msg:
                 server = None
@@ -101,7 +101,7 @@ class Server:
 
     @serverinfo.command(pass_context=True)
     async def emojis(self, ctx, msg: str = None):
-        """List all emojis in this server. Ex: >server emojis"""
+        """List all emojis in this server. Ex: [p]server emojis"""
         if msg:
             server, found = self.find_server(msg)
             if not found:
@@ -131,7 +131,7 @@ class Server:
 
     @serverinfo.command(pass_context=True)
     async def role(self, ctx, *, msg):
-        """Get more info about a specific role. Ex: >server role Admins"""
+        """Get more info about a specific role. Ex: [p]server role Admins"""
         for role in ctx.message.guild.roles:
             if msg.lower() == role.name.lower() or msg == role.id:
                 all_users = [str(x) for x in role.members]

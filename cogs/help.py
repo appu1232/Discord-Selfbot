@@ -43,6 +43,7 @@ _mention_pattern = re.compile('|'.join(_mentions_transforms.keys()))
 
 
 orig_help = None
+wiki_link = '\nAlternatively, you may want to check out [the wiki](https://github.com/appu1232/Discord-Selfbot/wiki) which also has the full list of in-built commands.'
 
 
 class Help(formatter.HelpFormatter):
@@ -83,6 +84,8 @@ class Help(formatter.HelpFormatter):
 
     async def send(self, dest, content=None, embeds=None):
         help_msg = await dest.send(content=content, embed=embeds[0])
+        if len(embeds) == 1:
+            return
         page_msg = await dest.send(self.bot.bot_prefix + "There are {} help pages. Send a number to see the corresponding page. Send any other message to exit.".format(len(embeds)))
         def is_me(msg):
             if msg.author == self.context.me and msg.channel == dest:
@@ -99,7 +102,6 @@ class Help(formatter.HelpFormatter):
                     page_number = len(embeds)-1
                 await help_msg.edit(content=content, embed=embeds[page_number])
             except ValueError:
-                print('done')
                 await page_msg.edit(content=self.bot.bot_prefix + "Quit Help menu.")
                 break
 
@@ -132,10 +134,10 @@ class Help(formatter.HelpFormatter):
             if self.is_cog() or self.is_bot():
                 name = '{0}{1}'.format(self.clean_prefix, name)
 
-            if len(entries + '**{0}**  -  {1}\n'.format(name, command.short_doc)) > 1000:
+            if len(entries + '**{0}**  -  {1}\n'.format(name, command.short_doc.replace('[p]', self.clean_prefix))) > 1000:
                 list_entries.append(entries)
                 entries = ''
-            entries += '**{0}**  -  {1}\n'.format(name, command.short_doc)
+            entries += '**{0}**  -  {1}\n'.format(name, command.short_doc.replace('[p]', self.clean_prefix))
         list_entries.append(entries)
         return list_entries
 
@@ -162,11 +164,11 @@ class Help(formatter.HelpFormatter):
             'fields': []
         }
 
-        emb['embed']['description'] = '\nAlternatively, you may want to check out [the wiki](https://github.com/appu1232/Discord-Selfbot/wiki) which also has the full list of in-built commands.'
+        emb['embed']['description'] = wiki_link
 
         if isinstance(command, discord.ext.commands.core.Command):
             # <signature portion>
-            emb['embed']['title'] = emb['embed']['description']
+            # emb['embed']['title'] = emb['embed']['description']
             emb['embed']['description'] = '`Syntax: {0}`'.format(self.get_command_signature())
 
             # <long doc> section
@@ -174,6 +176,10 @@ class Help(formatter.HelpFormatter):
                 name = '__{0}__'.format(command.help.split('\n\n')[0])
                 name_length = len(name) - 4
                 value = command.help[name_length:].replace('[p]', self.clean_prefix)
+                if value == '':
+                     name = '__{0}__'.format(command.help.split('\n')[0])
+                     name_length = len(name) - 4
+                     value = command.help[name_length:].replace('[p]', self.clean_prefix)
                 if value == '':
                     value = empty
                 field = {
@@ -260,15 +266,13 @@ class Help(formatter.HelpFormatter):
             txt += field["name"] + field["value"]
             if len(txt) > 1000:
                 embeds.append(embed)
-                print(len(txt))
                 txt = field["name"] + field["value"]
                 del embed
                 embed = discord.Embed(color=self.color, **emb['embed'])
-                embed.set_author(name='{0} Help Manual Page {1}'.format(self.bot.user.name, len(embeds)+1), icon_url=self.avatar)
+                embed.set_author(name='{} Help Manual Page {}'.format(self.bot.user.name, len(embeds)+1), icon_url=self.avatar)
                 embed.set_footer(**emb['footer'])
             embed.add_field(**field)
         embeds.append(embed)
-        print(len(txt))
 
         embed.set_footer(**emb['footer'])
         await self.send(self.destination, embeds=embeds)

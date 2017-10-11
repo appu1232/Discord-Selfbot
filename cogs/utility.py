@@ -165,7 +165,7 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, msg):
-        """Simple calculator. Ex: >calc 2+2"""
+        """Simple calculator. Ex: [p]calc 2+2"""
         equation = msg.strip().replace('^', '**').replace('x', '*')
         try:
             if '=' in equation:
@@ -188,7 +188,7 @@ class Utility:
 
     @commands.command(aliases=['sd'],pass_context=True)
     async def selfdestruct(self, ctx, *, amount):
-        """Builds a self-destructing message. Ex: >sd 5"""
+        """Builds a self-destructing message. Ex: [p]sd 5"""
         async for message in ctx.message.channel.history():
             if message.id == ctx.message.id:
                 continue
@@ -242,7 +242,7 @@ class Utility:
 
     @commands.command(aliases=['d'], pass_context=True)
     async def delete(self, ctx, txt=None, channel=None):
-        """Deletes the last message sent or n messages sent. Ex: >d 5"""
+        """Deletes the last message sent or n messages sent. Ex: [p]d 5"""
         if txt: # If number of seconds/messages are specified
             await ctx.message.delete()
             deleted = 0
@@ -278,7 +278,7 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg: str):
-        """Spoiler tag. Ex: >spoiler Some book | They get married."""
+        """Spoiler tag. Ex: [p]spoiler Some book | They get married."""
         try:
             if " | " in msg:
                 spoiled_work, spoiler = msg.lower().split(" | ", 1)
@@ -321,12 +321,12 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def uni(self, ctx, *, msg: str):
-        """Convert to unicode emoji if possible. Ex: >uni :eyes:"""
+        """Convert to unicode emoji if possible. Ex: [p]uni :eyes:"""
         await ctx.send("`" + msg.replace("`", "") + "`")
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):
-        """Create a strawpoll. Ex: >poll Favorite color = Blue | Red | Green"""
+        """Create a strawpoll. Ex: [p]poll Favorite color = Blue | Red | Green"""
         loop = asyncio.get_event_loop()
         try:
             options = [op.strip() for op in msg.split('|')]
@@ -343,7 +343,7 @@ class Utility:
 
     @commands.command(pass_context=True, aliases=['source'])
     async def sauce(self, ctx, *, txt: str = None):
-        """Find source of image. Ex: >sauce http://i.imgur.com/NIq2U67.png"""
+        """Find source of image. Ex: [p]sauce http://i.imgur.com/NIq2U67.png"""
         if not txt:
             return await ctx.send(self.bot.bot_prefix + 'Input a link to check the source. Ex: ``>sauce http://i.imgur.com/NIq2U67.png``')
         await ctx.message.delete()
@@ -475,9 +475,9 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def ud(self, ctx, *, msg):
-        """Pull data from Urban Dictionary. Use >help ud for more information.
-        Usage: >ud <term> - Search for a term on Urban Dictionary.
-        You can pick a specific result to use with >ud <term> | <result>.
+        """Pull data from Urban Dictionary. Use [p]help ud for more information.
+        Usage: [p]ud <term> - Search for a term on Urban Dictionary.
+        You can pick a specific result to use with [p]ud <term> | <result>.
         If no result is specified, the first result will be used.
         """
         await ctx.message.delete()
@@ -582,8 +582,8 @@ class Utility:
             
     @commands.command(pass_context=True, aliases=['anim'])
     async def animate(self, ctx, animation):
-        """Play an animation from a text file. >help animate for more details.
-        >animate <animation> - Animate a text file.
+        """Play an animation from a text file. [p]help animate for more details.
+        [p]animate <animation> - Animate a text file.
         Animation text files are stored in the anims folder. Each frame of animation is put on a new line.
 
         An example text file looks like this:
@@ -717,12 +717,12 @@ class Utility:
     @commands.command(pass_context=True)
     async def rpoll(self, ctx, *, msg):
         """Create a poll using reactions. >help rpoll for more information.
-        >rpoll <question> | <answer> | <answer> - Create a poll. You may use as many answers as you want, placing a pipe | symbol in between them.
+        [p]rpoll <question> | <answer> | <answer> - Create a poll. You may use as many answers as you want, placing a pipe | symbol in between them.
         Example:
-        >rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
+        [p]rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
         You can also use the "time" flag to set the amount of time in seconds the poll will last for.
         Example:
-        >rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
+        [p]rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
         """
         await ctx.message.delete()
         options = msg.split(" | ")

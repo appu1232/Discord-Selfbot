@@ -16,9 +16,9 @@ class Translate:
     # Thanks to lyric for helping me in making this possible. You are not so bad afterall :] ~~jk~~
     @commands.command(pass_context=True)
     async def translate(self, ctx, to_language, *, msg):
-        """Translates words from one language to another. Do >help translate for more information.
+        """Translates words from one language to another. Do [p]help translate for more information.
         Usage:
-        >translate <new language> <words> - Translate words from one language to another. Full language names must be used.
+        [p]translate <new language> <words> - Translate words from one language to another. Full language names must be used.
         The original language will be assumed automatically.
         """
         await ctx.message.delete()

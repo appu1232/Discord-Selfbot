@@ -53,10 +53,10 @@ class Emoji:
         """
         View, copy, add or remove emoji.
         Usage:
-        1) >emoji <emoji> - View a large image of a given emoji. Use >emoji s for additional info.
-        2) >emoji copy <emoji> - Copy a custom emoji on another server and add it to the current server if you have the permissions.
-        3) >emoji add <url> - Add a new emoji to the current server if you have the permissions.
-        4) >emoji remove <emoji> - Remove an emoji from the current server if you have the permissions
+        1) [p]emoji <emoji> - View a large image of a given emoji. Use [p]emoji s for additional info.
+        2) [p]emoji copy <emoji> - Copy a custom emoji on another server and add it to the current server if you have the permissions.
+        3) [p]emoji add <url> - Add a new emoji to the current server if you have the permissions.
+        4) [p]emoji remove <emoji> - Remove an emoji from the current server if you have the permissions
         """
         await ctx.message.delete()
         emojis = msg.split()

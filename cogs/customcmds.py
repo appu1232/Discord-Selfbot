@@ -91,18 +91,18 @@ class Customcmds:
     # List all custom commands
     @commands.group(pass_context=True)
     async def customcmds(self, ctx):
-        """Lists all customcmds. >help customcmds for more info
+        """Lists all customcmds. [p]help customcmds for more info
 
-        >customcmds - normal output with all the customcmds and subcommands (response names).
-        >customcmds <command_name> - output only this specific command.
-        >customcmds gist - normal output but posted to Gist to avoid cluttering the chat."""
+        [p]customcmds - normal output with all the customcmds and subcommands (response names).
+        [p]customcmds <command_name> - output only this specific command.
+        [p]customcmds gist - normal output but posted to Gist to avoid cluttering the chat."""
         if ctx.invoked_subcommand is None:
             await self.customcommands(ctx)
         await ctx.message.delete()
 
     @customcmds.command(pass_context=True)
     async def long(self, ctx):
-        """Lists detailed version of customcmds. Ex: >customcmds long"""
+        """Lists detailed version of customcmds. Ex: [p]customcmds long"""
         with open('settings/commands.json') as commands:
             if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
                 cmds = commands.read()
@@ -156,7 +156,7 @@ class Customcmds:
     # Change customcmd embed color
     @customcmds.command(pass_context=True, aliases=['colour'])
     async def color(self, ctx, *, msg: str = None):
-        '''Set color (hex) of a custom command image. Ex: >customcmds color 000000'''
+        '''Set color (hex) of a custom command image. Ex: [p]customcmds color 000000'''
         if msg:
             try:
                 msg = msg.lstrip('#')
@@ -206,9 +206,9 @@ class Customcmds:
     # Add a custom command
     @commands.command(pass_context=True)
     async def add(self, ctx, *, msg: str = None):
-        """Add a new customcmd. >help add for more info
+        """Add a new customcmd. [p]help add for more info
 
-        Simply do: >add
+        Simply do: [p]add
         This will trigger the menu which you can navigate through and add your custom command that way.
 
         -----------------------------------------------------------
@@ -217,20 +217,20 @@ class Customcmds:
 
         There are two ways to add custom commands. The first way:
         ----Simple----
-        >add <command> <response> Now, if you do .<command> you will receive <response>.
-        Example: >add nervous http://i.imgur.com/K9gMjWo.gifv
+        [p]add <command> <response> Now, if you do .<command> you will receive <response>.
+        Example: [p]add nervous http://i.imgur.com/K9gMjWo.gifv
         Then, doing .nervous will output this imgur link (images and gifs will auto embed) Assuming that your customcmd_prefix is set to "."
 
         ---Multiple responses to the same command----
-        >add <command> <response_name> <response>. This way, you can add multiple responses to the same command.
+        [p]add <command> <response_name> <response>. This way, you can add multiple responses to the same command.
         Example:
-        >add cry k-on http://i.imgur.com/tWtXttk.gif
+        [p]add cry k-on http://i.imgur.com/tWtXttk.gif
 
         Then you can add another to the .cry command:
-        >add cry nichijou https://media.giphy.com/media/3fmRTfVIKMRiM/giphy.gif
+        [p]add cry nichijou https://media.giphy.com/media/3fmRTfVIKMRiM/giphy.gif
 
         Note: If anything you are adding/removing is more than one word, you MUST put each part in quotes.
-        Example: >add "cry" "mugi why" "http://i.imgur.com/tWtXttk.gif" or >add "copypasta" "I identify as an attack helicopter."
+        Example: [p]add "cry" "mugi why" "http://i.imgur.com/tWtXttk.gif" or [p]add "copypasta" "I identify as an attack helicopter."
 
         Then invoke a specific response with .<command> <response_name> or get a random response for that command with .<command>
         So: .cry k-on would give you that specific link but .cry would give you one of the two you added to the cry command."""
@@ -483,19 +483,19 @@ class Customcmds:
     # Remove a custom command
     @commands.command(pass_context=True)
     async def remove(self, ctx, *, msg: str = None):
-        """Remove a customcmd. >help remove for more info.
+        """Remove a customcmd. [p]help remove for more info.
 
-        Simply do: >remove
+        Simply do: [p]remove
         This will trigger the menu which you can navigate through and remove your custom command that way.
 
         -----------------------------------------------------------
 
         Legacy method:
 
-        >remove <command> or >remove <command> <response_name> if you want to remove a specific response for a command.
+        [p]remove <command> or [p]remove <command> <response_name> if you want to remove a specific response for a command.
 
         Just like with the add cmd, note that if anything you are adding/removing is more than one word, you must put each part in quotes.
-        Example: If "cry" is the command and "mugi why" is the name for one of the links, removing that link would be: >remove "cry" "mugi why" """
+        Example: If "cry" is the command and "mugi why" is the name for one of the links, removing that link would be: [p]remove "cry" "mugi why" """
         if not msg:
 
             await ctx.message.delete()

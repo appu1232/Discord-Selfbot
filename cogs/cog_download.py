@@ -28,13 +28,13 @@ class CogDownloading:
 
     @commands.group(pass_context=True)
     async def cog(self, ctx):
-        """Manage custom cogs from ASCII. >help cog for more information.
+        """Manage custom cogs from ASCII. [p]help cog for more information.
         The Appu Selfbot Cog Importable Index (aka ASCII) is a server that hosts custom cogs for the bot.
-        >cog install <cog> - Install a custom cog from ASCII.
-        >cog uninstall <cog> - Uninstall one of your ASCII cogs.
-        >cog list - List all cogs on ASCII.
-        >cog view <cog> - View information about a cog on ASCII.
-        >cog update - Update all of your ASCII cogs.
+        [p]cog install <cog> - Install a custom cog from ASCII.
+        [p]cog uninstall <cog> - Uninstall one of your ASCII cogs.
+        [p]cog list - List all cogs on ASCII.
+        [p]cog view <cog> - View information about a cog on ASCII.
+        [p]cog update - Update all of your ASCII cogs.
         If you would like to add a custom cog to ASCII, see http://appucogs.tk
         """
         if ctx.invoked_subcommand is None:

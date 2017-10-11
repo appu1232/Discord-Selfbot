@@ -53,12 +53,12 @@ class Imagedump:
 
     @commands.group(pass_context=True)
     async def imagedump(self, ctx):
-        """Mass downloads images from a channel. >help imagedump for info.
+        """Mass downloads images from a channel. [p]help imagedump for info.
         ----Simple----
-        >imagedump <n> - checks the last <n> messages in this chat and downloads all the images/gifs/webms found.
+        [p]imagedump <n> - checks the last <n> messages in this chat and downloads all the images/gifs/webms found.
         
         ----More options----
-        >imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item> | channel=<id> | user=<id> - add any one or more of these to the command to furthur specify your requirements to find items.
+        [p]imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item> | channel=<id> | user=<id> - add any one or more of these to the command to furthur specify your requirements to find items.
         
         - items=<m> - when checking the last <n> messages, only download <m> items max.
         
@@ -79,7 +79,7 @@ class Imagedump:
         
         Example: I want a new wallpaper. I download 100 items with type .png that fit on my 16:9 monitor with dimensions 1920x1080 that was posted in this channel:
 
-        >imagedump 5000 | items=100 | type=png | ratio=16:9 | dim=1920x1080"""
+        [p]imagedump 5000 | items=100 | type=png | ratio=16:9 | dim=1920x1080"""
 
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
@@ -313,7 +313,7 @@ class Imagedump:
 
     @imagedump.command(pass_context=True)
     async def dir(self, ctx, *, msg: str = None):
-        """Set directory to save to. Ex: >imagedump dir C:/Users/Bill/Desktop"""
+        """Set directory to save to. Ex: [p]imagedump dir C:/Users/Bill/Desktop"""
         if msg:
             msg = msg.strip() if msg.strip().endswith('/') else msg.strip() + '/'
             if os.path.exists(msg):
