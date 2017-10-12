@@ -18,7 +18,7 @@ class Userinfo:
             if name:
                 try:
                     user = ctx.message.mentions[0]
-                except:
+                except IndexError:
                     user = ctx.guild.get_member_named(name)
                 if not user:
                     user = ctx.guild.get_member(int(name))
@@ -63,7 +63,7 @@ class Userinfo:
         if txt:
             try:
                 user = ctx.message.mentions[0]
-            except:
+            except IndexError:
                 user = ctx.guild.get_member_named(txt)
             if not user:
                 user = ctx.guild.get_member(int(txt))

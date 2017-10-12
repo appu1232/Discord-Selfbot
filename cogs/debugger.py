@@ -34,6 +34,7 @@ import psutil
 
 '''Module for the python interpreter as well as saving, loading, viewing, etc. the cmds/scripts ran with the interpreter.'''
 
+
 class Debugger:
 
     def __init__(self, bot):
@@ -113,7 +114,7 @@ class Debugger:
                 elif sys.platform == 'win32':
                     try: platform
                     except: import platform
-                    system = '%s %s (%s)'%(platform.system(),platform.version(),sys.platform)
+                    system = '%s %s (%s)'%(platform.system(), platform.version(), sys.platform)
                 else:
                     system = sys.platform
                 em.add_field(name='Operating System', value='%s' % system, inline=False)
@@ -320,7 +321,6 @@ class Debugger:
             os.chdir('..')
             os.chdir('..')
 
-
     @commands.command(pass_context=True)
     async def load(self, ctx, *, msg):
         """Load a module."""
@@ -398,6 +398,7 @@ class Debugger:
                 self.stream = io.StringIO()
                 sys.stdout = self.stream
                 sys.stderr = self.stream
+
 
 def setup(bot):
     debug_cog = Debugger(bot)

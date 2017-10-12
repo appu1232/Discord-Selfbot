@@ -185,8 +185,7 @@ class Utility:
         else:
             await ctx.send(self.bot.bot_prefix + answer)
 
-
-    @commands.command(aliases=['sd'],pass_context=True)
+    @commands.command(aliases=['sd'], pass_context=True)
     async def selfdestruct(self, ctx, *, amount):
         """Builds a self-destructing message. Ex: [p]sd 5"""
         async for message in ctx.message.channel.history():
@@ -243,7 +242,7 @@ class Utility:
     @commands.command(aliases=['d'], pass_context=True)
     async def delete(self, ctx, txt=None, channel=None):
         """Deletes the last message sent or n messages sent. Ex: [p]d 5"""
-        if txt: # If number of seconds/messages are specified
+        if txt:  # If number of seconds/messages are specified
             await ctx.message.delete()
             deleted = 0
             if txt == "all":
@@ -485,7 +484,7 @@ class Utility:
         if " | " in msg:
             msg, number = msg.rsplit(" | ", 1)
         search = parse.quote(msg)
-        async with self.session.get("http://api.urbandictionary.com/v0/define", params={"term":search}) as resp:
+        async with self.session.get("http://api.urbandictionary.com/v0/define", params={"term": search}) as resp:
             result = await resp.json()
         if result["result_type"] == "no_results":
             await ctx.send(self.bot.bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
@@ -711,7 +710,7 @@ class Utility:
                 image.save(file, "PNG")
                 file.seek(0)
                 await ctx.send("Colour with hex code {}:".format(colour_code), file=discord.File(file, "colour_file.png"))
-            await asyncio.sleep(1) # Prevent spaminess
+            await asyncio.sleep(1)  # Prevent spaminess
 
     @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True)
@@ -824,6 +823,7 @@ class Utility:
         for guild in self.bot.guilds:
             await guild.ack()
         await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds))) 
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))

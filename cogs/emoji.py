@@ -15,7 +15,7 @@ class Emoji:
 
     def find_emoji(self, msg):
         msg = re.sub("<:(.+):([0-9]+)>", "\\2", msg)
-        color_modifiers = ["1f3fb", "1f3fc", "1f3fd", "1f44c", "1f3fe", "1f3ff"] # These color modifiers aren't in Twemoji
+        color_modifiers = ["1f3fb", "1f3fc", "1f3fd", "1f44c", "1f3fe", "1f3ff"]  # These color modifiers aren't in Twemoji
 
         for guild in self.bot.guilds:
             for emoji in guild.emojis:

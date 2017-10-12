@@ -11,6 +11,7 @@ import os.path
 
 '''Todo list cog.'''
 
+
 class Todo:
 
     def __init__(self, bot):

@@ -26,21 +26,22 @@ from cogs.utils.config import *
 from discord.ext import commands
 
 
-def parse_cmd_arguments(): # allows for arguments
+def parse_cmd_arguments():  # allows for arguments
     parser = argparse.ArgumentParser(description="Discord-Selfbot")
-    parser.add_argument("-test", "--test-run", # test run flag for Travis
+    parser.add_argument("-test", "--test-run",  # test run flag for Travis
                         action="store_true",
                         help="Makes the bot quit before trying to log in")
-    parser.add_argument("--force-mac", # Allows for Testing of mac related code
+    parser.add_argument("--force-mac",  # Allows for Testing of mac related code
                         action="store_true",
                         help="Forces to run the Mac checks")
-    parser.add_argument("--reset-config", # Allows for Testing of mac related code
+    parser.add_argument("--reset-config",  # Allows for Testing of mac related code
                         action="store_true",
                         help="Reruns the setup")
-    parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
+    parser.add_argument("-s", "--silent",  # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
     return parser
+
 
 args = parse_cmd_arguments().parse_args()
 _test_run = args.test_run
@@ -65,8 +66,8 @@ if _test_run:
                         fields = json.load(template)
                         json.dump(fields, g, sort_keys=True, indent=4)
     except:
-        print('Something when wrong. Check for missing sample files') # only visible in Travis
-        pass # duo to some sample files sometimes missing passing it will make sure nothing goes wrong
+        print('Something when wrong. Check for missing sample files')  # only visible in Travis
+        pass  # duo to some sample files sometimes missing passing it will make sure nothing goes wrong
     print("Quitting: test run")
     exit(0)
 
@@ -112,12 +113,13 @@ def wizard():
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
         dump(config, f, sort_keys=True, indent=4)
 
+
 if _reset_cfg and not heroku:
     wizard()
 else:
     try:
         with open('settings/config.json', encoding='utf-8', mode="r") as f:
-            data = load(f) # checks if the settings file is valid json file
+            data = load(f)  # checks if the settings file is valid json file
     except IOError:
         wizard()
 
@@ -125,7 +127,7 @@ shutdown = False
 if os.name == 'nt':
     try:
         # only windows users with admin privileges can read the C:\windows\temp
-        temp = os.listdir(os.sep.join([os.environ.get('SystemRoot','C:\\windows'),'temp']))
+        temp = os.listdir(os.sep.join([os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
     except:
         shutdown = False
     else:
@@ -164,6 +166,7 @@ def set_log():
     logger.addHandler(errhandler)
 
     return logger
+
 
 logger = set_log()
 
@@ -826,7 +829,7 @@ if __name__ == '__main__':
                 for entry in list[2:]:
                     response = requests.get("http://appucogs.tk/cogs/{}".format(entry))
                     found_cog = response.json()
-                    filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
+                    filename = found_cog["link"].rsplit("/", 1)[1].rsplit(".", 1)[0]
                     if os.path.isfile("cogs/" + filename + ".py"):
                         os.rename("cogs/" + filename + ".py", "custom_cogs/" + filename + ".py")
         except Exception as e:

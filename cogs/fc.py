@@ -5,6 +5,7 @@ import json
 from requests.structures import CaseInsensitiveDict
 from cogs.utils.checks import embed_perms
 
+
 class FriendCodes:
 
     def __init__(self, bot):
