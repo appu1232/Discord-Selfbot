@@ -6,6 +6,7 @@ import json
 import discord
 import git
 import os
+from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.config import get_config_value
@@ -556,10 +557,15 @@ class Misc:
     @commands.command(pass_context=True)
     async def setavatar(self, ctx, *, msg):
         """
-        Set an avatar from a URL: Usage [p]setavatar <url_to_image>
-        Image must be a .png or a .jpg
+        Set an avatar from a URL or user.
+        Usage: [p]setavatar <url_to_image> or [p]seravatar <user> to copy that user's avi
+        Image URL must be a .png, a .jpg, or a .gif (nitro only)
         """
-        url = msg
+        user = get_user(ctx.message, msg)
+        if user:
+            url = user.avatar_url
+        else:
+            url = msg
         response = requests.get(url, stream=True)
         name = url.split('/')[-1]
         with open(name, 'wb') as img:
@@ -569,6 +575,12 @@ class Misc:
                     break
 
                 img.write(block)
+
+        if ".webp" in name:
+            im = Image.open(name)
+            im.save(name.replace('.webp', '.png'), 'png')
+            os.remove(name)
+            name = name.replace('.webp', '.png')
 
         if url:
             with open(name, 'rb') as fp:
