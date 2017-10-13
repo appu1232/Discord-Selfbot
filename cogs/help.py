@@ -187,12 +187,27 @@ class Help(formatter.HelpFormatter):
                      value = command.help[name_length:].replace('[p]', self.clean_prefix)
                 if value == '':
                     value = empty
-                field = {
-                    'name': name,
-                    'value': value,
-                    'inline': False
-                }
-                emb['fields'].append(field)
+                if len(value) > 1024:
+                    first = value[:1024].rsplit('\n', 1)[0]
+                    list_values = [first, value[len(first):]]
+                    while len(list_values[-1]) > 1024:
+                        next_val = list_values[-1][:1024].rsplit('\n', 1)[0]
+                        remaining = [next_val, list_values[-1][len(next_val):]]
+                        list_values = list_values[:-1] + remaining
+                    for new_val in list_values:
+                        field = {
+                            'name': name,
+                            'value': new_val,
+                            'inline': False
+                        }
+                        emb['fields'].append(field)
+                else:
+                    field = {
+                        'name': name,
+                        'value': value,
+                        'inline': False
+                    }
+                    emb['fields'].append(field)
 
             # end it here if it's just a regular command
             if not self.has_subcommands():

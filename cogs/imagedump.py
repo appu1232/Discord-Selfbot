@@ -58,6 +58,13 @@ class Imagedump:
         [p]imagedump <n> - checks the last <n> messages in this chat and downloads all the images/gifs/webms found.
         
         ----More options----
+        Example: I want a new wallpaper. I'll check the last 5000 messages in this channel and download 100 items with type .png that fit on my 16:9 monitor with dimensions 1920x1080. This is what I would do:
+
+        [p]imagedump 5000 | items=100 | type=png | ratio=16:9 | dim=1920x1080
+
+        ----
+
+        General Syntax (only include the options you want):
         [p]imagedump <n> | items=<m> | before=YYYY-MM-DD | after=YYYY-MM-DD | dim=WidthxHeight | ratio=Width:Height | type=<type_of_item> | channel=<id> | user=<id> - add any one or more of these to the command to furthur specify your requirements to find items.
         
         - items=<m> - when checking the last <n> messages, only download <m> items max.
@@ -76,10 +83,7 @@ class Imagedump:
         
         - user=<id> - download only items posted by this user. Enable developer mode, right click on user, copy id to get their id. Ex: user=124910128582361092
         
-        
-        Example: I want a new wallpaper. I download 100 items with type .png that fit on my 16:9 monitor with dimensions 1920x1080 that was posted in this channel:
-
-        [p]imagedump 5000 | items=100 | type=png | ratio=16:9 | dim=1920x1080"""
+        """
 
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
