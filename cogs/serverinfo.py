@@ -167,9 +167,8 @@ class Server:
         else:
             channel = self.bot.get_channel(channel)
         data = discord.Embed()
-        content = None
         if hasattr(channel, 'mention'):
-            content = self.bot.bot_prefix + "**Information about Channel:** " + channel.mention
+            data.description = "**Information about Channel:** " + channel.mention
         if hasattr(channel, 'changed_roles'):
             if len(channel.changed_roles) > 0:
                 data.color = discord.Colour.green() if channel.changed_roles[0].permissions.read_messages else discord.Colour.red()
@@ -205,14 +204,10 @@ class Server:
             allowed = []
             for role in channel.changed_roles:
                 if role.permissions.read_messages is True:
-                    if role.is_default():
-                        allowed.append("@everyone")
-                    else:
+                    if role.name != "@everyone":
                         allowed.append(role.mention)
                 elif role.permissions.read_messages is False:
-                    if role.is_default():
-                        hidden.append("@everyone")
-                    else:
+                    if role.name != "@everyone":
                         hidden.append(role.mention)
             if len(allowed) > 0: 
                 data.add_field(name='Allowed Roles ({})'.format(len(allowed)), value=', '.join(allowed), inline=False)
@@ -220,7 +215,7 @@ class Server:
                 data.add_field(name='Restricted Roles ({})'.format(len(hidden)), value=', '.join(hidden), inline=False)
         if channel.created_at:
             data.set_footer(text=("Created on {} ({} days ago)".format(channel.created_at.strftime("%d %b %Y %H:%M"), (ctx.message.created_at - channel.created_at).days)))
-        await ctx.send(content, embed=data)
+        await ctx.send(embed=data)
 
     @commands.command(aliases=['invitei', 'ii'], pass_context=True)
     async def inviteinfo(self, ctx, *, invite: str = None):
