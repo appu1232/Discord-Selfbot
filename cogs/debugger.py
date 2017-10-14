@@ -84,21 +84,20 @@ class Debugger:
                     result = '```\n{}\n```'.format(value)
                 else:
                     try:
-                        result = '```\n{}\n```'.format(eval(body, env))
+                        result = '```\n{}\n```'.format(repr(eval(body, env)))
                     except:
                         pass
             else:
                 self._last_result = ret
                 result = '```\n{}{}\n```'.format(value, ret)
 
-            if result:
-                if len(str(result)) > 1950:
-                    url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
-                    result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
-                    await ctx.send(result)
+            if len(str(result)) > 1950:
+                url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
+                result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
+                await ctx.send(result)
 
-                else:
-                    await ctx.send(result)
+            else:
+                await ctx.send(result)
 
     @commands.command(pass_context=True)
     async def debug(self, ctx, *, option: str = None):
