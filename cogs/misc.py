@@ -6,7 +6,6 @@ import json
 import discord
 import git
 import os
-from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.config import get_config_value
@@ -563,7 +562,7 @@ class Misc:
         """
         user = get_user(ctx.message, msg)
         if user:
-            url = user.avatar_url
+            url = user.avatar_url_as(static_format='png')
         else:
             url = msg
         response = requests.get(url, stream=True)
@@ -575,12 +574,6 @@ class Misc:
                     break
 
                 img.write(block)
-
-        if ".webp" in name:
-            im = Image.open(name)
-            im.save(name.replace('.webp', '.png'), 'png')
-            os.remove(name)
-            name = name.replace('.webp', '.png')
 
         if url:
             with open(name, 'rb') as fp:
