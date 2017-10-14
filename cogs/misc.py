@@ -585,8 +585,11 @@ class Misc:
                                 await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
                             else:
                                 pw = opt['password']
-                                await self.bot.user.edit(password=pw, avatar=e)
-                                await ctx.send("Your avatar has been set to the specified image")
+                                try:
+                                    await self.bot.user.edit(password=pw, avatar=e)
+                                    await ctx.send(self.bot.bot_prefix + "Your avatar has been set to the specified image")
+                                except discord.errors.HTTPException:
+                                    await ctx.send(self.bot.bot_prefix + "You are being rate limited!")
                         else:
                             opt['password'] = ""
                             await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
