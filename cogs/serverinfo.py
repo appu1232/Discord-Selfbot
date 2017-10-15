@@ -195,9 +195,12 @@ class Server:
             data.add_field(name="Users", value=userlist)
             data.add_field(name="Bitrate", value=channel.bitrate)
         elif isinstance(channel, discord.TextChannel):
-            pins = await channel.pins()
             data.add_field(name="Members", value="%s"%len(channel.members))
-            data.add_field(name="Pins", value=len(pins), inline=True)
+            try:
+                pins = await channel.pins()
+                data.add_field(name="Pins", value=len(pins), inline=True)
+            except:
+                data.add_field(name="Pins", value="Cannot get pins for this channel!", inline=True)
             if channel.topic:
                 data.add_field(name="Topic", value=channel.topic, inline=False)
             hidden = []
