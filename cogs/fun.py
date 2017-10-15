@@ -5,7 +5,7 @@ from discord.ext import commands
 import discord
 from cogs.utils.checks import embed_perms, cmd_prefix_len, find_channel
 from cogs.utils.config import get_config_value, write_config_value
-from pyfiglet import figlet_format
+from pyfiglet import figlet_format, FontError, FontNotFound
 import urllib.parse
 
 '''Module for fun/meme commands commands'''
@@ -230,7 +230,7 @@ class Fun:
         """Change font for ascii. All fonts: http://www.figlet.org/examples.html for all fonts."""
         try:
             str(figlet_format('test', font=txt))
-        except:
+        except (FontError, FontNotFound):
             return await ctx.send(self.bot.bot_prefix + 'Invalid font type.')
         write_config_value("optional_config", "ascii_font", txt)
         await ctx.send(self.bot.bot_prefix + 'Successfully set ascii font.')

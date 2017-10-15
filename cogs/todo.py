@@ -156,7 +156,7 @@ class Todo:
                         else:
                             try:
                                 repeat = int(i.split('repeat=')[1])
-                            except:
+                            except ValueError:
                                 repeat = 0
                     else:
                         if timer == 0:
