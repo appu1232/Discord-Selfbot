@@ -6,6 +6,7 @@ import json
 import discord
 import git
 import os
+import io
 from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.config import get_config_value
@@ -357,7 +358,7 @@ class Misc:
         """Set color (hex) of a embeds. Ex: [p]embedcolor 000000"""
         if color == 'auto':
             color = str(ctx.message.author.top_role.color)[1:]
-            
+
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
             if color:
@@ -568,39 +569,37 @@ class Misc:
             url = user.avatar_url_as(static_format='png')
         else:
             url = msg
+        if ".gif" in url and not self.bot.user.premium:
+            await ctx.send(self.bot.bot_prefix + "Warning: attempting to copy an animated avatar without Nitro. Only the first frame will be set.")
         response = requests.get(url, stream=True)
-        name = url.split('/')[-1]
-        with open(name, 'wb') as img:
+        img = io.BytesIO()
+        for block in response.iter_content(1024):
+            if not block:
+                break
 
-            for block in response.iter_content(1024):
-                if not block:
-                    break
-
-                img.write(block)
+            img.write(block)
 
         if url:
-            with open(name, 'rb') as fp:
-                e = fp.read()
-                with open('settings/avatars.json', 'r+') as fp:
-                        opt = json.load(fp)
-                        if opt['password']:
-                            if opt['password'] == "":
-                                await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
-                            else:
-                                pw = opt['password']
-                                try:
-                                    await self.bot.user.edit(password=pw, avatar=e)
-                                    await ctx.send(self.bot.bot_prefix + "Your avatar has been set to the specified image")
-                                except discord.errors.HTTPException:
-                                    await ctx.send(self.bot.bot_prefix + "You are being rate limited!")
-                        else:
-                            opt['password'] = ""
-                            await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
-            os.remove(name)
-        elif not embed_perms(ctx.message) and url:
-            await ctx.send(url)
+            img.seek(0)
+            imgbytes = img.read()
+            img.close()
+            with open('settings/avatars.json', 'r+') as fp:
+                opt = json.load(fp)
+                if opt['password']:
+                    if opt['password'] == "":
+                        await ctx.send(self.bot.bot_prefix + "You have not set your password yet in `settings/avatars.json` Please do so and try again")
+                    else:
+                        pw = opt['password']
+                        try:
+                            await self.bot.user.edit(password=pw, avatar=imgbytes)
+                            await ctx.send(self.bot.bot_prefix + "Your avatar has been set to the specified image.")
+                        except discord.errors.HTTPException:
+                            await ctx.send(self.bot.bot_prefix + "You are being rate limited!")
+                else:
+                    await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
         else:
             await ctx.send(self.bot.bot_prefix + 'Could not find image.')
+
 
     @commands.command(pass_context=True)
     async def ping(self, ctx):
