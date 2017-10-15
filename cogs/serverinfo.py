@@ -200,7 +200,7 @@ class Server:
                 pins = await channel.pins()
                 data.add_field(name="Pins", value=len(pins), inline=True)
             except:
-                data.add_field(name="Pins", value="Cannot get pins for this channel!", inline=True)
+                data.add_field(name="Pins", value="0", inline=True)
             if channel.topic:
                 data.add_field(name="Topic", value=channel.topic, inline=False)
             hidden = []
