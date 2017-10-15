@@ -1,7 +1,6 @@
 import discord
 import requests
 import io
-import os
 import re
 from discord.ext import commands
 

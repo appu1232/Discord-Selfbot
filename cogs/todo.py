@@ -1,13 +1,10 @@
 import re
-import json
 import discord
 import asyncio
 from time import time as current_time
 from cogs.utils.webhooks import Webhook
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
-import shutil
-import os.path
 
 '''Todo list cog.'''
 
