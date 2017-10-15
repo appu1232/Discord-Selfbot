@@ -113,7 +113,7 @@ class Misc:
 
         You do NOT need to specify every property, only the ones you want.
 
-        **All properties and the syntax (put your custom stuff in place of the <> stuff):
+        **All properties and the syntax:**
         - title=<words>
         - description=<words>
         - color=<hex_value>
@@ -125,7 +125,10 @@ class Misc:
         - ptext=<words>
 
         NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it.
-        PS: Hyperlink text like so: [text](https://www.whateverlink.com)
+        
+        PS: Hyperlink text like so:
+        \[text](https://www.whateverlink.com)
+
         PPS: Force a field to go to the next line with the added parameter inline=False"""
         if msg:
             if embed_perms(ctx.message):
