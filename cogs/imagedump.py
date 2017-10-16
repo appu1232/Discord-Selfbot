@@ -21,7 +21,7 @@ class Imagedump:
     def check_images(self, message, images, type_of_items):
         if message.attachments:
             yield from (item.url for item in message.attachments if item.url != '' and item.url not in images
-                        for i in type_of_items if item.url.endswith(i.strip()))
+                        for i in type_of_items if item.url.lower().endswith(i.strip()))
 
         if message.embeds:
             for embed in message.embeds:
@@ -34,10 +34,10 @@ class Imagedump:
                     except KeyError:
                         continue
 
-                if (url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm'))
+                if (url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm'))
                         or data['type'] in {'jpg', 'jpeg', 'png', 'gif', 'gifv', 'webm', 'image'}) and url not in images:
                     for i in type_of_items:
-                        if url.endswith(i.strip()):
+                        if url.lower().endswith(i.strip()):
                             yield url
 
         urls = []
@@ -48,8 +48,8 @@ class Imagedump:
 
         if urls is not []:
             yield from (url for url in urls
-                        if url.endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images
-                        for i in type_of_items if url.endswith(i.strip()))
+                        if url.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.gifv', '.webm')) and url not in images
+                        for i in type_of_items if url.lower().endswith(i.strip()))
 
     @commands.group(pass_context=True)
     async def imagedump(self, ctx):
