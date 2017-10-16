@@ -212,6 +212,9 @@ async def on_ready():
     bot.game = bot.game_interval = bot.avatar = bot.avatar_interval = bot.subpro = bot.keyword_found = None
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
     bot.notify = load_notify_config()
+    if not os.path.isfile('settings/command_count.json'):
+        dataIO.save_json('settings/command_count.json', {})
+    bot.command_count = dataIO.load_json('settings/command_count.json')
     if not os.path.isfile('settings/ignored.json'):
         with open('settings/ignored.json', 'w', encoding="utf8") as fp:
             json.dump({'servers': []}, fp, indent=4)
@@ -333,6 +336,22 @@ async def on_ready():
         bot.subpro = subprocess.Popen([sys.executable, 'cogs/utils/notify.py'])
         with open('notifier.txt', 'w', encoding="utf8") as fp:
             fp.write(str(bot.subpro.pid))
+
+
+@bot.after_invoke
+async def after_any_command(ctx):
+    if not ctx.command_failed and str(ctx.command) != 'clearcmdcount':
+        if str(ctx.command) not in bot.command_count:
+            bot.command_count[str(ctx.command)] = 1
+        else:
+            bot.command_count[str(ctx.command)] += 1
+
+
+@bot.command(aliases=["clearcommandcount", "clrcmdcount", "clrcmdcnt", "clearcmdcnt"])
+async def clearcmdcount(ctx):
+    """Clear command count records (used to display most used cmd in stats cmd)."""
+    bot.command_count = {}
+    await ctx.send(bot.bot_prefix + "Cleared command count records.")
 
 
 @bot.event

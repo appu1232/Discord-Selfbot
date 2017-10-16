@@ -55,9 +55,16 @@ class Misc:
         channel_count = 0
         for guild in self.bot.guilds:
             channel_count += len(guild.channels)
+        if not self.bot.command_count:
+            most_used_cmd = 'Not enough info'
+        else:
+            cmd_name = max(self.bot.command_count, key=self.bot.command_count.get)
+            total_usage = self.bot.command_count[str(cmd_name)]
+            most_used_cmd = '{} - {} uses'.format(cmd_name, total_usage)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
-            em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
+            em.add_field(name=u'\U0001F553 Uptime', value=time)
+            em.add_field(name=u'\u2328 Most Used Cmd', value=most_used_cmd)
             em.add_field(name=u'\U0001F4E4 Msgs sent', value=str(self.bot.icount))
             em.add_field(name=u'\U0001F4E5 Msgs received', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
