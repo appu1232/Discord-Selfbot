@@ -91,13 +91,16 @@ class Debugger:
                 self._last_result = ret
                 result = '```\n{}{}\n```'.format(value, ret)
 
-            if len(str(result)) > 1950:
-                url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
-                result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
-                await ctx.send(result)
+            if result:
+                if len(str(result)) > 1950:
+                    url = PythonGists.Gist(description='Py output', content=str(result).strip("`"), name='output.txt')
+                    result = self.bot.bot_prefix + 'Large output. Posted to Gist: %s' % url
+                    await ctx.send(result)
 
+                else:
+                    await ctx.send(result)
             else:
-                await ctx.send(result)
+                await ctx.send("```\n```")
 
     @commands.command(pass_context=True)
     async def debug(self, ctx, *, option: str = None):
