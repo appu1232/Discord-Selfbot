@@ -626,7 +626,7 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def quotecolor(self, ctx, *, msg):
-        '''Set color (hex) of a quote embed.\n`[p]quotecolor 000000` to set the quote color to black.\n´[p]quotecolor auto´ to set it to the color of the highest role the quoted person has.'''
+        '''Set color (hex) of a quote embed.\n`[p]quotecolor 000000` to set the quote color to black.\n`[p]quotecolor auto` to set it to the color of the highest role the quoted person has.'''
         if msg:
             if msg == "auto":
                 await ctx.send(self.bot.bot_prefix + 'Successfully set color for quote embeds.')
