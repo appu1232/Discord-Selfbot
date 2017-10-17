@@ -179,12 +179,12 @@ class Help(formatter.HelpFormatter):
             # <long doc> section
             if command.help:
                 name = '{0}'.format(command.help.split('\n\n')[0])
-                name_length = len(name) + 4
+                name_length = len(name)
                 name = name.replace('[p]', self.clean_prefix)
                 value = command.help[name_length:].replace('[p]', self.clean_prefix)
                 if value == '':
                      name = '{0}'.format(command.help.split('\n')[0])
-                     name_length = len(name) + 2
+                     name_length = len(name)
                      value = command.help[name_length:].replace('[p]', self.clean_prefix)
                 if value == '':
                     value = empty
