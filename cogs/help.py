@@ -180,11 +180,11 @@ class Help(formatter.HelpFormatter):
             if command.help:
                 name = '{0}'.format(command.help.split('\n\n')[0])
                 name = name.replace('[p]', self.clean_prefix)
-                name_length = len(name)
+                name_length = len(name) + 4
                 value = command.help[name_length:].replace('[p]', self.clean_prefix)
                 if value == '':
                      name = '{0}'.format(command.help.split('\n')[0])
-                     name_length = len(name)
+                     name_length = len(name) + 2
                      value = command.help[name_length:].replace('[p]', self.clean_prefix)
                 if value == '':
                     value = empty
