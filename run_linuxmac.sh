@@ -101,7 +101,7 @@ run_bot() {
 			echo "Upgrading pip"
 			if python3 -m pip install --user --upgrade pip; then
 				echo "Upgrading requirements"
-				if python3 -m pip install --user -r requirements.txt; then
+				if python3 -m pip install --user --upgrade -r requirements.txt; then
 					echo "Starting bot..."
 					python3 loopself.py
 					ret=$?
