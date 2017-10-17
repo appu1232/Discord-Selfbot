@@ -466,6 +466,7 @@ async def reload(ctx, txt: str = None):
         for i in bot.extensions:
             utils.append(i)
         l = len(utils)
+        utils.append(utils.pop(utils.index('cogs.help')))
         for i in utils:
             bot.unload_extension(i)
             try:
