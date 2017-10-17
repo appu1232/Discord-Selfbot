@@ -74,10 +74,10 @@ class Userinfo:
             user = ctx.message.author
 
         # Thanks to IgneelDxD for help on this
-        if user.avatar_url[54:].startswith('a_'):
+        if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
             avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
         else:
-            avi = user.avatar_url
+            avi = user.avatar_url_as(static_format='png')
         if embed_perms(ctx.message):
             em = discord.Embed(colour=0x708DD0)
             em.set_image(url=avi)
