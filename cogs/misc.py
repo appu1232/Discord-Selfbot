@@ -60,7 +60,8 @@ class Misc:
         else:
             cmd_name = max(self.bot.command_count, key=self.bot.command_count.get)
             total_usage = self.bot.command_count[str(cmd_name)]
-            most_used_cmd = '{} - {} uses'.format(cmd_name, total_usage)
+            plural = '' if total_usage == 1 else 's'
+            most_used_cmd = '{} - {} use{}'.format(cmd_name, total_usage, plural)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time)
