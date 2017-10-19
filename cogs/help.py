@@ -174,7 +174,7 @@ class Help(formatter.HelpFormatter):
         if isinstance(command, discord.ext.commands.core.Command):
             # <signature portion>
             # emb['embed']['title'] = emb['embed']['description']
-            emb['embed']['description'] = 'Syntax: `{0}`'.format(self.get_command_signature())
+            emb['embed']['description'] = '`Syntax: {0}`'.format(self.get_command_signature())
 
             # <long doc> section
             if command.help:

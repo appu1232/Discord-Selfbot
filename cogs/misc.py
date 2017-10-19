@@ -60,11 +60,12 @@ class Misc:
         else:
             cmd_name = max(self.bot.command_count, key=self.bot.command_count.get)
             total_usage = self.bot.command_count[str(cmd_name)]
-            most_used_cmd = '{} - {} uses'.format(cmd_name, total_usage)
+            plural = '' if total_usage == 1 else 's'
+            most_used_cmd = '{} - {} use{}'.format(cmd_name, total_usage, plural)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
-            em.add_field(name=u'\U0001F553 Uptime', value=time)
-            em.add_field(name=u'\u2328 Most Used Cmd', value=most_used_cmd)
+            em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
+            em.add_field(name=u'\u2328 Most Used Cmd', value=most_used_cmd, inline=False)
             em.add_field(name=u'\U0001F4E4 Msgs sent', value=str(self.bot.icount))
             em.add_field(name=u'\U0001F4E5 Msgs received', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
@@ -625,7 +626,7 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def quotecolor(self, ctx, *, msg):
-        '''Set color (hex) of a quote embed.\n`[p]quotecolor 000000` to set the quote color to black.\n´[p]quotecolor auto´ to set it to the color of the highest role the quoted person has.'''
+        '''Set color (hex) of a quote embed.\n`[p]quotecolor 000000` to set the quote color to black.\n`[p]quotecolor auto` to set it to the color of the highest role the quoted person has.'''
         if msg:
             if msg == "auto":
                 await ctx.send(self.bot.bot_prefix + 'Successfully set color for quote embeds.')
