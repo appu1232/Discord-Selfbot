@@ -64,8 +64,8 @@ class Misc:
             most_used_cmd = '{} - {} use{}'.format(cmd_name, total_usage, plural)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
-            em.add_field(name=u'\U0001F553 Uptime', value=time)
-            em.add_field(name=u'\u2328 Most Used Cmd', value=most_used_cmd)
+            em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
+            em.add_field(name=u'\u2328 Most Used Cmd', value=most_used_cmd, inline=False)
             em.add_field(name=u'\U0001F4E4 Msgs sent', value=str(self.bot.icount))
             em.add_field(name=u'\U0001F4E5 Msgs received', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
