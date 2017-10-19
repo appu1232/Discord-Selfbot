@@ -603,7 +603,7 @@ class Utility:
             with open("anims/{}.txt".format(animation)) as f:
                 anim = f.read().split("\n")
         except IOError:
-            return await ctx.send(self.bot.bot_prefix + "You don't have that animation in your `anims` folder!")
+            return await ctx.send(self.bot.bot_prefix + "You don't have that animation in your anims folder!")
         if anim:
             try:
                 delay = float(anim[0])
