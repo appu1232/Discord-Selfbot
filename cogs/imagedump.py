@@ -215,6 +215,7 @@ class Imagedump:
                             if not channel:
                                 return await ctx.send(self.bot.bot_prefix + 'Channel not found. Are you using the right syntax? ``channel=`` should be the channel id. '
                                                                                                      'Ex: ``>imagedump 500 | channel=299431230984683520``')
+                            limit -= 1
                             channel_msg = 'Channel: {} '.format(channel.name)
 
                         if i.strip().lower().startswith('user='):
