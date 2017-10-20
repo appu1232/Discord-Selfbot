@@ -605,28 +605,27 @@ async def on_message(message):
                     msg = message.clean_content.replace('`', '')
 
                     context = []
+                    total_context = 0
                     try:
-                        for i in range(0, int(bot.log_conf['context_len'])):
-                            context.append(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)][len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)])-i-2])
-                        msg = ''
-                        for i in range(0, int(bot.log_conf['context_len'])):
-                            temp = context[len(context)-i-1][0]
-                            if temp.clean_content:
-                                msg += 'User: %s | %s\n' % (temp.author.name, temp.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
-                        msg += 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
-                        success = True
-                    except:
-                        success = False
-                        msg = 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
-
+                        for i in range(1, min(int(bot.log_conf['context_len']), len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)]))):
+                            context.append(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)][len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)])-i-1])
+                            total_context += 1
+                    except IndexError:  # This usually means that the bot's internal log has not been sufficiently populated yet
+                        pass
+                    msg = ''
+                    for i in range(0, total_context):
+                        temp = context[len(context)-i-1][0]
+                        if temp.clean_content:
+                            msg += 'User: %s | %s\n' % (temp.author.name, temp.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
+                    msg += 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
                     part = int(math.ceil(len(msg) / 1950))
                     if user_found:
                         title = '%s posted' % user_found
                     else:
                         title = '%s mentioned: %s' % (message.author.name, word)
-                    if part == 1 and success is True:
+                    if part == 1:
                         em = discord.Embed(timestamp=message.created_at, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.guild), str(message.channel.id), message.channel.name))
-                        for i in range(0, int(bot.log_conf['context_len'])):
+                        while context:
                             temp = context.pop()
                             if temp[0].clean_content:
                                 em.add_field(name='%s' % temp[0].author.name, value=temp[0].clean_content, inline=False)
