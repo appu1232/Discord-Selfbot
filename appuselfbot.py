@@ -607,8 +607,8 @@ async def on_message(message):
                     context = []
                     total_context = 0
                     try:
-                        for i in range(0, int(bot.log_conf['context_len'])):
-                            context.append(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)][len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)])-i-2])
+                        for i in range(1, min(int(bot.log_conf['context_len']), len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)]))):
+                            context.append(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)][len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)])-i-1])
                             total_context += 1
                     except IndexError:  # This usually means that the bot's internal log has not been sufficiently populated yet
                         pass
@@ -625,7 +625,7 @@ async def on_message(message):
                         title = '%s mentioned: %s' % (message.author.name, word)
                     if part == 1:
                         em = discord.Embed(timestamp=message.created_at, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.guild), str(message.channel.id), message.channel.name))
-                        for i in range(0, int(bot.log_conf['context_len'])):
+                        while context:
                             temp = context.pop()
                             if temp[0].clean_content:
                                 em.add_field(name='%s' % temp[0].author.name, value=temp[0].clean_content, inline=False)
