@@ -817,10 +817,10 @@ class Utility:
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
         
     @commands.command(aliases=['ra'])
-    async def readall(self, ctx, msg=""):
+    async def readall(self, ctx, msg: str = None):
         """Marks everything as read. Append `server` to your message to only clear the current server."""
         await ctx.message.delete()
-        if msg is None:
+        if not msg:
             for guild in self.bot.guilds:
                 await guild.ack()
             await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds)))
