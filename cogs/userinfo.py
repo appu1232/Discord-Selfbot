@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from cogs.utils.checks import embed_perms, cmd_prefix_len
 
-'''Module for the >info command.'''
+'''Module for the info command.'''
 
 
 class Userinfo:
@@ -12,13 +12,13 @@ class Userinfo:
 
     @commands.group(invoke_without_command=True, aliases=['user', 'uinfo', 'info', 'ui'])
     async def userinfo(self, ctx, *, name=""):
-        """Get user info. Ex: >info @user"""
+        """Get user info. Ex: [p]info @user"""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
             if name:
                 try:
                     user = ctx.message.mentions[0]
-                except:
+                except IndexError:
                     user = ctx.guild.get_member_named(name)
                 if not user:
                     user = ctx.guild.get_member(int(name))
@@ -59,11 +59,11 @@ class Userinfo:
 
     @userinfo.command()
     async def avi(self, ctx, txt: str = None):
-        """View bigger version of user's avatar. Ex: >info avi @user"""
+        """View bigger version of user's avatar. Ex: [p]info avi @user"""
         if txt:
             try:
                 user = ctx.message.mentions[0]
-            except:
+            except IndexError:
                 user = ctx.guild.get_member_named(txt)
             if not user:
                 user = ctx.guild.get_member(int(txt))
@@ -74,10 +74,10 @@ class Userinfo:
             user = ctx.message.author
 
         # Thanks to IgneelDxD for help on this
-        if user.avatar_url[54:].startswith('a_'):
+        if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
             avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
         else:
-            avi = user.avatar_url
+            avi = user.avatar_url_as(static_format='png')
         if embed_perms(ctx.message):
             em = discord.Embed(colour=0x708DD0)
             em.set_image(url=avi)

@@ -131,7 +131,7 @@ class Menu:
                 if type(current.options) == dict:
                     current.input_function(reply, indexes[int(reply.content)-1])
                 else:
-                    current.input_function(reply, current.options[reply-1]) 
+                    current.input_function(reply, current.options[int(reply.content)-1]) 
                     
                 if not current.leads_to:
                     break

@@ -6,6 +6,7 @@ import hashlib
 from io import BytesIO
 from PIL import Image
 
+
 path, new_dump, delay, x, y, dimx, dimy, fixed = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8]
 images = []
 downloaded = []
@@ -37,14 +38,23 @@ for i, image in enumerate(images):
             fp.write('{}%'.format(int((i / len(images)) * 100)))
             fp.write('\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(path, new_dump, delay, x, y, dimx, dimy, fixed))
         os._exit(0)
-    try:
-        response = requests.get(image, stream=True)
-        data = response.content
-    except:
-        sys.stdout.write('\rFailed to save: %s                       ' % image)
-        sys.stdout.flush()
-        print('\nContinuing...')
-        failures += 1
+
+    failed = False
+    for i in range(3):
+        try:
+            response = requests.get(image, stream=True)
+            data = response.content
+            break
+        except:
+            time.sleep(2)
+            if i == 2:
+                failed = True
+                sys.stdout.write('\rFailed to retrieve: %s                       ' % image)
+                sys.stdout.flush()
+                print('\nContinuing...')
+                failures += 1
+            continue
+    if failed:
         continue
 
     if (x != 'None' or dimx != 'None') and (image.endswith(('.jpg', '.jpeg', '.png'))):
@@ -100,6 +110,9 @@ for i, image in enumerate(images):
         total += 1
         finished_status[i] = '+{} {}'.format(image_hash, finished_status[i])
     except:
+        sys.stdout.write('\rUnable to save image to folder: %s                       ' % image)
+        sys.stdout.flush()
+        print('\nContinuing...')
         try:
             os.remove('{}image_dump/{}/{}'.format(path, new_dump, image_name))
         except:

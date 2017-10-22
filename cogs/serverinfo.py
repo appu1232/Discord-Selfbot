@@ -38,7 +38,7 @@ class Server:
     # Stats about server
     @commands.group(aliases=['server', 'sinfo', 'si'], pass_context=True, invoke_without_command=True)
     async def serverinfo(self, ctx, *, msg=""):
-        """Various info about the server. >help server for more info."""
+        """Various info about the server. [p]help server for more info."""
         if ctx.invoked_subcommand is None:
             if msg:
                 server = None
@@ -101,7 +101,7 @@ class Server:
 
     @serverinfo.command(pass_context=True)
     async def emojis(self, ctx, msg: str = None):
-        """List all emojis in this server. Ex: >server emojis"""
+        """List all emojis in this server. Ex: [p]server emojis"""
         if msg:
             server, found = self.find_server(msg)
             if not found:
@@ -131,7 +131,7 @@ class Server:
 
     @serverinfo.command(pass_context=True)
     async def role(self, ctx, *, msg):
-        """Get more info about a specific role. Ex: >server role Admins"""
+        """Get more info about a specific role. Ex: [p]server role Admins"""
         for role in ctx.message.guild.roles:
             if msg.lower() == role.name.lower() or msg == role.id:
                 all_users = [str(x) for x in role.members]
@@ -167,9 +167,8 @@ class Server:
         else:
             channel = self.bot.get_channel(channel)
         data = discord.Embed()
-        content = None
         if hasattr(channel, 'mention'):
-            content = self.bot.bot_prefix + "**Information about Channel:** " + channel.mention
+            data.description = "**Information about Channel:** " + channel.mention
         if hasattr(channel, 'changed_roles'):
             if len(channel.changed_roles) > 0:
                 data.color = discord.Colour.green() if channel.changed_roles[0].permissions.read_messages else discord.Colour.red()
@@ -196,22 +195,22 @@ class Server:
             data.add_field(name="Users", value=userlist)
             data.add_field(name="Bitrate", value=channel.bitrate)
         elif isinstance(channel, discord.TextChannel):
-            if channel.members:
-                data.add_field(name="Members", value="%s"%len(channel.members))
+            try:
+                pins = await channel.pins()
+                data.add_field(name="Pins", value=len(pins), inline=True)
+            except discord.Forbidden:
+                pass
+            data.add_field(name="Members", value="%s"%len(channel.members))
             if channel.topic:
                 data.add_field(name="Topic", value=channel.topic, inline=False)
             hidden = []
             allowed = []
             for role in channel.changed_roles:
                 if role.permissions.read_messages is True:
-                    if role.is_default():
-                        allowed.append("@everyone")
-                    else:
+                    if role.name != "@everyone":
                         allowed.append(role.mention)
                 elif role.permissions.read_messages is False:
-                    if role.is_default():
-                        hidden.append("@everyone")
-                    else:
+                    if role.name != "@everyone":
                         hidden.append(role.mention)
             if len(allowed) > 0: 
                 data.add_field(name='Allowed Roles ({})'.format(len(allowed)), value=', '.join(allowed), inline=False)
@@ -219,7 +218,7 @@ class Server:
                 data.add_field(name='Restricted Roles ({})'.format(len(hidden)), value=', '.join(hidden), inline=False)
         if channel.created_at:
             data.set_footer(text=("Created on {} ({} days ago)".format(channel.created_at.strftime("%d %b %Y %H:%M"), (ctx.message.created_at - channel.created_at).days)))
-        await ctx.send(content, embed=data)
+        await ctx.send(embed=data)
 
     @commands.command(aliases=['invitei', 'ii'], pass_context=True)
     async def inviteinfo(self, ctx, *, invite: str = None):

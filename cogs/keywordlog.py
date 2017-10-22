@@ -1008,7 +1008,7 @@ class KeywordLogger:
 
     @log.command(pass_context=True)
     async def history(self, ctx, txt: str = None):
-        """View the last n messages in this channel. Ex: >log history 20"""
+        """View the last n messages in this channel. Ex: [p]log history 20"""
         if txt:
             if txt.startswith('save'):
                 if txt[5:].strip():

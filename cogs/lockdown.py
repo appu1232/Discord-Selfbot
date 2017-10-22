@@ -69,10 +69,10 @@ class Lockdown:
 
     @commands.group(pass_context=True)
     async def mod(self, ctx):
-        """Manage list of moderator roles for the >lockdown command. >help mod for more info.
-        >mod - List your moderator roles that you have set.
-        >mod add <server> <role> - Add a role to the list of moderators on a server.
-        >mod remove <server> <role> - Remove a role from the list of moderators on a server.
+        """Manage list of moderator roles for the [p]lockdown command. [p]help mod for more info.
+        [p]mod - List your moderator roles that you have set.
+        [p]mod add <server> <role> - Add a role to the list of moderators on a server.
+        [p]mod remove <server> <role> - Remove a role from the list of moderators on a server.
         If a server or role name has spaces in it, you must enclose *both* of them in quotes, no matter which one is the one with spaces in it.
         """
         if ctx.invoked_subcommand is None:

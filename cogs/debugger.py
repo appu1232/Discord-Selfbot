@@ -34,6 +34,7 @@ import psutil
 
 '''Module for the python interpreter as well as saving, loading, viewing, etc. the cmds/scripts ran with the interpreter.'''
 
+
 class Debugger:
 
     def __init__(self, bot):
@@ -83,7 +84,7 @@ class Debugger:
                     result = '```\n{}\n```'.format(value)
                 else:
                     try:
-                        result = '```\n{}\n```'.format(eval(body, env))
+                        result = '```\n{}\n```'.format(repr(eval(body, env)))
                     except:
                         pass
             else:
@@ -98,6 +99,8 @@ class Debugger:
 
                 else:
                     await ctx.send(result)
+            else:
+                await ctx.send("```\n```")
 
     @commands.command(pass_context=True)
     async def debug(self, ctx, *, option: str = None):
@@ -113,7 +116,7 @@ class Debugger:
                 elif sys.platform == 'win32':
                     try: platform
                     except: import platform
-                    system = '%s %s (%s)'%(platform.system(),platform.version(),sys.platform)
+                    system = '%s %s (%s)'%(platform.system(), platform.version(), sys.platform)
                 else:
                     system = sys.platform
                 em.add_field(name='Operating System', value='%s' % system, inline=False)
@@ -185,10 +188,10 @@ class Debugger:
             await self.interpreter(env, msg, ctx)
 
 
-    # Save last >py cmd/script.
+    # Save last [p]py cmd/script.
     @py.command(pass_context=True)
     async def save(self, ctx, *, msg):
-        """Save the code you last ran. Ex: >py save stuff"""
+        """Save the code you last ran. Ex: [p]py save stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir(os.getcwd())
         if not os.path.exists('%s/cogs/utils/temp.txt' % os.getcwd()):
@@ -209,10 +212,10 @@ class Debugger:
         except:
             await ctx.send(self.bot.bot_prefix + 'Error saving file as ``%s.txt``' % msg)
 
-    # Load a cmd/script saved with the >save cmd
+    # Load a cmd/script saved with the [p]save cmd
     @py.command(aliases=['start'], pass_context=True)
     async def run(self, ctx, *, msg):
-        """Run code that you saved with the save commmand. Ex: >py run stuff parameter1 parameter2"""
+        """Run code that you saved with the save commmand. Ex: [p]py run stuff parameter1 parameter2"""
         # Like in unix, the first parameter is the script name
         parameters = msg.split()
         save_file = parameters[0] # Force scope
@@ -245,7 +248,7 @@ class Debugger:
     # List saved cmd/scripts
     @py.command(aliases=['ls'], pass_context=True)
     async def list(self, ctx, txt: str = None):
-        """List all saved scripts. Ex: >py list or >py ls"""
+        """List all saved scripts. Ex: [p]py list or [p]py ls"""
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
             if txt:
@@ -284,7 +287,7 @@ class Debugger:
     # View a saved cmd/script
     @py.group(aliases=['vi', 'vim'], pass_context=True)
     async def view(self, ctx, *, msg: str):
-        """View a saved script's contents. Ex: >py view stuff"""
+        """View a saved script's contents. Ex: [p]py view stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
@@ -304,7 +307,7 @@ class Debugger:
     # Delete a saved cmd/script
     @py.group(aliases=['rm'], pass_context=True)
     async def delete(self, ctx, *, msg: str):
-        """Delete a saved script. Ex: >py delete stuff"""
+        """Delete a saved script. Ex: [p]py delete stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
         os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
@@ -319,7 +322,6 @@ class Debugger:
             os.chdir('..')
             os.chdir('..')
             os.chdir('..')
-
 
     @commands.command(pass_context=True)
     async def load(self, ctx, *, msg):
@@ -344,7 +346,7 @@ class Debugger:
         await ctx.message.delete()
         try:
             if os.path.exists("cogs/{}.py".format(msg)):
-                self.bot.unload_extension("cogs.{}.py".format(msg))
+                self.bot.unload_extension("cogs.{}".format(msg))
             elif os.path.exists("custom_cogs/{}.py".format(msg)):
                 self.bot.unload_extension("custom_cogs.{}".format(msg))
             else:
@@ -355,6 +357,23 @@ class Debugger:
         else:
             await ctx.send(self.bot.bot_prefix + 'Unloaded module: `{}.py`'.format(msg))
 
+    @commands.command(pass_context=True)
+    async def loadall(self, ctx):
+        """Loads all core modules"""
+        await ctx.message.delete()
+        errors = ""
+        for cog in os.listdir("cogs"):
+            if ".py" in cog:
+                cog = cog.replace('.py', '')
+                try:
+                    self.bot.load_extension("cogs.{}".format(cog))
+                except Exception as e:
+                    errors += 'Failed to load module: `{}.py` due to `{}: {}`\n'.format(cog, type(e).__name__, e)
+        if not errors:
+            await ctx.send(self.bot.bot_prefix + "All core modules loaded")
+        else:
+            await ctx.send(self.bot.bot_prefix + errors)            
+            
     @commands.command(pass_context=True)
     async def redirect(self, ctx):
         """Redirect STDOUT and STDERR to a channel for debugging purposes."""
@@ -381,6 +400,7 @@ class Debugger:
                 self.stream = io.StringIO()
                 sys.stdout = self.stream
                 sys.stderr = self.stream
+
 
 def setup(bot):
     debug_cog = Debugger(bot)

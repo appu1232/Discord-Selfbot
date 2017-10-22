@@ -148,7 +148,7 @@ class Google:
 
     @commands.command(pass_context=True)
     async def g(self, ctx, *, query):
-        """Google web search. Ex: >g what is discordapp?"""
+        """Google web search. Ex: [p]g what is discordapp?"""
         if not embed_perms(ctx.message):
             config = load_optional_config()
             async with aiohttp.ClientSession() as session:
@@ -180,7 +180,7 @@ class Google:
 
     @commands.command(pass_context=True, aliases=['image', 'img'])
     async def i(self, ctx, *, query):
-        """Google image search. >i Lillie pokemon sun and moon"""
+        """Google image search. [p]i Lillie pokemon sun and moon"""
         await ctx.message.delete()
         config = load_optional_config()
         if query[0].isdigit():

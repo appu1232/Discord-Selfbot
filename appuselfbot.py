@@ -26,21 +26,22 @@ from cogs.utils.config import *
 from discord.ext import commands
 
 
-def parse_cmd_arguments(): # allows for arguments
+def parse_cmd_arguments():  # allows for arguments
     parser = argparse.ArgumentParser(description="Discord-Selfbot")
-    parser.add_argument("-test", "--test-run", # test run flag for Travis
+    parser.add_argument("-test", "--test-run",  # test run flag for Travis
                         action="store_true",
                         help="Makes the bot quit before trying to log in")
-    parser.add_argument("--force-mac", # Allows for Testing of mac related code
+    parser.add_argument("--force-mac",  # Allows for Testing of mac related code
                         action="store_true",
                         help="Forces to run the Mac checks")
-    parser.add_argument("--reset-config", # Allows for Testing of mac related code
+    parser.add_argument("--reset-config",  # Allows for Testing of mac related code
                         action="store_true",
                         help="Reruns the setup")
-    parser.add_argument("-s", "--silent", # Allows for Testing of mac related code
+    parser.add_argument("-s", "--silent",  # Allows for Testing of mac related code
                         action="store_true",
                         help="Supresses all errors")
     return parser
+
 
 args = parse_cmd_arguments().parse_args()
 _test_run = args.test_run
@@ -65,8 +66,8 @@ if _test_run:
                         fields = json.load(template)
                         json.dump(fields, g, sort_keys=True, indent=4)
     except:
-        print('Something when wrong. Check for missing sample files') # only visible in Travis
-        pass # duo to some sample files sometimes missing passing it will make sure nothing goes wrong
+        print('Something when wrong. Check for missing sample files')  # only visible in Travis
+        pass  # duo to some sample files sometimes missing passing it will make sure nothing goes wrong
     print("Quitting: test run")
     exit(0)
 
@@ -78,32 +79,47 @@ def wizard():
         exit(0)
     config = {}
     print("Welcome to Appu's Discord Selfbot!\nThis setup wizard will guide you through the initial configuration required to get the bot working.\nThe choices you make in this wizard can be changed at any time by editing the settings/config.json file.\n")
+    
+    print("The first step is to set up your token.")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
     print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
     print("Paste the contents of that entry below.")
     print("-------------------------------------------------------------")
     config["token"] = input("| ").strip().strip('"')
-    print("\nEnter the command prefix you want to use for main commands (eg. if you enter > you will use commands like so: >about).")
-    print("-------------------------------------------------------------")
-    config["cmd_prefix"] = input("| ").strip()
-    print("\nEnter the command prefix you want to use for custom commands (commands that you add to the bot yourself with custom replies). Using the same prefix as the main command prefix is allowed but not recommended.")
-    print("-------------------------------------------------------------")
-    config["customcmd_prefix"] = input("| ").strip()
-    print("\nEnter something that will precede every response from the bot. This is to identify messages that came from the bot vs. just you talking. Ex: Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends. Recommended but if you don't want anything, press enter to skip.")
+    
+    config["cmd_prefix"] = False
+    while not config["cmd_prefix"]:
+        print("\nEnter the command prefix you want to use for main commands (e.g. if you enter > you will use commands like so: >about).")
+        print("-------------------------------------------------------------")
+        config["cmd_prefix"] = input("| ").strip()
+        if not config["cmd_prefix"]:
+            print("Empty command prefixes are invalid.")
+            
+    config["customcmd_prefix"] = False
+    while not config["customcmd_prefix"]:
+        print("\nEnter the command prefix you want to use for custom commands (commands that you add to the bot yourself with custom replies). Using the same prefix as the main command prefix is allowed, but not recommended.")
+        print("-------------------------------------------------------------")
+        config["customcmd_prefix"] = input("| ").strip()
+        if not config["customcmd_prefix"]:
+            print("Empty command prefixes are invalid.")
+    
+    print("\nEnter something that will precede every response from the bot. This is to distinguish bot responses from normal user chatter i.e. Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
-    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nRerun this wizard by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
+    
+    input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nYou may restart this wizard at any time by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
   
     print("Starting up...")
     with open('settings/config.json', encoding='utf-8', mode="w") as f:
         dump(config, f, sort_keys=True, indent=4)
+
 
 if _reset_cfg and not heroku:
     wizard()
 else:
     try:
         with open('settings/config.json', encoding='utf-8', mode="r") as f:
-            data = load(f) # checks if the settings file is valid json file
+            data = load(f)  # checks if the settings file is valid json file
     except IOError:
         wizard()
 
@@ -111,7 +127,7 @@ shutdown = False
 if os.name == 'nt':
     try:
         # only windows users with admin privileges can read the C:\windows\temp
-        temp = os.listdir(os.sep.join([os.environ.get('SystemRoot','C:\\windows'),'temp']))
+        temp = os.listdir(os.sep.join([os.environ.get('SystemRoot', 'C:\\windows'), 'temp']))
     except:
         shutdown = False
     else:
@@ -150,6 +166,7 @@ def set_log():
     logger.addHandler(errhandler)
 
     return logger
+
 
 logger = set_log()
 
@@ -195,6 +212,7 @@ async def on_ready():
     bot.game = bot.game_interval = bot.avatar = bot.avatar_interval = bot.subpro = bot.keyword_found = None
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
     bot.notify = load_notify_config()
+    bot.command_count = {}
     if not os.path.isfile('settings/ignored.json'):
         with open('settings/ignored.json', 'w', encoding="utf8") as fp:
             json.dump({'servers': []}, fp, indent=4)
@@ -318,6 +336,15 @@ async def on_ready():
             fp.write(str(bot.subpro.pid))
 
 
+@bot.after_invoke
+async def after_any_command(ctx):
+    if not ctx.command_failed:
+        if str(ctx.command) not in bot.command_count:
+            bot.command_count[str(ctx.command)] = 1
+        else:
+            bot.command_count[str(ctx.command)] += 1
+
+
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CommandNotFound):
@@ -439,6 +466,7 @@ async def reload(ctx, txt: str = None):
         for i in bot.extensions:
             utils.append(i)
         l = len(utils)
+        utils.append(utils.pop(utils.index('cogs.help')))
         for i in utils:
             bot.unload_extension(i)
             try:
@@ -513,7 +541,7 @@ async def on_message(message):
             word_found = False
             if (bot.log_conf['allservers'] == 'True' or str(message.guild.id) in bot.log_conf['servers']) and (str(message.guild.id) not in bot.log_conf['blacklisted_servers'] and str(message.channel.id) not in bot.log_conf['blacklisted_channels']):
                 add_alllog(str(message.channel.id), str(message.guild.id), message)
-                if message.author.id != bot.user.id and (not message.author.bot and not any(x in str(message.author.id) for x in bot.log_conf['blacklisted_users'])):
+                if message.author.id != bot.user.id and (not message.author.bot and not any(x in str(message.author.id) for x in bot.log_conf['blacklisted_users'])) and message.author not in bot.user.blocked:
                     for word in bot.log_conf['keywords']:
                         if ' [server]' in word:
                             word, guild = word.split(' [server]')
@@ -577,28 +605,27 @@ async def on_message(message):
                     msg = message.clean_content.replace('`', '')
 
                     context = []
+                    total_context = 0
                     try:
-                        for i in range(0, int(bot.log_conf['context_len'])):
-                            context.append(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)][len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)])-i-2])
-                        msg = ''
-                        for i in range(0, int(bot.log_conf['context_len'])):
-                            temp = context[len(context)-i-1][0]
-                            if temp.clean_content:
-                                msg += 'User: %s | %s\n' % (temp.author.name, temp.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
-                        msg += 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
-                        success = True
-                    except:
-                        success = False
-                        msg = 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + msg
-
+                        for i in range(1, min(int(bot.log_conf['context_len']), len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)]))):
+                            context.append(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)][len(bot.all_log[str(message.channel.id) + ' ' + str(message.guild.id)])-i-1])
+                            total_context += 1
+                    except IndexError:  # This usually means that the bot's internal log has not been sufficiently populated yet
+                        pass
+                    msg = ''
+                    for i in range(0, total_context):
+                        temp = context[len(context)-i-1][0]
+                        if temp.clean_content:
+                            msg += 'User: %s | %s\n' % (temp.author.name, temp.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + temp.clean_content.replace('`', '') + '\n\n'
+                    msg += 'User: %s | %s\n' % (message.author.name, message.created_at.replace(tzinfo=timezone.utc).astimezone(tz=None).__format__('%x @ %X')) + message.clean_content.replace('`', '')
                     part = int(math.ceil(len(msg) / 1950))
                     if user_found:
                         title = '%s posted' % user_found
                     else:
                         title = '%s mentioned: %s' % (message.author.name, word)
-                    if part == 1 and success is True:
+                    if part == 1:
                         em = discord.Embed(timestamp=message.created_at, color=0xbc0b0b, title=title, description='Server: ``%s``\nChannel: <#%s> | %s\n\n**Context:**' % (str(message.guild), str(message.channel.id), message.channel.name))
-                        for i in range(0, int(bot.log_conf['context_len'])):
+                        while context:
                             temp = context.pop()
                             if temp[0].clean_content:
                                 em.add_field(name='%s' % temp[0].author.name, value=temp[0].clean_content, inline=False)
@@ -812,7 +839,7 @@ if __name__ == '__main__':
                 for entry in list[2:]:
                     response = requests.get("http://appucogs.tk/cogs/{}".format(entry))
                     found_cog = response.json()
-                    filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
+                    filename = found_cog["link"].rsplit("/", 1)[1].rsplit(".", 1)[0]
                     if os.path.isfile("cogs/" + filename + ".py"):
                         os.rename("cogs/" + filename + ".py", "custom_cogs/" + filename + ".py")
         except Exception as e:

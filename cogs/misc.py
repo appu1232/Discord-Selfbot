@@ -6,6 +6,7 @@ import json
 import discord
 import git
 import os
+import io
 from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.config import get_config_value
@@ -54,9 +55,17 @@ class Misc:
         channel_count = 0
         for guild in self.bot.guilds:
             channel_count += len(guild.channels)
+        if not self.bot.command_count:
+            most_used_cmd = 'Not enough info'
+        else:
+            cmd_name = max(self.bot.command_count, key=self.bot.command_count.get)
+            total_usage = self.bot.command_count[str(cmd_name)]
+            plural = '' if total_usage == 1 else 's'
+            most_used_cmd = '{} - {} use{}'.format(cmd_name, total_usage, plural)
         if embed_perms(ctx.message):
             em = discord.Embed(title='Bot Stats', color=0x32441c)
             em.add_field(name=u'\U0001F553 Uptime', value=time, inline=False)
+            em.add_field(name=u'\u2328 Most Used Cmd', value=most_used_cmd, inline=False)
             em.add_field(name=u'\U0001F4E4 Msgs sent', value=str(self.bot.icount))
             em.add_field(name=u'\U0001F4E5 Msgs received', value=str(self.bot.message_count))
             em.add_field(name=u'\u2757 Mentions', value=str(self.bot.mention_count))
@@ -107,13 +116,13 @@ class Misc:
     # Embeds the message
     @commands.command(pass_context=True)
     async def embed(self, ctx, *, msg: str = None):
-        """Embed given text. Ex: Do >embed for more help
+        """Embed given text. Ex: Do [p]embed for more help
 
-        Example: >embed title=test this | description=some words | color=3AB35E | field=name=test value=test
+        Example: [p]embed title=test this | description=some words | color=3AB35E | field=name=test value=test
 
         You do NOT need to specify every property, only the ones you want.
 
-        **All properties and the syntax (put your custom stuff in place of the <> stuff):
+        **All properties and the syntax:**
         - title=<words>
         - description=<words>
         - color=<hex_value>
@@ -125,7 +134,10 @@ class Misc:
         - ptext=<words>
 
         NOTE: After the command is sent, the bot will delete your message and replace it with the embed. Make sure you have it saved or else you'll have to type it all again if the embed isn't how you want it.
-        PS: Hyperlink text like so: [text](https://www.whateverlink.com)
+        
+        PS: Hyperlink text like so:
+        \[text](https://www.whateverlink.com)
+
         PPS: Force a field to go to the next line with the added parameter inline=False"""
         if msg:
             if embed_perms(ctx.message):
@@ -351,10 +363,10 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def embedcolor(self, ctx, *, color: str = None):
-        """Set color (hex) of a embeds. Ex: >embedcolor 000000"""
+        """Set color (hex) of a embeds. Ex: [p]embedcolor 000000"""
         if color == 'auto':
             color = str(ctx.message.author.top_role.color)[1:]
-            
+
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
             if color:
@@ -377,20 +389,20 @@ class Misc:
 
     @commands.command(pass_context=True, aliases=['stream'])
     async def game(self, ctx, *, game: str = None):
-        """Set game/stream. Ex: >game napping >help game for more info
+        """Set game/stream. Ex: [p]game napping [p]help game for more info
 
         Your game/stream status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
 
         --Setting game--
-        To set a rotating game status, do >game game1 | game2 | game3 | etc.
+        To set a rotating game status, do [p]game game1 | game2 | game3 | etc.
         It will then prompt you with an interval in seconds to wait before changing the game and after that the order in which to change (in order or random)
-        Ex: >game with matches | sleeping | watching anime
+        Ex: [p]game with matches | sleeping | watching anime
 
         --Setting stream--
         Same as above but you also need a link to the stream. (must be a valid link to a stream or else the status will not show as streaming).
         Add the link like so: <words>=<link>
-        Ex: >stream Underwatch=https://www.twitch.tv/a_seagull
-        or >stream Some moba=https://www.twitch.tv/doublelift | Underwatch=https://www.twitch.tv/a_seagull"""
+        Ex: [p]stream Underwatch=https://www.twitch.tv/a_seagull
+        or [p]stream Some moba=https://www.twitch.tv/doublelift | Underwatch=https://www.twitch.tv/a_seagull"""
         pre = cmd_prefix_len()
         if ctx.message.content[pre:].startswith('game'):
             is_stream = False
@@ -556,40 +568,46 @@ class Misc:
     @commands.command(pass_context=True)
     async def setavatar(self, ctx, *, msg):
         """
-        Set an avatar from a URL: Usage >setavatar <url_to_image>
-        Image must be a .png or a .jpg
+        Set an avatar from a URL or user.
+        Usage: [p]setavatar <url_to_image> or [p]seravatar <user> to copy that user's avi
+        Image URL must be a .png, a .jpg, or a .gif (nitro only)
         """
-        url = msg
+        user = get_user(ctx.message, msg)
+        if user:
+            url = user.avatar_url_as(static_format='png')
+        else:
+            url = msg
+        if ".gif" in url and not self.bot.user.premium:
+            await ctx.send(self.bot.bot_prefix + "Warning: attempting to copy an animated avatar without Nitro. Only the first frame will be set.")
         response = requests.get(url, stream=True)
-        name = url.split('/')[-1]
-        with open(name, 'wb') as img:
+        img = io.BytesIO()
+        for block in response.iter_content(1024):
+            if not block:
+                break
 
-            for block in response.iter_content(1024):
-                if not block:
-                    break
-
-                img.write(block)
+            img.write(block)
 
         if url:
-            with open(name, 'rb') as fp:
-                e = fp.read()
-                with open('settings/avatars.json', 'r+') as fp:
-                        opt = json.load(fp)
-                        if opt['password']:
-                            if opt['password'] == "":
-                                await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
-                            else:
-                                pw = opt['password']
-                                await self.bot.user.edit(password=pw, avatar=e)
-                                await ctx.send("Your avatar has been set to the specified image")
-                        else:
-                            opt['password'] = ""
-                            await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
-            os.remove(name)
-        elif not embed_perms(ctx.message) and url:
-            await ctx.send(url)
+            img.seek(0)
+            imgbytes = img.read()
+            img.close()
+            with open('settings/avatars.json', 'r+') as fp:
+                opt = json.load(fp)
+                if opt['password']:
+                    if opt['password'] == "":
+                        await ctx.send(self.bot.bot_prefix + "You have not set your password yet in `settings/avatars.json` Please do so and try again")
+                    else:
+                        pw = opt['password']
+                        try:
+                            await self.bot.user.edit(password=pw, avatar=imgbytes)
+                            await ctx.send(self.bot.bot_prefix + "Your avatar has been set to the specified image.")
+                        except discord.errors.HTTPException:
+                            await ctx.send(self.bot.bot_prefix + "You are being rate limited!")
+                else:
+                    await ctx.send("You have not set your password yet in `settings/avatars.json` Please do so and try again")
         else:
             await ctx.send(self.bot.bot_prefix + 'Could not find image.')
+
 
     @commands.command(pass_context=True)
     async def ping(self, ctx):
@@ -608,7 +626,7 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def quotecolor(self, ctx, *, msg):
-        '''Set color (hex) of a quote embed.\n`>quotecolor 000000` to set the quote color to black.\n´>quotecolor auto´ to set it to the color of the highest role the quoted person has.'''
+        '''Set color (hex) of a quote embed.\n`[p]quotecolor 000000` to set the quote color to black.\n`[p]quotecolor auto` to set it to the color of the highest role the quoted person has.'''
         if msg:
             if msg == "auto":
                 await ctx.send(self.bot.bot_prefix + 'Successfully set color for quote embeds.')
@@ -631,14 +649,14 @@ class Misc:
 
     @commands.command(aliases=['q'], pass_context=True)
     async def quote(self, ctx, *, msg: str = ""):
-        """Quote a message. >help quote for more info.
-        >quote - quotes the last message sent in the channel.
-        >quote <words> - tries to search for a message in the server that contains the given words and quotes it.
-        >quote <message_id> - quotes the message with the given message ID. Ex: >quote 302355374524644290 (enable developer mode to copy message IDs)
-        >quote <user_mention_name_or_id> - quotes the last message sent by a specific user
-        >quote <words> | channel=<channel_name> - quotes the message with the given words in a specified channel
-        >quote <message_id> | channel=<channel_name> - quotes the message with the given message ID in a specified channel
-        >quote <user_mention_name_or_id> | channel=<channel_name> - quotes the last message sent by a specific user in a specified channel
+        """Quote a message. [p]help quote for more info.
+        [p]quote - quotes the last message sent in the channel.
+        [p]quote <words> - tries to search for a message in the server that contains the given words and quotes it.
+        [p]quote <message_id> - quotes the message with the given message ID. Ex: [p]quote 302355374524644290 (enable developer mode to copy message IDs)
+        [p]quote <user_mention_name_or_id> - quotes the last message sent by a specific user
+        [p]quote <words> | channel=<channel_name> - quotes the message with the given words in a specified channel
+        [p]quote <message_id> | channel=<channel_name> - quotes the message with the given message ID in a specified channel
+        [p]quote <user_mention_name_or_id> | channel=<channel_name> - quotes the last message sent by a specific user in a specified channel
         """
         
         await ctx.message.delete()
@@ -724,7 +742,7 @@ class Misc:
 
     @commands.command(pass_context=True)
     async def afk(self, ctx, txt: str = None):
-        """Set your Discord status for when you aren't online. Ex: >afk idle"""
+        """Set your Discord status for when you aren't online. Ex: [p]afk idle"""
         with open('settings/optional_config.json', 'r+') as fp:
             opt = json.load(fp)
             info = parse_prefix(self.bot, 'Current status returned by Discord: `{}` | Current Default status: `{}`\n'.format(str(ctx.message.author.status).title(), opt['default_status'].title())+\

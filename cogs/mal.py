@@ -55,12 +55,12 @@ class Mal:
     # Mal search (chained with either anime or manga)
     @commands.group(pass_context=True)
     async def mal(self, ctx):
-        """Search MyAnimeList for an anime/manga. Ex: >mal anime Steins;Gate
+        """Search MyAnimeList for an anime/manga. Ex: [p]mal anime Steins;Gate
         
-        For >mal anime and >mal manga, put [link] after the anime/manga part to just get the link instead of the full info.
-        Ex: >mal anime [link] Steins;Gate
+        For [p]mal anime and [p]mal manga, put [link] after the anime/manga part to just get the link instead of the full info.
+        Ex: [p]mal anime [link] Steins;Gate
 
-        For >mal va, put [more] to get some more info. (Takes more time) Ex: >mal va [more] saori hayami"""
+        For [p]mal va, put [more] to get some more info. (Takes more time) Ex: [p]mal va [more] saori hayami"""
         if ctx.invoked_subcommand is None:
             await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. See `>help mal` for more info on how to use this command.')
 
@@ -69,7 +69,7 @@ class Mal:
     # Anime search for Mal
     @mal.command(pass_context=True)
     async def anime(self, ctx, *, msg: str = None):
-        """Search the anime database. Ex: >mal anime Steins;Gate"""
+        """Search the anime database. Ex: [p]mal anime Steins;Gate"""
         if msg:
             fetch = await ctx.send(self.bot.bot_prefix + 'Searching...')
             if msg.startswith('[link]'):
@@ -143,7 +143,7 @@ class Mal:
     # Manga search for Mal
     @mal.command(pass_context=True)
     async def manga(self, ctx, *, msg: str = None):
-        """Search the manga database. Ex: >mal manga Boku no Hero Academia"""
+        """Search the manga database. Ex: [p]mal manga Boku no Hero Academia"""
         if msg:
             fetch = await ctx.send(self.bot.bot_prefix + 'Searching...')
             if msg.startswith('[link]'):

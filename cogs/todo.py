@@ -1,15 +1,13 @@
 import re
-import json
 import discord
 import asyncio
 from time import time as current_time
 from cogs.utils.webhooks import Webhook
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
-import shutil
-import os.path
 
 '''Todo list cog.'''
+
 
 class Todo:
 
@@ -42,14 +40,14 @@ class Todo:
 
     @commands.group(pass_context=True)
     async def todo(self, ctx):
-        """Manage your to-do list. >help todo for more information.
+        """Manage your to-do list. [p]help todo for more information.
 
-        >todo - List all of the entries in your to-do list.
+        [p]todo - List all of the entries in your to-do list.
 
-        >todo add <item> - Add an item to your to-do list. Example: >todo add buy bacon
+        [p]todo add <item> - Add an item to your to-do list. Example: [p]todo add buy bacon
 
         ---- ADD A TIMER ----
-        >todo add <item> | <time> - Add an item to your to-do list with a timer. See below for more information.
+        [p]todo add <item> | <time> - Add an item to your to-do list with a timer. See below for more information.
           - When a timed to-do list item is completed, you will be notified via the webhook you set up for keyword logging.
 
           - Other possible parameters you can add when you set a timer:
@@ -60,12 +58,10 @@ class Todo:
             +  text=<text> - sends this text (instead of the <item> field) to the channel specified.
             +  alert=off - add this if you don't want to get notified when the timer runs out.
 
-        Example:
-        >todo add Get Daily Tatsumaki Credits | 24h1m | text=t!daily | channel=299431230984683520 | repeat=yes | alert=off
+        Example: [p]todo add Get Daily Tatsumaki Credits | 24h1m | text=t!daily | channel=299431230984683520 | repeat=yes | alert=off
 
-
-        >todo remove <item> - Remove an item from your to-do list.
-        >todo clear - Clear your entire to-do list.
+        [p]todo remove <item> - Remove an item from your to-do list.
+        [p]todo clear - Clear your entire to-do list.
 
         If you do not have keyword logging set up, go to https://github.com/appu1232/Discord-Selfbot/wiki/Keyword-Notifier---User-Following-Info-and-Setup
 
@@ -160,7 +156,7 @@ class Todo:
                         else:
                             try:
                                 repeat = int(i.split('repeat=')[1])
-                            except:
+                            except ValueError:
                                 repeat = 0
                     else:
                         if timer == 0:

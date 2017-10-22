@@ -1,4 +1,3 @@
-import sys
 import asyncio
 import tokage
 import sys

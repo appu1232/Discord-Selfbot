@@ -100,7 +100,7 @@ def update_bot(message):
             version = 4
         else:
             version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
-        version = description = str(int(version) + 1)
+        version = description = str(int(version))
         if int(version) > 4:
             version = "4"
         commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])

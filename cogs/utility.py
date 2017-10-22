@@ -4,6 +4,7 @@ import strawpy
 import pytz
 import re
 import requests
+import aiohttp
 import json
 import discord
 import os
@@ -28,6 +29,7 @@ from cogs.utils.config import write_config_value
 class Utility:
     def __init__(self, bot):
         self.bot = bot
+        self.session = aiohttp.ClientSession(loop=self.bot.loop, headers={"User-Agent": "AppuSelfBot"})
 
     @staticmethod
     def get_datetime():
@@ -163,7 +165,7 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def calc(self, ctx, *, msg):
-        """Simple calculator. Ex: >calc 2+2"""
+        """Simple calculator. Ex: [p]calc 2+2"""
         equation = msg.strip().replace('^', '**').replace('x', '*')
         try:
             if '=' in equation:
@@ -183,10 +185,9 @@ class Utility:
         else:
             await ctx.send(self.bot.bot_prefix + answer)
 
-
-    @commands.command(aliases=['sd'],pass_context=True)
+    @commands.command(aliases=['sd'], pass_context=True)
     async def selfdestruct(self, ctx, *, amount):
-        """Builds a self-destructing message. Ex: >sd 5"""
+        """Builds a self-destructing message. Ex: [p]sd 5"""
         async for message in ctx.message.channel.history():
             if message.id == ctx.message.id:
                 continue
@@ -240,8 +241,8 @@ class Utility:
 
     @commands.command(aliases=['d'], pass_context=True)
     async def delete(self, ctx, txt=None, channel=None):
-        """Deletes the last message sent or n messages sent. Ex: >d 5"""
-        if txt: # If number of seconds/messages are specified
+        """Deletes the last message sent or n messages sent. Ex: [p]d 5"""
+        if txt:  # If number of seconds/messages are specified
             await ctx.message.delete()
             deleted = 0
             if txt == "all":
@@ -276,7 +277,7 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def spoiler(self, ctx, *, msg: str):
-        """Spoiler tag. Ex: >spoiler Some book | They get married."""
+        """Spoiler tag. Ex: [p]spoiler Some book | They get married."""
         try:
             if " | " in msg:
                 spoiled_work, spoiler = msg.lower().split(" | ", 1)
@@ -319,12 +320,12 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def uni(self, ctx, *, msg: str):
-        """Convert to unicode emoji if possible. Ex: >uni :eyes:"""
+        """Convert to unicode emoji if possible. Ex: [p]uni :eyes:"""
         await ctx.send("`" + msg.replace("`", "") + "`")
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):
-        """Create a strawpoll. Ex: >poll Favorite color = Blue | Red | Green"""
+        """Create a strawpoll. Ex: [p]poll Favorite color = Blue | Red | Green"""
         loop = asyncio.get_event_loop()
         try:
             options = [op.strip() for op in msg.split('|')]
@@ -341,7 +342,7 @@ class Utility:
 
     @commands.command(pass_context=True, aliases=['source'])
     async def sauce(self, ctx, *, txt: str = None):
-        """Find source of image. Ex: >sauce http://i.imgur.com/NIq2U67.png"""
+        """Find source of image. Ex: [p]sauce http://i.imgur.com/NIq2U67.png"""
         if not txt:
             return await ctx.send(self.bot.bot_prefix + 'Input a link to check the source. Ex: ``>sauce http://i.imgur.com/NIq2U67.png``')
         await ctx.message.delete()
@@ -473,9 +474,9 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def ud(self, ctx, *, msg):
-        """Pull data from Urban Dictionary. Use >help ud for more information.
-        Usage: >ud <term> - Search for a term on Urban Dictionary.
-        You can pick a specific result to use with >ud <term> | <result>.
+        """Pull data from Urban Dictionary. Use [p]help ud for more information.
+        Usage: [p]ud <term> - Search for a term on Urban Dictionary.
+        You can pick a specific result to use with [p]ud <term> | <result>.
         If no result is specified, the first result will be used.
         """
         await ctx.message.delete()
@@ -483,8 +484,8 @@ class Utility:
         if " | " in msg:
             msg, number = msg.rsplit(" | ", 1)
         search = parse.quote(msg)
-        response = requests.get("http://api.urbandictionary.com/v0/define?term={}".format(search)).text
-        result = json.loads(response)
+        async with self.session.get("http://api.urbandictionary.com/v0/define", params={"term": search}) as resp:
+            result = await resp.json()
         if result["result_type"] == "no_results":
             await ctx.send(self.bot.bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
         else:
@@ -510,7 +511,8 @@ class Utility:
         """Search for videos on YouTube."""
         search = parse.quote(msg)
         youtube_regex = re.compile('\/watch\?v=[\d\w\-]*')
-        response = requests.get("https://www.youtube.com/results?search_query={}".format(search)).text
+        async with self.session.get("https://www.youtube.com/results", params={"search_query": search}) as resp:
+            response = await resp.text()
         await ctx.message.delete()
         url = youtube_regex.findall(response)[0]
         await ctx.send("https://www.youtube.com{}".format(url))
@@ -526,7 +528,8 @@ class Utility:
             site = None
             found = None
             search = parse.quote(comic)
-            result = requests.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)).text
+            async with self.session.get("https://www.google.co.nz/search?&q={}+site:xkcd.com".format(search)) as resp:
+                result = await resp.text()
             soup = BeautifulSoup(result, "html.parser")
             links = soup.find_all("cite")
             for link in links:
@@ -549,9 +552,10 @@ class Utility:
     async def hastebin(self, ctx, *, data):
         """Post to Hastebin."""
         await ctx.message.delete()
-        post = requests.post("https://hastebin.com/documents", data=data)
+        async with self.session.post("https://hastebin.com/documents", data=data) as resp:
+            post = await resp.text()
         try:
-            await ctx.send(self.bot.bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(post.json()["key"]))
+            await ctx.send(self.bot.bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(json.loads(post)["key"]))
         except json.JSONDecodeError:
             await ctx.send(self.bot.bot_prefix + "Failed to post to Hastebin. The API may be down right now.")
 
@@ -577,8 +581,8 @@ class Utility:
             
     @commands.command(pass_context=True, aliases=['anim'])
     async def animate(self, ctx, animation):
-        """Play an animation from a text file. >help animate for more details.
-        >animate <animation> - Animate a text file.
+        """Play an animation from a text file. [p]help animate for more details.
+        [p]animate <animation> - Animate a text file.
         Animation text files are stored in the anims folder. Each frame of animation is put on a new line.
 
         An example text file looks like this:
@@ -596,10 +600,10 @@ class Utility:
         fam i love you
         """
         try:
-            with open("anims/{}.txt".format(animation)) as f:
+            with open("anims/{}.txt".format(animation), encoding="utf-8") as f:
                 anim = f.read().split("\n")
         except IOError:
-            return await ctx.send(self.bot.bot_prefix + "You don't have that animation in your anims folder!")
+            return await ctx.send(self.bot.bot_prefix + "You don't have that animation in your `anims` folder!")
         if anim:
             try:
                 delay = float(anim[0])
@@ -706,18 +710,18 @@ class Utility:
                 image.save(file, "PNG")
                 file.seek(0)
                 await ctx.send("Colour with hex code {}:".format(colour_code), file=discord.File(file, "colour_file.png"))
-            await asyncio.sleep(1) # Prevent spaminess
+            await asyncio.sleep(1)  # Prevent spaminess
 
     @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True)
     async def rpoll(self, ctx, *, msg):
         """Create a poll using reactions. >help rpoll for more information.
-        >rpoll <question> | <answer> | <answer> - Create a poll. You may use as many answers as you want, placing a pipe | symbol in between them.
+        [p]rpoll <question> | <answer> | <answer> - Create a poll. You may use as many answers as you want, placing a pipe | symbol in between them.
         Example:
-        >rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
+        [p]rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
         You can also use the "time" flag to set the amount of time in seconds the poll will last for.
         Example:
-        >rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
+        [p]rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
         """
         await ctx.message.delete()
         options = msg.split(" | ")
@@ -813,12 +817,17 @@ class Utility:
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
         
     @commands.command(aliases=['ra'])
-    async def readall(self, ctx):
-        """Marks everything as read."""
+    async def readall(self, ctx, msg: str = None):
+        """Marks everything as read. Append `server` to your message to only clear the current server."""
         await ctx.message.delete()
-        for guild in self.bot.guilds:
-            await guild.ack()
-        await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds))) 
+        if msg == "server":
+            await ctx.guild.ack()
+            await ctx.send(self.bot.bot_prefix + "Marked current guild as read.")
+        else:
+            for guild in self.bot.guilds:
+                await guild.ack()
+            await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds)))
+            
 
 def setup(bot):
     bot.add_cog(Utility(bot))

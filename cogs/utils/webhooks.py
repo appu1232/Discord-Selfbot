@@ -51,8 +51,8 @@ class Webhook:
 
     @asyncio.coroutine
     def request_webhook(self, partialurl, content=None, username=None,
-                 avatar_url=None, tts=False, file=None, embeds=None,
-                 filename=None):
+                        avatar_url=None, tts=False, file=None, embeds=None,
+                        filename=None):
         """Requests an webhook with the data provided to this function."""
         if self.create_form_data:
             self.create_form_data = False
