@@ -231,8 +231,23 @@ class Server:
                     return await ctx.send(self.bot.bot_prefix + "Couldn't find valid invite, please double check the link.")
                 break
         else:
-            return await ctx.send(self.bot.bot_prefix + "Please specify an invite.")
-
+            async for msg in ctx.message.channel.history():
+                if any(x in msg.content for x in self.invites):
+                    for url in re.findall(r'(https?://\S+)', msg.content):
+                        url = urlparse(url)
+                        if any(x in url for x in self.invite_domains):
+                            print(url)
+                            url = url.path.replace('/', '').replace('<', '').replace('>', '').replace('\'', '').replace(')', '')
+                            print(url)
+                            try:
+                                invite = await self.bot.get_invite(url)
+                            except:
+                                return await ctx.send(self.bot.bot_prefix + "Couldn't find valid invite, please double check the link.")
+                            break
+                
+        if not invite:
+            return await ctx.send(self.bot.bot_prefix + "Couldn't find an invite in the last 100 messages. Please specify an invite.")
+        
         data = discord.Embed()
         content = None
         if invite.id is not None:
