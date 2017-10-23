@@ -241,7 +241,7 @@ class Server:
                             print(url)
                             try:
                                 invite = await self.bot.get_invite(url)
-                            except:
+                            except discord.NotFound:
                                 return await ctx.send(self.bot.bot_prefix + "Couldn't find valid invite, please double check the link.")
                             break
                 
