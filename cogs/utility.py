@@ -771,27 +771,6 @@ class Utility:
             end_msg += "\n{} is the winner!".format(top_result)
         await ctx.send(end_msg)
 
-    @commands.command(pass_context=True)
-    async def cogs(self, ctx):
-        """Shows loaded/unloaded cogs"""
-        await ctx.message.delete()
-        cogs = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
-        cogs.extend(["custom_cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("custom_cogs/*.py")]])
-        loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
-        unloaded = [c.split(".")[1] for c in cogs
-                    if c.split(".")[1] not in loaded]
-        embed = discord.Embed(title="List of installed cogs")
-        if loaded:
-            embed.add_field(name="Loaded", value="\n".join(sorted(loaded)), inline=True)
-        else:
-            embed.add_field(name="Loaded", value="None!", inline=True)
-        if unloaded:
-            embed.add_field(name="Not Loaded", value="\n".join(sorted(unloaded)), inline=True)
-        else:
-            embed.add_field(name="Not Loaded", value="None!", inline=True)
-        embed.set_footer(text="Were you looking for >cog?")
-        await ctx.send("", embed=embed)
-
     @commands.command(pass_context=True, aliases=['clearconsole', 'cc', 'clear'])
     async def cleartrace(self, ctx):
         global git
