@@ -794,7 +794,6 @@ class Utility:
 
     @commands.command(pass_context=True, aliases=['clearconsole', 'cc', 'clear'])
     async def cleartrace(self, ctx):
-        global git
         """Clear the console."""
         if os.name == 'nt':
             os.system('cls')
@@ -802,7 +801,8 @@ class Utility:
             try:
                 os.system('clear')
             except:
-                await ctx.send(self.bot.bot_prefix + 'Could not clear console, continuing anyways')
+                for _ in range(100):
+                    print()
 
         print('Logged in as')
         try:
@@ -810,10 +810,6 @@ class Utility:
         except:
             pass
         print('User id: ' + str(self.bot.user.id))
-        g = git.cmd.Git(working_dir=os.getcwd())
-        branch = g.execute(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-        print('Current branch is: ' + branch)
-        print('------')
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
         
     @commands.command(aliases=['ra'])
