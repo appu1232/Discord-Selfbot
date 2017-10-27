@@ -810,6 +810,7 @@ class Utility:
         except:
             pass
         print('User id: ' + str(self.bot.user.id))
+        print('------')
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
         
     @commands.command(aliases=['ra'])
