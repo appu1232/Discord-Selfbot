@@ -249,7 +249,6 @@ class Debugger:
     @py.command(aliases=['ls'], pass_context=True)
     async def list(self, ctx, txt: str = None):
         """List all saved scripts. Ex: [p]py list or [p]py ls"""
-        os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
             if txt:
                 numb = txt.strip()
@@ -259,7 +258,7 @@ class Debugger:
                     await ctx.send(self.bot.bot_prefix + 'Invalid syntax. Ex: ``>py list 1``')
             else:
                 numb = 1
-            filelist = glob.glob('*.txt')
+            filelist = glob.glob('cogs/utils/save/*.txt')
             if len(filelist) == 0:
                 return await ctx.send(self.bot.bot_prefix + 'No saved cmd/scripts.')
             filelist.sort()
@@ -272,56 +271,42 @@ class Debugger:
 
             for i in range(10):
                 try:
-                    msg += filelist[i + (10 * (numb-1))] + '\n'
+                    msg += filelist[i + (10 * (numb-1))][16:] + '\n'
                 except:
                     break
 
             await ctx.send(self.bot.bot_prefix + 'List of saved cmd/scripts. Page ``%s of %s`` ```%s```' % (numb, pages, msg))
         except Exception as e:
             await ctx.send(self.bot.bot_prefix + 'Error, something went wrong: ``%s``' % e)
-        finally:
-            os.chdir('..')
-            os.chdir('..')
-            os.chdir('..')
 
     # View a saved cmd/script
     @py.group(aliases=['vi', 'vim'], pass_context=True)
     async def view(self, ctx, *, msg: str):
         """View a saved script's contents. Ex: [p]py view stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
-        os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
-            if os.path.exists('%s.txt' % msg):
-                f = open('%s.txt' % msg, 'r').read()
+            if os.path.isfile('cogs/utils/save/%s.txt' % msg):
+                f = open('cogs/utils/save/%s.txt' % msg, 'r').read()
                 await ctx.send(self.bot.bot_prefix + 'Viewing ``%s.txt``: ```py\n%s```' % (msg, f.strip('` ')))
             else:
                 await ctx.send(self.bot.bot_prefix + '``%s.txt`` does not exist.' % msg)
 
         except Exception as e:
             await ctx.send(self.bot.bot_prefix + 'Error, something went wrong: ``%s``' % e)
-        finally:
-            os.chdir('..')
-            os.chdir('..')
-            os.chdir('..')
 
     # Delete a saved cmd/script
     @py.group(aliases=['rm'], pass_context=True)
     async def delete(self, ctx, *, msg: str):
         """Delete a saved script. Ex: [p]py delete stuff"""
         msg = msg.strip()[:-4] if msg.strip().endswith('.txt') else msg.strip()
-        os.chdir('%s/cogs/utils/save/' % os.getcwd())
         try:
-            if os.path.exists('%s.txt' % msg):
-                os.remove('%s.txt' % msg)
+            if os.path.exists('cogs/utils/save/%s.txt' % msg):
+                os.remove('cogs/utils/save/%s.txt' % msg)
                 await ctx.send(self.bot.bot_prefix + 'Deleted ``%s.txt`` from saves.' % msg)
             else:
                 await ctx.send(self.bot.bot_prefix + '``%s.txt`` does not exist.' % msg)
         except Exception as e:
             await ctx.send(self.bot.bot_prefix + 'Error, something went wrong: ``%s``' % e)
-        finally:
-            os.chdir('..')
-            os.chdir('..')
-            os.chdir('..')
 
     @commands.command(pass_context=True)
     async def load(self, ctx, *, msg):
