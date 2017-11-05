@@ -186,7 +186,7 @@ class Mod:
     @commands.has_permissions(manage_messages=True)
     @commands.command(aliases=['p'], pass_context=True, no_pm=True)
     async def purge(self, ctx, msgs: int, *, txt=None):
-        """Purge last n msgs or n msgs with a word. [p]help purge for more info.
+        """Purge last n msgs or n msgs with a word. Requires Manage Messages permission. [p]help purge for more info.
         
         Ex:
         
@@ -201,8 +201,8 @@ class Mod:
                             await message.delete()
                     else:
                         await message.delete()
-                except:
-                    pass
+                except discord.Forbidden:
+                    await ctx.send(self.bot.bot_prefix + "You do not have permission to delete other users' messages. Use {}delete instead to delete your own messages.".format(self.bot.cmd_prefix))
         else:
             await ctx.send(self.bot.bot_prefix + 'Too many messages to delete. Enter a number < 10000')
 
