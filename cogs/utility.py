@@ -194,6 +194,8 @@ class Utility:
             if message.author == ctx.message.author:
                 killmsg = message
                 break
+        if not killmsg:
+            return await ctx.send(self.bot.bot_prefix + 'There is no message to destroy.')
         timer = int(amount.strip())
         # Animated countdown because screw rate limit amirite
         destroy = ctx.message
