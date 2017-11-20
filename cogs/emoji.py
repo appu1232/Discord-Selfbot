@@ -97,7 +97,7 @@ class Emoji:
                 if get_guild:
                     await ctx.send('**ID:** {}\n**Server:** {}\n**URL: {}**'.format(id, guild, url))
                 else:
-                    await ctx.end(url)
+                    await ctx.send(url)
             file.close()
 
     @emoji.command(pass_context=True, aliases=["steal"])
