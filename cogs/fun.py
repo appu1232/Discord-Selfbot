@@ -191,7 +191,7 @@ class Fun:
                        self.bot.bot_prefix + 'I choose: ``{}``'.format(random.choice(choices.split("|"))))
 
     @commands.command(pass_context=True)
-    async def l2g(self, ctx, *, msg: str):
+    async def l2g(self, ctx, *, msg: str, aliases=['lmgtfy']):
         """Creates a lmgtfy link. Ex: [p]l2g how do i become cool."""
         lmgtfy = 'http://lmgtfy.com/?q='
         await ctx.send(self.bot.bot_prefix + lmgtfy + urllib.parse.quote_plus(msg.lower().strip()))
