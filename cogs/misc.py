@@ -387,7 +387,7 @@ class Misc:
             fp.truncate()
             json.dump(opt, fp, indent=4)
 
-    @commands.command(pass_context=True, aliases=['stream'])
+    @commands.command(pass_context=True, aliases=['stream', 'watching', 'listening'])
     async def game(self, ctx, *, game: str = None):
         """Set game/stream. Ex: [p]game napping [p]help game for more info
 
@@ -403,20 +403,24 @@ class Misc:
         Add the link like so: <words>=<link>
         Ex: [p]stream Underwatch=https://www.twitch.tv/a_seagull
         or [p]stream Some moba=https://www.twitch.tv/doublelift | Underwatch=https://www.twitch.tv/a_seagull"""
-        pre = cmd_prefix_len()
-        if ctx.message.content[pre:].startswith('game'):
-            is_stream = False
-            status_type = 'Game'
-        else:
+        is_stream = False
+        if ctx.invoked_with == "game":
+            message = "Playing"
+            self.bot.status_type = 0
+        elif ctx.invoked_with == "stream":
             is_stream = True
-            status_type = 'Stream'
+            self.bot.status_type = 1
             self.bot.is_stream = True
+        elif ctx.invoked_with == "watching":
+            message = "Watching"
+            self.bot.status_type = 3
+        elif ctx.invoked_with == "listening":
+            message = "Listening to"
+            self.bot.status_type = 2
         if game:
-
             # Cycle games if more than one game is given.
             if ' | ' in game:
-                await ctx.send(self.bot.bot_prefix + 'Input interval in seconds to wait before changing to the next {} (``n`` to cancel):'.format(
-                                                status_type.lower()))
+                await ctx.send(self.bot.bot_prefix + 'Input interval in seconds to wait before changing (``n`` to cancel):')
 
                 def check(msg):
                     return (msg.content.isdigit() or msg.content.lower().strip() == 'n') and msg.author == self.bot.user
@@ -435,14 +439,13 @@ class Misc:
                         self.bot.game_interval = interval
                         games = game.split(' | ')
                         if len(games) != 2:
-                            await ctx.send(self.bot.bot_prefix + 'Change {} in order or randomly? Input ``o`` for order or ``r`` for random:'.format(
-                                                            status_type.lower()))
+                            await ctx.send(self.bot.bot_prefix + 'Change in order or randomly? Input ``o`` for order or ``r`` for random:')
                             s = await self.bot.wait_for("message", check=check2)
                             if not s:
                                 return
                             if s.content.strip() == 'r' or s.content.strip() == 'random':
                                 await ctx.send(self.bot.bot_prefix + '{status} set. {status} will randomly change every ``{time}`` seconds'.format(
-                                                                status=status_type, time=reply.content.strip()))
+                                                                status=message, time=reply.content.strip()))
                                 loop_type = 'random'
                             else:
                                 loop_type = 'ordered'
@@ -451,10 +454,10 @@ class Misc:
 
                         if loop_type == 'ordered':
                             await ctx.send(self.bot.bot_prefix + '{status} set. {status} will change every ``{time}`` seconds'.format(
-                                                            status=status_type, time=reply.content.strip()))
+                                                            status=message, time=reply.content.strip()))
 
                         stream = 'yes' if is_stream else 'no'
-                        games = {'games': game.split(' | '), 'interval': interval, 'type': loop_type, 'stream': stream}
+                        games = {'games': game.split(' | '), 'interval': interval, 'type': loop_type, 'stream': stream, 'status': self.bot.status_type}
                         with open('settings/games.json', 'w') as g:
                             json.dump(games, g, indent=4)
 
@@ -468,7 +471,7 @@ class Misc:
                 self.bot.game_interval = None
                 self.bot.game = game
                 stream = 'yes' if is_stream else 'no'
-                games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none', 'stream': stream}
+                games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none', 'stream': stream, 'status': self.bot.status_type}
                 with open('settings/games.json', 'w') as g:
                     json.dump(games, g, indent=4)
                 if is_stream and '=' in game:
@@ -476,8 +479,8 @@ class Misc:
                     await ctx.send(self.bot.bot_prefix + 'Stream set as: ``Streaming %s``' % g)
                     await self.bot.change_presence(game=discord.Game(name=g, type=1, url=url))
                 else:
-                    await ctx.send(self.bot.bot_prefix + 'Game set as: ``Playing %s``' % game)
-                    await self.bot.change_presence(game=discord.Game(name=game, type=0))
+                    await ctx.send(self.bot.bot_prefix + 'Game set as: ``{} {}``'.format(message, game))
+                    await self.bot.change_presence(game=discord.Game(name=game, type=self.bot.status_type))
 
         # Remove game status.
         else:
