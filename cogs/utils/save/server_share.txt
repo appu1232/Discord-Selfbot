@@ -1,7 +1,0 @@
-count = 0
-for user in guild.members:
-    for serv in bot.guilds:
-        if serv.get_member(user.id) and serv.id != guild.id and not user.bot:
-            count += 1
-            break
-print('\nTotal members (including myself): {} \n\nMembers I share another server with: {}'.format(server.member_count, count-1))

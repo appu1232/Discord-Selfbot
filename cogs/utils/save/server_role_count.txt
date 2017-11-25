@@ -1,8 +1,0 @@
-print('{} role count:\n'.format(guild.name))
-for role in guild.roles:
-    if role.hoist:
-        role_count = 0
-        for user in guild.members:
-                    if role in user.roles:
-                        role_count += 1
-        print('{} - {} users'.format(role, role_count))
