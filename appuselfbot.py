@@ -408,36 +408,30 @@ async def restart(ctx):
     os._exit(0)
 
 
-@bot.command(pass_context=True, aliases=['upgrade'])
-async def update(ctx, msg: str = None):
-    """Update the bot if there is an update available."""
-    if msg:
-        latest = update_bot(False) if msg == 'show' else update_bot(True)
-    else:
-        latest = update_bot(True)
-    if latest:
-        if not msg == 'show':
-            if embed_perms(ctx.message):
-                try:
-                    await ctx.send(content=None, embed=latest)
-                except:
-                    pass
-            await ctx.send(bot.bot_prefix + 'There is an update available. Downloading update and restarting (check your console to see the progress)...')
+
+@bot.command()
+async def update(self, ctx):
+    '''Auto Update command, checks if you have latest version
+    Use tags github-token to find out how to set up this token'''
+    git = self.bot.get_cog('Git')
+    if not await git.starred('PallavBS/Discord-Selfbot-1'): return await ctx.send('**This command is disabled as the user have not starred <https://github.com/PallavBS/Discord-Selfbot-1>**')
+    # get username
+    username = await git.githubusername()
+    async with ctx.session.get('https://api.github.com/repos/PallavBS/Discord-Selfbot-1/git/refs/heads/rewrite', headers={"Authorization": f"Bearer {git.githubtoken}"}) as resp:
+        if 300 > resp.status >= 200:
+            async with ctx.session.post(f'https://api.github.com/repos/{username}/selfbot.py/merges', json={"head": (await resp.json())['object']['sha'], "base": "rewrite", "commit_message": "Updating Bot"}, headers={"Authorization": f"Bearer {git.githubtoken}"}) as resp2:
+                if 300 > resp2.status >= 200:
+                    if resp2.status == 204:
+                        return await ctx.send('Already at latest version!')
+                    await ctx.send('Bot updated! Restarting...')
+                else:
+                    if resp2.status == 409:
+                        return await ctx.send('Merge conflict, you did some commits that made this fail!')
+                    await ctx.send('Well, I failed somehow, send the following to ​`Pallav#1747​` (157355779320446976) - resp2: ​`​`​`py\n' + str(await resp2.json()) + '\n​`​`​`')
         else:
-            try:
-                await ctx.send(content=None, embed=latest)
-            except:
-                pass
-            return
-        with open('quit.txt', 'w', encoding="utf8") as q:
-            q.write('update')
-        with open('restart.txt', 'w', encoding="utf8") as re:
-            re.write(str(ctx.message.channel.id))
-        if bot.subpro:
-            bot.subpro.kill()
-        os._exit(0)
-    else:
-        await ctx.send(bot.bot_prefix + 'The bot is up to date.')
+            await ctx.send('Well, I failed somehow, send the following to ​`Pallav#1747​` (157355779320446976) - resp: ​`​`​`py\n' + str(await resp.json()) + '\n​`​`​`')
+
+
 
 
 @bot.command(pass_context=True, aliases=['stop', 'shutdown'])

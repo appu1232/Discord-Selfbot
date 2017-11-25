@@ -8,9 +8,12 @@ import aiohttp
 import json
 import discord
 import os
+import traceback
+import textwrap
 import glob
 import git
 import io
+from contextlib import redirect_stdout
 from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
@@ -30,6 +33,10 @@ class Utility:
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession(loop=self.bot.loop, headers={"User-Agent": "AppuSelfBot"})
+        self._last_embed = None
+        self._rtfm_cache = None
+        self._last_google = None
+        self._last_result = None
 
     @staticmethod
     def get_datetime():
@@ -106,13 +113,7 @@ class Utility:
         dandt, tzerror = self.get_datetime()
         msg = '{:Date: `%d %B %Y`}'.format(dandt)
         await ctx.send(self.bot.bot_prefix + msg)
-
-    @commands.command(pass_context=True)
-    async def code(self, ctx, *, msg):
-        """Write text in code format."""
-        await ctx.message.delete()
-        await ctx.send("```" + msg.replace("`", "") + "```")
-    
+        
     @commands.command(pass_context=True)
     async def toggletime(self, ctx):
         """Toggle between 24 hours time and 12 hours time"""
@@ -241,7 +242,7 @@ class Utility:
         await msg.delete()
         await killmsg.delete()
 
-    @commands.command(aliases=['d'], pass_context=True)
+    @commands.command(aliases=['d','clean'], pass_context=True)
     async def delete(self, ctx, txt=None, channel=None):
         """Deletes the last message sent or n messages sent. Ex: [p]d 5"""
         if txt:  # If number of seconds/messages are specified
@@ -327,7 +328,7 @@ class Utility:
 
     @commands.command(pass_context=True)
     async def poll(self, ctx, *, msg):
-        """Create a strawpoll. Ex: [p]poll Favorite color = Blue | Red | Green"""
+        """Create a strawpoll. Ex: [p]poll Favorite color = Blue | Purple | Green"""
         loop = asyncio.get_event_loop()
         try:
             options = [op.strip() for op in msg.split('|')]
@@ -737,7 +738,7 @@ class Utility:
         if len(options) >= 11:
             return await ctx.send(self.bot.bot_prefix + "You must have 9 options or less.")
         if time:
-            time = int(time.strip("time="))
+            time = int(time.strip("time = "))
         else:
             time = 30
         emoji = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '6⃣', '7⃣', '8⃣', '9⃣']
@@ -827,6 +828,118 @@ class Utility:
                 await guild.ack()
             await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds)))
             
+    
+    @commands.command(pass_context=True, hidden=True, name='eval')
+    async def _eval(self, ctx, *, body: str, edit=True):
+        """Evaluates python code"""
+
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'channel': ctx.channel,
+            'author': ctx.author,
+            'guild': ctx.guild,
+            'message': ctx.message,
+            '_': self._last_result
+        }
+
+        env.update(globals())
+
+        body = self.cleanup_code(body)
+        if edit: await self.edit_to_codeblock(ctx, body)
+        stdout = io.StringIO()
+        err = out = None
+
+        to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
+
+        try:
+            exec(to_compile, env)
+        except Exception as e:
+            err = await ctx.send(f'```py\n{e.__class__.__name__}: {e}\n```')
+            return await err.add_reaction('\u2049')
+
+        func = env['func']
+        try:
+            with redirect_stdout(stdout):
+                ret = await func()
+        except Exception as e:
+            value = stdout.getvalue()
+            err = await ctx.send(f'```py\n{value}{traceback.format_exc()}\n```')
+        else:
+            value = stdout.getvalue()
+            
+            if ret is None:
+                if value:
+                    try:
+                        out = await ctx.send(f'```py\n{value}\n```')
+                    except:
+                        paginated_text = ctx.paginate(value)
+                        for page in paginated_text:
+                            if page == paginated_text[-1]:
+                                out = await ctx.send(f'```py\n{page}\n```')
+                                break
+                            await ctx.send(f'```py\n{page}\n```')
+            else:
+                self._last_result = ret
+                try:
+                    out = await ctx.send(f'```py\n{value}{ret}\n```')
+                except:
+                    paginated_text = ctx.paginate(f"{value}{ret}")
+                    for page in paginated_text:
+                        if page == paginated_text[-1]:
+                            out = await ctx.send(f'```py\n{page}\n```')
+                            break
+                        await ctx.send(f'```py\n{page}\n```')
+
+        if out:
+            await out.add_reaction('\u2705')  # tick
+        elif err:
+            await err.add_reaction('\u2049')  # x
+        else:
+            await ctx.message.add_reaction('\u2705')
+            
+    async def edit_to_codeblock(self, ctx, body, pycc='blank'):
+        if pycc == 'blank':
+            msg = f'{ctx.prefix}eval\n```py\n{body}\n```'
+        else:
+            msg = f'{ctx.prefix}cc make {pycc}\n```py\n{body}\n```'
+        await ctx.message.edit(content=msg)
+
+    def cleanup_code(self, content):
+        """Automatically removes code blocks from the code."""
+        # remove ```py\n```
+        if content.startswith('```') and content.endswith('```'):
+            return '\n'.join(content.split('\n')[1:-1])
+
+        # remove `foo`
+        return content.strip('` \n')
+
+    def get_syntax_error(self, e):
+        if e.text is None:
+            return f'```py\n{e.__class__.__name__}: {e}\n```'
+        return f'```py\n{e.text}{"^":>{e.offset}}\n{e.__class__.__name__}: {e}```'
+    
+    @commands.command()
+    async def herokuupdate(self, ctx):
+        '''Auto Update command, checks if you have latest version
+        Use tags github-token to find out how to set up this token'''
+        git = self.bot.get_cog('Git')
+        if not await git.starred('PallavBS/Discord-SelfBot-1'): return await ctx.send('**This command is disabled as the user have not starred <https://github.com/PallavBS/Discord-Selfbot-1>**')
+        # get username
+        username = await git.githubusername()
+        async with self.session.get('https://api.github.com/repos/PallavBS/Discord-Selfbot-1/git/refs/heads/master', headers={"Authorization": f"Bearer {git.githubtoken}"}) as resp:
+            if 300 > resp.status >= 200:
+                async with self.session.post(f'https://api.github.com/repos/{username}/Discord-Selfbot-1/merges', json={"head": (await resp.json())['object']['sha'], "base": "master", "commit_message": "Updating Bot"}, headers={"Authorization": f"Bearer {git.githubtoken}"}) as resp2:
+                    if 300 > resp2.status >= 200:
+                        if resp2.status == 204:
+                            return await ctx.send('Already at latest version!')
+                        await ctx.send('Bot updated! Restarting....')
+                    else:
+                        if resp2.status == 409:
+                            return await ctx.send('Merge conflict, you did some commits that made this fail!')
+                        await ctx.send('Well, I failed somehow, send the following to `Pallav#1747` (157355779320446976) - resp2: ```py\n' + str(await resp2.json()) + '\n```')
+            else:
+                await ctx.send('Well, I failed somehow, send the following to `Pallav#1747` (157355779320446976) - resp: ```py\n' + str(await resp.json()) + '\n```')
 
 def setup(bot):
     bot.add_cog(Utility(bot))

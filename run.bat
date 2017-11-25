@@ -29,17 +29,6 @@ goto run
 	findstr %forwardable% %findfile% >nul 2>&1		
 	if errorlevel 1 goto prompt
 	goto run
-:update
-	echo Starting update...
-	echo Backing up your settings...
-	echo d | xcopy settings settings_backup /E >nul
-	echo Latest update:
-	git --no-pager log --pretty=oneline -n1 origin/master ^master
-	git pull origin master
-	if errorlevel 1 goto force
-	echo Finished updating
-	echo Starting up...
-	goto run
 :force
 	git fetch --all
 	git reset --hard origin/master
