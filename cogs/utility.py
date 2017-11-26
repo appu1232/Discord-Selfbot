@@ -773,7 +773,7 @@ class Utility:
             end_msg += "\n{} is the winner!".format(top_result)
         await ctx.send(end_msg)
 
-    @commands.command(aliases=['cogs'])
+    @commands.command()
     async def coglist(self, ctx):
         """Shows loaded/unloaded cogs"""
         await ctx.message.delete()
