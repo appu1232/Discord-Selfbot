@@ -8,9 +8,12 @@ import aiohttp
 import json
 import discord
 import os
+import traceback
+import textwrap
 import glob
 import git
 import io
+from contextlib import redirect_stdout
 from PIL import Image
 from PythonGists import PythonGists
 from discord.ext import commands
@@ -827,6 +830,25 @@ class Utility:
                 await guild.ack()
             await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds)))
             
+    @commands.command(aliases=['hu','hupdate'])
+    async def herokuupdate(self, ctx):
+        '''Auto Update command, checks if you have latest version'''
+        git = self.bot.get_cog('Git')
+        # get username
+        username = await git.githubusername()
+        async with self.session.get('https://api.github.com/repos/appu1232/Discord-Selfbot/git/refs/heads/master', headers={"Authorization": "Bearer {}".format(git.githubtoken)}) as resp:
+            if 300 > resp.status >= 200:
+                async with self.session.post('https://api.github.com/repos/{}/Discord-Selfbot/merges'.format(username), json={"head": (await resp.json())['object']['sha'], "base": "master", "commit_message": "Updating Bot"}, headers={"Authorization": "Bearer {}".format(git.githubtoken)}) as resp2:
+                    if 300 > resp2.status >= 200:
+                        if resp2.status == 204:
+                            return await ctx.send('Already at latest version!')
+                        await ctx.send('Bot updated! Restarting....')
+                    else:
+                        if resp2.status == 409:
+                            return await ctx.send('Merge conflict, you did some commits that made this fail!')
+                        await ctx.send('Well, I failed somehow, send the following to `Pallav#1747` (157355779320446976) - resp2: ```py\n' + str(await resp2.json()) + '\n```')
+            else:
+                await ctx.send('Well, I failed somehow, send the following to `Pallav#1747` (157355779320446976) - resp: ```py\n' + str(await resp.json()) + '\n```')
 
 def setup(bot):
     bot.add_cog(Utility(bot))
