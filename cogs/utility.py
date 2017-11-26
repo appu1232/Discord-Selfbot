@@ -773,8 +773,8 @@ class Utility:
             end_msg += "\n{} is the winner!".format(top_result)
         await ctx.send(end_msg)
 
-    @commands.command(pass_context=True)
-    async def cogs(self, ctx):
+    @commands.command(aliases=['cogs'])
+    async def coglist(self, ctx):
         """Shows loaded/unloaded cogs"""
         await ctx.message.delete()
         core_cogs = []
