@@ -194,6 +194,8 @@ class Utility:
             if message.author == ctx.message.author:
                 killmsg = message
                 break
+        if not killmsg:
+            return await ctx.send(self.bot.bot_prefix + 'There is no message to destroy.')
         timer = int(amount.strip())
         # Animated countdown because screw rate limit amirite
         destroy = ctx.message
@@ -771,30 +773,39 @@ class Utility:
             end_msg += "\n{} is the winner!".format(top_result)
         await ctx.send(end_msg)
 
-    @commands.command(pass_context=True)
-    async def cogs(self, ctx):
+    @commands.command(aliases=['clist', 'cinfo'])
+    async def loaded(self, ctx):
         """Shows loaded/unloaded cogs"""
         await ctx.message.delete()
+        core_cogs = []
+        custom = []
         cogs = ["cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("cogs/*.py")]]
-        cogs.extend(["custom_cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("custom_cogs/*.py")]])
+        custom_cogs = ["custom_cogs." + os.path.splitext(f)[0] for f in [os.path.basename(f) for f in glob.glob("custom_cogs/*.py")]]
         loaded = [x.__module__.split(".")[1] for x in self.bot.cogs.values()]
         unloaded = [c.split(".")[1] for c in cogs
                     if c.split(".")[1] not in loaded]
         embed = discord.Embed(title="List of installed cogs")
-        if loaded:
-            embed.add_field(name="Loaded", value="\n".join(sorted(loaded)), inline=True)
-        else:
+        cogs = [w.replace('cogs.', '') for w in cogs]
+        custom_cogs = [w.replace('custom_cogs.', '') for w in custom_cogs]
+        for cog in loaded:
+            if cog in cogs:
+                core_cogs.append(cog)
+            if cog in custom_cogs:
+                custom.append(cog)
+        if core_cogs:
+            embed.add_field(name="Core Loaded", value="\n".join(sorted(core_cogs)), inline=True)
+        if custom:
+            embed.add_field(name="Custom Loaded", value="\n".join(sorted(custom)), inline=True)
+        if not custom and not core_cogs:
             embed.add_field(name="Loaded", value="None!", inline=True)
         if unloaded:
             embed.add_field(name="Not Loaded", value="\n".join(sorted(unloaded)), inline=True)
         else:
             embed.add_field(name="Not Loaded", value="None!", inline=True)
-        embed.set_footer(text="Were you looking for >cog?")
         await ctx.send("", embed=embed)
 
     @commands.command(pass_context=True, aliases=['clearconsole', 'cc', 'clear'])
     async def cleartrace(self, ctx):
-        global git
         """Clear the console."""
         if os.name == 'nt':
             os.system('cls')
@@ -802,7 +813,8 @@ class Utility:
             try:
                 os.system('clear')
             except:
-                await ctx.send(self.bot.bot_prefix + 'Could not clear console, continuing anyways')
+                for _ in range(100):
+                    print()
 
         print('Logged in as')
         try:
@@ -810,9 +822,6 @@ class Utility:
         except:
             pass
         print('User id: ' + str(self.bot.user.id))
-        g = git.cmd.Git(working_dir=os.getcwd())
-        branch = g.execute(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-        print('Current branch is: ' + branch)
         print('------')
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
         

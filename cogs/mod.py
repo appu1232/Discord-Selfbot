@@ -35,6 +35,28 @@ class Mod:
         else:
             return await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user.')
 
+
+    # TODO: Add reason with ban
+    @commands.command(aliases=['hban'], pass_context=True)     
+    async def hackban(self, ctx, user_id: int):
+        """Bans a user outside of the server."""
+        author = ctx.message.author
+        guild = author.guild
+
+        user = guild.get_member(user_id)
+        if user is not None:
+            return await ctx.invoke(self.ban, user=user)
+
+        try:
+            await self.bot.http.ban(user_id, guild.id, 0)
+            await ctx.message.edit(content=self.bot.bot_prefix + 'Banned user: %s' % user_id)
+        except discord.NotFound:
+            await ctx.message.edit(content=self.bot.bot_prefix + 'Could not find user. '
+                               'Invalid user ID was provided.')
+        except discord.errors.Forbidden:
+            await ctx.message.edit(content=self.bot.bot_prefix + 'Could not ban user. Not enough permissions.')
+
+
     @commands.command(pass_context=True)
     async def ban(self, ctx, user, *, reason=""):
         """Bans a user (if you have the permission)."""
@@ -164,7 +186,7 @@ class Mod:
     @commands.has_permissions(manage_messages=True)
     @commands.command(aliases=['p'], pass_context=True, no_pm=True)
     async def purge(self, ctx, msgs: int, *, txt=None):
-        """Purge last n msgs or n msgs with a word. [p]help purge for more info.
+        """Purge last n msgs or n msgs with a word. Requires Manage Messages permission. [p]help purge for more info.
         
         Ex:
         
@@ -179,8 +201,8 @@ class Mod:
                             await message.delete()
                     else:
                         await message.delete()
-                except:
-                    pass
+                except discord.Forbidden:
+                    await ctx.send(self.bot.bot_prefix + "You do not have permission to delete other users' messages. Use {}delete instead to delete your own messages.".format(self.bot.cmd_prefix))
         else:
             await ctx.send(self.bot.bot_prefix + 'Too many messages to delete. Enter a number < 10000')
 
