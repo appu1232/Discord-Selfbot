@@ -572,7 +572,7 @@ class Misc:
     async def setavatar(self, ctx, *, msg):
         """
         Set an avatar from a URL or user.
-        Usage: [p]setavatar <url_to_image> or [p]seravatar <user> to copy that user's avi
+        Usage: [p]setavatar <url_to_image> or [p]setavatar <user> to copy that user's avi
         Image URL must be a .png, a .jpg, or a .gif (nitro only)
         """
         user = get_user(ctx.message, msg)
