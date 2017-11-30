@@ -213,6 +213,7 @@ async def on_ready():
     bot.game_time = bot.avatar_time = bot.gc_time = bot.refresh_time = time.time()
     bot.notify = load_notify_config()
     bot.command_count = {}
+    bot.channel_last = [None, None]
     if not os.path.isfile('settings/ignored.json'):
         with open('settings/ignored.json', 'w', encoding="utf8") as fp:
             json.dump({'servers': []}, fp, indent=4)
@@ -338,6 +339,18 @@ async def on_ready():
         bot.subpro = subprocess.Popen([sys.executable, 'cogs/utils/notify.py'])
         with open('notifier.txt', 'w', encoding="utf8") as fp:
             fp.write(str(bot.subpro.pid))
+
+
+@bot.before_invoke
+async def before_any_command(ctx):
+    """Adding a >> after a command causes the command to execute in the last channel you sent a message in besides this one. The command is executed as if it were sent in that last channel.
+       >> <channel_id> to specify the channel instead of using the last channel."""
+    if ">>" in ctx.message.content:
+        ctx.message.content, new_channel = ctx.message.content.rsplit(">>", 1)
+        if new_channel.strip().isdigit():
+            ctx.channel = bot.get_channel(int(new_channel.strip()))
+        elif new_channel.strip() == "" and bot.channel_last[0] != None:
+            ctx.channel = bot.get_channel(bot.channel_last[0])
 
 
 @bot.after_invoke
@@ -480,7 +493,6 @@ async def reload(ctx, txt: str = None):
                 l -= 1
         await ctx.send(bot.bot_prefix + 'Reloaded {} of {} modules.'.format(l, len(utils)))
 
-
 # On all messages sent (for quick commands, custom commands, and logging messages)
 @bot.event
 async def on_message(message):
@@ -490,6 +502,10 @@ async def on_message(message):
 
     # If the message was sent by me
     if message.author.id == bot.user.id:
+        if hasattr(bot, 'channel_last'):
+            if message.channel.id not in bot.channel_last:
+                bot.channel_last.pop(0)
+                bot.channel_last.append(message.channel.id)
         if hasattr(bot, 'icount'):
             bot.icount += 1
         try:
