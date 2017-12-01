@@ -341,18 +341,6 @@ async def on_ready():
             fp.write(str(bot.subpro.pid))
 
 
-@bot.before_invoke
-async def before_any_command(ctx):
-    """Adding a >> after a command causes the command to execute in the last channel you sent a message in besides this one. The command is executed as if it were sent in that last channel.
-       >> <channel_id> to specify the channel instead of using the last channel."""
-    if ">>" in ctx.message.content:
-        ctx.message.content, new_channel = ctx.message.content.rsplit(">>", 1)
-        if new_channel.strip().isdigit():
-            ctx.channel = bot.get_channel(int(new_channel.strip()))
-        elif new_channel.strip() == "" and bot.channel_last[0] != None:
-            ctx.channel = bot.get_channel(bot.channel_last[0])
-
-
 @bot.after_invoke
 async def after_any_command(ctx):
     if not ctx.command_failed:
@@ -502,6 +490,13 @@ async def on_message(message):
 
     # If the message was sent by me
     if message.author.id == bot.user.id:
+        if ">>" in message.content:
+            message.content, new_channel = message.content.rsplit(">>", 1)
+            if new_channel.strip().isdigit():
+                message.channel = bot.get_channel(int(new_channel.strip()))
+            elif new_channel.strip() == "" and bot.channel_last[0] != None:
+                message.channel = bot.get_channel(bot.channel_last[0])
+
         if hasattr(bot, 'channel_last'):
             if message.channel.id not in bot.channel_last:
                 bot.channel_last.pop(0)
