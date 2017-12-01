@@ -393,7 +393,10 @@ class Misc:
 
         Your game/stream status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
 
-        --Setting game--
+        --Setting playing/watching/listening--
+        Set a game: [p]game <text>
+        Set watching: [p]watching <text>
+        Set listening: [p]listening <text>
         To set a rotating game status, do [p]game game1 | game2 | game3 | etc.
         It will then prompt you with an interval in seconds to wait before changing the game and after that the order in which to change (in order or random)
         Ex: [p]game with matches | sleeping | watching anime
