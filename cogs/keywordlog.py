@@ -400,7 +400,7 @@ class KeywordLogger:
                                         if reply and not reply.content.startswith(pre):
                                             await reply.delete()
                                             guild = ctx.message.guild if reply.content == '1' else self.bot.get_guild(
-                                                reply.content)
+                                                int(reply.content))
                                             if not guild:
                                                 await menu.edit(content=self.bot.bot_prefix + 'Could not find the server.')
                                             else:
