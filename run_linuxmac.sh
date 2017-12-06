@@ -80,47 +80,22 @@ min_updater() {
 run_bot() {
 	echo "Checking requirements..."
 	if hash python3 2>/dev/null; then # TODO abstracify all this which mirrors above an also look up boolean operators in sh
-		if hash pip3 2>/dev/null; then
-			echo "Using global pip3 executable"
-			if pip3 install --user -r requirements.txt; then
-				echo "Starting bot..."
-				python3 loopself.py
-				ret=$?
-				if [ $ret == "15" ]; then
-					min_updater
-					run_bot
-				else
-					echo "Shutting down"
-				fi
-			else
-				echo "Requirements installation failed"
-				exit 254
-			fi
-		else
-			echo "Using pip as a python3 module"
-			echo "Upgrading pip"
-			if python3 -m pip install --user --upgrade pip; then
-				echo "Upgrading requirements"
-				if python3 -m pip install --user --upgrade -r requirements.txt; then
-					echo "Starting bot..."
-					python3 loopself.py
-					ret=$?
-					if [ $ret == "15" ]; then
-						min_updater
-						run_bot
-					else
-						echo "Shutting down"
-					fi
-				else
-					echo "Requirements installation failed"
-					exit 254
-				fi
-			else
-				echo "Pip could not be installed. Try using your package manager"
-				exit 253
-			fi
-		fi
-
+        echo "Using pip as a python3 module"
+        echo "Upgrading requirements"
+        if python3 -m pip install --user --upgrade -r requirements.txt; then
+            echo "Starting bot..."
+            python3 loopself.py
+            ret=$?
+            if [ $ret == "15" ]; then
+                min_updater
+                run_bot
+            else
+                echo "Shutting down"
+            fi
+        else
+            echo "Requirements installation failed"
+            exit 254
+        fi
 	elif hash python 2>/dev/null; then # TODO abstracify all this which mirrors above an also look up boolean operators in sh
 		case "$(python --version 2>&1)" in
 			*" 3."*)
@@ -132,47 +107,22 @@ run_bot() {
 				exit
 				;;
 		esac
-		if hash pip 2>/dev/null; then
-			echo "Using global pip executable"
-			if pip install --user -r requirements.txt; then
-				echo "Starting bot..."
-				python loopself.py
-				ret=$?
-				if [ $ret == "15" ]; then
-					min_updater
-					run_bot
-				else
-					echo "Shutting down"
-				fi
-
-			else
-				echo "Requirements installation failed"
-				exit 254
-			fi
-		else
-			echo "Using pip as a python3 module"
-			echo "Upgrading pip"
-			if python -m pip install --user --upgrade pip; then
-				echo "Upgrading requirements"
-				if python -m pip install --user -r requirements.txt; then
-					echo "Starting bot..."
-					python loopself.py
-					ret=$?
-					if [ $ret == "15" ]; then
-						min_updater
-						run_bot
-					else
-						echo "Shutting down"
-					fi
-				else
-					echo "Requirements installation failed"
-					exit 254
-				fi
-			else
-				echo "Pip could not be installed. Try using your package manager"
-				exit 253
-			fi
-		fi
+        echo "Using pip as a python3 module"
+        echo "Upgrading requirements"
+        if python -m pip install --user -r requirements.txt; then
+            echo "Starting bot..."
+            python loopself.py
+            ret=$?
+            if [ $ret == "15" ]; then
+                min_updater
+                run_bot
+            else
+                echo "Shutting down"
+            fi
+        else
+            echo "Requirements installation failed"
+            exit 254
+        fi
 
 	else
 		echo "You do not appear to have Python 3 installed"
