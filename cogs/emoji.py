@@ -134,7 +134,7 @@ class Emoji:
             response = requests.get(url)
         except (requests.exceptions.MissingSchema, requests.exceptions.InvalidURL, requests.exceptions.InvalidSchema, requests.exceptions.ConnectionError):
             return await ctx.send(self.bot.bot_prefix + "The URL you have provided is invalid.")
-        elif response.status_code == 404:
+        if response.status_code == 404:
             return await ctx.send(self.bot.bot_prefix + "The URL you have provided leads to a 404.")
         try:
             emoji = await ctx.guild.create_custom_emoji(name=name, image=response.content)
