@@ -132,13 +132,14 @@ class Emoji:
         await ctx.message.delete()
         try:
             response = requests.get(url)
-        except (requests.errors.MissingSchema, requests.errors.InvalidURL, requests.errors.InvalidSchema):
+        except (requests.exceptions.MissingSchema, requests.exceptions.InvalidURL, requests.exceptions.InvalidSchema, requests.exceptions.ConnectionError):
             return await ctx.send(self.bot.bot_prefix + "The URL you have provided is invalid.")
-        if response.status_code == 404:
+        elif response.status_code == 404:
             return await ctx.send(self.bot.bot_prefix + "The URL you have provided leads to a 404.")
-        elif url[-3:] not in ("png", "jpg") and url[-4:] != "jpeg":
-            return await ctx.send(self.bot.bot_prefix + "Only PNG and JPEG format images work to add as emoji.")
-        emoji = await ctx.guild.create_custom_emoji(name=name, image=response.content)
+        try:
+            emoji = await ctx.guild.create_custom_emoji(name=name, image=response.content)
+        except InvalidArgument:
+            return await ctx.send(self.bot.bot_prefix + "Invalid image type. Only PNG and JPEG are supported.")
         await ctx.send(self.bot.bot_prefix + "Successfully added the emoji {0.name} <:{0.name}:{0.id}>!".format(emoji))
 
     @emoji.command(pass_context=True)
