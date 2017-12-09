@@ -491,11 +491,12 @@ async def on_message(message):
     # If the message was sent by me
     if message.author.id == bot.user.id:
         if ">>" in message.content:
-            message.content, new_channel = message.content.rsplit(">>", 1)
-            if new_channel.strip().isdigit():
-                message.channel = bot.get_channel(int(new_channel.strip()))
-            elif new_channel.strip() == "" and bot.channel_last[0] != None:
-                message.channel = bot.get_channel(bot.channel_last[0])
+            if message.content.rsplit(">>", 1)[0] != "":
+                message.content, new_channel = message.content.rsplit(">>", 1)
+                if new_channel.strip().isdigit():
+                    message.channel = bot.get_channel(int(new_channel.strip()))
+                elif new_channel.strip() == "" and bot.channel_last[0] != None:
+                    message.channel = bot.get_channel(bot.channel_last[0])
 
         if hasattr(bot, 'channel_last'):
             if message.channel.id not in bot.channel_last:
