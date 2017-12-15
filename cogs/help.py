@@ -61,7 +61,7 @@ class Help(formatter.HelpFormatter):
     # Shortcuts that allow cog to run on 0.16.8 and 1.0.0a
 
     def pm_check(self, ctx):
-        return isinstance(ctx.channel, discord.DMChannel) or isinstance(ctx.channel, discord.GroupChannel)
+        return isinstance(ctx.channel, discord.abc.PrivateChannel)
 
     @property
     def me(self):
