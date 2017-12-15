@@ -689,6 +689,8 @@ async def on_message(message):
         # Bad habit but this is for skipping errors when dealing with Direct messages, blocked users, etc. Better to just ignore.
         except (AttributeError, discord.errors.HTTPException):
             pass
+    elif isinstance(message.channel, discord.abc.PrivateChannel):
+        add_alllog(str(message.channel.id), str(message.guild.id), message)
 
     await bot.process_commands(message)
 
