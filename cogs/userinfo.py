@@ -23,6 +23,8 @@ class Userinfo:
                 if not user:
                     user = ctx.guild.get_member(int(name))
                 if not user:
+                    user = self.bot.get_user(int(name))
+                if not user:
                     await ctx.send(self.bot.bot_prefix + 'Could not find user.')
                     return
             else:
@@ -33,26 +35,31 @@ class Userinfo:
                 avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
             else:
                 avi = user.avatar_url
-
-            role = user.top_role.name
-            if role == "@everyone":
-                role = "N/A"
-            voice_state = None if not user.voice else user.voice.channel
+            if isinstance(user, discord.Member):
+                role = user.top_role.name
+                if role == "@everyone":
+                    role = "N/A"
+                voice_state = None if not user.voice else user.voice.channel
             if embed_perms(ctx.message):
                 em = discord.Embed(timestamp=ctx.message.created_at, colour=0x708DD0)
                 em.add_field(name='User ID', value=user.id, inline=True)
-                em.add_field(name='Nick', value=user.nick, inline=True)
-                em.add_field(name='Status', value=user.status, inline=True)
-                em.add_field(name='In Voice', value=voice_state, inline=True)
-                em.add_field(name='Game', value=user.game, inline=True)
-                em.add_field(name='Highest Role', value=role, inline=True)
+                if isinstance(user, discord.Member):
+                    em.add_field(name='Nick', value=user.nick, inline=True)
+                    em.add_field(name='Status', value=user.status, inline=True)
+                    em.add_field(name='In Voice', value=voice_state, inline=True)
+                    em.add_field(name='Game', value=user.game, inline=True)
+                    em.add_field(name='Highest Role', value=role, inline=True)
                 em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
-                em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
+                if isinstance(user, discord.Member):
+                    em.add_field(name='Join Date', value=user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=avi)
                 em.set_author(name=user, icon_url='https://i.imgur.com/RHagTDg.png')
                 await ctx.send(embed=em)
             else:
-                msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nGame: %s\nHighest Role: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (user.id, user.nick, user.status, voice_state, user.game, role, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
+                if isinstance(user, discord.Member):
+                    msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nGame: %s\nHighest Role: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (user.id, user.nick, user.status, voice_state, user.game, role, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
+                else:
+                    msg = '**User Info:** ```User ID: %s\nAccount Created: %s\nAvatar url:%s```' % (user.id, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
                 await ctx.send(self.bot.bot_prefix + msg)
 
             await ctx.message.delete()
@@ -67,6 +74,8 @@ class Userinfo:
                 user = ctx.guild.get_member_named(txt)
             if not user:
                 user = ctx.guild.get_member(int(txt))
+            if not user:
+                user = self.bot.get_user(int(txt))
             if not user:
                 await ctx.send(self.bot.bot_prefix + 'Could not find user.')
                 return
