@@ -690,7 +690,7 @@ async def on_message(message):
         except (AttributeError, discord.errors.HTTPException):
             pass
     elif isinstance(message.channel, discord.abc.PrivateChannel):
-        add_alllog(str(message.channel.id), str(message.guild.id), message)
+        add_alllog(str(message.channel.id), "DM", message)
 
     await bot.process_commands(message)
 

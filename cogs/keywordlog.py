@@ -1044,7 +1044,10 @@ class KeywordLogger:
             if size.isdigit:
                 size = int(size)
                 msg = ''
-                comments = self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)]
+                if isinstance(ctx.channel, discord.abc.PrivateChannel):
+                    comments = self.bot.all_log[str(ctx.message.channel.id) + ' DM']
+                else:
+                    comments = self.bot.all_log[str(ctx.message.channel.id) + ' ' + str(ctx.message.guild.id)]
                 if len(comments)-2-skip < size:
                     size = len(comments)-2-skip
                     if size < 0:
