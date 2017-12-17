@@ -197,13 +197,13 @@ bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
 # Startup
 @bot.event
 async def on_ready():
-	message = 'Logged in as {0.name}#{0.discriminator}.'.format(bot.user)
-	uid_message = 'User id: %s.' % bot.user.id
-	separator = '━' * max(len(message), len(uid_message))
-	print(separator)
-	print(message)
-	print(uid_message)
-	print(separator)
+    message = 'Logged in as {0.name}#{0.discriminator}.'.format(bot.user)
+    uid_message = 'User id: %s.' % bot.user.id
+    separator = '━' * max(len(message), len(uid_message))
+    print(separator)
+    print(message)
+    print(uid_message)
+    print(separator)
 
     bot.uptime = datetime.datetime.now()
     bot.icount = bot.message_count = bot.mention_count = bot.keyword_log = 0
