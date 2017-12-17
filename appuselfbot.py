@@ -197,7 +197,7 @@ bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
 # Startup
 @bot.event
 async def on_ready():
-    message = 'Logged in as {0.name}#{0.discriminator}.'.format(bot.user)
+    message = 'Logged in as %s.' % bot.user
     uid_message = 'User id: %s.' % bot.user.id
     separator = '━' * max(len(message), len(uid_message))
     print(separator)
