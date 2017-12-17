@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+# encoding: utf-8
+
 import subprocess
 import os
 import sys
+
 
 while True:
     if os.path.isfile('quit.txt'):
