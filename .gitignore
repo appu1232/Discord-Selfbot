@@ -13,3 +13,4 @@ settings/*
 cogs/utils/temp.txt
 settings_backup/*
 image_dump/*
+venv/
