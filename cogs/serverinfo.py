@@ -94,8 +94,8 @@ class Server:
                 em.set_footer(text='Server ID: %s' % server.id)
                 await ctx.send(embed=em)
             else:
-                msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nDefault Channel: %s\nCreated At: %s\nServer avatar: : %s```' % (
-                server.name, server.owner, server.member_count, online, server.region, str(server.verification_level), server.role_hierarchy[0], server.default_channel, server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
+                msg = '**Server Info:** ```Name: %s\nOwner: %s\nMembers: %s\nCurrently Online: %s\nRegion: %s\nVerification Level: %s\nHighest Role: %s\nCreated At: %s\nServer avatar: : %s```' % (
+                    server.name, server.owner, server.member_count, online, server.region, str(server.verification_level), server.role_hierarchy[0], server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), server.icon_url)
                 await ctx.send(self.bot.bot_prefix + msg)
             await ctx.message.delete()
 
