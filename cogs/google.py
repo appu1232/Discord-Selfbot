@@ -152,7 +152,7 @@ class Google:
         if not embed_perms(ctx.message):
             config = load_optional_config()
             async with aiohttp.ClientSession() as session:
-                async with session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+                async with session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=1" + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
                     result = json.loads(await resp.text())
             return await ctx.send(result['items'][0]['link'])
 
@@ -168,7 +168,7 @@ class Google:
                 if value:
                     card.add_field(name='Search Results', value=value, inline=False)
                 return await ctx.send(embed=card)
-            if len(entries) == 0:
+            if not entries:
                 return await ctx.send('No results.')
             next_two = entries[1:3]
             if next_two:
