@@ -15,16 +15,22 @@ class Emoji:
     def find_emoji(self, msg):
         msg = re.sub("<a?:(.+):([0-9]+)>", "\\2", msg)
         color_modifiers = ["1f3fb", "1f3fc", "1f3fd", "1f44c", "1f3fe", "1f3ff"]  # These color modifiers aren't in Twemoji
+        
+        name = None
 
         for guild in self.bot.guilds:
             for emoji in guild.emojis:
-                if msg.strip().lower() in emoji.name:
+                if msg.strip().lower() in emoji.name.lower():
+                    name = emoji.name + ".gif" if emoji.animated else ".png"
                     url = emoji.url
-                    emote_name = emoji.name
+                    id = emoji.id
+                    guild_name = guild.name
                 if msg.strip() in (str(emoji.id), emoji.name):
-                    name = "{}.png".format(emoji.name)
+                    name = emoji.name + ".gif" if emoji.animated else ".png"
                     url = emoji.url
                     return name, url, emoji.id, guild.name
+        if name:
+            return name, url, id, guild_name
 
         # Here we check for a stock emoji before returning a failure
         codepoint_regex = re.compile('([\d#])?\\\\[xuU]0*([a-f\d]*)')
