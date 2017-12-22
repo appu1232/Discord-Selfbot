@@ -135,8 +135,8 @@ class Fun:
 
     # used in [p]react, checks if it's possible to react with the duper string or not
     def has_dupe(duper):
-        collect_my_duper = list(filter(lambda x: x != '<' and x != '⃣',
-                                       duper))  # remove < because those are used to denote a written out emoji, and there might be more than one of those requested that are not necessarily the same one.  ⃣ appears twice in the number unicode thing, so that must be stripped too...
+        collect_my_duper = list(filter(lambda x: x != '⃣',
+                                       duper))  #   ⃣ appears twice in the number unicode thing, so that must be stripped
         return len(set(collect_my_duper)) != len(collect_my_duper)
 
     # used in [p]react, replaces e.g. 'ng' with '🆖'
@@ -308,18 +308,17 @@ class Fun:
 
         # replace all custom server emoji <:emoji:123456789> with "<" and add emoji ids to non_unicode_emoji_list
         char_index = 0
-        while char_index < len(msg):
-            react_me += msg[char_index]
-            if msg[char_index] == '<':
-                if (char_index != len(msg) - 1) and msg[char_index + 1] == ":":
-                    name_end_colon = msg[char_index + 2:].index(':') + char_index
-                    id_end = msg[name_end_colon + 2:].index('>') + name_end_colon
-                    non_unicode_emoji_list.append(
-                        msg[name_end_colon + 3:id_end + 2])  # we add the custom emoji to the list to replace '<' later
-                    char_index = id_end + 2  # jump ahead in react_me parse
-                else:
-                    await ctx.send(self.bot.bot_prefix + "Can't react with '<'.")
-            char_index += 1
+        emotes = re.findall(r"<a?:(?:[a-zA-Z0-9]+?):(?:[0-9]+?)>", msg)
+        print(emotes)
+        react_me = re.sub(r"<a?:([a-zA-Z0-9]+?):([0-9]+?)>", "", msg)
+        print(react_me)
+        
+        for emote in emotes:
+            reactions.append(discord.utils.get(self.bot.emojis, id=int(emote.split(":")[-1][:-1])))
+            non_unicode_emoji_list.append(emote)
+            
+        print(non_unicode_emoji_list)
+        
         if Fun.has_dupe(non_unicode_emoji_list):
             return await ctx.send(self.bot.bot_prefix + 
                                   "You requested that I react with at least two of the exact same specific emoji. I'll try to find alternatives for alphanumeric text, but if you specify a specific emoji must be used, I can't help.")
@@ -330,7 +329,7 @@ class Fun:
             if prefer_combine:  # we want a smaller reaction string, so we'll try to combine anything we can right away
                 react_me = Fun.replace_combos(react_me)
             react_me = Fun.replace_letters(react_me)
-
+            print(react_me)
             if Fun.has_dupe(react_me):  # check if we were able to solve the dupe
                 if not prefer_combine:  # we wanted the most legible reaction string possible, even if it was longer, but unfortunately that's not possible, so we're going to combine first anyway
                     react_me = react_me_original
@@ -344,27 +343,20 @@ class Fun:
 
             lt_count = 0
             for char in react_me:
-                if char != "<":
-                    if char not in "0123456789":  # these unicode characters are weird and actually more than one character.
-                        if char != '⃣':  # </3
-                            reactions.append(char)
-                    else:
-                        reactions.append(self.emoji_dict[char][0])
+                if char not in "0123456789":  # these unicode characters are weird and actually more than one character.
+                    if char != '⃣':  # </3
+                        reactions.append(char)
                 else:
-                    reactions.append(discord.utils.get(self.bot.emojis, id=int(non_unicode_emoji_list[lt_count])))
-                    lt_count += 1
+                    reactions.append(self.emoji_dict[char][0])
         else:  # probably doesn't matter, but by treating the case without dupes seperately, we can save some time
             lt_count = 0
             for char in react_me:
-                if char != "<":
-                    if char in "abcdefghijklmnopqrstuvwxyz0123456789!?":
-                        reactions.append(self.emoji_dict[char][0])
-                    else:
-                        reactions.append(char)
+                if char in "abcdefghijklmnopqrstuvwxyz0123456789!?":
+                    reactions.append(self.emoji_dict[char][0])
                 else:
-                    reactions.append(discord.utils.get(self.bot.emojis, id=int(non_unicode_emoji_list[lt_count])))
-                    lt_count += 1
+                    reactions.append(char)
 
+        print(reactions)
         if channel == "current":
             async for message in ctx.message.channel.history(limit=limit):
                 if (not msg_id and message.id != ctx.message.id) or (msg_id == message.id):
