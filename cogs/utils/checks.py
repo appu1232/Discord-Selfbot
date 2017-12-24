@@ -91,7 +91,8 @@ def avatar_time_check(oldtime, interval):
 
 def update_bot(message):
     g = git.cmd.Git(working_dir=os.getcwd())
-    g.execute(["git", "fetch", "origin", "master"])
+    branch = g.execute(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+    g.execute(["git", "fetch", "origin", branch])
     update = g.execute(["git", "remote", "show", "origin"])
     if ('up to date' in update or 'fast-forward' in update) and message:
         return False
@@ -99,19 +100,20 @@ def update_bot(message):
         if message is False:
             version = 4
         else:
-            version = g.execute(["git", "rev-list", "--right-only", "--count", "master...origin/master"])
+            version = g.execute(["git", "rev-list", "--right-only", "--count", "{0}...origin/{0}".format(branch)])
         version = description = str(int(version))
         if int(version) > 4:
             version = "4"
-        commits = g.execute(["git", "rev-list", "--max-count=%s" % version, "origin/master"])
+        commits = g.execute(["git", "rev-list", "--max-count={0}".format(version), "origin/{0}".format(branch)])
         commits = commits.split('\n')
-        em = discord.Embed(color=0x24292E, title='Latest changes for the selfbot:', description='%s release(s) behind.' % description)
-        for i in range(int(version)-1):
-            title = g.execute(["git", "log", "--format=%ar", "-n", "1", "%s" % commits[i]])
-            field = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--shortstat", "%s" % commits[i], "^%s" % commits[i+1]])
+        em = discord.Embed(color=0x24292E, title='Latest changes for the selfbot:', description='{0} release(s) behind.'.format(description))
+        for i in range(int(version)):
+            i = i - 1  # Change i to i -1 to let the formatters below work
+            title = g.execute(["git", "log", "--format=%ar", "-n", "1", commits[i]])
+            field = g.execute(["git", "log", "--pretty=oneline", "--abbrev-commit", "--shortstat", commits[i], "^{0}".format(commits[i + 1])])
             field = field[8:].strip()
             link = 'https://github.com/appu1232/Discord-Selfbot/commit/%s' % commits[i]
-            em.add_field(name=title, value='%s\n[Code changes](%s)' % (field, link), inline=False)
+            em.add_field(name=title, value='{0}\n[Code changes]({1})'.format(field, link), inline=False)
         em.set_thumbnail(url='https://image.flaticon.com/icons/png/512/25/25231.png')
         em.set_footer(text='Full project: https://github.com/appu1232/Discord-Selfbot')
         return em
