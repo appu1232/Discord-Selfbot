@@ -2,6 +2,8 @@
 SET root=%~dp0
 CD /D %root%
 SETLOCAL EnableDelayedExpansion
+for /f %%i in ('git rev-parse --abbrev-ref HEAD') do set BRANCH=%%i
+
 python -V >nul 2>&1 || goto :python
 git init . >nul || goto :git
 git remote add origin https://github.com/appu1232/Discord-Selfbot.git >nul 2>&1
@@ -34,15 +36,15 @@ goto run
 	echo Backing up your settings...
 	echo d | xcopy settings settings_backup /E >nul
 	echo Latest update:
-	git --no-pager log --pretty=oneline -n1 origin/master ^master
-	git pull origin master
+	git --no-pager log --pretty=oneline -n1 origin/%BRANCH% ^%BRANCH%
+	git pull origin %BRANCH%
 	if errorlevel 1 goto force
 	echo Finished updating
 	echo Starting up...
 	goto run
 :force
 	git fetch --all
-	git reset --hard origin/master
+	git reset --hard origin/%BRANCH%
 	echo Finished updating
 	echo Starting up...
 	goto run
