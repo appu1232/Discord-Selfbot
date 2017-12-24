@@ -7,13 +7,15 @@ else
     echo "Unable to set script's directory as the current working directory. You will need to make sure you run the script from it's directory."
 fi
 
+branch=$(git rev-parse --abbrev-ref HEAD)
+
 updater () {
 	echo "Starting auto-update"
 	if hash git 2>/dev/null; then
 		echo "Fetching origin"
 		git init >/dev/null 2>&1
 		git remote add origin https://github.com/appu1232/Discord-Selfbot.git >/dev/null 2>&1
-		git fetch origin master
+		git fetch origin $branch
 		if [ -d "settings" ]; then
 			cp -r settings settings_backup
 		fi
@@ -31,9 +33,9 @@ updater () {
 					echo "Update succeeded"
 					sleep 2
 				else
-					echo "Pull failed, attempting to hard reset to origin master (settings are still saved)"
+					echo "Pull failed, attempting to hard reset to origin $branch (settings are still saved)"
 					git fetch --all
-					git reset --hard origin/master
+					git reset --hard origin/$branch
 					echo "Update succeeded"
 					sleep 2
 				fi
@@ -55,17 +57,17 @@ min_updater() {
 		if [ -d "settings" ]; then
 			cp -r settings settings_backup
 		fi
-		git fetch origin master
+		git fetch origin $branch
 		echo ""
 		echo "Installing update"
 		echo "Updating to latest stable build."
-		if git pull origin master ; then
+		if git pull origin $branch ; then
 			echo "Update succeeded"
 			sleep 2
 		else
-			echo "Pull failed, attempting to hard reset to origin master (settings are still saved)"
+			echo "Pull failed, attempting to hard reset to origin $nranch (settings are still saved)"
 			git fetch --all
-			git reset --hard origin/master
+			git reset --hard origin/$branch
 			echo "Update succeeded"
 			sleep 2
 		fi
