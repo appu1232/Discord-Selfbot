@@ -21,12 +21,12 @@ class Emoji:
         for guild in self.bot.guilds:
             for emoji in guild.emojis:
                 if msg.strip().lower() in emoji.name.lower():
-                    name = emoji.name + ".gif" if emoji.animated else ".png"
+                    name = emoji.name + (".gif" if emoji.animated else ".png")
                     url = emoji.url
                     id = emoji.id
                     guild_name = guild.name
                 if msg.strip() in (str(emoji.id), emoji.name):
-                    name = emoji.name + ".gif" if emoji.animated else ".png"
+                    name = emoji.name + (".gif" if emoji.animated else ".png")
                     url = emoji.url
                     return name, url, emoji.id, guild.name
         if name:
