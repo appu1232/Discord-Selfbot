@@ -318,7 +318,7 @@ class Debugger:
             elif os.path.exists("cogs/{}.py".format(msg)):
                 self.bot.load_extension("cogs.{}".format(msg))
             else:
-                raise ModuleNotFoundError("No module named '{}'".format(msg))
+                raise ImportError("No module named '{}'".format(msg))
         except Exception as e:
             await ctx.send(self.bot.bot_prefix + 'Failed to load module: `{}.py`'.format(msg))
             await ctx.send(self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
@@ -335,7 +335,7 @@ class Debugger:
             elif os.path.exists("custom_cogs/{}.py".format(msg)):
                 self.bot.unload_extension("custom_cogs.{}".format(msg))
             else:
-                raise ModuleNotFoundError("No module named '{}'".format(msg))
+                raise ImportError("No module named '{}'".format(msg))
         except Exception as e:
             await ctx.send(self.bot.bot_prefix + 'Failed to unload module: `{}.py`'.format(msg))
             await ctx.send(self.bot.bot_prefix + '{}: {}'.format(type(e).__name__, e))
