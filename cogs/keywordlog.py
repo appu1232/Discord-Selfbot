@@ -6,6 +6,7 @@ import re
 import subprocess
 import psutil
 import sys
+import discord
 from PythonGists import PythonGists
 from datetime import timezone
 from cogs.utils.checks import load_notify_config
