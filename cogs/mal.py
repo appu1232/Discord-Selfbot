@@ -115,7 +115,7 @@ class Mal:
             em.add_field(name='Type', value=selection.type)
             episodes = 'Unknown' if selection.episodes == '0' else selection.episodes
             em.add_field(name='Episodes', value=episodes)
-            score = '?' if selection.score[0] == 0 else str(selection.score[0]) + '/10'
+            score = '?' if selection.score == 0 else str(selection.score) + '/10'
             em.add_field(name='Score', value=score)
             em.add_field(name='Status', value=selection.status)
             try:
@@ -128,7 +128,8 @@ class Mal:
             em.add_field(name='Synopsis',
                          value=text + ' [Read more »](https://myanimelist.net/anime/%s)' % selection.id)
 
-            em.add_field(name='Airing Time:', value=selection.air_time)
+            air_time = selection.air_start + " - " + selection.air_end
+            em.add_field(name='Airing Time:', value=air_time)
             em.set_thumbnail(url=selection.image)
             em.set_author(name=selection.title,
                           icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
@@ -157,6 +158,8 @@ class Mal:
             if found:
                 manga_id = re.findall('/manga/(.*)/', result)
                 try:
+                    if '/' in manga_id[0]:
+                        manga_id[0] = manga_id[0].split('/', 1)[0]
                     results = await self.t_client.get_manga(int(manga_id[0]))
                 except IndexError:
                     return await ctx.send(self.bot.bot_prefix + 'No results.')
@@ -188,7 +191,7 @@ class Mal:
             em.add_field(name='Type', value=selection.type)
             chapters = 'Unknown' if selection.chapters == '0' else selection.chapters
             em.add_field(name='Chapters', value=chapters)
-            score = '?' if selection.score[0] == 0 else str(selection.score[0]) + '/10'
+            score = '?' if selection.score == 0 else str(selection.score) + '/10'
             em.add_field(name='Score', value=score)
             em.add_field(name='Status', value=selection.status)
             try:
@@ -201,7 +204,8 @@ class Mal:
             em.add_field(name='Synopsis',
                          value=text + ' [Read more »](https://myanimelist.net/manga/%s)' % selection.id)
 
-            em.add_field(name='Airing Time:', value=selection.publish_time)
+            publish_time = selection.publish_start + " - " + selection.publish_end
+            em.add_field(name='Airing Time:', value=publish_time)
             em.set_thumbnail(url=selection.image)
             em.set_author(name=selection.title,
                           icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
@@ -298,35 +302,20 @@ class Mal:
             await ctx.message.delete()
             return await ctx.send(self.bot.bot_prefix + 'No results.')
 
-        # No way to get va name so must parse html and grab name from title -_-
-        request_headers = {
-            "Accept-Language": "en-US,en;q=0.5",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Referer": "http://thewebsite.com",
-            "Connection": "keep-alive"
-        }
-        loop = asyncio.get_event_loop()
-        try:
-            req = Request(result, headers=request_headers)
-            webpage = await loop.run_in_executor(None, urlopen, req)
-        except:
-            return await ctx.send(self.bot.bot_prefix + 'Exceeded daily request limit. Try again tomorrow, sorry!')
-        soup = BeautifulSoup(webpage, 'html.parser')
-        va_name = soup.title.string.split(' - MyAnimeList')[0]
-
         try:
             selection = await self.t_client.get_person(va_id[0])
         except IndexError:
             return await ctx.send(self.bot.bot_prefix + 'No results.')
-        em = discord.Embed(description='{}'.format('https://myanimelist.net/people/%s' % selection.id),
+        em = discord.Embed(description='{}'.format(selection.link),
                            colour=0x0066CC)
         em.add_field(name='Favorites', value=selection.favorites)
         if more_info:
             em.add_field(name='Total Roles', value='Fetching...')
             em.add_field(name='Most Popular Role', value='Fetching...', inline=False)
+        em.add_field(name='Birthday', value=selection.birthday)
+        em.add_field(name='More info', value=selection.more.replace('\\n', '\n'))
         em.set_image(url=selection.image)
-        em.set_author(name=va_name,
+        em.set_author(name=selection.name,
                       icon_url='https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png')
         em.set_footer(text='MyAnimeList Voice Actor Search')
         va_info = await ctx.send(content=None, embed=em)
@@ -337,9 +326,7 @@ class Mal:
         if more_info:
             all_chars = []
             for character in selection.voice_acting:
-                id = character['character']['link'].split('/')[2]
-                all_chars.append(id)
-            print(all_chars)
+                all_chars.append(str(character.id))
             try:
                 chunk_generator = self.partition(all_chars, int(len(all_chars)/5))
                 chunk_list = [chunk for chunk in chunk_generator]
@@ -376,9 +363,11 @@ class Mal:
         search = await ctx.send(self.bot.bot_prefix + "Searching...")
         found, result = await self.google_results('anime', query)
         if found:
-            anime_id = re.findall('/anime/(.*)/', result)[0]
+            anime_id = re.findall('/anime/(.*)/', result)
             try:
-                anime = await self.t_client.get_anime(anime_id)
+                if '/' in anime_id[0]:
+                    anime_id[0] = anime_id[0].split('/', 1)[0]
+                anime = await self.t_client.get_anime(anime_id[0])
             except Exception as e:
                 await ctx.send(self.bot.bot_prefix + ":exclamation: Oops!\n {}: {}".format(type(e).__name__, e))
                 await search.delete()
@@ -388,7 +377,8 @@ class Mal:
             await search.delete()
             return await ctx.message.delete()
         if anime.status == "Finished Airing":
-            remaining = "This anime has finished airing!\n" + anime.air_time
+            air_time = anime.air_start + " - " + anime.air_end
+            remaining = "This anime has finished airing!\n" + air_time
         else:
             remaining = await self.get_remaining_time(anime)
         embed = discord.Embed(title=anime.title, color=0x0066CC)

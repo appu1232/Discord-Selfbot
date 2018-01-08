@@ -9,6 +9,6 @@ PythonGists==1.1.3
 GitPython==2.1.3
 Pillow==4.2.1
 pyfiglet==0.7.5
-tokage==0.1.6.5
+tokage==1.0.0
 pytz==2017.2
 PyGithub==1.34
