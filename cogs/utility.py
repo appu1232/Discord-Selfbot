@@ -374,7 +374,7 @@ class Utility:
         similarity_percent = re.findall(r'(?s)<div class="resultsimilarityinfo">(.*?)<',
                                         str(soup.find('div', id='middle')))
         ti = ''
-        if title and float(similarity_percent[0][:-1]) > 60.0:
+        if title and float(similarity_percent[0][:-1]) > 50.0:
             title = title[0].strip().replace('<br/>', '\n').replace('<strong>', '').replace('</strong>', '').replace(
                 '<div class="resultcontentcolumn">', '').replace('<span class="subtext">', '\n').replace('<small>',
                                                                                                          '').replace(
@@ -422,7 +422,7 @@ class Utility:
                         'anime-pictures.net': 'anime-pictures.net', 'drawr.net': 'drawr'}
         for i in match:
             if not i.startswith('http://saucenao.com'):
-                if float(similarity_percent[count][:-1]) > 60.0:
+                if float(similarity_percent[count][:-1]) > 50.0:
                     link_to_site = '{} - {}, '.format(i, similarity_percent[count])
                     for site in source_sites:
                         if site in i:
@@ -461,7 +461,7 @@ class Utility:
             em.add_field(name='Source sites - percent similarity', value=sources, inline=False)
 
         if not sources and not creator and not characters and not material and not title or float(
-                similarity_percent[0][:-1]) < 60.0:
+                similarity_percent[0][:-1]) < 50.0:
             em = discord.Embed(color=0xaa550f, description='**Input:**\n{}\n\n**No results found.**'.format(txt))
 
         await ctx.send(content=None, embed=em)
