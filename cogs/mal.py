@@ -248,7 +248,7 @@ class Mal:
 
     @mal.command(pass_context=True, alias=['character'])
     async def char(self, ctx, *, query):
-        """Finds specified character actor on MyAnimeList"""
+        """Finds specified character on MyAnimeList"""
         fetch = await ctx.send(self.bot.bot_prefix + 'Searching...')
         found, result = await self.google_results('character', query)
         if found:
@@ -263,17 +263,25 @@ class Mal:
             return await ctx.send(self.bot.bot_prefix + 'No results.')
         em = discord.Embed(description='{}'.format('https://myanimelist.net/character/%s' % selection.id),
                            colour=0x0066CC)
-        em.add_field(name='Anime', value=selection.animeography[0]['name'], inline=False)
-        if len(selection.raw_voice_actors) > 1:
+
+        print(dir(selection))
+        if selection.animeography:
+            em.add_field(name='Anime', value=selection.animeography[0].title, inline=False)
+        elif selection.mangaography:
+            em.add_field(name='Manga', value=selection.mangaography[0].title, inline=False)
+        print(dir(selection.voice_actors))
+        if len(selection.voice_actors) > 1:
             va = None
-            for actor in selection.raw_voice_actors:
-                if actor['language'] == 'Japanese':
-                    va = actor['name']
+            for actor in selection.voice_actors:
+                if actor.language == 'Japanese':
+                    va = actor.name
                     break
             if not va:
-                va = selection.raw_voice_actors[0]['name']
+                va = selection.voice_actors[0].name
+        elif len(selection.voice_actors) == 0:
+            va = "N/A"
         else:
-            va = selection.raw_voice_actors[0]['name']
+            va = selection.voice_actors[0].name
         em.add_field(name='Voice Actor', value=va)
         em.add_field(name='Favorites', value=selection.favorites)
         em.set_image(url=selection.image)
