@@ -264,12 +264,10 @@ class Mal:
         em = discord.Embed(description='{}'.format('https://myanimelist.net/character/%s' % selection.id),
                            colour=0x0066CC)
 
-        print(dir(selection))
         if selection.animeography:
             em.add_field(name='Anime', value=selection.animeography[0].title, inline=False)
         elif selection.mangaography:
             em.add_field(name='Manga', value=selection.mangaography[0].title, inline=False)
-        print(dir(selection.voice_actors))
         if len(selection.voice_actors) > 1:
             va = None
             for actor in selection.voice_actors:
