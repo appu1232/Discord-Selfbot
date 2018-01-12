@@ -551,6 +551,11 @@ async def on_message(message):
 
     if not hasattr(bot, 'log_conf'):
         bot.log_conf = load_log_config()
+        
+    if isinstance(message.channel, discord.abc.PrivateChannel):
+        add_alllog(str(message.channel.id), "DM", message)
+    else:
+        add_alllog(str(message.channel.id), str(message.guild.id), message)
 
     # Keyword logging.
     if bot.log_conf['keyword_logging'] == 'on' and isinstance(message.channel, discord.abc.GuildChannel):
@@ -558,7 +563,6 @@ async def on_message(message):
         try:
             word_found = False
             if (bot.log_conf['allservers'] == 'True' or str(message.guild.id) in bot.log_conf['servers']) and (str(message.guild.id) not in bot.log_conf['blacklisted_servers'] and str(message.channel.id) not in bot.log_conf['blacklisted_channels']):
-                add_alllog(str(message.channel.id), str(message.guild.id), message)
                 if message.author.id != bot.user.id and (not message.author.bot and not any(x in str(message.author.id) for x in bot.log_conf['blacklisted_users'])) and message.author not in bot.user.blocked:
                     for word in bot.log_conf['keywords']:
                         if ' [server]' in word:
@@ -691,10 +695,6 @@ async def on_message(message):
         # Bad habit but this is for skipping errors when dealing with Direct messages, blocked users, etc. Better to just ignore.
         except (AttributeError, discord.errors.HTTPException):
             pass
-    if isinstance(message.channel, discord.abc.PrivateChannel):
-        add_alllog(str(message.channel.id), "DM", message)
-    else:
-        add_alllog(str(message.channel.id), str(message.guild.id), message)
 
     await bot.process_commands(message)
 
