@@ -201,7 +201,10 @@ async def on_ready():
     uid_message = 'User id: %s.' % bot.user.id
     separator = '━' * max(len(message), len(uid_message))
     print(separator)
-    print(message)
+    try:
+        print(message)
+    except: # some bot usernames with special chars fail on shitty platforms
+        pass
     print(uid_message)
     print(separator)
 
