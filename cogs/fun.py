@@ -309,15 +309,12 @@ class Fun:
         # replace all custom server emoji <:emoji:123456789> with "<" and add emoji ids to non_unicode_emoji_list
         char_index = 0
         emotes = re.findall(r"<a?:(?:[a-zA-Z0-9]+?):(?:[0-9]+?)>", msg)
-        print(emotes)
         react_me = re.sub(r"<a?:([a-zA-Z0-9]+?):([0-9]+?)>", "", msg)
-        print(react_me)
         
         for emote in emotes:
             reactions.append(discord.utils.get(self.bot.emojis, id=int(emote.split(":")[-1][:-1])))
             non_unicode_emoji_list.append(emote)
             
-        print(non_unicode_emoji_list)
         
         if Fun.has_dupe(non_unicode_emoji_list):
             return await ctx.send(self.bot.bot_prefix + 
@@ -356,7 +353,6 @@ class Fun:
                 else:
                     reactions.append(char)
 
-        print(reactions)
         if channel == "current":
             async for message in ctx.message.channel.history(limit=limit):
                 if (not msg_id and message.id != ctx.message.id) or (msg_id == message.id):
