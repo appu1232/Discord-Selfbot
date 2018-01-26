@@ -30,11 +30,10 @@ class Userinfo:
             else:
                 user = ctx.message.author
 
-            # Thanks to IgneelDxD for help on this
-            if user.avatar_url[54:].startswith('a_'):
-                avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
+            if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
+                avi = user.avatar_url.rsplit("?", 1)[0]
             else:
-                avi = user.avatar_url
+                avi = user.avatar_url_as(static_format='png')
             if isinstance(user, discord.Member):
                 role = user.top_role.name
                 if role == "@everyone":
@@ -82,9 +81,8 @@ class Userinfo:
         else:
             user = ctx.message.author
 
-        # Thanks to IgneelDxD for help on this
         if user.avatar_url_as(static_format='png')[54:].startswith('a_'):
-            avi = 'https://images.discordapp.net/avatars/' + user.avatar_url[35:-10]
+            avi = user.avatar_url.rsplit("?", 1)[0]
         else:
             avi = user.avatar_url_as(static_format='png')
         if embed_perms(ctx.message):
