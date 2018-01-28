@@ -5,7 +5,7 @@ SETLOCAL EnableDelayedExpansion
 for /f %%i in ('git rev-parse --abbrev-ref HEAD') do set BRANCH=%%i
 
 python -V >nul 2>&1 || goto :python
-if not exist appuselfbot.py (
+if not exist .git\ (
     echo This seems to be your first run. The setup will now proceed to download all required files. They will be downloaded to the same location as where this run.bat file is.
     pause
     git init . >nul || goto :git
