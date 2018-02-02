@@ -204,7 +204,7 @@ async def on_ready():
     try:
         print(message)
     except: # some bot usernames with special chars fail on shitty platforms
-        pass
+        print(message.encode(errors='replace').decode())
     print(uid_message)
     print(separator)
 
