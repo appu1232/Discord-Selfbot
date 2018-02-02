@@ -197,13 +197,17 @@ bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
 # Startup
 @bot.event
 async def on_ready():
-    print('Logged in as')
+    message = 'Logged in as %s.' % bot.user
+    uid_message = 'User id: %s.' % bot.user.id
+    separator = '━' * max(len(message), len(uid_message))
+    print(separator)
     try:
-        print(bot.user.name)
-    except:
-        pass
-    print('User id:' + str(bot.user.id))
-    print('------')
+        print(message)
+    except: # some bot usernames with special chars fail on shitty platforms
+        print(message.encode(errors='replace').decode())
+    print(uid_message)
+    print(separator)
+
     bot.uptime = datetime.datetime.now()
     bot.icount = bot.message_count = bot.mention_count = bot.keyword_log = 0
     bot.self_log = bot.all_log = {}
