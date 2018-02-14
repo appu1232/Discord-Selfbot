@@ -129,10 +129,20 @@ class Server:
             await ctx.send(self.bot.bot_prefix + server.icon_url)
         await ctx.message.delete()
 
-    @serverinfo.command(pass_context=True)
-    async def role(self, ctx, *, msg):
-        """Get more info about a specific role. Ex: [p]server role Admins"""
-        for role in ctx.message.guild.roles:
+    @serverinfo.command()
+    async def role(self, ctx, msg, guild=None):
+        """Get more info about a specific role. Ex: [p]server role Admins
+
+        You need to quote roles with spaces. You may also specify a server to check the role for. Ex. [p]server role "Dev" 299293492645986307"""
+        if guild:
+            guild, found = self.find_server(guild)
+            if not found:
+                return await ctx.send(guild)
+            guild_roles = guild.roles
+        else:
+            guild = ctx.message.guild
+            guild_roles = ctx.message.guild.roles
+        for role in guild_roles:
             if msg.lower() == role.name.lower() or msg == role.id:
                 all_users = [str(x) for x in role.members]
                 all_users.sort()
@@ -146,18 +156,18 @@ class Server:
                 em.add_field(name='Mentionable', value=role.mentionable)
                 if len(role.members) > 10:
                     all_users = all_users.replace(', ', '\n')
-                    url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, ctx.message.guild.name), content=str(all_users), name='role.txt')
+                    url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, guild.name), content=str(all_users), name='role.txt')
                     em.add_field(name='All users', value='{} users. [List of users posted to Gist.]({})'.format(len(role.members), url), inline=False)
                 elif len(role.members) >= 1:
                     em.add_field(name='All users', value=all_users, inline=False)
                 else:
                     em.add_field(name='All users', value='There are no users in this role!', inline=False)
                 em.add_field(name='Created at', value=role.created_at.__format__('%x at %X'))
-                em.set_thumbnail(url='http://www.colorhexa.com/%s.png' % str(role.color).strip("#"))
+                em.set_thumbnail(url='http://www.colorhexa.com/{}.png'.format(str(role.color).strip("#")))
                 await ctx.message.delete()
                 return await ctx.send(content=None, embed=em)
         await ctx.message.delete()
-        await ctx.send(self.bot.bot_prefix + 'Could not find role ``%s``' % msg)
+        await ctx.send(self.bot.bot_prefix + 'Could not find role ``{}``'.format(msg))
 
     @commands.command(aliases=['channel', 'cinfo', 'ci'], pass_context=True, no_pm=True)
     async def channelinfo(self, ctx, *, channel: int = None):
