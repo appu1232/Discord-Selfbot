@@ -13,7 +13,7 @@ if not exist .git\ (
     git fetch --all
 	git reset --hard origin/master
 )
-get fetch origin master >nul 2>&1
+git fetch origin master >nul 2>&1
 git remote show origin > tmp.txt
 set findfile="tmp.txt"
 set findtext="up"
