@@ -15,6 +15,7 @@ import os
 import logging
 import requests
 import logging.handlers
+import discord
 from bs4 import BeautifulSoup
 from json import load, dump
 from datetime import timezone
