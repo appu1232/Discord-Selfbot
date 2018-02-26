@@ -506,7 +506,7 @@ async def on_message(message):
                             message.channel = bot.get_channel(bot.channel_last[0])
 
         if hasattr(bot, 'channel_last'):
-            if message.channel.id not in bot.channel_last:
+            if message.channel and message.channel.id not in bot.channel_last:
                 bot.channel_last.pop(0)
                 bot.channel_last.append(message.channel.id)
         if hasattr(bot, 'icount'):
