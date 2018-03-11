@@ -77,7 +77,7 @@ def gc_clear(gc_time):
     return time.time()
 
 
-def game_time_check(oldtime, interval):
+def activity_time_check(oldtime, interval):
     if time.time() - float(interval) < oldtime:
         return False
     return time.time()

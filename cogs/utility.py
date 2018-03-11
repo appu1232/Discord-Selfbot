@@ -562,23 +562,23 @@ class Utility:
             await ctx.send(self.bot.bot_prefix + "Failed to post to Hastebin. The API may be down right now.")
 
     @commands.command(pass_context=True)
-    async def whoisplaying(self, ctx, *, game):
-        """Check how many people are playing a certain game."""
+    async def whoisplaying(self, ctx, *, activity):
+        """Check how many people are playing a certain activity."""
         msg = ""
         for guild in self.bot.guilds:
             for user in guild.members:
-                if user.game is not None:
-                    if user.game.name is not None:
-                        if user.game.name.lower() == game.lower():
+                if user.activity is not None:
+                    if user.activity.name is not None:
+                        if user.activity.name.lower() == activity.lower():
                             msg += "{}#{}\n".format(user.name, user.discriminator)
         msg = "\n".join(set(msg.split("\n")))  # remove dupes
         if len(msg) > 1500:
-            gist = PythonGists.Gist(description="Number of people playing {}".format(game), content=msg, name="Output")
+            gist = PythonGists.Gist(description="Number of people playing {}".format(activity), content=msg, name="Output")
             await ctx.send("{}Large output posted to Gist: {}".format(self.bot.bot_prefix, gist))
         elif len(msg) == 0:
-            await ctx.send(self.bot.bot_prefix + "Nobody is playing that game!")
+            await ctx.send(self.bot.bot_prefix + "Nobody is playing that activity!")
         else:
-            embed = discord.Embed(title="Number of people playing {}".format(game), description=msg)
+            embed = discord.Embed(title="Number of people playing {}".format(activity), description=msg)
             await ctx.send("", embed=embed)
             
     @commands.command(pass_context=True, aliases=['anim'])
