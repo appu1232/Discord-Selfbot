@@ -26,7 +26,7 @@ class Misc:
         if embed_perms(ctx.message) and txt != 'short':
             em = discord.Embed(color=0xad2929, title='\ud83e\udd16 Appu\'s Discord Selfbot',
                                description='**Features:**\n- Custom commands/reactions\n- Save last x images in a channel to your computer\n- Keyword notifier\n'
-                                           '- Set/cycle your game status and your avatar\n- Google web and image search\n- MyAnimeList search\n- Spoiler tagging\n'
+                                           '- Set/cycle your activity status and your avatar\n- Google web and image search\n- MyAnimeList search\n- Spoiler tagging\n'
                                            '- Server info commands\n- Quoting, calculator, creating polls, and much more')
             em.add_field(name='\ud83d\udd17 Link to download',
                          value='[Github link](https://github.com/appu1232/Discord-Selfbot/tree/master)')
@@ -49,9 +49,9 @@ class Misc:
             time = '%s days, %s hours, %s minutes, and %s seconds' % (days, hours, minutes, seconds)
         else:
             time = '%s hours, %s minutes, and %s seconds' % (hours, minutes, seconds)
-        game = self.bot.game
-        if not game:
-            game = 'None'
+        activity = self.bot.activity
+        if not activity:
+            activity = 'None'
         channel_count = 0
         for guild in self.bot.guilds:
             channel_count += len(guild.channels)
@@ -72,9 +72,9 @@ class Misc:
             em.add_field(name=u'\u2694 Servers', value=str(len(self.bot.guilds)))
             em.add_field(name=u'\ud83d\udcd1 Channels', value=str(channel_count))
             em.add_field(name=u'\u270F Keywords logged', value=str(self.bot.keyword_log))
-            g = u'\U0001F3AE Game'
-            if '=' in game: g = '\ud83c\udfa5 Stream'
-            em.add_field(name=g, value=game)
+            g = u'\U0001F3AE Activity'
+            if '=' in activity: g = '\ud83c\udfa5 Stream'
+            em.add_field(name=g, value=activity)
             try:
                 mem_usage = '{:.2f} MiB'.format(__import__('psutil').Process().memory_full_info().uss / 1024 ** 2)
             except AttributeError:
@@ -107,9 +107,9 @@ class Misc:
                 pass
             await ctx.send(content=None, embed=em)
         else:
-            msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Received: %s\nMentions: %s\nguilds: %s\nKeywords logged: %s\nGame: %s```' % (
+            msg = '**Bot Stats:** ```Uptime: %s\nMessages Sent: %s\nMessages Received: %s\nMentions: %s\nguilds: %s\nKeywords logged: %s\nActivity: %s```' % (
             time, str(self.bot.icount), str(self.bot.message_count), str(self.bot.mention_count),
-            str(len(self.bot.guilds)), str(self.bot.keyword_log), game)
+            str(len(self.bot.guilds)), str(self.bot.keyword_log), activity)
             await ctx.send(self.bot.bot_prefix + msg)
         await ctx.message.delete()
 
@@ -388,18 +388,18 @@ class Misc:
             json.dump(opt, fp, indent=4)
 
     @commands.command(pass_context=True, aliases=['stream', 'watching', 'listening'])
-    async def game(self, ctx, *, game: str = None):
-        """Set game/stream. Ex: [p]game napping [p]help game for more info
+    async def activity(self, ctx, *, activity: str = None):
+        """Set activity/stream. Ex: [p]activity napping [p]help activity for more info
 
-        Your game/stream status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
+        Your activity/stream status will not show for yourself, only other people can see it. This is a limitation of how the client works and how the api interacts with the client.
 
         --Setting playing/watching/listening--
-        Set a game: [p]game <text>
+        Set a activity: [p]activity <text>
         Set watching: [p]watching <text>
         Set listening: [p]listening <text>
-        To set a rotating game status, do [p]game game1 | game2 | game3 | etc.
+        To set a rotating game status, do [p]activity activity1 | activity2 | activity3 | etc.
         It will then prompt you with an interval in seconds to wait before changing the game and after that the order in which to change (in order or random)
-        Ex: [p]game with matches | sleeping | watching anime
+        Ex: [p]activity with matches | sleeping | watching anime
 
         --Setting stream--
         Same as above but you also need a link to the stream. (must be a valid link to a stream or else the status will not show as streaming).
@@ -407,7 +407,7 @@ class Misc:
         Ex: [p]stream Underwatch=https://www.twitch.tv/a_seagull
         or [p]stream Some moba=https://www.twitch.tv/doublelift | Underwatch=https://www.twitch.tv/a_seagull"""
         is_stream = False
-        if ctx.invoked_with == "game":
+        if ctx.invoked_with == "activity":
             message = "Playing"
             self.bot.status_type = 0
         elif ctx.invoked_with == "stream":
@@ -420,9 +420,9 @@ class Misc:
         elif ctx.invoked_with == "listening":
             message = "Listening to"
             self.bot.status_type = 2
-        if game:
+        if activity:
             # Cycle games if more than one game is given.
-            if ' | ' in game:
+            if ' | ' in activity:
                 await ctx.send(self.bot.bot_prefix + 'Input interval in seconds to wait before changing (``n`` to cancel):')
 
                 def check(msg):
@@ -439,8 +439,8 @@ class Misc:
                 elif reply.content.strip().isdigit():
                     interval = int(reply.content.strip())
                     if interval >= 10:
-                        self.bot.game_interval = interval
-                        games = game.split(' | ')
+                        self.bot.activity_interval = interval
+                        games = activity.split(' | ')
                         if len(games) != 2:
                             await ctx.send(self.bot.bot_prefix + 'Change in order or randomly? Input ``o`` for order or ``r`` for random:')
                             s = await self.bot.wait_for("message", check=check2)
@@ -460,40 +460,40 @@ class Misc:
                                                             status=message, time=reply.content.strip()))
 
                         stream = 'yes' if is_stream else 'no'
-                        games = {'games': game.split(' | '), 'interval': interval, 'type': loop_type, 'stream': stream, 'status': self.bot.status_type}
-                        with open('settings/games.json', 'w') as g:
+                        games = {'games': activity.split(' | '), 'interval': interval, 'type': loop_type, 'stream': stream, 'status': self.bot.status_type}
+                        with open('settings/activities.json', 'w') as g:
                             json.dump(games, g, indent=4)
 
-                        self.bot.game = game.split(' | ')[0]
+                        self.bot.activity = activity.split(' | ')[0]
 
                     else:
                         return await ctx.send(self.bot.bot_prefix + 'Cancelled. Interval is too short. Must be at least 10 seconds.')
 
             # Set game if only one game is given.
             else:
-                self.bot.game_interval = None
-                self.bot.game = game
+                self.bot.activity_interval = None
+                self.bot.activity = activity
                 stream = 'yes' if is_stream else 'no'
-                games = {'games': str(self.bot.game), 'interval': '0', 'type': 'none', 'stream': stream, 'status': self.bot.status_type}
-                with open('settings/games.json', 'w') as g:
+                games = {'games': str(self.bot.activity), 'interval': '0', 'type': 'none', 'stream': stream, 'status': self.bot.status_type}
+                with open('settings/activities.json', 'w') as g:
                     json.dump(games, g, indent=4)
-                if is_stream and '=' in game:
-                    g, url = game.split('=')
+                if is_stream and '=' in activity:
+                    g, url = activity.split('=')
                     await ctx.send(self.bot.bot_prefix + 'Stream set as: ``Streaming %s``' % g)
-                    await self.bot.change_presence(game=discord.Game(name=g, type=1, url=url))
+                    await self.bot.change_presence(activity=discord.Game(name=g, type=1, url=url))
                 else:
-                    await ctx.send(self.bot.bot_prefix + 'Game set as: ``{} {}``'.format(message, game))
-                    await self.bot.change_presence(game=discord.Game(name=game, type=self.bot.status_type))
+                    await ctx.send(self.bot.bot_prefix + 'Game set as: ``{} {}``'.format(message, activity))
+                    await self.bot.change_presence(activity=discord.Game(name=activity, type=self.bot.status_type))
 
         # Remove game status.
         else:
             self.bot.game_interval = None
-            self.bot.game = None
+            self.bot.activity = None
             self.bot.is_stream = False
-            await self.bot.change_presence(game=None)
+            await self.bot.change_presence(activity=None)
             await ctx.send(self.bot.bot_prefix + 'Set playing status off')
-            if os.path.isfile('settings/games.json'):
-                os.remove('settings/games.json')
+            if os.path.isfile('settings/activities.json'):
+                os.remove('settings/activities.json')
 
     @commands.group(aliases=['avatars'], pass_context=True)
     async def avatar(self, ctx):
