@@ -409,17 +409,17 @@ class Misc:
         is_stream = False
         if ctx.invoked_with == "game":
             message = "Playing"
-            self.bot.status_type = 0
+            self.bot.status_type = discord.ActivityType.playing
         elif ctx.invoked_with == "stream":
             is_stream = True
-            self.bot.status_type = 1
+            self.bot.status_type = discord.ActivityType.streaming
             self.bot.is_stream = True
         elif ctx.invoked_with == "watching":
             message = "Watching"
-            self.bot.status_type = 3
+            self.bot.status_type = discord.ActivityType.watching
         elif ctx.invoked_with == "listening":
             message = "Listening to"
-            self.bot.status_type = 2
+            self.bot.status_type = discord.ActivityType.listening
         if game:
             # Cycle games if more than one game is given.
             if ' | ' in game:
@@ -480,17 +480,17 @@ class Misc:
                 if is_stream and '=' in game:
                     g, url = game.split('=')
                     await ctx.send(self.bot.bot_prefix + 'Stream set as: ``Streaming %s``' % g)
-                    await self.bot.change_presence(game=discord.Game(name=g, type=1, url=url))
+                    await self.bot.change_presence(activity=discord.Streaming(name=g, url=url))
                 else:
                     await ctx.send(self.bot.bot_prefix + 'Game set as: ``{} {}``'.format(message, game))
-                    await self.bot.change_presence(game=discord.Game(name=game, type=self.bot.status_type))
+                    await self.bot.change_presence(activity=discord.Activity(name=game, type=self.bot.status_type))
 
         # Remove game status.
         else:
             self.bot.game_interval = None
             self.bot.game = None
             self.bot.is_stream = False
-            await self.bot.change_presence(game=None)
+            await self.bot.change_presence(activity=None)
             await ctx.send(self.bot.bot_prefix + 'Set playing status off')
             if os.path.isfile('settings/games.json'):
                 os.remove('settings/games.json')
