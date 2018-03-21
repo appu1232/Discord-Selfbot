@@ -200,7 +200,7 @@ bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
 async def on_ready():
     message = 'Logged in as %s.' % bot.user
     uid_message = 'User id: %s.' % bot.user.id
-    separator = '━' * max(len(message), len(uid_message))
+    separator = '-' * max(len(message), len(uid_message))
     print(separator)
     try:
         print(message)
@@ -365,6 +365,8 @@ async def on_command_error(ctx, error):
         formatter = commands.formatter.HelpFormatter()
         help = await formatter.format_help_for(ctx, ctx.command)
         await ctx.send(bot.bot_prefix + "You are missing required arguments.\n" + help[0])
+    elif isinstance(error, commands.errors.BadArgument):
+        await ctx.send(bot.bot_prefix + "You have given an invalid argument.")
     else:
         if _silent:
             await ctx.send(bot.bot_prefix + "An error occurred with the `{}` command.".format(ctx.command.name))

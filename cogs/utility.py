@@ -812,26 +812,33 @@ class Utility:
         else:
             try:
                 os.system('clear')
-            except:
+            except Exception:
                 for _ in range(100):
                     print()
 
-        print('Logged in as')
+        message = 'Logged in as %s.' % bot.user
+        uid_message = 'User id: %s.' % bot.user.id
+        separator = '-' * max(len(message), len(uid_message))
+        print(separator)
         try:
-            print(self.bot.user.name)
-        except:
-            pass
-        print('User id: ' + str(self.bot.user.id))
-        print('------')
+            print(message)
+        except: # some bot usernames with special chars fail on shitty platforms
+            print(message.encode(errors='replace').decode())
+        print(uid_message)
+        print(separator)
         await ctx.send(self.bot.bot_prefix + 'Console cleared successfully.')
         
-    @commands.command(aliases=['ra'])
-    async def readall(self, ctx, msg: str = None):
-        """Marks everything as read. Append `server` to your message to only clear the current server."""
+    @commands.command()
+    async def read(self, ctx, id: int=None):
+        """Marks a specified server as read. If an ID is not provided, all servers will be marked as read."""
         await ctx.message.delete()
-        if msg == "server":
-            await ctx.guild.ack()
-            await ctx.send(self.bot.bot_prefix + "Marked current guild as read.")
+        if id:
+            guild = self.bot.get_guild(int(id))
+            if guild:
+                await guild.ack()
+                await ctx.send(self.bot.bot_prefix + "Marked {} as read.".format(guild.name))
+            else:
+                await ctx.send(self.bot.bot_prefix + "Invalid server ID.")
         else:
             for guild in self.bot.guilds:
                 await guild.ack()

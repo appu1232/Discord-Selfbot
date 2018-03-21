@@ -239,7 +239,7 @@ class Misc:
             pass
 
     @commands.command(pass_context=True)
-    async def editembed(self, ctx, msg_id : int):
+    async def editembed(self, ctx, msg_id: int):
         """Edit an embedded message."""
         msg = await ctx.history(limit=100).get(id=msg_id)
         if not msg:
@@ -259,6 +259,13 @@ class Misc:
                 result.append("color={}".format(str(old_embed.color)[1:]))
             if old_embed.url:
                 result.append("url={}".format(old_embed.url))
+            if old_embed.author:
+                author = "author=name=" + old_embed.author.name
+                if old_embed.author.icon_url:
+                    author += " icon=" + old_embed.author.icon_url
+                if old_embed.author.url:
+                    author += " url=" + old_embed.author.url
+                result.append(author)
             if fields:
                 for field in fields:
                     result.append("field=name={} value={} inline={}".format(field.name, field.value, field.inline))
@@ -340,11 +347,14 @@ class Misc:
                 if 'icon=' in author:
                     text, icon = author.split('icon=')
                     if 'url=' in icon:
-                        print("here")
+                        em.set_author(name=text.strip()[5:], icon_url=icon.split('url=')[0].strip(), url=icon.split('url=')[1].strip())
+                    else:
+                        em.set_author(name=text.strip()[5:], icon_url=icon)
+                else:
+                    if 'url=' in author:
                         em.set_author(name=author.split('url=')[0].strip()[5:], url=author.split('url=')[1].strip())
                     else:
                         em.set_author(name=author)
-
             if image:
                 em.set_image(url=image)
             if thumbnail:
