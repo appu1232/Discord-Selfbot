@@ -46,7 +46,7 @@ class Userinfo:
                     em.add_field(name='Nick', value=user.nick, inline=True)
                     em.add_field(name='Status', value=user.status, inline=True)
                     em.add_field(name='In Voice', value=voice_state, inline=True)
-                    em.add_field(name='Game', value=user.game, inline=True)
+                    em.add_field(name='Game', value=user.activity, inline=True)
                     em.add_field(name='Highest Role', value=role, inline=True)
                 em.add_field(name='Account Created', value=user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 if isinstance(user, discord.Member):
@@ -56,7 +56,7 @@ class Userinfo:
                 await ctx.send(embed=em)
             else:
                 if isinstance(user, discord.Member):
-                    msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nGame: %s\nHighest Role: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (user.id, user.nick, user.status, voice_state, user.game, role, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
+                    msg = '**User Info:** ```User ID: %s\nNick: %s\nStatus: %s\nIn Voice: %s\nGame: %s\nHighest Role: %s\nAccount Created: %s\nJoin Date: %s\nAvatar url:%s```' % (user.id, user.nick, user.status, voice_state, user.activity, role, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), user.joined_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
                 else:
                     msg = '**User Info:** ```User ID: %s\nAccount Created: %s\nAvatar url:%s```' % (user.id, user.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'), avi)
                 await ctx.send(self.bot.bot_prefix + msg)
