@@ -816,8 +816,8 @@ class Utility:
                 for _ in range(100):
                     print()
 
-        message = 'Logged in as %s.' % bot.user
-        uid_message = 'User id: %s.' % bot.user.id
+        message = 'Logged in as %s.' % self.bot.user
+        uid_message = 'User id: %s.' % self.bot.user.id
         separator = '-' * max(len(message), len(uid_message))
         print(separator)
         try:
