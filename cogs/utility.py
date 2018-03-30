@@ -20,7 +20,7 @@ from urllib.request import Request, urlopen
 import math
 from math import sqrt
 from cogs.utils.dataIO import dataIO
-from cogs.utils.config import write_config_value, hastebin
+from cogs.utils.config import write_config_value
 
 '''Module for fun/meme commands commands'''
 
