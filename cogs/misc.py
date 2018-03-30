@@ -7,11 +7,10 @@ import discord
 import git
 import os
 import io
-from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.config import get_config_value
 from cogs.utils.dataIO import dataIO
-from cogs.utils.checks import embed_perms, cmd_prefix_len, parse_prefix, get_user
+from cogs.utils.checks import embed_perms, cmd_prefix_len, parse_prefix, get_user, hastebin
 
 '''Module for miscellaneous commands'''
 
@@ -96,12 +95,11 @@ class Misc:
                     latest = g.execute(
                         ["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version,
                          "origin/%s" % branch])
-                    gist_latest = PythonGists.Gist(description='Latest changes for the selfbot.', content=latest,
-                                                   name='latest.txt')
+                    haste_latest = await hastebin(latest)
                     if version == '1':
-                        status = 'Behind by 1 release%s [Latest update.](%s)' % (branch_note, gist_latest)
+                        status = 'Behind by 1 release%s [Latest update.](%s)' % (branch_note, haste_latest)
                     else:
-                        status = '%s releases behind%s [Latest updates.](%s)' % (version, branch_note, gist_latest)
+                        status = '%s releases behind%s [Latest updates.](%s)' % (version, branch_note, haste_latest)
                 em.add_field(name=u'\U0001f4bb Update status:', value=status)
             except:
                 pass

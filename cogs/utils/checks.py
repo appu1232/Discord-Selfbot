@@ -4,6 +4,7 @@ import git
 import discord
 import os
 import aiohttp
+import requests
 from cogs.utils.dataIO import dataIO
 from urllib.parse import quote as uriquote
 
@@ -213,3 +214,12 @@ def parse_prefix(bot, text):
     if type(prefix) is list:
         prefix = prefix[0]
     return text.replace("[c]", prefix).replace("[b]", bot.bot_prefix)
+
+async def hastebin(content):
+    async with aiohttp.ClientSession() as session:
+        async with session.post("https://hastebin.com/documents", data=content.encode('utf-8')) as resp:
+            if resp.status == 200:
+                result = await resp.json()
+                return "https://hastebin.com/" + result["key"]
+            else:
+                return "Error with creating Hastebin. Status: %s" % resp.status

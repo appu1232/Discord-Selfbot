@@ -5,7 +5,7 @@ import aiohttp
 import inspect
 import traceback
 from contextlib import redirect_stdout
-from PythonGists import PythonGists
+from cogs.utils.checks import hastebin
 import io
 
 '''Module for an embeded python interpreter. More or less the same as the debugger module but with embeds.'''
@@ -127,10 +127,7 @@ class EmbedShell():
                         item,
                         history[item])
 
-                gist_url = PythonGists.Gist(description='Py output', content=str(history_string), name='output.txt')
-                return_msg = "[`Leaving shell session. " \
-                             "History hosted on Gist.`]({})".format(
-                    gist_url)
+                haste_url = await hastebin(str(history_string))
 
                 self.repl_embeds[shell].add_field(
                     name="`>>> {}`".format(cleaned),
@@ -169,10 +166,7 @@ class EmbedShell():
                     if len(cleaned) > 800:
                         cleaned = "<Too big to be printed>"
                     if len(return_msg) > 800:
-                        gist_url = PythonGists.Gist(description='Py output', content=str(return_msg), name='output.txt')
-                        return_msg = "[`SyntaxError too big to be printed. " \
-                                     "Hosted on Gist.`]({})".format(
-                            gist_url)
+                        haste_url = await hastebin(str(return_msg))
 
                     self.repl_embeds[shell].add_field(
                         name="`>>> {}`".format(cleaned),
@@ -223,12 +217,12 @@ class EmbedShell():
             try:
                 if fmt is not None:
                     if len(fmt) >= 800:
-                        gist_url = PythonGists.Gist(description='Py output', content=str(fmt), name='output.txt')
+                        haste_url = await hastebin(str(fmt))
                         self.repl_embeds[shell].add_field(
                             name="`>>> {}`".format(cleaned),
                             value="[`Content too big to be printed. "
-                                  "Hosted on Gist.`]({})".format(
-                                gist_url),
+                                  "Hosted on Hastebin.`]({})".format(
+                                haste_url),
                             inline=False)
 
                         await self.repl_sessions[session].edit(embed=self.repl_embeds[shell])

@@ -7,9 +7,8 @@ import subprocess
 import psutil
 import sys
 import discord
-from PythonGists import PythonGists
 from datetime import timezone
-from cogs.utils.checks import load_notify_config
+from cogs.utils.checks import load_notify_config, hastebin
 
 keywords = []
 val = 0
@@ -997,9 +996,9 @@ class KeywordLogger:
                                 pass
                         msg = msg.rstrip(', ') + '```'
 
-                    if len(msg) > 1950 or 'gist' in ctx.message.content:
-                        gist_log = PythonGists.Gist(description='Logging info.', content=msg, name='log.txt')
-                        await menu.edit(content=self.bot.bot_prefix + gist_log)
+                    if len(msg) > 1950 or 'haste' in ctx.message.content:
+                        haste_log = await hastebin(msg)
+                        await menu.edit(content=self.bot.bot_prefix + haste_log)
                     else:
                         await menu.edit(content=self.bot.bot_prefix + msg)
 

@@ -3,9 +3,8 @@ import discord
 import os
 import re
 from urllib.parse import urlparse
-from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import embed_perms, cmd_prefix_len
+from cogs.utils.checks import embed_perms, cmd_prefix_len, hastebin
 
 '''Module for server commands.'''
 
@@ -85,9 +84,9 @@ class Server:
                 em.add_field(name='Highest role', value=server.role_hierarchy[0])
                 em.add_field(name='Number of roles', value=str(role_count))
                 em.add_field(name='Number of emotes', value=str(emoji_count))
-                url = PythonGists.Gist(description='All Users in: %s' % server.name, content=str(all), name='server.txt')
-                gist_of_users = '[List of all {} users in this server]({})'.format(server.member_count, url)
-                em.add_field(name='Users', value=gist_of_users)
+                url = await hastebin(str(all))
+                hastebin_of_users = '[List of all {} users in this server]({})'.format(server.member_count, url)
+                em.add_field(name='Users', value=hastebin_of_users)
                 em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
                 em.set_thumbnail(url=server.icon_url)
                 em.set_author(name='Server Info', icon_url='https://i.imgur.com/RHagTDg.png')
@@ -156,8 +155,8 @@ class Server:
                 em.add_field(name='Mentionable', value=role.mentionable)
                 if len(role.members) > 10:
                     all_users = all_users.replace(', ', '\n')
-                    url = PythonGists.Gist(description='Users in role: {} for server: {}'.format(role.name, guild.name), content=str(all_users), name='role.txt')
-                    em.add_field(name='All users', value='{} users. [List of users posted to Gist.]({})'.format(len(role.members), url), inline=False)
+                    url = await hastebin(str(all_users))
+                    em.add_field(name='All users', value='{} users. [List of users posted to Hastebin.]({})'.format(len(role.members), url), inline=False)
                 elif len(role.members) >= 1:
                     em.add_field(name='All users', value=all_users, inline=False)
                 else:

@@ -12,7 +12,6 @@ import glob
 import git
 import io
 from PIL import Image
-from PythonGists import PythonGists
 from discord.ext import commands
 from cogs.utils.checks import *
 from bs4 import BeautifulSoup
@@ -21,7 +20,7 @@ from urllib.request import Request, urlopen
 import math
 from math import sqrt
 from cogs.utils.dataIO import dataIO
-from cogs.utils.config import write_config_value
+from cogs.utils.config import write_config_value, hastebin
 
 '''Module for fun/meme commands commands'''
 
@@ -295,26 +294,22 @@ class Utility:
             await ctx.send(self.bot.bot_prefix + 'Could not encrypt spoiler.')
 
     @commands.group(pass_context=True)
-    async def gist(self, ctx):
-        """Posts to gist"""
+    async def hastebin(self, ctx):
+        """Posts to Hastebin"""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
-            url = PythonGists.Gist(
-                description='Created in channel: {} in server: {}'.format(ctx.message.channel, ctx.message.guild),
-                content=ctx.message.content[4 + pre:].strip(), name='Output')
-            await ctx.send(self.bot.bot_prefix + 'Gist output: ' + url)
+            url = await hastebin(ctx.message.content[4 + pre:].strip())
+            await ctx.send(self.bot.bot_prefix + 'Hastebin output: ' + url)
             await ctx.message.delete()
 
-    @gist.command(pass_context=True)
+    @hastebin.command(pass_context=True)
     async def file(self, ctx, *, msg):
-        """Create gist of file"""
+        """Create Hastebin of file"""
         try:
             with open(msg) as fp:
                 output = fp.read()
-                url = PythonGists.Gist(
-                    description='Created in channel: {} in server: {}'.format(ctx.message.channel, ctx.message.guild),
-                    content=output, name=msg.replace('/', '.'))
-                await ctx.send(self.bot.bot_prefix + 'Gist output: ' + url)
+                url = await hastebin(output)
+                await ctx.send(self.bot.bot_prefix + 'Hastebin output: ' + url)
         except:
             await ctx.send(self.bot.bot_prefix + 'File not found.')
         finally:
@@ -573,8 +568,8 @@ class Utility:
                             msg += "{}#{}\n".format(user.name, user.discriminator)
         msg = "\n".join(set(msg.split("\n")))  # remove dupes
         if len(msg) > 1500:
-            gist = PythonGists.Gist(description="Number of people playing {}".format(game), content=msg, name="Output")
-            await ctx.send("{}Large output posted to Gist: {}".format(self.bot.bot_prefix, gist))
+            hastebin = await hastebin(msg)
+            await ctx.send("{}Large output posted to Hastebin: {}".format(self.bot.bot_prefix, hastebin))
         elif len(msg) == 0:
             await ctx.send(self.bot.bot_prefix + "Nobody is playing that game!")
         else:

@@ -2,9 +2,8 @@ import math
 import re
 import json
 from github import Github
-from PythonGists import PythonGists
 from discord.ext import commands
-from cogs.utils.checks import cmd_prefix_len, load_config
+from cogs.utils.checks import cmd_prefix_len, load_config, hastebin
 
 '''Module for custom commands adding, removing, and viewing.'''
 
@@ -45,7 +44,7 @@ class Customcmds:
         msgs = []
         part = ''
         pre = cmd_prefix_len()
-        if ctx.message.content[10 + pre:].strip() and ctx.message.content[10 + pre:].strip() != 'gist':
+        if ctx.message.content[10 + pre:].strip() and ctx.message.content[10 + pre:].strip() != 'haste':
             one_cmd = True
             list_cmd = ctx.message.content.strip().split(' ')[1]
             for cmd in sortedcmds:
@@ -74,9 +73,9 @@ class Customcmds:
                 else:
                     part += check
         msgs.append(part)
-        if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
+        if 'haste' in ctx.message.content or 'Haste' in ctx.message.content:
             msgs = '\n'.join(msgs)
-            url = PythonGists.Gist(description='Custom Commands', content=str(msgs), name='commands.txt')
+            url = await hastebin(str(msgs))
             await ctx.send(self.bot.bot_prefix + 'List of Custom Commands: %s' % url)
         else:
             if len(msgs) == 1:
@@ -95,7 +94,7 @@ class Customcmds:
 
         [p]customcmds - normal output with all the customcmds and subcommands (response names).
         [p]customcmds <command_name> - output only this specific command.
-        [p]customcmds gist - normal output but posted to Gist to avoid cluttering the chat."""
+        [p]customcmds haste - normal output but posted to Hastebin to avoid cluttering the chat."""
         if ctx.invoked_subcommand is None:
             await self.customcommands(ctx)
         await ctx.message.delete()
@@ -104,15 +103,15 @@ class Customcmds:
     async def long(self, ctx):
         """Lists detailed version of customcmds. Ex: [p]customcmds long"""
         with open('settings/commands.json') as commands:
-            if 'gist' in ctx.message.content or 'Gist' in ctx.message.content:
+            if 'haste' in ctx.message.content or 'Haste' in ctx.message.content:
                 cmds = commands.read()
-                link = PythonGists.Gist(description='Full commands.json', content=cmds, name='commands.json')
+                link = await hastebin(cmds)
                 return await ctx.send(self.bot.bot_prefix + 'Full commands.json: %s' % link)
             else:
                 cmds = json.load(commands)
         msg = ''
         sortedcmds = sorted(cmds.keys(), key=lambda x: x.lower())
-        if ctx.message.content[17:] and ctx.message.content[17:] != 'gist':
+        if ctx.message.content[17:] and ctx.message.content[17:] != 'haste':
             one_cmd = True
             list_cmd = ctx.message.content.strip().split('long')[1].strip()
             for cmd in sortedcmds:
