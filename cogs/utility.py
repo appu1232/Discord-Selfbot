@@ -293,16 +293,16 @@ class Utility:
         except:
             await ctx.send(self.bot.bot_prefix + 'Could not encrypt spoiler.')
 
-    @commands.group(pass_context=True)
-    async def hastebin(self, ctx):
+    @commands.group(pass_context=True, aliases=['hastebin'], invoke_without_command=True)
+    async def hb(self, ctx, *, msg):
         """Posts to Hastebin"""
         if ctx.invoked_subcommand is None:
             pre = cmd_prefix_len()
-            url = await hastebin(ctx.message.content[4 + pre:].strip())
+            url = await hastebin(msg)
             await ctx.send(self.bot.bot_prefix + 'Hastebin output: ' + url)
             await ctx.message.delete()
 
-    @hastebin.command(pass_context=True)
+    @hb.command(pass_context=True)
     async def file(self, ctx, *, msg):
         """Create Hastebin of file"""
         try:
@@ -544,17 +544,6 @@ class Utility:
             embed.set_image(url=json["img"])
             embed.set_footer(text="{}".format(json["alt"]))
             await ctx.send("", embed=embed)
-
-    @commands.command(pass_context=True)
-    async def hastebin(self, ctx, *, data):
-        """Post to Hastebin."""
-        await ctx.message.delete()
-        async with self.session.post("https://hastebin.com/documents", data=data) as resp:
-            post = await resp.text()
-        try:
-            await ctx.send(self.bot.bot_prefix + "Succesfully posted to Hastebin:\nhttps://hastebin.com/{}.txt".format(json.loads(post)["key"]))
-        except json.JSONDecodeError:
-            await ctx.send(self.bot.bot_prefix + "Failed to post to Hastebin. The API may be down right now.")
 
     @commands.command(pass_context=True)
     async def whoisplaying(self, ctx, *, game):
