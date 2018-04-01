@@ -122,7 +122,11 @@ else:
         with open('settings/config.json', encoding='utf-8', mode="r") as f:
             data = load(f)  # checks if the settings file is valid json file
     except IOError:
-        wizard()
+        if not heroku:
+            wizard()
+        else:
+            print("Error: Heroku environment detected, but config.json not found!\nThis is usually due to user error during Heroku setup.")
+            exit(-1)
 
 shutdown = False
 if os.name == 'nt':
