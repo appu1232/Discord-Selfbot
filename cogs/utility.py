@@ -717,7 +717,7 @@ class Utility:
         if time:
             options.remove(time)
         if len(options) <= 1:
-            raise commands.errors.MissingRequiredArgument
+            return await ctx.send(self.bot.bot_prefix + "You must have 2 options or more.")
         if len(options) >= 11:
             return await ctx.send(self.bot.bot_prefix + "You must have 9 options or less.")
         if time:
