@@ -551,14 +551,14 @@ class Utility:
         msg = ""
         for guild in self.bot.guilds:
             for user in guild.members:
-                if user.game is not None:
-                    if user.game.name is not None:
-                        if user.game.name.lower() == game.lower():
+                if user.activity is not None:
+                    if user.activity.name is not None:
+                        if user.activity.name.lower() == game.lower():
                             msg += "{}#{}\n".format(user.name, user.discriminator)
         msg = "\n".join(set(msg.split("\n")))  # remove dupes
         if len(msg) > 1500:
-            hastebin = await hastebin(msg)
-            await ctx.send("{}Large output posted to Hastebin: {}".format(self.bot.bot_prefix, hastebin))
+            hastebin_output = await hastebin(msg)
+            await ctx.send("{}Large output posted to Hastebin: {}".format(self.bot.bot_prefix, hastebin_output))
         elif len(msg) == 0:
             await ctx.send(self.bot.bot_prefix + "Nobody is playing that game!")
         else:
