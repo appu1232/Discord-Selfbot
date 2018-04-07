@@ -156,7 +156,7 @@ class Google:
             return await ctx.send(result['items'][0]['link'])
 
         try:
-            entries, root = await get_google_entries(query)
+            entries, root = await get_google_entries(query, session=self.bot.session)
             card_node = root.find(".//div[@id='topstuff']")
             card = self.parse_google_card(card_node)
         except RuntimeError as e:
