@@ -835,7 +835,7 @@ async def game_and_avatar(bot):
                         g, url = bot.game.split('=')
                         await bot.change_presence(activity=discord.Streaming(name=g, url=url), status=set_status(bot), afk=True)
                     elif bot.game and not bot.is_stream:
-                        await bot.change_presence(activity=discord.Game(name=bot.game),
+                        await bot.change_presence(activity=discord.Activity(name=bot.game, type=bot.status_type),
                                                   status=set_status(bot), afk=True)
                     else:
                         await bot.change_presence(status=set_status(bot), afk=True)
