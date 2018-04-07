@@ -52,6 +52,13 @@ _silent = args.silent
 _force_admin = False
 
 try:
+    import uvloop
+except ImportError:
+    pass
+else:
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+
+try:
     token = os.environ['TOKEN']
     heroku = True
 except KeyError:
