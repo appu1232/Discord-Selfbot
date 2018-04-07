@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import collections
-import aiohttp
 import inspect
 import traceback
 from contextlib import redirect_stdout
@@ -16,7 +15,6 @@ class EmbedShell():
         self.bot = bot
         self.repl_sessions = {}
         self.repl_embeds = {}
-        self.aioclient = aiohttp.ClientSession()
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
