@@ -213,6 +213,8 @@ async def on_ready():
     print(uid_message)
     print(separator)
 
+    bot.session = aiohttp.ClientSession(loop=bot.loop, headers={"User-Agent": "AppuSelfBot"})
+
     bot.uptime = datetime.datetime.now()
     bot.icount = bot.message_count = bot.mention_count = bot.keyword_log = 0
     bot.self_log = bot.all_log = {}

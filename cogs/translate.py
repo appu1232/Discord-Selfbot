@@ -11,7 +11,6 @@ from discord.ext import commands
 class Translate:
     def __init__(self, bot):
         self.bot = bot
-        self.session = aiohttp.ClientSession(loop=self.bot.loop, headers={"User-Agent": "AppuSelfBot"})
 
     # Thanks to lyric for helping me in making this possible. You are not so bad afterall :] ~~jk~~
     @commands.command(pass_context=True)
@@ -27,7 +26,7 @@ class Translate:
             embed.add_field(name="Original", value=msg, inline=False)
             embed.add_field(name="ROT13", value=codecs.encode(msg, "rot_13"), inline=False)
             return await ctx.send("", embed=embed)
-        async with self.session.get("https://gist.githubusercontent.com/astronautlevel2/93a19379bd52b351dbc6eef269efa0bc/raw/18d55123bc85e2ef8f54e09007489ceff9b3ba51/langs.json") as resp:
+        async with self.bot.session.get("https://gist.githubusercontent.com/astronautlevel2/93a19379bd52b351dbc6eef269efa0bc/raw/18d55123bc85e2ef8f54e09007489ceff9b3ba51/langs.json") as resp:
             lang_codes = await resp.json(content_type='text/plain')
         real_language = False
         to_language = to_language.lower()
@@ -37,7 +36,7 @@ class Translate:
                 to_language = entry
                 real_language = True
         if real_language:
-            async with self.session.get("https://translate.google.com/m",
+            async with self.bot.session.get("https://translate.google.com/m",
                                         params={"hl": to_language, "sl": "auto", "q": msg}) as resp:
                 translate = await resp.text()
             result = str(translate).split('class="t0">')[1].split("</div>")[0]

@@ -95,7 +95,7 @@ class Misc:
                     latest = g.execute(
                         ["git", "log", "--pretty=oneline", "--abbrev-commit", "--stat", "--pretty", "-%s" % version,
                          "origin/%s" % branch])
-                    haste_latest = await hastebin(latest)
+                    haste_latest = await hastebin(latest, self.bot.session)
                     if version == '1':
                         status = 'Behind by 1 release%s [Latest update.](%s)' % (branch_note, haste_latest)
                     else:

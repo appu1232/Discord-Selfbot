@@ -997,7 +997,7 @@ class KeywordLogger:
                         msg = msg.rstrip(', ') + '```'
 
                     if len(msg) > 1950 or 'haste' in ctx.message.content:
-                        haste_log = await hastebin(msg)
+                        haste_log = await hastebin(msg, self.bot.session)
                         await menu.edit(content=self.bot.bot_prefix + haste_log)
                     else:
                         await menu.edit(content=self.bot.bot_prefix + msg)

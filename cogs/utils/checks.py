@@ -4,7 +4,6 @@ import git
 import discord
 import os
 import aiohttp
-import requests
 from cogs.utils.dataIO import dataIO
 from urllib.parse import quote as uriquote
 
@@ -160,7 +159,9 @@ def find_channel(channel_list, text):
     return found_channel
 
 
-async def get_google_entries(query):
+async def get_google_entries(query, session=None):
+    if not session:
+        session = aiohttp.ClientSession()
     url = 'https://www.google.com/search?q={}'.format(uriquote(query))
     params = {
         'safe': 'off',
@@ -171,37 +172,36 @@ async def get_google_entries(query):
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64)'
     }
     entries = []
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, params=params, headers=headers) as resp:
-            if resp.status != 200:
-                config = load_optional_config()
-                async with session.get("https://www.googleapis.com/customsearch/v1?q=" + quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
-                    result = json.loads(await resp.text())
-                return None, result['items'][0]['link']
+    async with session.get(url, params=params, headers=headers) as resp:
+        if resp.status != 200:
+            config = load_optional_config()
+            async with session.get("https://www.googleapis.com/customsearch/v1?q=" + quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+                result = json.loads(await resp.text())
+            return None, result['items'][0]['link']
 
-            try:
-                root = etree.fromstring(await resp.text(), etree.HTMLParser())
-                search_nodes = root.findall(".//div[@class='g']")
-                for node in search_nodes:
-                    url_node = node.find('.//h3/a')
-                    if url_node is None:
-                        continue
-                    url = url_node.attrib['href']
-                    if not url.startswith('/url?'):
-                        continue
-                    url = parse_qs(url[5:])['q'][0]
-                    entries.append(url)
-            except NameError:
-                root = BeautifulSoup(await resp.text(), 'html.parser')
-                for result in root.find_all("div", class_='g'):
-                    url_node = result.find('h3')
-                    if url_node:
-                        for link in url_node.find_all('a', href=True):
-                            url = link['href']
-                            if not url.startswith('/url?'):
-                                continue
-                            url = parse_qs(url[5:])['q'][0]
-                            entries.append(url)
+        try:
+            root = etree.fromstring(await resp.text(), etree.HTMLParser())
+            search_nodes = root.findall(".//div[@class='g']")
+            for node in search_nodes:
+                url_node = node.find('.//h3/a')
+                if url_node is None:
+                    continue
+                url = url_node.attrib['href']
+                if not url.startswith('/url?'):
+                    continue
+                url = parse_qs(url[5:])['q'][0]
+                entries.append(url)
+        except NameError:
+            root = BeautifulSoup(await resp.text(), 'html.parser')
+            for result in root.find_all("div", class_='g'):
+                url_node = result.find('h3')
+                if url_node:
+                    for link in url_node.find_all('a', href=True):
+                        url = link['href']
+                        if not url.startswith('/url?'):
+                            continue
+                        url = parse_qs(url[5:])['q'][0]
+                        entries.append(url)
     return entries, root
 
 
@@ -215,11 +215,13 @@ def parse_prefix(bot, text):
         prefix = prefix[0]
     return text.replace("[c]", prefix).replace("[b]", bot.bot_prefix)
 
-async def hastebin(content):
-    async with aiohttp.ClientSession() as session:
-        async with session.post("https://hastebin.com/documents", data=content.encode('utf-8')) as resp:
-            if resp.status == 200:
-                result = await resp.json()
-                return "https://hastebin.com/" + result["key"]
-            else:
-                return "Error with creating Hastebin. Status: %s" % resp.status
+
+async def hastebin(content, session=None):
+    if not session:
+        session = aiohttp.ClientSession()
+    async with session.post("https://hastebin.com/documents", data=content.encode('utf-8')) as resp:
+        if resp.status == 200:
+            result = await resp.json()
+            return "https://hastebin.com/" + result["key"]
+        else:
+            return "Error with creating Hastebin. Status: %s" % resp.status
