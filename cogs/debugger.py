@@ -388,6 +388,5 @@ class Debugger:
 
 def setup(bot):
     debug_cog = Debugger(bot)
-    loop = asyncio.get_event_loop()
-    loop.create_task(debug_cog.redirection_clock())
+    bot.loop.create_task(debug_cog.redirection_clock())
     bot.add_cog(debug_cog)
