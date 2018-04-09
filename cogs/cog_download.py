@@ -171,7 +171,8 @@ class CogDownloading:
         """Update all of your installed ASCII cogs."""
         await ctx.message.delete()
         msg = await ctx.send(self.bot.bot_prefix + "Updating...")
-        site = requests.get('https://github.com/LyricLy/ASCII/tree/master/cogs').text
+        async with self.bot.session.get('https://github.com/LyricLy/ASCII/tree/master/cogs') as resp:
+            site = await resp.text()
         soup = BeautifulSoup(site, "lxml")
         data = soup.find_all(attrs={"class": "js-navigation-open"})
         list = []
@@ -183,9 +184,11 @@ class CogDownloading:
         for entry in list[2:]:
             entry = entry.rsplit(".")[0]
             if os.path.isfile("custom_cogs/" + entry + ".py"):
-                cog = requests.get("http://appucogs.tk/cogs/{}.json".format(entry)).json()
-                link = cog["link"]
-                download = requests.get(link).text
+                async with self.bot.session.get("http://appucogs.tk/cogs/{}.json".format(entry)) as resp:
+                    cog = await resp.json()
+                    link = cog["link"]
+                async with self.bot.session.get(link) as resp:
+                    download = await resp.text()
                 filename = link.rsplit("/", 1)[1]
                 with open("custom_cogs/" + filename, "wb+") as f:
                     f.write(download.encode("utf-8"))
