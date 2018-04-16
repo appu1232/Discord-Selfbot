@@ -128,9 +128,11 @@ class EmbedShell():
                 haste_url = await hastebin(str(history_string), self.bot.session)
 
                 self.repl_embeds[shell].add_field(
-                    name="`>>> {}`".format(cleaned),
-                    value=return_msg,
-                    inline=False)
+                            name="`>>> {}`".format(cleaned),
+                            value="[`Exited. History for latest session: "
+                                  "View on Hastebin.`]({})".format(
+                                haste_url),
+                            inline=False)
 
                 try:
                     await self.repl_sessions[session].edit(embed=self.repl_embeds[shell])
