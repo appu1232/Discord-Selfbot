@@ -264,6 +264,5 @@ class Todo:
 
 def setup(bot):
     t = Todo(bot)
-    loop = asyncio.get_event_loop()
-    loop.create_task(t.todo_timer())
+    bot.loop.create_task(t.todo_timer())
     bot.add_cog(t)

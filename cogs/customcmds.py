@@ -75,7 +75,7 @@ class Customcmds:
         msgs.append(part)
         if 'haste' in ctx.message.content or 'Haste' in ctx.message.content:
             msgs = '\n'.join(msgs)
-            url = await hastebin(str(msgs))
+            url = await hastebin(str(msgs), self.bot.session)
             await ctx.send(self.bot.bot_prefix + 'List of Custom Commands: %s' % url)
         else:
             if len(msgs) == 1:
@@ -105,7 +105,7 @@ class Customcmds:
         with open('settings/commands.json') as commands:
             if 'haste' in ctx.message.content or 'Haste' in ctx.message.content:
                 cmds = commands.read()
-                link = await hastebin(cmds)
+                link = await hastebin(cmds, self.bot.session)
                 return await ctx.send(self.bot.bot_prefix + 'Full commands.json: %s' % link)
             else:
                 cmds = json.load(commands)

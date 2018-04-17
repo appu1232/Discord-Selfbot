@@ -151,13 +151,12 @@ class Google:
         """Google web search. Ex: [p]g what is discordapp?"""
         if not embed_perms(ctx.message):
             config = load_optional_config()
-            async with aiohttp.ClientSession() as session:
-                async with session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=1" + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
-                    result = json.loads(await resp.text())
+            async with self.bot.session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=1" + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine']) as resp:
+                result = json.loads(await resp.text())
             return await ctx.send(result['items'][0]['link'])
 
         try:
-            entries, root = await get_google_entries(query)
+            entries, root = await get_google_entries(query, session=self.bot.session)
             card_node = root.find(".//div[@id='topstuff']")
             card = self.parse_google_card(card_node)
         except RuntimeError as e:
@@ -188,30 +187,29 @@ class Google:
             query = query[1:]
         else:
             item = 0
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + "&searchType=image") as resp:
-                if resp.status != 200:
-                    if not config['google_api_key'] or not config['custom_search_engine']:
-                        return await ctx.send(self.bot.bot_prefix + "You don't seem to have image searching configured properly. Refer to the wiki for details.")
-                    return await ctx.send(self.bot.bot_prefix + 'Google failed to respond.')
+        async with self.bot.session.get("https://www.googleapis.com/customsearch/v1?q=" + urllib.parse.quote_plus(query) + "&start=" + '1' + "&key=" + config['google_api_key'] + "&cx=" + config['custom_search_engine'] + "&searchType=image") as resp:
+            if resp.status != 200:
+                if not config['google_api_key'] or not config['custom_search_engine']:
+                    return await ctx.send(self.bot.bot_prefix + "You don't seem to have image searching configured properly. Refer to the wiki for details.")
+                return await ctx.send(self.bot.bot_prefix + 'Google failed to respond.')
+            else:
+                result = json.loads(await resp.text())
+                try:
+                    result['items']
+                except:
+                    return await ctx.send(self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
+                if len(result['items']) < 1:
+                    return await ctx.send(self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
+                em = discord.Embed()
+                if embed_perms(ctx.message):
+                    em.set_image(url=result['items'][item]['link'])
+                    show_search = get_config_value("optional_config", "show_search_term")
+                    if show_search == "True":
+                        em.set_footer(text="Search term: \"" + query + "\"")
+                    await ctx.send(content=None, embed=em)
                 else:
-                    result = json.loads(await resp.text())
-                    try:
-                        result['items']
-                    except:
-                        return await ctx.send(self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
-                    if len(result['items']) < 1:
-                        return await ctx.send(self.bot.bot_prefix + 'There were no results to your search. Use more common search query or make sure you have image search enabled for your custom search engine.')
-                    em = discord.Embed()
-                    if embed_perms(ctx.message):
-                        em.set_image(url=result['items'][item]['link'])
-                        show_search = get_config_value("optional_config", "show_search_term")
-                        if show_search == "True":
-                            em.set_footer(text="Search term: \"" + query + "\"")
-                        await ctx.send(content=None, embed=em)
-                    else:
-                        await ctx.send(result['items'][item]['link'])
-                        await ctx.send("Search term: \"" + query + "\"")
+                    await ctx.send(result['items'][item]['link'])
+                    await ctx.send("Search term: \"" + query + "\"")
 
 
 def setup(bot):

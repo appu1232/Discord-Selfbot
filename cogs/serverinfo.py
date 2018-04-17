@@ -84,7 +84,7 @@ class Server:
                 em.add_field(name='Highest role', value=server.role_hierarchy[0])
                 em.add_field(name='Number of roles', value=str(role_count))
                 em.add_field(name='Number of emotes', value=str(emoji_count))
-                url = await hastebin(str(all))
+                url = await hastebin(str(all), self.bot.session)
                 hastebin_of_users = '[List of all {} users in this server]({})'.format(server.member_count, url)
                 em.add_field(name='Users', value=hastebin_of_users)
                 em.add_field(name='Created At', value=server.created_at.__format__('%A, %d. %B %Y @ %H:%M:%S'))
@@ -155,7 +155,7 @@ class Server:
                 em.add_field(name='Mentionable', value=role.mentionable)
                 if len(role.members) > 10:
                     all_users = all_users.replace(', ', '\n')
-                    url = await hastebin(str(all_users))
+                    url = await hastebin(str(all_users), self.bot.session)
                     em.add_field(name='All users', value='{} users. [List of users posted to Hastebin.]({})'.format(len(role.members), url), inline=False)
                 elif len(role.members) >= 1:
                     em.add_field(name='All users', value=all_users, inline=False)

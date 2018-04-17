@@ -92,7 +92,7 @@ class Debugger:
 
             if result:
                 if len(str(result)) > 1950:
-                    url = await hastebin(str(result).strip("`"))
+                    url = await hastebin(str(result).strip("`"), self.bot.session)
                     result = self.bot.bot_prefix + 'Large output. Posted to Hastebin: %s' % url
                     await ctx.send(result)
 
@@ -149,7 +149,7 @@ class Debugger:
                 if option and 'path' in option.lower():
                     paths = "\n".join(sys.path).strip()
                     if len(paths) > 300:
-                        url = await hastebin(str(paths))
+                        url = await hastebin(str(paths), self.bot.session)
                         em.add_field(name='Import Paths', value=paths[:300]+' [(Show more)](%s)'%url)
                     else:
                         em.add_field(name='Import Paths', value=paths)
@@ -388,6 +388,5 @@ class Debugger:
 
 def setup(bot):
     debug_cog = Debugger(bot)
-    loop = asyncio.get_event_loop()
-    loop.create_task(debug_cog.redirection_clock())
+    bot.loop.create_task(debug_cog.redirection_clock())
     bot.add_cog(debug_cog)
