@@ -2,7 +2,7 @@
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FFDATZ8NFFV6Y) [<img src="https://img.shields.io/github/license/appu1232/Discord-Selfbot.svg?style=flat-square">](https://github.com/appu1232/Discord-Selfbot/blob/master/LICENSE) [![Build Status](https://travis-ci.org/appu1232/Discord-Selfbot.svg?branch=master)](https://travis-ci.org/appu1232/Discord-Selfbot)
 
-Do not join the dedicated server for this bot, as it does not exist! Ask questions, give suggestions, get help, but only in GitHub Issues now. Don't be shy, the Discord devs already bit us!
+Do not join the dedicated server for this bot, as it does not exist! You also acknowledge that you run this bot at your own risk.
 
 ### [**Install guide + list of all commands.**](https://github.com/appu1232/Discord-Selfbot/wiki)
 
