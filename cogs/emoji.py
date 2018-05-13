@@ -144,7 +144,7 @@ class Emoji:
             return await ctx.send(self.bot.bot_prefix + "The URL you have provided leads to a 404.")
         try:
             emoji = await ctx.guild.create_custom_emoji(name=name, image=response.content)
-        except InvalidArgument:
+        except discord.InvalidArgument:
             return await ctx.send(self.bot.bot_prefix + "Invalid image type. Only PNG, JPEG and GIF are supported.")
         await ctx.send(self.bot.bot_prefix + "Successfully added the emoji {0.name} <{1}:{0.name}:{0.id}>!".format(emoji, "a" if emoji.animated else ""))
 
