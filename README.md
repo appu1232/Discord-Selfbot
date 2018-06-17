@@ -2,7 +2,7 @@
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FFDATZ8NFFV6Y) [<img src="https://img.shields.io/github/license/appu1232/Discord-Selfbot.svg?style=flat-square">](https://github.com/appu1232/Discord-Selfbot/blob/master/LICENSE) [![Build Status](https://travis-ci.org/appu1232/Discord-Selfbot.svg?branch=master)](https://travis-ci.org/appu1232/Discord-Selfbot)
 
-**If you are running into [this issue](https://i.imgur.com/h9naJ77.png) with starting the bot, please uninstall python 3.5.2 and install [3.5.3 or higher](https://www.python.org/downloads/release/python-365/). Make sure you check "add to PATH" on install.**
+### IMPORTANT: **If you are running into [this issue](https://i.imgur.com/h9naJ77.png) with starting the bot, please uninstall Python version 3.5.2 and install [3.5.3 or higher](https://www.python.org/downloads/release/python-365/). Make sure you check "add to PATH" on install.**
 
 ### [**Install guide + list of all commands.**](https://github.com/appu1232/Discord-Selfbot/wiki)
 
