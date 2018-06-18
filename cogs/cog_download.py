@@ -52,7 +52,7 @@ class CogDownloading:
                 return False
 
         await ctx.message.delete()
-        response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
+        response = requests.get("https://lyricly.github.io/ASCII/cogs/{}.json".format(cog))
         if response.status_code == 404:
             await ctx.send(self.bot.bot_prefix + "That cog couldn't be found on the network. Check your spelling and try again.")
         else:
@@ -101,7 +101,7 @@ class CogDownloading:
                 return False
 
         await ctx.message.delete()
-        response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
+        response = requests.get("https://lyricly.github.io/ASCII/cogs/{}.json".format(cog))
         if response.status_code == 404:
             await ctx.send(self.bot.bot_prefix + "That's not a real cog!")
         else:
@@ -134,7 +134,7 @@ class CogDownloading:
         installed = []
         uninstalled = []
         for entry in list[2:]:
-            response = requests.get("http://appucogs.tk/cogs/{}".format(entry))
+            response = requests.get("https://lyricly.github.io/ASCII/cogs/{}".format(entry))
             found_cog = response.json()
             filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
             if os.path.isfile("custom_cogs/" + filename + ".py"):
@@ -157,7 +157,7 @@ class CogDownloading:
     async def view(self, ctx, cog):
         """View information about a cog on ASCII."""
         await ctx.message.delete()
-        response = requests.get("http://appucogs.tk/cogs/{}.json".format(cog))
+        response = requests.get("https://lyricly.github.io/ASCII/cogs/{}.json".format(cog))
         if response.status_code == 404:
             await ctx.send(self.bot.bot_prefix + "That cog couldn't be found on the network. Check your spelling and try again.")
         else:
@@ -184,7 +184,7 @@ class CogDownloading:
         for entry in list[2:]:
             entry = entry.rsplit(".")[0]
             if os.path.isfile("custom_cogs/" + entry + ".py"):
-                async with self.bot.session.get("http://appucogs.tk/cogs/{}.json".format(entry)) as resp:
+                async with self.bot.session.get("https://lyricly.github.io/ASCII/cogs/{}.json".format(entry)) as resp:
                     cog = await resp.json()
                     link = cog["link"]
                 async with self.bot.session.get(link) as resp:
