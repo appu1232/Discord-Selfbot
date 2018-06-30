@@ -20,7 +20,6 @@ import gc
 import datetime
 import time
 import traceback
-import prettytable
 import re
 import io
 import asyncio

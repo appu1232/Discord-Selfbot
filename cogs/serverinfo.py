@@ -1,4 +1,3 @@
-import prettytable
 import discord
 import os
 import re
