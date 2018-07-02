@@ -595,7 +595,7 @@ async def on_message(message):
                                 continue
                         if word.startswith('[isolated]'):
                             word = word[10:].lower()
-                            found = re.findall('\\b' + word + '\\b', message.content.lower())
+                            found = re.findall(r'\b' + re.escape(word) + r'\b', message.content.lower())
                             if found:
                                 word_found = True
                                 break
