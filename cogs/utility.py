@@ -482,7 +482,7 @@ class Utility:
         search = parse.quote(msg)
         async with self.bot.session.get("http://api.urbandictionary.com/v0/define", params={"term": search}) as resp:
             result = await resp.json()
-        if result["result_type"] == "no_results":
+        if not result["list"]:
             await ctx.send(self.bot.bot_prefix + "{} couldn't be found on Urban Dictionary.".format(msg))
         else:
             try:
