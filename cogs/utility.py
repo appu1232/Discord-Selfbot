@@ -196,48 +196,21 @@ class Utility:
             return await ctx.send(self.bot.bot_prefix + 'There is no message to destroy.')
         timer = int(amount.strip())
         # Animated countdown because screw rate limit amirite
-        destroy = ctx.message
-        await ctx.message.edit(content=self.bot.bot_prefix + 'The above message will self-destruct in:')
-        msg = await ctx.send('``%s  |``' % timer)
-        for i in range(0, timer, 4):
-            if timer - 1 - i == 0:
-                await destroy.delete()
-                await msg.edit(content='``0``')
-                break
-            else:
-                await msg.edit(content='``%s  |``' % int(timer - 1 - i))
-                await asyncio.sleep(1)
-            if timer - 1 - i != 0:
-                if timer - 2 - i == 0:
-                    await destroy.delete()
-                    await msg.edit(content='``0``')
-                    break
-                else:
-                    await msg.edit(content='``%s  /``' % int(timer - 2 - i))
-                    await asyncio.sleep(1)
-            if timer - 2 - i != 0:
-                if timer - 3 - i == 0:
-                    await destroy.delete()
-                    await msg.edit(content='``0``')
-                    break
-                else:
-                    await msg.edit(content='``%s  -``' % int(timer - 3 - i))
-                    await asyncio.sleep(1)
-            if timer - 3 - i != 0:
-                if timer - 4 - i == 0:
-                    await destroy.delete()
-                    await msg.edit(content='``0``')
-                    break
-                else:
-                    await msg.edit(content='``%s  \ ``' % int(timer - 4 - i))
-                    await asyncio.sleep(1)
-        await msg.edit(content=':bomb:')
+        timer -= 1
+        await ctx.message.edit(content=':bomb:'+"-"*int(timer)+":fire:")
+        await asyncio.sleep(1)
+        msg = ctx.message
+        while timer:
+            timer -= 1
+            await msg.edit(content=':bomb:'+"-"*int(timer)+":fire:")
+            await asyncio.sleep(1)
+        await msg.edit(content=':boom:')
         await asyncio.sleep(.5)
-        await msg.edit(content=':fire:')
         await killmsg.edit(content=':fire:')
         await asyncio.sleep(.5)
-        await msg.delete()
         await killmsg.delete()
+        await msg.delete()
+
 
     @commands.command(aliases=['d'], pass_context=True)
     async def delete(self, ctx, txt=None, channel=None):
@@ -826,6 +799,16 @@ class Utility:
             for guild in self.bot.guilds:
                 await guild.ack()
             await ctx.send(self.bot.bot_prefix + "Marked {} guilds as read.".format(len(self.bot.guilds)))
+    @commands.command()
+    async def createrole(self, ctx, colour: str, role_name:str=None):
+        try:
+            await ctx.guild.create_role(name=(colour if not role_name else role_name), colour=discord.Colour(eval('0x0{}'.format(colour.lstrip("#").lstrip("0x")))))
+            await ctx.send('Created new role!')
+        except TypeError:
+            await ctx.send('Not in DM!')
+        except discord.Forbidden:
+            await ctx.send('Can\'t do that!')
+
             
 
 def setup(bot):
