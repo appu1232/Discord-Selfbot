@@ -90,7 +90,8 @@ def wizard():
     
     print("The first step is to set up your token.")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
-    print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
+    print("Go into the Network tab, and wait for some requests to show up. If there are none, create one by typing in any channel.")
+    print("Find a request that has an authorization key in the request headers. Grab the value given for authorization. This is your token. (https://i.imgur.com/RH4Xj3z.png)")
     print("Paste the contents of that entry below.")
     print("-------------------------------------------------------------")
     config["token"] = input("| ").strip().strip('"')
