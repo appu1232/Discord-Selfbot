@@ -114,6 +114,9 @@ def wizard():
     print("\nEnter something that will precede every response from the bot. This is to distinguish bot responses from normal user chatter i.e. Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
+
+    print("\nWould you like information about your usage of the bot to be recorded for statistic purposes? All information is anonymous and cannot be tracked back to you. (Y/N)")
+    config["track"] = "y" in input("| ").strip().lower()
     
     input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nYou may restart this wizard at any time by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
   
