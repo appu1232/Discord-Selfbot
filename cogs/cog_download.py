@@ -134,7 +134,7 @@ class CogDownloading:
         installed = []
         uninstalled = []
         for entry in list[2:]:
-            response = requests.get("https://lyricly.github.io/ASCII/cogs/{}.json".format(entry))
+            response = requests.get("https://lyricly.github.io/ASCII/cogs/{}".format(entry))
             found_cog = response.json()
             filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
             if os.path.isfile("custom_cogs/" + filename + ".py"):
