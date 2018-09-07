@@ -79,7 +79,6 @@ if _test_run:
     print("Quitting: test run")
     exit(0)
 
-
 def wizard():
     # setup wizard
     if _silent:
@@ -90,8 +89,7 @@ def wizard():
     
     print("The first step is to set up your token.")
     print("Go into your Discord window and press Ctrl+Shift+I (Ctrl+Opt+I can also work on macOS)")
-    print("Go into the Network tab, and wait for some requests to show up. If there are none, create one by typing in any channel.")
-    print("Find a request that has an authorization key in the request headers. Grab the value given for authorization. This is your token. (https://i.imgur.com/RH4Xj3z.png)")
+    print("Then, go into the Applications tab (you may have to click the arrow at the top right to get there), expand the 'Local Storage' dropdown, select discordapp, and then grab the token value at the bottom. Here's how it looks: https://imgur.com/h3g9uf6")
     print("Paste the contents of that entry below.")
     print("-------------------------------------------------------------")
     config["token"] = input("| ").strip().strip('"')
@@ -115,6 +113,10 @@ def wizard():
     print("\nEnter something that will precede every response from the bot. This is to distinguish bot responses from normal user chatter i.e. Entering :robot: will make the bot respond with the robot emoji at the front of every message it sends.")
     print("-------------------------------------------------------------")
     config["bot_identifier"] = input("| ").strip()
+
+    print("\nWould you like information about your usage of the bot to be recorded for statistic purposes? All information is anonymous and cannot be tracked back to you. (Y/N)")
+    print("-------------------------------------------------------------")
+    config["track"] = "y" in input("| ").strip().lower()
     
     input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nYou may restart this wizard at any time by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
   
@@ -205,13 +207,18 @@ if bot.bot_prefix != '':
 
 bot.cmd_prefix = get_config_value('config', 'cmd_prefix')
 bot.customcmd_prefix = get_config_value('config', 'customcmd_prefix')
-
+bot.track = get_config_value('config', 'track', None)
+if bot.track is None:
+    print("Would you like information about your usage of the bot to be recorded for statistic purposes? All information is anonymous and cannot be tracked back to you. (Y/N)")
+    print("-------------------------------------------------------------")
+    bot.track = "y" in input("| ").strip().lower()
+    write_config_value("config", "track", bot.track)
 
 # Startup
 @bot.event
 async def on_ready():
-    message = 'Logged in as %s.' % bot.user
-    uid_message = 'User id: %s.' % bot.user.id
+    message = 'logged in as %s' % bot.user
+    uid_message = 'user id %s' % bot.user.id
     separator = '-' * max(len(message), len(uid_message))
     print(separator)
     try:
@@ -219,6 +226,9 @@ async def on_ready():
     except: # some bot usernames with special chars fail on shitty platforms
         print(message.encode(errors='replace').decode())
     print(uid_message)
+    if bot.track:
+        print("anonymous tracking of bot usage is enabled")
+    print("'unclosed client session' and 'unclosed connector' are not errors")
     print(separator)
 
     bot.session = aiohttp.ClientSession(loop=bot.loop, headers={"User-Agent": "AppuSelfBot"})
