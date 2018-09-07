@@ -115,10 +115,7 @@ def wizard():
     config["bot_identifier"] = input("| ").strip()
 
     print("\nWould you like information about your usage of the bot to be recorded for statistic purposes? All information is anonymous and cannot be tracked back to you. (Y/N)")
-<<<<<<< HEAD
     print("-------------------------------------------------------------")
-=======
->>>>>>> d947d99ab9435981a8e4d479059fb9629353ac02
     config["track"] = "y" in input("| ").strip().lower()
     
     input("\nThis concludes the setup wizard. For further setup options (ex. setting up google image search), refer to the Discord Selfbot wiki.\n\nYour settings:\nInvoke commands with: {cmd}  Ex: {cmd}ping\nInvoke custom commands with: {custom}  Ex: {custom}get good\nYou may restart this wizard at any time by deleting config.json in the settings folder.\n\nPress Enter to start the bot....\n".format(cmd=config["cmd_prefix"], custom=config["customcmd_prefix"]))
