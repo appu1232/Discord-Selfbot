@@ -18,7 +18,7 @@ class Track:
         """Toggle light tracking of data."""
         self.bot.track = not self.bot.track
         write_config_value("config", "track", self.bot.track)
-        await ctx.send(self.bot.bot_prefix + f"Successfully set tracking to {self.bot.track}.")
+        await ctx.send(self.bot.bot_prefix + "Successfully set tracking to {}.".format(self.bot.track))
 
     @commands.command()
     async def complain(self, ctx, *, message):
