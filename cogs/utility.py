@@ -464,8 +464,6 @@ class Utility:
                                       url=top_result["permalink"])
                 if top_result["example"]:
                     embed.add_field(name="Example:", value=top_result["example"])
-                if result["tags"]:
-                    embed.add_field(name="Tags:", value=" ".join(result["tags"]))
                 embed.set_author(name=top_result["author"],
                                  icon_url="https://lh5.ggpht.com/oJ67p2f1o35dzQQ9fVMdGRtA7jKQdxUFSQ7vYstyqTp-Xh-H5BAN4T5_abmev3kz55GH=w300")
                 number = str(int(number) + 1)
