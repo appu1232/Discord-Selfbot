@@ -40,6 +40,16 @@ class Track:
                     pass
             await asyncio.sleep(60)
 
+    async def on_error(self, error):
+        if self.bot.track:
+            async with self.bot.session.post(self.url + "/error", data={"error_type": type(error).__name__, "error_message": str(error)}) as resp:
+                pass
+
+    async def on_command_error(self, ctx, error):
+        if self.bot.track:
+            async with self.bot.session.post(self.url + "/commanderror", data={"error_type": type(error).__name__, "error_message": str(error), "command_name": ctx.command.name}) as resp:
+                pass
+
 
 def setup(bot):
     track = Track(bot)
