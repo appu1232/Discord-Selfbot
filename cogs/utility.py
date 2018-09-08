@@ -292,23 +292,6 @@ class Utility:
         """Convert to unicode emoji if possible. Ex: [p]uni :eyes:"""
         await ctx.send("`" + msg.replace("`", "") + "`")
 
-    @commands.command(pass_context=True)
-    async def poll(self, ctx, *, msg):
-        """Create a strawpoll. Ex: [p]poll Favorite color = Blue | Red | Green"""
-        loop = asyncio.get_event_loop()
-        try:
-            options = [op.strip() for op in msg.split('|')]
-            if '=' in options[0]:
-                title, options[0] = options[0].split('=')
-                options[0] = options[0].strip()
-            else:
-                title = 'Poll by %s' % ctx.message.author.name
-        except:
-            return await ctx.send(self.bot.bot_prefix + 'Invalid Syntax. Example use: ``>poll Favorite color = Blue | Red | Green | Purple``')
-
-        poll = await loop.run_in_executor(None, strawpy.create_poll, title.strip(), options)
-        await ctx.send(self.bot.bot_prefix + poll.url)
-
     @commands.command(pass_context=True, aliases=['source'])
     async def sauce(self, ctx, *, txt: str = None):
         """Find source of image. Ex: [p]sauce http://i.imgur.com/NIq2U67.png"""
@@ -323,7 +306,7 @@ class Utility:
             "Referer": "http://thewebsite.com",
             "Connection": "keep-alive"
         }
-        loop = asyncio.get_event_loop()
+        loop = bot.loop
         try:
             req = Request(sauce_nao + txt, headers=request_headers)
             webpage = await loop.run_in_executor(None, urlopen, req)
@@ -670,14 +653,14 @@ class Utility:
 
     @commands.has_permissions(add_reactions=True)
     @commands.command(pass_context=True)
-    async def rpoll(self, ctx, *, msg):
-        """Create a poll using reactions. >help rpoll for more information.
-        [p]rpoll <question> | <answer> | <answer> - Create a poll. You may use as many answers as you want, placing a pipe | symbol in between them.
+    async def poll(self, ctx, *, msg):
+        """Create a poll using reactions. [p]help poll for more information.
+        [p]poll <question> | <answer> | <answer> - Create a poll. You may use as many answers as you want, placing a pipe | symbol in between them.
         Example:
-        [p]rpoll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
+        [p]poll What is your favorite anime? | Steins;Gate | Naruto | Attack on Titan | Shrek
         You can also use the "time" flag to set the amount of time in seconds the poll will last for.
         Example:
-        [p]rpoll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
+        [p]poll What time is it? | HAMMER TIME! | SHOWTIME! | time=10
         """
         await ctx.message.delete()
         options = msg.split(" | ")
