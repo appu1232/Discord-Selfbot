@@ -1,5 +1,5 @@
 {
-  "token": "",
+  "token": process.env.TOKEN,
   "cmd_prefix": ">",
   "customcmd_prefix": ".",
   "bot_identifier": ":robot:",
