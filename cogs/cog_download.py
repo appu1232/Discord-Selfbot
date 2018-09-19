@@ -128,12 +128,12 @@ class CogDownloading:
         site = requests.get('https://github.com/LyricLy/ASCII/tree/master/cogs').text
         soup = BeautifulSoup(site, "lxml")
         data = soup.find_all(attrs={"class": "js-navigation-open"})
-        list = []
+        list_ = []
         for a in data:
-            list.append(a.get("title"))
+            list_.append(a.get("title"))
         installed = []
         uninstalled = []
-        for entry in list[2:]:
+        for entry in list_[3:]:
             response = requests.get("https://lyricly.github.io/ASCII/cogs/{}".format(entry))
             found_cog = response.json()
             filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
