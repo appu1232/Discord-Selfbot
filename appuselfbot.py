@@ -24,8 +24,11 @@ from cogs.utils.allmsgs import custom, quickcmds
 from cogs.utils.webhooks import Webhook
 from cogs.utils.checks import *
 from cogs.utils.config import *
+from collections import namedtuple
 from discord.ext import commands
 
+
+FakeGuild = namedtuple("FakeGuild", ["name", "id", "icon_url", "members", "me", "channels", "emojis"])
 
 def parse_cmd_arguments():  # allows for arguments
     parser = argparse.ArgumentParser(description="Discord-Selfbot")
@@ -727,6 +730,7 @@ async def on_message(message):
         except (AttributeError, discord.errors.HTTPException):
             pass
 
+    
     await bot.process_commands(message)
 
 

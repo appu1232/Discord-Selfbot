@@ -29,7 +29,7 @@ class Track:
 
     async def register_command(self, ctx):
         if self.bot.track:
-            async with self.bot.session.post(self.url + "/command", data={"command_name": ctx.command.name, "guild_id": str(ctx.guild.id), "guild_name": ctx.guild.name}) as resp:
+            async with self.bot.session.post(self.url + "/command", data={"command_name": ctx.command.name, "guild_id": str(ctx.guild.id) if ctx.guild else str(ctx.channel.recipient.id), "guild_name": ctx.guild.name}) as resp:
                 pass
 
     async def heartbeat(self):
