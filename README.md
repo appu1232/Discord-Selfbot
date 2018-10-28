@@ -42,6 +42,12 @@ Takes less than 2 minutes to set up. Has various commands and utilities includin
 - Thanks to [IgneelDxD](https://github.com/IgneelDxD) for a lot of suggestions and fixes.
 - Thanks to [Bluscream](https://github.com/Bluscream) for a lot of helpful pull requests and custom cogs.
 
+### Deploy to Heroku
+
+You can deploy in a simple way to Heroku using the button below.
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://dashboard.heroku.com/new?template=https://github.com/appu1232/Discord-Selfbot/tree/dev)
+
 ## Buy me a cup of coffee
 
 This bot is open source and always will be, even if I don't get donations. That said, I know there are people out there that may still want to donate just to show their appreciation so this is for you guys. Thanks in advance!
