@@ -2,6 +2,7 @@
   "name": "Discord-Selfbot",
   "description": "A Selfbot made to run under a user, to enable more functionalities.",
   "website": "https://github.com/appu1232/Discord-Selfbot/",
+  "logo": "https://imgur.com/RN7U1GN.jpg",
   "env": {
     "TOKEN": {
       "description": "Your unique User TOKEN. You can find it by following the steps here: https://github.com/TheRacingLion/Discord-SelfBot/wiki/Discord-Token-Tutorial"
