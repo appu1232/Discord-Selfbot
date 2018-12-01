@@ -1,4 +1,4 @@
-﻿import discord
+import discord
 import os
 import requests
 import pip
@@ -29,7 +29,7 @@ class CogDownloading:
     @commands.group(pass_context=True)
     async def cog(self, ctx):
         """Manage custom cogs from ASCII. [p]help cog for more information.
-        
+
         The Appu Selfbot Cog Importable Index (aka ASCII) is a server that hosts custom cogs for the bot.
         [p]cog install <cog> - Install a custom cog from ASCII.
         [p]cog uninstall <cog> - Uninstall one of your ASCII cogs.
@@ -133,7 +133,9 @@ class CogDownloading:
             list_.append(a.get("title"))
         installed = []
         uninstalled = []
-        for entry in list_[3:]:
+        for entry in list_:
+            if entry is None or not entry.endswith(".json"):
+                continue
             response = requests.get("https://lyricly.github.io/ASCII/cogs/{}".format(entry))
             found_cog = response.json()
             filename = found_cog["link"].rsplit("/",1)[1].rsplit(".",1)[0]
