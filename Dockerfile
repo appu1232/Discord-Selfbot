@@ -1,4 +1,4 @@
-FROM python:latest
+FROM python:3.6.5
 ADD . /Discord-Selfbot
 
 RUN cd Discord-Selfbot && \
